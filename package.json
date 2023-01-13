@@ -1,0 +1,21 @@
+{
+    "name": "wolkenwelten-ts",
+    "version": "0.0.1",
+    "description": "An experiment with voxels",
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview",
+        "typecheck": "tsc -p ./tsconfig.json --noEmit"
+    },
+    "author": "Benjamin Vincent Schulenburg <ben@wolkenwelten.net>",
+    "license": "AGPL3",
+    "devDependencies": {
+        "typescript": "^4.9.4",
+        "vite": "^4.0.0"
+    },
+    "dependencies": {
+        "gl-matrix": "^3.4.3"
+    }
+}
