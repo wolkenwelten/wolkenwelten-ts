@@ -1,3 +1,4 @@
+import { mat4 } from "gl-matrix";
 import { TextMesh, meshInit } from "./meshes";
 
 export interface GameConfig {
@@ -43,7 +44,29 @@ export class Game {
 
     initGLContext() {
         this.gl.clearColor(0.5,0.3,0.1,1.0);
+        //this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, true);
         //this.gl.enable(this.gl.DEPTH_TEST);
+    }
+
+    draw3DScene() {
+
+    }
+
+    draw2DScene() {
+        const projectionMatrix = mat4.create();
+        mat4.ortho(projectionMatrix, 0, this.width, this.height, 0, -1, 1);
+
+        const modelViewMatrix = mat4.create();
+        mat4.translate(
+          modelViewMatrix, // destination matrix
+          modelViewMatrix, // matrix to translate
+          [0.0, 0.0, 0.0]
+        );
+
+        const modelViewProjectionMatrix = mat4.create();
+        mat4.multiply(modelViewProjectionMatrix, projectionMatrix, modelViewMatrix);
+
+        this.testMesh.draw(modelViewProjectionMatrix);
     }
 
     drawFrame () {
@@ -53,7 +76,8 @@ export class Game {
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
         this.gl.viewport(0,0, this.canvas.width, this.canvas.height);
 
-        this.testMesh.draw();
+        this.draw3DScene();
+        this.draw2DScene();
 
         this.gl.flush();
     }
