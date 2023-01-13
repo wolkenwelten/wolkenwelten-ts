@@ -25,28 +25,28 @@ export class TextMesh {
     constructor () {
         this.vertices = [
             0, 1024,
+            0, 0,
+            0xFFFFFFFF,
+
+            1024, 0,
+            1, 1,
+            0xFFFFFFFF,
+
+            0, 0,
             0, 1,
             0xFFFFFFFF,
 
-            0, 0,
-            0, 0,
-            0xFFFFFFFF,
 
             1024, 0,
-            1, 0,
-            0xFFFFFFFF,
-
-
-            1024, 0,
-            1, 0,
-            0xFFFFFFFF,
-
-            1024, 1024,
             1, 1,
             0xFFFFFFFF,
 
             0, 1024,
-            0.0, 1.0,
+            0.0, 0.0,
+            0xFFFFFFFF,
+
+            1024, 1024,
+            1, 0,
             0xFFFFFFFF,
         ];
 

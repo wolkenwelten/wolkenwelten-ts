@@ -1,5 +1,6 @@
 import { mat4 } from "gl-matrix";
-import { TextMesh, meshInit } from "./meshes";
+import { TextMesh, meshInit, Mesh } from "./meshes";
+import { createPear } from "./meshes/mesh";
 
 export interface GameConfig {
     parent: HTMLElement,
@@ -15,6 +16,7 @@ export class Game {
     drawFrameClosure: () => void;
 
     testMesh: TextMesh;
+    pearMesh: Mesh;
 
     constructor (config: GameConfig) {
         this.rootElement = config.parent;
@@ -27,6 +29,7 @@ export class Game {
         this.initGLContext();
         meshInit(gl);
         this.testMesh = new TextMesh();
+        this.pearMesh = createPear();
 
         this.drawFrameClosure = this.drawFrame.bind(this);
         window.requestAnimationFrame(this.drawFrameClosure);
@@ -44,12 +47,28 @@ export class Game {
 
     initGLContext() {
         this.gl.clearColor(0.5,0.3,0.1,1.0);
-        //this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, true);
-        //this.gl.enable(this.gl.DEPTH_TEST);
+        this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, true);
+        this.gl.enable(this.gl.DEPTH_TEST);
+        this.gl.enable(this.gl.CULL_FACE);
     }
 
     draw3DScene() {
+        const projectionMatrix = mat4.create();
+        mat4.perspective(projectionMatrix, 80.0 * Math.PI / 180, this.width / this.height, 0.1, 512.0);
 
+        const modelViewMatrix = mat4.create();
+        mat4.translate(
+          modelViewMatrix, // destination matrix
+          modelViewMatrix, // matrix to translate
+          [0.0, -0.5, -2.0]
+        );
+
+        mat4.rotateY(modelViewMatrix, modelViewMatrix, this.frames / 140);
+
+        const modelViewProjectionMatrix = mat4.create();
+        mat4.multiply(modelViewProjectionMatrix, projectionMatrix, modelViewMatrix);
+
+        this.pearMesh.draw(modelViewProjectionMatrix);
     }
 
     draw2DScene() {
@@ -60,7 +79,7 @@ export class Game {
         mat4.translate(
           modelViewMatrix, // destination matrix
           modelViewMatrix, // matrix to translate
-          [0.0, 0.0, 0.0]
+          [-512.0, Math.sin(this.frames / 240) * 256, 0.0]
         );
 
         const modelViewProjectionMatrix = mat4.create();
