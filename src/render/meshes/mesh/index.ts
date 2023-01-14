@@ -2,9 +2,10 @@ import "../../../types";
 import { Shader } from "../../shader";
 import { Texture } from "../../texture";
 import { WavefrontFile, WavefrontObject } from "./objLoader";
+export { WavefrontFile, WavefrontObject } from "./objLoader";
 
 let gl: WebGL2RenderingContext;
-let shader: Shader;
+export let shader: Shader;
 
 import shaderVertSource from "./mesh.vert?raw";
 import shaderFragSource from "./mesh.frag?raw";

@@ -3,12 +3,14 @@ import { mat4 } from "gl-matrix";
 import { TextMesh, meshInit, Mesh } from "./meshes";
 import { createPear } from "./meshes/mesh";
 import { Camera } from "./camera";
+import { Sky } from "./singletons/sky";
 
 export class RenderManager {
     game: Game;
     canvas: HTMLCanvasElement;
     gl: WebGL2RenderingContext;
     fov = 60;
+    renderDistance = 192.0;
     width = 640;
     height = 480;
     frames = 0;
@@ -17,6 +19,7 @@ export class RenderManager {
     testMesh: TextMesh;
     pearMesh: Mesh;
     cam = new Camera();
+    sky: Sky;
 
     constructor (game: Game) {
         this.game = game;
@@ -29,6 +32,8 @@ export class RenderManager {
         this.gl = gl;
         this.initGLContext();
         meshInit(gl);
+
+        this.sky = new Sky(this);
         this.testMesh = new TextMesh();
         this.pearMesh = createPear();
 
@@ -50,19 +55,30 @@ export class RenderManager {
         const projectionMatrix = mat4.create();
         mat4.perspective(projectionMatrix, this.fov * Math.PI / 180, this.width / this.height, 0.1, 512.0);
 
-        const modelViewMatrix = mat4.create();
+        const viewMatrix = mat4.create();
+        mat4.rotateY(
+            viewMatrix,
+            viewMatrix,
+            -this.cam.yaw
+        );
+        mat4.rotateX(
+            viewMatrix,
+            viewMatrix,
+            -this.cam.pitch
+        );
         mat4.translate(
-          modelViewMatrix,
-          modelViewMatrix,
+          viewMatrix,
+          viewMatrix,
           [-this.cam.x, -this.cam.y, -this.cam.z]
         );
 
-        mat4.rotateY(modelViewMatrix, modelViewMatrix, this.frames / 140);
+        this.sky.draw(projectionMatrix, viewMatrix)
 
-        const modelViewProjectionMatrix = mat4.create();
-        mat4.multiply(modelViewProjectionMatrix, projectionMatrix, modelViewMatrix);
-
-        this.pearMesh.draw(modelViewProjectionMatrix);
+        const modelMatrix = mat4.create();
+        mat4.rotateY(modelMatrix, modelMatrix, this.frames / 140);
+        mat4.multiply(modelMatrix, viewMatrix, modelMatrix);
+        mat4.multiply(modelMatrix, projectionMatrix, modelMatrix);
+        this.pearMesh.draw(modelMatrix);
     }
 
     draw3DHud() {

@@ -3,8 +3,8 @@ import { Shader } from "../../shader";
 import { Texture } from "../../texture";
 
 let gl: WebGL2RenderingContext;
-let shader: Shader;
-let texture: Texture;
+export let shader: Shader;
+export let texture: Texture;
 
 import shaderVertSource from "./text.vert?raw";
 import shaderFragSource from "./text.frag?raw";

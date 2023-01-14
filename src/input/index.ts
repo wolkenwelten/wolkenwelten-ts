@@ -17,17 +17,31 @@ export class InputManager {
     }
 
     tick() {
+        const speed = this.keystates.has("ShiftLeft") ? 0.03 : 0.015;
         if(this.keystates.has("KeyW")){
-            this.game.render.cam.z -= 0.02;
+            this.game.render.cam.z -= speed;
         }
         if(this.keystates.has("KeyS")){
-            this.game.render.cam.z += 0.02;
+            this.game.render.cam.z += speed;
         }
         if(this.keystates.has("KeyA")){
-            this.game.render.cam.x -= 0.02;
+            this.game.render.cam.x -= speed;
         }
         if(this.keystates.has("KeyD")){
-            this.game.render.cam.x += 0.02;
+            this.game.render.cam.x += speed;
+        }
+
+        if(this.keystates.has("ArrowLeft")){
+            this.game.render.cam.yaw += speed;
+        }
+        if(this.keystates.has("ArrowRight")){
+            this.game.render.cam.yaw -= speed;
+        }
+        if(this.keystates.has("ArrowUp")){
+            this.game.render.cam.pitch -= speed;
+        }
+        if(this.keystates.has("ArrowDown")){
+            this.game.render.cam.pitch += speed;
         }
     }
 }
