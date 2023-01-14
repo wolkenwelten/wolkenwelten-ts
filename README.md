@@ -1,12 +1,12 @@
-# Space Harvest Wreckage - Extreme 2001
+# WolkenWelten - TS
 
-You play an astronaut on a spaceship that got shot to pieces by meteorites.
+An experiment in turning the Rust/TS relationship around, writing most of the game in TS and using Rust/WASM for the hot loops.
 
-Take care of your fuel and oxygen supply and harvest as many floppy disks as possible, but watch out for the dangerous plasma traps! :3
+## Status
+Super early, nothing works whatsoever, so probably not that interesting (yet).
 
-## Ludum Dare
-
-This game was created for LD52 which had the topic "Harvest", you can find the (somewhat buggy) submitted Version on the LD52 branch and play it [here](https://ld52.wolkenwelten.net/).
+## Preview
+You can see the current state of the main branch here: https://wolkenwelten.github.io/wolkenwelten-ts/
 
 ## Requirements
 - Node JS (v18+) with NPM
