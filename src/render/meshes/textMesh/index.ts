@@ -1,4 +1,4 @@
-import "../../types";
+import "../../../types";
 import { Shader } from "../../shader";
 import { Texture } from "../../texture";
 
@@ -8,7 +8,7 @@ let texture: Texture;
 
 import shaderVertSource from "./text.vert?raw";
 import shaderFragSource from "./text.frag?raw";
-import guiTextureUrl from "../../../assets/gfx/gui.png";
+import guiTextureUrl from "../../../../assets/gfx/gui.png";
 import { mat4, ReadonlyMat4 } from "gl-matrix";
 
 export const textMeshInit = (glc: WebGL2RenderingContext) => {

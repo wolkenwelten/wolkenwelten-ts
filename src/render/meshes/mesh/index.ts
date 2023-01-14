@@ -1,4 +1,4 @@
-import "../../types";
+import "../../../types";
 import { Shader } from "../../shader";
 import { Texture } from "../../texture";
 import { WavefrontFile, WavefrontObject } from "./objLoader";
@@ -15,8 +15,8 @@ export const meshMeshInit = (glc: WebGL2RenderingContext) => {
     shader = new Shader(gl, 'textMesh', shaderVertSource, shaderFragSource, ["cur_tex", "mat_mvp"]);
 };
 
-import pearObjSource from "../../../assets/gfx/pear.obj?raw";
-import pearPng from "../../../assets/gfx/pear.png";
+import pearObjSource from "../../../../assets/gfx/pear.obj?raw";
+import pearPng from "../../../../assets/gfx/pear.png";
 
 export const createPear = ():Mesh => {
     const tex = new Texture(gl, 'pear', pearPng);
