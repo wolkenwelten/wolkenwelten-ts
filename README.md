@@ -12,10 +12,9 @@ You can see the current state of the main branch here: https://wolkenwelten.gith
 - Node JS (v18+) with NPM
 
 ## Setup
-You need to run the build step once before starting a dev server so that the extruded tileset will be built:
+Nothing special, just install everything with npm
 ```bash
 npm install
-npm build
 ```
 
 ## Development (VS Code)
