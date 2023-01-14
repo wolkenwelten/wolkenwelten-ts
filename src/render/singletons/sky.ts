@@ -14,6 +14,7 @@ export class Sky {
     constructor (render: RenderManager) {
         this.render = render;
         const texture = new Texture(render.gl, 'sky', skyTextureUrl);
+        texture.linear();
         this.mesh = new Mesh(texture);
         const obj = new WavefrontFile(skyDomeFile);
         this.mesh.addObj(obj.objects[0]);
@@ -27,7 +28,6 @@ export class Sky {
 
         const model = mat4.create();
         mat4.scale(model, model, vec3.fromValues(192,192,192));
-        const mvp = mat4.create();
         mat4.multiply(model, view, model);
         mat4.multiply(model, projection, model);
         this.mesh.draw(model);

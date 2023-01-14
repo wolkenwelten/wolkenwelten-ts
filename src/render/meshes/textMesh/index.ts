@@ -9,7 +9,7 @@ export let texture: Texture;
 import shaderVertSource from "./text.vert?raw";
 import shaderFragSource from "./text.frag?raw";
 import guiTextureUrl from "../../../../assets/gfx/gui.png";
-import { mat4, ReadonlyMat4 } from "gl-matrix";
+import { mat4 } from "gl-matrix";
 
 export const textMeshInit = (glc: WebGL2RenderingContext) => {
     gl = glc;
@@ -18,9 +18,10 @@ export const textMeshInit = (glc: WebGL2RenderingContext) => {
 };
 
 export class TextMesh {
-    vertices: number[];
-    elementCount: number;
+    vertices: number[] = [];
+    elementCount = 0;
     vao: WebGLVertexArrayObject;
+    vbo: WebGLBuffer;
 
     constructor () {
         this.vertices = [
@@ -76,6 +77,11 @@ export class TextMesh {
 
         this.elementCount = this.vertices.length / 5;
         this.vao = vao;
+        this.vbo = vertex_buffer;
+    }
+
+    empty () {
+        this.vertices = [];
     }
 
     draw (mat_mvp: mat4) {

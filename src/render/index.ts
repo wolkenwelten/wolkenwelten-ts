@@ -56,15 +56,15 @@ export class RenderManager {
         mat4.perspective(projectionMatrix, this.fov * Math.PI / 180, this.width / this.height, 0.1, 512.0);
 
         const viewMatrix = mat4.create();
-        mat4.rotateY(
-            viewMatrix,
-            viewMatrix,
-            -this.cam.yaw
-        );
         mat4.rotateX(
             viewMatrix,
             viewMatrix,
             -this.cam.pitch
+        );
+        mat4.rotateY(
+            viewMatrix,
+            viewMatrix,
+            -this.cam.yaw
         );
         mat4.translate(
           viewMatrix,
@@ -82,14 +82,15 @@ export class RenderManager {
     }
 
     draw3DHud() {
+        this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
         const projectionMatrix = mat4.create();
         mat4.perspective(projectionMatrix, this.fov * Math.PI / 180, this.width / this.height, 0.1, 512.0);
 
         const modelViewMatrix = mat4.create();
         mat4.translate(
-          modelViewMatrix,
-          modelViewMatrix,
-          [1.75, -0.7, -2.0]
+            modelViewMatrix,
+            modelViewMatrix,
+            [1.75, -0.7, -2.0]
         );
 
         const modelViewProjectionMatrix = mat4.create();
@@ -104,15 +105,15 @@ export class RenderManager {
 
         const modelViewMatrix = mat4.create();
         mat4.translate(
-          modelViewMatrix,
-          modelViewMatrix,
-          [-512.0, Math.sin(this.frames / 120) * 256, 0.0]
+            modelViewMatrix,
+            modelViewMatrix,
+            [-512.0, Math.sin(this.frames / 120) * 256, 0.0]
         );
 
         const modelViewProjectionMatrix = mat4.create();
         mat4.multiply(modelViewProjectionMatrix, projectionMatrix, modelViewMatrix);
 
-        this.testMesh.draw(modelViewProjectionMatrix);
+        //this.testMesh.draw(modelViewProjectionMatrix);
     }
 
     resize () {
