@@ -1,0 +1,30 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Launch Chrome debug",
+            "url": "http://localhost:5173",
+            "webRoot": "${workspaceFolder}/dist",
+        },
+        {
+            "type": "node-terminal",
+            "request": "launch",
+            "name": "Launch webpack-dev-server",
+            "command": "npm i; npm run build; npm run dev"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Complete development",
+            "configurations": [
+                "Launch webpack-dev-server",
+                "Launch Chrome debug"
+            ]
+        }
+    ]
+}

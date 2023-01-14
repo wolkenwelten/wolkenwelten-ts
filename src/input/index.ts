@@ -18,6 +18,7 @@ export class InputManager {
 
     tick() {
         const speed = this.keystates.has("ShiftLeft") ? 0.03 : 0.015;
+
         if(this.keystates.has("KeyW")){
             this.game.render.cam.z -= speed;
         }

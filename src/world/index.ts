@@ -6,7 +6,13 @@ export class World {
     chunks: Map<number, Chunk> = new Map();
 
     getChunk (x:number, y:number, z:number): Chunk | undefined {
-        return this.chunks.get(coordinateToWorldKey(x,y,z));
+        const chunk = this.chunks.get(coordinateToWorldKey(x,y,z));
+        if(chunk){
+            if((chunk.x !== x) || (chunk.y !== y) || (chunk.z !== z)){
+                throw new Error("coordinateToWorldKey got something wrong: [${x},${y},${z}] !== [${chunk.x},${chunk.y},${chunk.z}]");
+            }
+        }
+        return chunk;
     }
 
     getOrGenChunk (x:number, y:number, z:number):Chunk {

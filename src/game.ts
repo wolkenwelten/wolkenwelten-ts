@@ -12,8 +12,6 @@ export class Game {
     input: InputManager;
     render: RenderManager;
     world: World;
-
-
     ticks = 0;
 
     constructor (config: GameConfig) {
