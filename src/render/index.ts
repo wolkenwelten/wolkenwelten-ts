@@ -1,9 +1,11 @@
 import { Game } from "../game";
 import { mat4 } from "gl-matrix";
-import { TextMesh, meshInit, Mesh } from "./meshes";
+import { TextMesh, meshInit, Mesh, BlockMesh } from "./meshes";
 import { createPear } from "./meshes/mesh";
 import { Camera } from "./camera";
 import { Sky } from "./singletons/sky";
+import { chunkIntoMesh } from "./meshes/blockMesh";
+import { Chunk } from "../world/chunk";
 
 export class RenderManager {
     game: Game;
@@ -15,6 +17,9 @@ export class RenderManager {
     height = 480;
     frames = 0;
     drawFrameClosure: () => void;
+
+    testChunk: Chunk;
+    testBlockMesh: BlockMesh;
 
     testMesh: TextMesh;
     pearMesh: Mesh;
@@ -36,6 +41,9 @@ export class RenderManager {
         this.sky = new Sky(this);
         this.testMesh = new TextMesh();
         this.pearMesh = createPear();
+        this.testChunk = new Chunk(0,0,0);
+        this.testBlockMesh = chunkIntoMesh(this.testChunk);
+
 
         this.drawFrameClosure = this.drawFrame.bind(this);
         window.requestAnimationFrame(this.drawFrameClosure);
@@ -46,7 +54,6 @@ export class RenderManager {
 
     initGLContext() {
         this.gl.clearColor(0.5,0.3,0.1,1.0);
-        this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, true);
         this.gl.enable(this.gl.DEPTH_TEST);
         this.gl.enable(this.gl.CULL_FACE);
     }
@@ -73,12 +80,14 @@ export class RenderManager {
         );
 
         this.sky.draw(projectionMatrix, viewMatrix)
+        this.testBlockMesh.draw(projectionMatrix, viewMatrix);
 
         const modelMatrix = mat4.create();
         mat4.rotateY(modelMatrix, modelMatrix, this.frames / 140);
         mat4.multiply(modelMatrix, viewMatrix, modelMatrix);
         mat4.multiply(modelMatrix, projectionMatrix, modelMatrix);
         this.pearMesh.draw(modelMatrix);
+
     }
 
     draw3DHud() {

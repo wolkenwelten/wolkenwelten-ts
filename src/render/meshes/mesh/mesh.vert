@@ -4,9 +4,9 @@ precision mediump float;
 uniform mat4 mat_mvp;
 //uniform vec4 in_color;
 
-in vec3 pos;
-in vec2 tex;
-in float lightness;
+layout (location=0) in vec3 pos;
+layout (location=1) in vec2 tex;
+layout (location=2) in float lightness;
 
 out vec2 multi_tex_coord;
 out vec4 color;

@@ -1,5 +1,4 @@
 # WolkenWelten - TS
-
 An experiment in turning the Rust/TS relationship around, writing most of the game in TS and using Rust/WASM for the hot loops.
 
 ## Status
@@ -18,7 +17,6 @@ npm install
 ```
 
 ## Development (VS Code)
-
 You can use the `Complete development` a Vite Dev Server and Chrome with the Debugger hooked up.
 
 Putting/removing breakpoints in the `.ts` files with VS Code in `/src` should then work.
@@ -27,7 +25,6 @@ If it does not, please open an issue.
 Edit the TypeScript files, the browser should automatically refresh after saving.
 
 ## Development (Terminal)
-
 You can also start the development server by executing the following command within the repo:
 ```bash
 npm run dev

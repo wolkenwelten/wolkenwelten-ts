@@ -53,7 +53,7 @@ export class Mesh {
             if(f.textureCoordinateIndex === undefined){throw new Error("Missing texture coordinates");}
             const tex = obj.textureCoordinates[f.textureCoordinateIndex];
             this.vertices.push(tex[0]);
-            this.vertices.push(tex[1]);
+            this.vertices.push(1.0 - tex[1]); // Gotta flip them
 
             this.vertices.push(1.0); // Lightness
         }
