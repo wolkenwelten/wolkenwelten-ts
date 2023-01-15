@@ -1,0 +1,28 @@
+#wolkenwelten-parent {
+    display:block;
+    position:relative;
+}
+
+#wolkenwelten-ui-root {
+    display:block;
+    position:absolute;
+    left:0;
+    top:0;
+    width:100%;
+    height:100%;
+    background: transparent;
+    transform:translate(0);
+    z-index:1;
+}
+
+#wolkenwelten-parent > canvas {
+    display:block;
+}
+
+#wolkenwelten-fps-counter {
+    display:block;
+    position:absolute;
+    right:4px;
+    top:4px;
+    font-family: 'Courier New', Courier, monospace;
+}

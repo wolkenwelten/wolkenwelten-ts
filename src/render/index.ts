@@ -16,6 +16,7 @@ export class RenderManager {
     width = 640;
     height = 480;
     frames = 0;
+    fps = 0;
     drawFrameClosure: () => void;
 
     testChunk: Chunk;
@@ -47,9 +48,16 @@ export class RenderManager {
 
         this.drawFrameClosure = this.drawFrame.bind(this);
         window.requestAnimationFrame(this.drawFrameClosure);
+        setInterval(this.updateFPS.bind(this), 1000);
 
         window.addEventListener("resize", this.resize.bind(this));
         this.resize();
+    }
+
+    updateFPS() {
+        const fps = this.fps;
+        this.fps = 0;
+        this.game.ui.updateFPS(fps);
     }
 
     initGLContext() {
@@ -135,6 +143,8 @@ export class RenderManager {
     drawFrame () {
         window.requestAnimationFrame(this.drawFrameClosure);
         this.frames++;
+        this.fps++;
+
         this.gl.clearColor(Math.sin(this.frames / 128),Math.sin(this.frames / 512), Math.sin(this.frames / 2048),1.0);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
         this.gl.viewport(0,0, this.canvas.width, this.canvas.height);
