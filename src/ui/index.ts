@@ -4,6 +4,7 @@ export class UIManager {
     game: Game;
     uiRoot: HTMLElement;
     fpsCounter: HTMLElement;
+    debugInfo: HTMLElement;
 
     constructor(game: Game) {
         this.game = game;
@@ -15,6 +16,11 @@ export class UIManager {
         this.fpsCounter.id = "wolkenwelten-fps-counter";
         this.fpsCounter.innerText = 'FPS: ';
         this.uiRoot.append(this.fpsCounter);
+
+        this.debugInfo = document.createElement("div");
+        this.debugInfo.id = "wolkenwelten-debug-info";
+        this.debugInfo.innerText = '';
+        this.uiRoot.append(this.debugInfo);
     }
 
     updateFPS(fps:number) {

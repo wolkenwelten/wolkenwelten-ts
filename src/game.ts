@@ -1,3 +1,4 @@
+import { Character } from './entities';
 import './game.css';
 
 import { InputManager } from "./input";
@@ -16,6 +17,7 @@ export class Game {
     input: InputManager;
     render: RenderManager;
     ui: UIManager;
+    player: Character;
     world: World;
     ticks = 0;
 
@@ -24,10 +26,12 @@ export class Game {
         this.rootElement = config.parent;
         this.world = new World();
         initDefaultBlocks();
+        this.player = new Character(-3, 30.5, -4, Math.PI * 1.25, -Math.PI / 12);
 
+        this.render = new RenderManager(this);
+        this.render.cam = this.player;
         this.ui = new UIManager(this);
         this.input = new InputManager(this);
-        this.render = new RenderManager(this);
         setInterval(this.tick.bind(this), 1000.0 / 60.0);
     }
 

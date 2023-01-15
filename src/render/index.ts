@@ -2,7 +2,7 @@ import { Game } from "../game";
 import { mat4 } from "gl-matrix";
 import { TextMesh, meshInit, Mesh, BlockMesh } from "./meshes";
 import { createPear } from "./meshes/mesh";
-import { Camera } from "./camera";
+import { Entity } from "../entities";
 import { Sky } from "./singletons/sky";
 import { chunkIntoMesh } from "./meshes/blockMesh";
 import { Chunk } from "../world/chunk";
@@ -24,7 +24,7 @@ export class RenderManager {
 
     testMesh: TextMesh;
     pearMesh: Mesh;
-    cam = new Camera();
+    cam?: Entity;
     sky: Sky;
 
     constructor (game: Game) {
@@ -44,7 +44,6 @@ export class RenderManager {
         this.pearMesh = createPear();
         this.testChunk = new Chunk(0,0,0);
         this.testBlockMesh = chunkIntoMesh(this.testChunk);
-
 
         this.drawFrameClosure = this.drawFrame.bind(this);
         window.requestAnimationFrame(this.drawFrameClosure);
@@ -67,6 +66,8 @@ export class RenderManager {
     }
 
     draw3DScene() {
+        if(!this.cam){return;}
+
         const projectionMatrix = mat4.create();
         mat4.perspective(projectionMatrix, this.fov * Math.PI / 180, this.width / this.height, 0.1, 512.0);
 
