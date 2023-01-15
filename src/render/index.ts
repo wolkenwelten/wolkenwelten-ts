@@ -1,11 +1,9 @@
 import { Game } from '../game';
 import { mat4 } from 'gl-matrix';
 import { TextMesh, meshInit, Mesh, BlockMesh } from './meshes';
-import { createPear } from './meshes/mesh';
 import { Entity } from '../entities';
-import { Sky } from './singletons/sky';
-import { WorldRenderer } from "./singletons/worldRenderer";
-
+import { Sky } from './sky';
+import { WorldRenderer } from './worldRenderer';
 
 export class RenderManager {
     game: Game;
@@ -43,7 +41,7 @@ export class RenderManager {
 
         this.sky = new Sky(this);
         this.testMesh = new TextMesh();
-        this.pearMesh = createPear();
+        this.pearMesh = Mesh.createPear();
         this.world = new WorldRenderer(this);
 
         this.drawFrameClosure = this.drawFrame.bind(this);
@@ -66,7 +64,7 @@ export class RenderManager {
         this.gl.enable(this.gl.CULL_FACE);
     }
 
-    draw3DScene() {
+    drawScene() {
         if (!this.cam) {
             return;
         }
@@ -77,7 +75,7 @@ export class RenderManager {
             (this.fov * Math.PI) / 180,
             this.width / this.height,
             0.1,
-            512.0
+            128.0
         );
 
         const viewMatrix = mat4.create();
@@ -89,7 +87,6 @@ export class RenderManager {
             -this.cam.z,
         ]);
         //this.sky.draw(projectionMatrix, viewMatrix);
-
         this.world.draw(projectionMatrix, viewMatrix, this.cam);
 
         const modelMatrix = mat4.create();
@@ -97,51 +94,17 @@ export class RenderManager {
         mat4.multiply(modelMatrix, viewMatrix, modelMatrix);
         mat4.multiply(modelMatrix, projectionMatrix, modelMatrix);
         this.pearMesh.draw(modelMatrix);
+
+        this.drawHud(projectionMatrix);
     }
 
-    draw3DHud() {
+    drawHud(projectionMatrix: mat4) {
         this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
-        const projectionMatrix = mat4.create();
-        mat4.perspective(
-            projectionMatrix,
-            (this.fov * Math.PI) / 180,
-            this.width / this.height,
-            0.1,
-            512.0
-        );
 
         const modelViewMatrix = mat4.create();
-        mat4.translate(modelViewMatrix, modelViewMatrix, [1.75, -0.7, 2.0]);
-
-        const modelViewProjectionMatrix = mat4.create();
-        mat4.multiply(
-            modelViewProjectionMatrix,
-            projectionMatrix,
-            modelViewMatrix
-        );
-
-        this.pearMesh.draw(modelViewProjectionMatrix);
-    }
-
-    draw2DHud() {
-        const projectionMatrix = mat4.create();
-        mat4.ortho(projectionMatrix, 0, this.width, this.height, 0, -1, 1);
-
-        const modelViewMatrix = mat4.create();
-        mat4.translate(modelViewMatrix, modelViewMatrix, [
-            -512.0,
-            Math.sin(this.frames / 120) * 256,
-            0.0,
-        ]);
-
-        const modelViewProjectionMatrix = mat4.create();
-        mat4.multiply(
-            modelViewProjectionMatrix,
-            projectionMatrix,
-            modelViewMatrix
-        );
-
-        //this.testMesh.draw(modelViewProjectionMatrix);
+        mat4.translate(modelViewMatrix, modelViewMatrix, [1.5, -0.75, -1.75]);
+        mat4.multiply(modelViewMatrix, projectionMatrix, modelViewMatrix);
+        this.pearMesh.draw(modelViewMatrix);
     }
 
     resize() {
@@ -156,14 +119,11 @@ export class RenderManager {
         this.frames++;
         this.fps++;
 
-        //this.gl.clearColor(Math.sin(this.frames / 128),Math.sin(this.frames / 512), Math.sin(this.frames / 2048),1.0);
         this.gl.clearColor(0.09, 0.478, 1, 1);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
         this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
 
-        this.draw3DScene();
-        this.draw3DHud();
-        this.draw2DHud();
+        this.drawScene();
 
         this.gl.flush();
     }

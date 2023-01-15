@@ -3,7 +3,7 @@ precision mediump float;
 precision mediump sampler2DArray;
 
 uniform sampler2DArray cur_tex;
-const float fade_distance = 64.0;
+const float fade_distance = 96.0;
 
 in vec3 view_position;
 in vec3 tex_coord;
