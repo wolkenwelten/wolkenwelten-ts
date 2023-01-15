@@ -8,7 +8,7 @@ Super early, pretty much nothing works whatsoever, so probably not that interest
 - [X] Port the BlockMesh/Mesh/TextMesh shaders
 - [X] Port parts of the meshgen and use it to build very inefficient voxel meshes
 - [X] FPS controls
-- [ ] Render multiple chunks at once
+- [X] Render multiple chunks at once
 - [ ] Omit hidden faces from voxel meshes
 - [ ] Greedy meshing
 - [ ] Compile the Rust meshgen to WASM and measure the performance difference

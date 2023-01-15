@@ -183,7 +183,6 @@ const addFaceRight = (
 
 export const meshgen = (chunk: Chunk): Uint8Array => {
     const light = 0xffff;
-    const tex_index = 0;
     const ret: number[] = [];
 
     for (let x = 0; x < 32; x++) {

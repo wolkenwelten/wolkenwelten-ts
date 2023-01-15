@@ -1,6 +1,7 @@
 import { Chunk } from './chunk';
+export { Chunk } from "./chunk";
 
-const coordinateToWorldKey = (x: number, y: number, z: number) =>
+export const coordinateToWorldKey = (x: number, y: number, z: number) =>
     ((x >> 5) & 0xffff) +
     ((y >> 5) & 0xffff) * 0x10000 +
     ((z >> 5) & 0xffff) * 0x100000000;
@@ -22,15 +23,11 @@ export class World {
 
     getOrGenChunk(x: number, y: number, z: number): Chunk {
         const key = coordinateToWorldKey(x, y, z);
-        let chunk = this.chunks.get(key);
-        if (chunk) {
-            return chunk;
-        }
-        chunk = new Chunk(x, y, z);
-        chunk.setBox(1, 1, 1, 30, 30, 30, 1);
-
-        this.chunks.set(key, chunk);
-        return chunk;
+        const chunk = this.chunks.get(key);
+        if (chunk) { return chunk; }
+        const newChunk = new Chunk(x, y, z);
+        this.chunks.set(key, newChunk);
+        return newChunk;
     }
 
     setChunk(x: number, y: number, z: number, chunk: Chunk) {

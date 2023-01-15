@@ -2,7 +2,7 @@ import { blockMeshInit } from './blockMesh';
 import { meshMeshInit } from './mesh';
 import { textMeshInit } from './textMesh';
 
-export { BlockMesh } from './blockMesh';
+export { BlockMesh, chunkIntoMesh } from './blockMesh';
 export { Mesh } from './mesh';
 export { TextMesh } from './textMesh';
 
