@@ -1,5 +1,4 @@
 import './style.css';
-import './game.css';
 import { Game } from "./game";
 
 const main = () => {
