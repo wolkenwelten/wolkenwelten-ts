@@ -2,14 +2,14 @@
 precision mediump float;
 
 uniform mat4 mat_mvp;
-//uniform mat4 mat_mv;
-//uniform vec3 trans_pos;
+uniform mat4 mat_mv;
+uniform vec3 trans_pos;
 
 layout (location=0) in uvec3 pos;
 layout (location=1) in uint texture_index;
 layout (location=2) in uint side_and_light;
 
-//out vec3 view_position;
+out vec3 view_position;
 out vec3 tex_coord;
 out float light_value;
 
@@ -45,8 +45,7 @@ void main(){
      | a chunk can fit in 5-bits, without this step we would need 16-bit
      | values, per axis...
      */
-    //vec4 world_position = (vec4(pos, 1.0) + vec4(trans_pos,0.0));
-    vec4 world_position = vec4(pos, 1.0);
-    //view_position = (mat_mv * world_position).xyz;
+    vec4 world_position = (vec4(pos, 1.0) + vec4(trans_pos,0.0));
+    view_position = (mat_mv * world_position).xyz;
 	gl_Position = mat_mvp * world_position;
 }

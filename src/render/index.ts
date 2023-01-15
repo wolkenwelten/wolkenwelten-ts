@@ -4,8 +4,8 @@ import { TextMesh, meshInit, Mesh, BlockMesh } from './meshes';
 import { createPear } from './meshes/mesh';
 import { Entity } from '../entities';
 import { Sky } from './singletons/sky';
-import { chunkIntoMesh } from './meshes/blockMesh';
-import { Chunk } from '../world/chunk';
+import { WorldRenderer } from "./singletons/worldRenderer";
+
 
 export class RenderManager {
     game: Game;
@@ -19,13 +19,11 @@ export class RenderManager {
     fps = 0;
     drawFrameClosure: () => void;
 
-    testChunk: Chunk;
-    testBlockMesh: BlockMesh;
-
     testMesh: TextMesh;
     pearMesh: Mesh;
     cam?: Entity;
     sky: Sky;
+    world: WorldRenderer;
 
     constructor(game: Game) {
         this.game = game;
@@ -46,8 +44,7 @@ export class RenderManager {
         this.sky = new Sky(this);
         this.testMesh = new TextMesh();
         this.pearMesh = createPear();
-        this.testChunk = new Chunk(0, 0, 0);
-        this.testBlockMesh = chunkIntoMesh(this.testChunk);
+        this.world = new WorldRenderer(this);
 
         this.drawFrameClosure = this.drawFrame.bind(this);
         window.requestAnimationFrame(this.drawFrameClosure);
@@ -91,9 +88,9 @@ export class RenderManager {
             -this.cam.y,
             -this.cam.z,
         ]);
-
         //this.sky.draw(projectionMatrix, viewMatrix);
-        this.testBlockMesh.draw(projectionMatrix, viewMatrix);
+
+        this.world.draw(projectionMatrix, viewMatrix, this.cam);
 
         const modelMatrix = mat4.create();
         mat4.rotateY(modelMatrix, modelMatrix, this.frames / 140);

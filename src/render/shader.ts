@@ -76,6 +76,16 @@ export class Shader {
         this.gl.uniform1i(loc, value);
     }
 
+    uniform3f(name: string, x:number, y:number, z:number) {
+        const loc = this.uniforms.get(name);
+        if (!loc) {
+            throw new Error(
+                `No uniform location stored for '${name}' for shader '${this.name}'`
+            );
+        }
+        this.gl.uniform3f(loc, x, y, z);
+    }
+
     uniform4fv(name: string, value: mat4) {
         const loc = this.uniforms.get(name);
         if (!loc) {

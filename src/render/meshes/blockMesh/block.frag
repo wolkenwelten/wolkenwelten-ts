@@ -3,9 +3,9 @@ precision mediump float;
 precision mediump sampler2DArray;
 
 uniform sampler2DArray cur_tex;
-const float fade_distance = 192.0;
+const float fade_distance = 64.0;
 
-//in vec3 view_position;
+in vec3 view_position;
 in vec3 tex_coord;
 in float light_value;
 
@@ -21,5 +21,5 @@ void main() {
 	float fade_start = fade_distance - 8.0;
 	vec3 light_color = vec3(light_value, light_value, light_value);
 	vec4 color = vec4(texture(cur_tex, tex_coord).rgb * light_color, 1.0);
-	frag_color = color;// * (1.0 - smoothstep(fade_start, fade_distance, length(view_position)));
+	frag_color = color * (1.0 - smoothstep(fade_start, fade_distance, length(view_position)));
 }
