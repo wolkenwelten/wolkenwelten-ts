@@ -181,6 +181,42 @@ const addFaceRight = (
     vertices.push(xw, y, z, texture_index, side | ((light << 4) & 0xf0));
 };
 
+const needsFront = (chunk:Chunk, x:number, y:number, z:number):boolean => {
+    if(z>=31){ return true; }
+    const b = chunk.getBlock(x,y,z+1);
+    return b === 0;
+}
+
+const needsBack = (chunk:Chunk, x:number, y:number, z:number):boolean => {
+    if(z<=0){ return true; }
+    const b = chunk.getBlock(x,y,z-1);
+    return b === 0;
+}
+
+const needsTop = (chunk:Chunk, x:number, y:number, z:number):boolean => {
+    if(y>=31){ return true; }
+    const b = chunk.getBlock(x,y+1,z);
+    return b === 0;
+}
+
+const needsBottom = (chunk:Chunk, x:number, y:number, z:number):boolean => {
+    if(y<=0){ return true; }
+    const b = chunk.getBlock(x,y-1,z);
+    return b === 0;
+}
+
+const needsRight = (chunk:Chunk, x:number, y:number, z:number):boolean => {
+    if(x>=31){ return true; }
+    const b = chunk.getBlock(x+1,y,z);
+    return b === 0;
+}
+
+const needsLeft = (chunk:Chunk, x:number, y:number, z:number):boolean => {
+    if(x<=0){ return true; }
+    const b = chunk.getBlock(x-1,y,z);
+    return b === 0;
+}
+
 export const meshgen = (chunk: Chunk): Uint8Array => {
     const light = 0xffff;
     const ret: number[] = [];
@@ -194,12 +230,24 @@ export const meshgen = (chunk: Chunk): Uint8Array => {
                     if (!bt) {
                         throw new Error(`Unknown block type: ${b}`);
                     }
-                    addFaceFront(ret, x, y, z, 1, 1, 1, bt.texFront, light);
-                    addFaceBack(ret, x, y, z, 1, 1, 1, bt.texBack, light);
-                    addFaceTop(ret, x, y, z, 1, 1, 1, bt.texTop, light);
-                    addFaceBottom(ret, x, y, z, 1, 1, 1, bt.texBottom, light);
-                    addFaceLeft(ret, x, y, z, 1, 1, 1, bt.texLeft, light);
-                    addFaceRight(ret, x, y, z, 1, 1, 1, bt.texRight, light);
+                    if(needsFront(chunk,x,y,z)){
+                        addFaceFront(ret, x, y, z, 1, 1, 1, bt.texFront, light);
+                    }
+                    if(needsBack(chunk,x,y,z)){
+                        addFaceBack(ret, x, y, z, 1, 1, 1, bt.texBack, light);
+                    }
+                    if(needsTop(chunk,x,y,z)){
+                        addFaceTop(ret, x, y, z, 1, 1, 1, bt.texTop, light);
+                    }
+                    if(needsBottom(chunk,x,y,z)){
+                        addFaceBottom(ret, x, y, z, 1, 1, 1, bt.texBottom, light);
+                    }
+                    if(needsLeft(chunk,x,y,z)){
+                        addFaceLeft(ret, x, y, z, 1, 1, 1, bt.texLeft, light);
+                    }
+                    if(needsRight(chunk,x,y,z)){
+                        addFaceRight(ret, x, y, z, 1, 1, 1, bt.texRight, light);
+                    }
                 }
             }
         }

@@ -34,7 +34,7 @@ export class InputManager {
     }
 
     tick() {
-        const speed = this.keystates.has('ShiftLeft') ? 0.08 : 0.04;
+        const speed = this.keystates.has('ShiftLeft') ? 0.2 : 0.05;
         const movement = { x: 0, y: 0, z: 0 };
 
         if (this.keystates.has('KeyW')) {
@@ -65,18 +65,5 @@ export class InputManager {
         }
 
         this.game.player.fly(movement.x, movement.y, movement.z);
-
-        if (this.keystates.has('ArrowLeft')) {
-            this.game.player.yaw += speed * 0.5;
-        }
-        if (this.keystates.has('ArrowRight')) {
-            this.game.player.yaw -= speed * 0.5;
-        }
-        if (this.keystates.has('ArrowUp')) {
-            this.game.player.pitch -= speed * 0.5;
-        }
-        if (this.keystates.has('ArrowDown')) {
-            this.game.player.pitch += speed * 0.5;
-        }
     }
 }

@@ -5,6 +5,8 @@ import { RenderManager } from "../";
 import { Entity } from "../../entities";
 import { coordinateToWorldKey } from '../../world';
 
+const RENDER_STEPS = 3;
+
 export class WorldRenderer {
     meshes: Map<number, BlockMesh> = new Map();
     renderer: RenderManager;
@@ -31,9 +33,9 @@ export class WorldRenderer {
         const cx = cam.x & ~31;
         const cy = cam.y & ~31;
         const cz = cam.z & ~31;
-        for(let x = -2;x<=2;x++){
-            for(let y = -2;y<=2;y++){
-                for(let z = -2;z<=2;z++){
+        for(let x = -RENDER_STEPS;x<=RENDER_STEPS;x++){
+            for(let y = -RENDER_STEPS;y<=RENDER_STEPS;y++){
+                for(let z = -RENDER_STEPS;z<=RENDER_STEPS;z++){
                     const nx = cx + x * 32;
                     const ny = cy + y * 32;
                     const nz = cz + z * 32;
