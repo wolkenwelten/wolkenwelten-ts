@@ -31,7 +31,7 @@ void main(){
      | texture right now. If we ever add more we have to increase this value.
      | Here we also mirror the textures, so that they are the right side up.
      */
-	tex_coord = vec3(uvec3(taxis[side >> 1], texture_index)) * vec3(0.5, -0.5, 1.0);
+	tex_coord = vec3(uvec3(taxis[side >> 1], texture_index)) * vec3(0.5, 0.5, 1.0);
 
     /* Finally we extract the 4-bit lightness value, turn it into a float
      | in the range of 0.0-1.0 and then multiply it by itself to make the

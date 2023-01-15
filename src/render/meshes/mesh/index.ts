@@ -78,7 +78,7 @@ export class Mesh {
         gl.vertexAttribPointer(2, 1, gl.FLOAT, false, 6 * 4, 5 * 4);
         gl.enableVertexAttribArray(2);
         this.finished = true;
-        this.elementCount = this.vertices.length / 5;
+        this.elementCount = this.vertices.length / 6;
     }
 
     draw (mat_mvp: mat4) {
