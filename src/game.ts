@@ -1,6 +1,7 @@
 import { InputManager } from "./input";
 import { RenderManager } from "./render";
 import { World } from "./world";
+import { initDefaultBlocks } from "./world/blockTypeDefaults";
 
 export interface GameConfig {
     parent: HTMLElement,
@@ -17,9 +18,11 @@ export class Game {
     constructor (config: GameConfig) {
         this.config = config;
         this.rootElement = config.parent;
+        this.world = new World();
+        initDefaultBlocks();
+
         this.input = new InputManager(this);
         this.render = new RenderManager(this);
-        this.world = new World();
         setInterval(this.tick.bind(this), 1000.0 / 60.0);
     }
 
