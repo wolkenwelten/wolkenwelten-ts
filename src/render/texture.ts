@@ -1,4 +1,4 @@
-const isPowerOf2 = (value:number) => (value & (value - 1)) === 0;
+const isPowerOf2 = (value: number) => (value & (value - 1)) === 0;
 
 let lastBoundTexture: WebGLTexture | undefined;
 
@@ -9,7 +9,7 @@ export class Texture {
     type: '2D' | '2DArray';
     gl: WebGL2RenderingContext;
 
-    loadTexture2D (url:string) {
+    loadTexture2D(url: string) {
         const gl = this.gl;
         const texture = this.texture;
         this.bind();
@@ -47,8 +47,16 @@ export class Texture {
                 image
             );
 
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(
+                gl.TEXTURE_2D,
+                gl.TEXTURE_WRAP_S,
+                gl.CLAMP_TO_EDGE
+            );
+            gl.texParameteri(
+                gl.TEXTURE_2D,
+                gl.TEXTURE_WRAP_T,
+                gl.CLAMP_TO_EDGE
+            );
             if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
                 gl.generateMipmap(gl.TEXTURE_2D);
                 that.hasMipmap = true;
@@ -59,7 +67,7 @@ export class Texture {
         image.src = url;
     }
 
-    loadTexture2DArray (url:string) {
+    loadTexture2DArray(url: string) {
         const gl = this.gl;
         const texture = this.texture;
         this.bind();
@@ -117,27 +125,36 @@ export class Texture {
         image.src = url;
     }
 
-    constructor (gl: WebGL2RenderingContext, name:string, url:string, type: "2D" | "2DArray" = "2D") {
+    constructor(
+        gl: WebGL2RenderingContext,
+        name: string,
+        url: string,
+        type: '2D' | '2DArray' = '2D'
+    ) {
         this.name = name;
         this.gl = gl;
         this.type = type;
 
         const texture = gl.createTexture();
-        if(!texture){throw new Error(`Couldn't create texture for ${name}`); }
+        if (!texture) {
+            throw new Error(`Couldn't create texture for ${name}`);
+        }
         this.texture = texture;
-        switch(type){
+        switch (type) {
             default:
-            case "2D":
+            case '2D':
                 this.loadTexture2D(url);
                 break;
-            case "2DArray":
+            case '2DArray':
                 this.loadTexture2DArray(url);
                 break;
         }
     }
 
     target() {
-        return this.type === "2DArray" ? this.gl.TEXTURE_2D_ARRAY : this.gl.TEXTURE_2D;
+        return this.type === '2DArray'
+            ? this.gl.TEXTURE_2D_ARRAY
+            : this.gl.TEXTURE_2D;
     }
 
     clamp() {
@@ -157,29 +174,61 @@ export class Texture {
     linear() {
         this.bind();
         const target = this.target();
-        if(this.hasMipmap){
-            this.gl.texParameteri(target, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST_MIPMAP_LINEAR);
-            this.gl.texParameteri(target, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST_MIPMAP_LINEAR);
+        if (this.hasMipmap) {
+            this.gl.texParameteri(
+                target,
+                this.gl.TEXTURE_MIN_FILTER,
+                this.gl.NEAREST_MIPMAP_LINEAR
+            );
+            this.gl.texParameteri(
+                target,
+                this.gl.TEXTURE_MAG_FILTER,
+                this.gl.NEAREST_MIPMAP_LINEAR
+            );
         } else {
-            this.gl.texParameteri(target, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
-            this.gl.texParameteri(target, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+            this.gl.texParameteri(
+                target,
+                this.gl.TEXTURE_MIN_FILTER,
+                this.gl.LINEAR
+            );
+            this.gl.texParameteri(
+                target,
+                this.gl.TEXTURE_MAG_FILTER,
+                this.gl.LINEAR
+            );
         }
     }
 
     nearest() {
         this.bind();
         const target = this.target();
-        if(this.hasMipmap){
-            this.gl.texParameteri(target, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST_MIPMAP_NEAREST);
-            this.gl.texParameteri(target, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST_MIPMAP_NEAREST);
+        if (this.hasMipmap) {
+            this.gl.texParameteri(
+                target,
+                this.gl.TEXTURE_MIN_FILTER,
+                this.gl.NEAREST_MIPMAP_NEAREST
+            );
+            this.gl.texParameteri(
+                target,
+                this.gl.TEXTURE_MAG_FILTER,
+                this.gl.NEAREST_MIPMAP_NEAREST
+            );
         } else {
-            this.gl.texParameteri(target, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
-            this.gl.texParameteri(target, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
+            this.gl.texParameteri(
+                target,
+                this.gl.TEXTURE_MIN_FILTER,
+                this.gl.NEAREST
+            );
+            this.gl.texParameteri(
+                target,
+                this.gl.TEXTURE_MAG_FILTER,
+                this.gl.NEAREST
+            );
         }
     }
 
     bind() {
-        if(lastBoundTexture !== this.texture){
+        if (lastBoundTexture !== this.texture) {
             lastBoundTexture = this.texture;
             this.gl.bindTexture(this.target(), this.texture);
         }

@@ -1,19 +1,22 @@
-import "../../../types";
-import { Shader } from "../../shader";
-import { Texture } from "../../texture";
+import '../../../types';
+import { Shader } from '../../shader';
+import { Texture } from '../../texture';
 
 let gl: WebGL2RenderingContext;
 export let shader: Shader;
 export let texture: Texture;
 
-import shaderVertSource from "./text.vert?raw";
-import shaderFragSource from "./text.frag?raw";
-import guiTextureUrl from "../../../../assets/gfx/gui.png";
-import { mat4 } from "gl-matrix";
+import shaderVertSource from './text.vert?raw';
+import shaderFragSource from './text.frag?raw';
+import guiTextureUrl from '../../../../assets/gfx/gui.png';
+import { mat4 } from 'gl-matrix';
 
 export const textMeshInit = (glc: WebGL2RenderingContext) => {
     gl = glc;
-    shader = new Shader(gl, 'textMesh', shaderVertSource, shaderFragSource, ["cur_tex", "mat_mvp"]);
+    shader = new Shader(gl, 'textMesh', shaderVertSource, shaderFragSource, [
+        'cur_tex',
+        'mat_mvp',
+    ]);
     texture = new Texture(gl, 'gui', guiTextureUrl);
 };
 
@@ -23,45 +26,36 @@ export class TextMesh {
     vao: WebGLVertexArrayObject;
     vbo: WebGLBuffer;
 
-    constructor () {
+    constructor() {
         this.vertices = [
-            0, 1024,
-            0, 0,
-            0xFFFFFFFF,
+            0, 1024, 0, 0, 0xffffffff,
 
-            1024, 0,
-            1, 1,
-            0xFFFFFFFF,
+            1024, 0, 1, 1, 0xffffffff,
 
-            0, 0,
-            0, 1,
-            0xFFFFFFFF,
+            0, 0, 0, 1, 0xffffffff,
 
+            1024, 0, 1, 1, 0xffffffff,
 
-            1024, 0,
-            1, 1,
-            0xFFFFFFFF,
+            0, 1024, 0.0, 0.0, 0xffffffff,
 
-            0, 1024,
-            0.0, 0.0,
-            0xFFFFFFFF,
-
-            1024, 1024,
-            1, 0,
-            0xFFFFFFFF,
+            1024, 1024, 1, 0, 0xffffffff,
         ];
 
         const vao = gl.createVertexArray();
-        if(!vao){throw new Error("Couldn't create VAO");}
+        if (!vao) {
+            throw new Error("Couldn't create VAO");
+        }
         gl.bindVertexArray(vao);
 
         const vertex_buffer = gl.createBuffer();
-        if(!vertex_buffer){throw new Error("Can't create new textMesh vertex buffer!");}
+        if (!vertex_buffer) {
+            throw new Error("Can't create new textMesh vertex buffer!");
+        }
         gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
 
         const float_arr = new Float32Array(this.vertices);
         const uint_arr = new Uint32Array(float_arr.buffer);
-        for (let i=4;i<this.vertices.length;i+=5) {
+        for (let i = 4; i < this.vertices.length; i += 5) {
             uint_arr[i] = this.vertices[i];
         }
         gl.bufferData(gl.ARRAY_BUFFER, float_arr, gl.STATIC_DRAW);
@@ -80,13 +74,13 @@ export class TextMesh {
         this.vbo = vertex_buffer;
     }
 
-    empty () {
+    empty() {
         this.vertices = [];
     }
 
-    draw (mat_mvp: mat4) {
+    draw(mat_mvp: mat4) {
         shader.bind();
-        shader.uniform4fv("mat_mvp", mat_mvp);
+        shader.uniform4fv('mat_mvp', mat_mvp);
         texture.bind();
         gl.bindVertexArray(this.vao);
 

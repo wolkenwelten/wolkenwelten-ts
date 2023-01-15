@@ -1,2 +1,2 @@
-export { Entity } from "./entity";
-export { Character } from "./character";
+export { Entity } from './entity';
+export { Character } from './character';
