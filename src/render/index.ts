@@ -99,7 +99,7 @@ export class RenderManager {
         mat4.translate(
             modelViewMatrix,
             modelViewMatrix,
-            [1.75, -0.7, -2.0]
+            [1.75, -0.7, 2.0]
         );
 
         const modelViewProjectionMatrix = mat4.create();

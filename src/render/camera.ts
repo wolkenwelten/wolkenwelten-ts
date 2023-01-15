@@ -1,8 +1,8 @@
 export class Camera {
-    x = 0;
-    y = 0.5;
-    z = 2.0;
+    x = -3;
+    y = 30.5;
+    z = -4.0;
 
-    yaw = 0;
-    pitch = 0;
+    yaw = Math.PI * 1.25;
+    pitch = -Math.PI / 12;
 }

@@ -20,13 +20,7 @@ export class World {
         let chunk = this.chunks.get(key);
         if(chunk){return chunk;}
         chunk = new Chunk(x,y,z);
-        chunk.setBlock(16,15,16,1);
-        chunk.setBlock(16,16,16,1);
-        chunk.setBlock(16,17,16,1);
-        chunk.setBlock(16,16,15,1);
-        chunk.setBlock(16,16,17,1);
-        chunk.setBlock(15,16,16,1);
-        chunk.setBlock(17,16,16,1);
+        chunk.setBox(1,1,1,30,30,30,1);
 
         this.chunks.set(key, chunk);
         return chunk;
