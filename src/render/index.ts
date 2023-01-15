@@ -87,7 +87,7 @@ export class RenderManager {
           [-this.cam.x, -this.cam.y, -this.cam.z]
         );
 
-        this.sky.draw(projectionMatrix, viewMatrix)
+        //this.sky.draw(projectionMatrix, viewMatrix);
         this.testBlockMesh.draw(projectionMatrix, viewMatrix);
 
         const modelMatrix = mat4.create();
@@ -145,7 +145,8 @@ export class RenderManager {
         this.frames++;
         this.fps++;
 
-        this.gl.clearColor(Math.sin(this.frames / 128),Math.sin(this.frames / 512), Math.sin(this.frames / 2048),1.0);
+        //this.gl.clearColor(Math.sin(this.frames / 128),Math.sin(this.frames / 512), Math.sin(this.frames / 2048),1.0);
+        this.gl.clearColor(0.09,0.478,1,1);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
         this.gl.viewport(0,0, this.canvas.width, this.canvas.height);
 
