@@ -1,17 +1,17 @@
-import { mat4, vec3 } from "gl-matrix";
+import { mat4, vec3 } from 'gl-matrix';
 
-import { Texture } from "../texture";
-import { Mesh, WavefrontFile } from "../meshes/mesh";
-import { RenderManager } from "../";
+import { Texture } from '../texture';
+import { Mesh, WavefrontFile } from '../meshes/mesh';
+import { RenderManager } from '../';
 
-import skyDomeFile from "../../../assets/gfx/skydome.obj?raw";
-import skyTextureUrl from "../../../assets/gfx/sky.png";
+import skyDomeFile from '../../../assets/gfx/skydome.obj?raw';
+import skyTextureUrl from '../../../assets/gfx/sky.png';
 
 export class Sky {
     mesh: Mesh;
     render: RenderManager;
 
-    constructor (render: RenderManager) {
+    constructor(render: RenderManager) {
         this.render = render;
         const texture = new Texture(render.gl, 'sky', skyTextureUrl);
         texture.linear();
@@ -21,13 +21,15 @@ export class Sky {
         this.mesh.finish();
     }
 
-    draw (projection: mat4, _view: mat4) {
+    draw(projection: mat4, _view: mat4) {
+        const yaw = this.render.cam?.yaw || 0;
+        const pitch = this.render.cam?.pitch || 0;
         const view = mat4.create();
-        mat4.rotateY(view, view, -this.render.cam.yaw);
-        mat4.rotateX(view, view, -this.render.cam.pitch);
+        mat4.rotateY(view, view, -yaw);
+        mat4.rotateX(view, view, -pitch);
 
         const model = mat4.create();
-        mat4.scale(model, model, vec3.fromValues(192,192,192));
+        mat4.scale(model, model, vec3.fromValues(192, 192, 192));
         mat4.multiply(model, view, model);
         mat4.multiply(model, projection, model);
         this.mesh.draw(model);

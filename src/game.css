@@ -26,3 +26,11 @@
     top:4px;
     font-family: 'Courier New', Courier, monospace;
 }
+
+#wolkenwelten-debug-info {
+    display:block;
+    position:absolute;
+    left:4px;
+    top:4px;
+    font-family: 'Courier New', Courier, monospace;
+}

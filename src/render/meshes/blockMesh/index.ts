@@ -1,39 +1,47 @@
-import "../../../types";
-import { Shader } from "../../shader";
-import { Texture } from "../../texture";
-import { Chunk } from "../../../world/chunk";
+import '../../../types';
+import { Shader } from '../../shader';
+import { Texture } from '../../texture';
+import { Chunk } from '../../../world/chunk';
 
 let gl: WebGL2RenderingContext;
 export let shader: Shader;
 export let texture: Texture;
 
-import shaderVertSource from "./block.vert?raw";
-import shaderFragSource from "./block.frag?raw";
-import blockTextureUrl from "../../../../assets/gfx/blocks.png";
-import { mat4 } from "gl-matrix";
-import { meshgen } from "./meshgen";
+import shaderVertSource from './block.vert?raw';
+import shaderFragSource from './block.frag?raw';
+import blockTextureUrl from '../../../../assets/gfx/blocks.png';
+import { mat4 } from 'gl-matrix';
+import { meshgen } from './meshgen';
 
 export const blockMeshInit = (glc: WebGL2RenderingContext) => {
     gl = glc;
-    shader = new Shader(gl, 'blockMesh', shaderVertSource, shaderFragSource, ["cur_tex", "mat_mvp"]);
+    shader = new Shader(gl, 'blockMesh', shaderVertSource, shaderFragSource, [
+        'cur_tex',
+        'mat_mvp',
+    ]);
     texture = new Texture(gl, 'gui', blockTextureUrl, '2DArray');
     texture.nearest();
 };
 
-export const chunkIntoMesh = (chunk: Chunk):BlockMesh => new BlockMesh(meshgen(chunk));
+export const chunkIntoMesh = (chunk: Chunk): BlockMesh =>
+    new BlockMesh(meshgen(chunk));
 
 export class BlockMesh {
     elementCount = 0;
     vao: WebGLVertexArrayObject;
 
-    constructor (vertices: Uint8Array) {
+    constructor(vertices: Uint8Array) {
         const vao = gl.createVertexArray();
-        if(!vao){throw new Error("Couldn't create VAO");}
+        if (!vao) {
+            throw new Error("Couldn't create VAO");
+        }
         this.vao = vao;
         gl.bindVertexArray(this.vao);
 
         const vertex_buffer = gl.createBuffer();
-        if(!vertex_buffer){throw new Error("Can't create new textMesh vertex buffer!");}
+        if (!vertex_buffer) {
+            throw new Error("Can't create new textMesh vertex buffer!");
+        }
         gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
         gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 
@@ -48,12 +56,12 @@ export class BlockMesh {
         this.elementCount = vertices.length / 5;
     }
 
-    draw (projection: mat4, modelView: mat4) {
+    draw(projection: mat4, modelView: mat4) {
         shader.bind();
         //shader.uniform4fv("mat_mv", modelView);
         const modelViewProjection = mat4.create();
         mat4.multiply(modelViewProjection, projection, modelView);
-        shader.uniform4fv("mat_mvp", modelViewProjection);
+        shader.uniform4fv('mat_mvp', modelViewProjection);
         texture.bind();
         gl.bindVertexArray(this.vao);
         gl.drawArrays(gl.TRIANGLES, 0, this.elementCount);

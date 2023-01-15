@@ -7,7 +7,7 @@ Super early, pretty much nothing works whatsoever, so probably not that interest
 - [X] Setup a WebGL2 context
 - [X] Port the BlockMesh/Mesh/TextMesh shaders
 - [X] Port parts of the meshgen and use it to build very inefficient voxel meshes
-- [ ] FPS controls
+- [X] FPS controls
 - [ ] Render multiple chunks at once
 - [ ] Omit hidden faces from voxel meshes
 - [ ] Greedy meshing
@@ -34,9 +34,9 @@ You should now be able to see the game in your Browser on http://localhost:5137/
 
 
 ### Development (VS Code)
-You can use the `Complete development` a Vite Dev Server and Chrome with the Debugger hooked up.
+You can use the `Complete development` configuration to launch a Vite Dev Server and Chrome with the Debugger hooked up.
 
-Putting/removing breakpoints in the `.ts` files with VS Code in `/src` should then work.
+Putting/removing breakpoints in the `.ts` files with VS Code in `/src` should then work as expected.
 If it does not, please open an issue.
 
-Edit the TypeScript files, the browser should automatically refresh after saving.
+Edit the TypeScript files or assets and the browser should automatically refresh after saving.

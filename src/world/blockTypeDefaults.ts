@@ -1,143 +1,143 @@
-import { addBlockType, blocks } from "./blockType";
+import { addBlockType, blocks } from './blockType';
 
 export const initDefaultBlocks = () => {
     blocks.length = 0;
-    addBlockType("Air");
+    addBlockType('Air');
 
-    addBlockType("Dirt")
+    addBlockType('Dirt')
         .withTexture(1)
-        .withColours(0x110A00FF, 0x201200FF)
-        .withMiningCat("Shovel")
+        .withColours(0x110a00ff, 0x201200ff)
+        .withMiningCat('Shovel')
         .withBlockHealth(2000);
 
-    addBlockType("Grass")
+    addBlockType('Grass')
         .withTexture(16)
         .withTextureTop(0)
         .withTextureBottom(1)
-        .withColours(0x081200FF, 0x110A00FF)
-        .withMiningCat("Shovel")
+        .withColours(0x081200ff, 0x110a00ff)
+        .withMiningCat('Shovel')
         .withBlockHealth(2500);
 
-    addBlockType("Stone")
+    addBlockType('Stone')
         .withTexture(2)
-        .withColours(0x5E5E5EFF, 0x484848FF)
-        .withMiningCat("Pickaxe")
+        .withColours(0x5e5e5eff, 0x484848ff)
+        .withMiningCat('Pickaxe')
         .withBlockHealth(8000);
 
-    addBlockType("Coal")
+    addBlockType('Coal')
         .withTexture(3)
-        .withColours(0x262626FF, 0x101010FF)
-        .withMiningCat("Pickaxe")
+        .withColours(0x262626ff, 0x101010ff)
+        .withMiningCat('Pickaxe')
         .withBlockHealth(7000);
 
-    addBlockType("Spruce log")
+    addBlockType('Spruce log')
         .withTexture(4)
-        .withColours(0x251B05FF, 0x1D1607FF)
-        .withMiningCat("Axe")
+        .withColours(0x251b05ff, 0x1d1607ff)
+        .withMiningCat('Axe')
         .withBlockHealth(6000);
 
-    addBlockType("Spruce leaves")
+    addBlockType('Spruce leaves')
         .withTexture(5)
-        .withColours(0x122C01FF, 0x0F2501FF)
+        .withColours(0x122c01ff, 0x0f2501ff)
         .withBlockHealth(1000);
 
-    addBlockType("Dry grass")
+    addBlockType('Dry grass')
         .withTexture(22)
         .withTextureTop(6)
         .withTextureBottom(1)
-        .withColours(0x4B6411FF, 0x4F230AFF)
-        .withMiningCat("Shovel")
+        .withColours(0x4b6411ff, 0x4f230aff)
+        .withMiningCat('Shovel')
         .withBlockHealth(2000);
 
-    addBlockType("Roots")
+    addBlockType('Roots')
         .withTexture(7)
-        .withColours(0x3E3214FF, 0x29200DFF)
-        .withMiningCat("Shovel")
+        .withColours(0x3e3214ff, 0x29200dff)
+        .withMiningCat('Shovel')
         .withBlockHealth(5000);
 
-    addBlockType("Obsidian")
+    addBlockType('Obsidian')
         .withTexture(8)
-        .withColours(0x222222FF, 0x171717FF)
-        .withMiningCat("Pickaxe")
+        .withColours(0x222222ff, 0x171717ff)
+        .withMiningCat('Pickaxe')
         .withBlockHealth(14000);
 
-    addBlockType("Oak log")
+    addBlockType('Oak log')
         .withTexture(9)
-        .withColours(0x3C2C08FF, 0x2E2408FF)
-        .withMiningCat("Axe")
+        .withColours(0x3c2c08ff, 0x2e2408ff)
+        .withMiningCat('Axe')
         .withBlockHealth(7000);
 
-    addBlockType("Oak leaves")
+    addBlockType('Oak leaves')
         .withTexture(10)
-        .withColours(0x274200FF, 0x183300FF)
+        .withColours(0x274200ff, 0x183300ff)
         .withBlockHealth(1000);
 
-    addBlockType("Iron ore (hematite)")
+    addBlockType('Iron ore (hematite)')
         .withTexture(11)
-        .withColours(0x725B5BFF, 0x5E5E5EFF)
-        .withMiningCat("Pickaxe")
+        .withColours(0x725b5bff, 0x5e5e5eff)
+        .withMiningCat('Pickaxe')
         .withBlockHealth(10000);
 
-    addBlockType("Marble block")
+    addBlockType('Marble block')
         .withTexture(12)
-        .withColours(0xF0F0F0FF, 0xF0F0F0FF)
-        .withMiningCat("Pickaxe")
+        .withColours(0xf0f0f0ff, 0xf0f0f0ff)
+        .withMiningCat('Pickaxe')
         .withBlockHealth(10000);
 
-    addBlockType("Marble pillar")
+    addBlockType('Marble pillar')
         .withTexture(13)
         .withTextureTop(12)
         .withTextureBottom(12)
-        .withColours(0xF0F0F0FF, 0xF0F0F0FF)
-        .withMiningCat("Pickaxe")
+        .withColours(0xf0f0f0ff, 0xf0f0f0ff)
+        .withMiningCat('Pickaxe')
         .withBlockHealth(10000);
 
-    addBlockType("Marble blocks")
+    addBlockType('Marble blocks')
         .withTexture(14)
-        .withColours(0xF0F0F0FF, 0xF0F0F0FF)
-        .withMiningCat("Pickaxe")
+        .withColours(0xf0f0f0ff, 0xf0f0f0ff)
+        .withMiningCat('Pickaxe')
         .withBlockHealth(10000);
 
-    addBlockType("Acacia leaves")
+    addBlockType('Acacia leaves')
         .withTexture(15)
-        .withColours(0x023000FF, 0x326F1CFF)
+        .withColours(0x023000ff, 0x326f1cff)
         .withBlockHealth(1000);
 
-    addBlockType("Boards")
+    addBlockType('Boards')
         .withTexture(17)
-        .withColours(0x8F6709FF, 0xAF8013FF)
-        .withMiningCat("Axe")
+        .withColours(0x8f6709ff, 0xaf8013ff)
+        .withMiningCat('Axe')
         .withBlockHealth(4000);
 
-    addBlockType("Crystals")
+    addBlockType('Crystals')
         .withTexture(18)
-        .withColours(0xE87C99FF, 0xB5244DFF)
-        .withMiningCat("Pickaxe")
+        .withColours(0xe87c99ff, 0xb5244dff)
+        .withMiningCat('Pickaxe')
         .withBlockHealth(20000);
 
-    addBlockType("Sakura leaves")
+    addBlockType('Sakura leaves')
         .withTexture(19)
-        .withColours(0xE87C99FF, 0xB5254DFF)
+        .withColours(0xe87c99ff, 0xb5254dff)
         .withBlockHealth(1000);
 
-    addBlockType("Birch log")
+    addBlockType('Birch log')
         .withTexture(20)
-        .withColours(0x555252FF, 0xA5A2A2FF)
-        .withMiningCat("Axe")
+        .withColours(0x555252ff, 0xa5a2a2ff)
+        .withMiningCat('Axe')
         .withBlockHealth(6000);
 
-    addBlockType("Flower bush")
+    addBlockType('Flower bush')
         .withTexture(21)
-        .withColours(0x274200FF, 0x183300FF)
+        .withColours(0x274200ff, 0x183300ff)
         .withBlockHealth(1000);
 
-    addBlockType("Date bush")
+    addBlockType('Date bush')
         .withTexture(23)
-        .withColours(0x4F3300FF, 0x948312FF)
+        .withColours(0x4f3300ff, 0x948312ff)
         .withBlockHealth(1000);
 
-    addBlockType("Sand")
+    addBlockType('Sand')
         .withTexture(24)
-        .withColours(0xECD195FF, 0xD3A748FF)
+        .withColours(0xecd195ff, 0xd3a748ff)
         .withBlockHealth(1400);
 };
