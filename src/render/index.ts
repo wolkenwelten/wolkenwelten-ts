@@ -126,6 +126,5 @@ export class RenderManager {
         this.gl.clearColor(0.09, 0.478, 1, 1);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
         this.drawScene();
-        this.gl.flush();
     }
 }
