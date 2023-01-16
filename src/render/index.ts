@@ -4,6 +4,7 @@ import { TextMesh, meshInit, Mesh, BlockMesh } from './meshes';
 import { Entity } from '../entities';
 import { Sky } from './sky';
 import { WorldRenderer } from './worldRenderer';
+import { allTexturesLoaded } from './texture';
 
 export class RenderManager {
     game: Game;
@@ -28,7 +29,6 @@ export class RenderManager {
 
         this.canvas = document.createElement('canvas');
         game.rootElement.append(this.canvas);
-        canvas: HTMLCanvasElement;
         const gl = this.canvas.getContext('webgl2');
         if (!gl) {
             throw new Error(
@@ -112,19 +112,20 @@ export class RenderManager {
         this.height = window.innerHeight | 0;
         this.canvas.width = this.width;
         this.canvas.height = this.height;
+        this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
     }
 
     drawFrame() {
         window.requestAnimationFrame(this.drawFrameClosure);
+        if (!allTexturesLoaded()) {
+            return;
+        }
         this.frames++;
         this.fps++;
 
         this.gl.clearColor(0.09, 0.478, 1, 1);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-        this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
-
         this.drawScene();
-
         this.gl.flush();
     }
 }

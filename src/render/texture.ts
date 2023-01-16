@@ -1,6 +1,10 @@
 const isPowerOf2 = (value: number) => (value & (value - 1)) === 0;
 
 let lastBoundTexture: WebGLTexture | undefined;
+let texturesInFlight = 0;
+let texturesLoaded = 0;
+
+export const allTexturesLoaded = () => texturesLoaded >= texturesInFlight;
 
 export class Texture {
     name: string;
@@ -10,6 +14,7 @@ export class Texture {
     gl: WebGL2RenderingContext;
 
     loadTexture2D(url: string) {
+        texturesInFlight++;
         const gl = this.gl;
         const texture = this.texture;
         this.bind();
@@ -63,6 +68,7 @@ export class Texture {
             }
             that.nearest();
             that.clamp();
+            texturesLoaded++;
         };
         image.src = url;
     }
