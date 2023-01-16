@@ -24,23 +24,27 @@ export class BlockMesh {
     static generateIndexBuffer(squareCount: number) {
         const bufferSize = squareCount * 6;
         const buf = new Uint32Array(bufferSize);
-        for(let i=0;i<squareCount;i++){
+        for (let i = 0; i < squareCount; i++) {
             const off = i * 6;
             const vOff = i * 4;
             buf[off] = vOff;
-            buf[off+1] = vOff+1;
-            buf[off+2] = vOff+2;
+            buf[off + 1] = vOff + 1;
+            buf[off + 2] = vOff + 2;
 
-            buf[off+3] = vOff+2;
-            buf[off+4] = vOff+3;
-            buf[off+5] = vOff;
+            buf[off + 3] = vOff + 2;
+            buf[off + 4] = vOff + 3;
+            buf[off + 5] = vOff;
         }
         const vbo = this.gl.createBuffer();
         if (!vbo) {
             throw new Error("Can't create new textMesh vertex buffer!");
         }
         this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, vbo);
-        this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, buf, this.gl.STATIC_DRAW);
+        this.gl.bufferData(
+            this.gl.ELEMENT_ARRAY_BUFFER,
+            buf,
+            this.gl.STATIC_DRAW
+        );
         return vbo;
     }
 
@@ -91,7 +95,7 @@ export class BlockMesh {
 
         gl.vertexAttribIPointer(2, 1, gl.UNSIGNED_BYTE, 5, 4);
         gl.enableVertexAttribArray(2);
-        this.elementCount = vertices.length / 5;
+        this.elementCount = ((vertices.length / 5)/4)*6;
     }
 
     static bindShaderAndTexture(projection: mat4, modelView: mat4) {
@@ -106,7 +110,12 @@ export class BlockMesh {
     drawFast() {
         BlockMesh.shader.uniform3f('trans_pos', this.x, this.y, this.z);
         BlockMesh.gl.bindVertexArray(this.vao);
-        BlockMesh.gl.drawElements(BlockMesh.gl.TRIANGLES, this.elementCount * 4, BlockMesh.gl.UNSIGNED_INT, 0);
+        BlockMesh.gl.drawElements(
+            BlockMesh.gl.TRIANGLES,
+            this.elementCount,
+            BlockMesh.gl.UNSIGNED_INT,
+            0
+        );
     }
 
     draw(projection: mat4, modelView: mat4) {
