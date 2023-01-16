@@ -10,7 +10,7 @@ Super early, pretty much nothing works whatsoever, so probably not that interest
 - [X] FPS controls
 - [X] Render multiple chunks at once
 - [X] Omit hidden faces from voxel meshes
-- [ ] Use indeces when rendering BlockMeshes
+- [X] Use indeces when rendering BlockMeshes
 - [ ] Greedy meshing
 - [ ] Only render BlockMesh sides that can be seen
 - [ ] Frustum culling
