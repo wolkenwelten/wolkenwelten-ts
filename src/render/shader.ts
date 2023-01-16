@@ -21,10 +21,6 @@ export class Shader {
         }
         gl.shaderSource(vertShader, vert);
         gl.compileShader(vertShader);
-        if (!gl.getShaderParameter(vertShader, gl.COMPILE_STATUS)) {
-            console.error(gl.getShaderInfoLog(vertShader));
-            throw new Error(`Couldn't compile vertex shader ${name}`);
-        }
 
         const fragShader = gl.createShader(gl.FRAGMENT_SHADER);
         if (!fragShader) {
@@ -32,10 +28,6 @@ export class Shader {
         }
         gl.shaderSource(fragShader, frag);
         gl.compileShader(fragShader);
-        if (!gl.getShaderParameter(fragShader, gl.COMPILE_STATUS)) {
-            console.error(gl.getShaderInfoLog(fragShader));
-            throw new Error(`Couldn't compile fragment shader ${name}`);
-        }
 
         const program = gl.createProgram();
         if (!program) {
@@ -46,6 +38,14 @@ export class Shader {
         gl.linkProgram(program);
         if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
             console.error(gl.getProgramInfoLog(program));
+            if (!gl.getShaderParameter(vertShader, gl.COMPILE_STATUS)) {
+                console.error(gl.getShaderInfoLog(vertShader));
+                throw new Error(`Couldn't compile vertex shader ${name}`);
+            }
+            if (!gl.getShaderParameter(fragShader, gl.COMPILE_STATUS)) {
+                console.error(gl.getShaderInfoLog(fragShader));
+                throw new Error(`Couldn't compile fragment shader ${name}`);
+            }
             throw new Error(`Couldn't link shader ${name}`);
         }
         this.program = program;

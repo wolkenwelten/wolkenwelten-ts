@@ -1,6 +1,6 @@
 #version 300 es
-precision mediump float;
-precision mediump sampler2DArray;
+precision lowp float;
+precision lowp sampler2DArray;
 
 uniform sampler2DArray cur_tex;
 const float fade_distance = 96.0;
