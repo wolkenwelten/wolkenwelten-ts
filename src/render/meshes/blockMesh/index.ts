@@ -11,6 +11,7 @@ import { meshgen } from './meshgen';
 
 export class BlockMesh {
     static gl: WebGL2RenderingContext;
+    static indeces: WebGLBuffer;
     static shader: Shader;
     static texture: Texture;
 
@@ -19,6 +20,29 @@ export class BlockMesh {
     z: number;
     elementCount = 0;
     vao: WebGLVertexArrayObject;
+
+    static generateIndexBuffer(squareCount: number) {
+        const bufferSize = squareCount * 6;
+        const buf = new Uint32Array(bufferSize);
+        for(let i=0;i<squareCount;i++){
+            const off = i * 6;
+            const vOff = i * 4;
+            buf[off] = vOff;
+            buf[off+1] = vOff+1;
+            buf[off+2] = vOff+2;
+
+            buf[off+3] = vOff+2;
+            buf[off+4] = vOff+3;
+            buf[off+5] = vOff;
+        }
+        const vbo = this.gl.createBuffer();
+        if (!vbo) {
+            throw new Error("Can't create new textMesh vertex buffer!");
+        }
+        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, vbo);
+        this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, buf, this.gl.STATIC_DRAW);
+        return vbo;
+    }
 
     static init(glc: WebGL2RenderingContext) {
         this.gl = glc;
@@ -31,6 +55,7 @@ export class BlockMesh {
         );
         this.texture = new Texture(this.gl, 'gui', blockTextureUrl, '2DArray');
         this.texture.nearest();
+        this.indeces = this.generateIndexBuffer(32 * 32 * 32 * 6);
     }
 
     static fromChunk(chunk: Chunk): BlockMesh {
@@ -49,6 +74,7 @@ export class BlockMesh {
         }
         this.vao = vao;
         gl.bindVertexArray(this.vao);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, BlockMesh.indeces);
 
         const vertex_buffer = gl.createBuffer();
         if (!vertex_buffer) {
@@ -80,7 +106,7 @@ export class BlockMesh {
     drawFast() {
         BlockMesh.shader.uniform3f('trans_pos', this.x, this.y, this.z);
         BlockMesh.gl.bindVertexArray(this.vao);
-        BlockMesh.gl.drawArrays(BlockMesh.gl.TRIANGLES, 0, this.elementCount);
+        BlockMesh.gl.drawElements(BlockMesh.gl.TRIANGLES, this.elementCount * 4, BlockMesh.gl.UNSIGNED_INT, 0);
     }
 
     draw(projection: mat4, modelView: mat4) {
