@@ -64,6 +64,7 @@ export class Shader {
 
     bind() {
         this.gl.useProgram(this.program);
+        return this;
     }
 
     uniform1i(name: string, value: number) {
@@ -74,9 +75,10 @@ export class Shader {
             );
         }
         this.gl.uniform1i(loc, value);
+        return this;
     }
 
-    uniform3f(name: string, x:number, y:number, z:number) {
+    uniform3f(name: string, x: number, y: number, z: number) {
         const loc = this.uniforms.get(name);
         if (!loc) {
             throw new Error(
@@ -84,6 +86,18 @@ export class Shader {
             );
         }
         this.gl.uniform3f(loc, x, y, z);
+        return this;
+    }
+
+    uniform4f(name: string, r: number, g: number, b: number, a: number) {
+        const loc = this.uniforms.get(name);
+        if (!loc) {
+            throw new Error(
+                `No uniform location stored for '${name}' for shader '${this.name}'`
+            );
+        }
+        this.gl.uniform4f(loc, r, g, b, a);
+        return this;
     }
 
     uniform4fv(name: string, value: mat4) {
@@ -94,5 +108,6 @@ export class Shader {
             );
         }
         this.gl.uniformMatrix4fv(loc, false, value);
+        return this;
     }
 }

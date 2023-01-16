@@ -10,212 +10,194 @@ const sides = {
     right: 5,
 };
 
-const addFaceFront = (
-    vertices: number[],
+const addFront = (
+    out: number[],
     x: number,
     y: number,
     z: number,
     w: number,
     h: number,
     d: number,
-    texture_index: number,
+    tex: number,
     light: number
 ) => {
     const side = 0; // sides.front
     const zd = z + d;
 
-    vertices.push(x, y, zd, texture_index, side | ((light << 4) & 0xf0));
-    vertices.push(x + w, y, zd, texture_index, side | (light & 0xf0));
-    vertices.push(
-        x + w,
-        y + h,
-        zd,
-        texture_index,
-        side | ((light >> 4) & 0xf0)
-    );
+    out.push(x, y, zd, tex, side | ((light << 4) & 0xf0));
 
-    vertices.push(
-        x + w,
-        y + h,
-        zd,
-        texture_index,
-        side | ((light >> 4) & 0xf0)
-    );
-    vertices.push(x, y + h, zd, texture_index, side | ((light >> 8) & 0xf0));
-    vertices.push(x, y, zd, texture_index, side | ((light << 4) & 0xf0));
+    out.push(x + w, y, zd, tex, side | (light & 0xf0));
+    out.push(x + w, y + h, zd, tex, side | ((light >> 4) & 0xf0));
+
+    out.push(x + w, y + h, zd, tex, side | ((light >> 4) & 0xf0));
+    out.push(x, y + h, zd, tex, side | ((light >> 8) & 0xf0));
+    out.push(x, y, zd, tex, side | ((light << 4) & 0xf0));
 };
 
-const addFaceBack = (
-    vertices: number[],
+const addBack = (
+    out: number[],
     x: number,
     y: number,
     z: number,
     w: number,
     h: number,
     d: number,
-    texture_index: number,
+    tex: number,
     light: number
 ) => {
     const side = 1; // sides.front
 
-    vertices.push(x, y, z, texture_index, side | ((light << 4) & 0xf0));
-    vertices.push(x + w, y + h, z, texture_index, side | ((light >> 4) & 0xf0));
-    vertices.push(x + w, y, z, texture_index, side | (light & 0xf0));
+    out.push(x, y, z, tex, side | ((light << 4) & 0xf0));
+    out.push(x + w, y + h, z, tex, side | ((light >> 4) & 0xf0));
+    out.push(x + w, y, z, tex, side | (light & 0xf0));
 
-    vertices.push(x + w, y + h, z, texture_index, side | ((light >> 4) & 0xf0));
-    vertices.push(x, y, z, texture_index, side | ((light << 4) & 0xf0));
-    vertices.push(x, y + h, z, texture_index, side | ((light >> 8) & 0xf0));
+    out.push(x + w, y + h, z, tex, side | ((light >> 4) & 0xf0));
+    out.push(x, y, z, tex, side | ((light << 4) & 0xf0));
+    out.push(x, y + h, z, tex, side | ((light >> 8) & 0xf0));
 };
 
-const addFaceTop = (
-    vertices: number[],
+const addTop = (
+    out: number[],
     x: number,
     y: number,
     z: number,
     w: number,
     h: number,
     d: number,
-    texture_index: number,
+    tex: number,
     light: number
 ) => {
     const side = 2;
     const yh = y + h;
 
-    vertices.push(x, yh, z, texture_index, side | ((light << 4) & 0xf0));
-    vertices.push(x, yh, z + d, texture_index, side | (light & 0xf0));
-    vertices.push(
-        x + w,
-        yh,
-        z + d,
-        texture_index,
-        side | ((light >> 4) & 0xf0)
-    );
+    out.push(x, yh, z, tex, side | ((light << 4) & 0xf0));
+    out.push(x, yh, z + d, tex, side | (light & 0xf0));
+    out.push(x + w, yh, z + d, tex, side | ((light >> 4) & 0xf0));
 
-    vertices.push(
-        x + w,
-        yh,
-        z + d,
-        texture_index,
-        side | ((light >> 4) & 0xf0)
-    );
-    vertices.push(x + w, yh, z, texture_index, side | ((light >> 8) & 0xf0));
-    vertices.push(x, yh, z, texture_index, side | ((light << 4) & 0xf0));
+    out.push(x + w, yh, z + d, tex, side | ((light >> 4) & 0xf0));
+    out.push(x + w, yh, z, tex, side | ((light >> 8) & 0xf0));
+    out.push(x, yh, z, tex, side | ((light << 4) & 0xf0));
 };
 
-const addFaceBottom = (
-    vertices: number[],
+const addBottom = (
+    out: number[],
     x: number,
     y: number,
     z: number,
     w: number,
     h: number,
     d: number,
-    texture_index: number,
+    tex: number,
     light: number
 ) => {
     const side = 3;
 
-    vertices.push(x, y, z, texture_index, side | ((light << 4) & 0xf0));
-    vertices.push(x + w, y, z, texture_index, side | (light & 0xf0));
-    vertices.push(x + w, y, z + d, texture_index, side | ((light >> 4) & 0xf0));
+    out.push(x, y, z, tex, side | ((light << 4) & 0xf0));
+    out.push(x + w, y, z, tex, side | (light & 0xf0));
+    out.push(x + w, y, z + d, tex, side | ((light >> 4) & 0xf0));
 
-    vertices.push(x + w, y, z + d, texture_index, side | ((light >> 4) & 0xf0));
-    vertices.push(x, y, z + d, texture_index, side | ((light >> 8) & 0xf0));
-    vertices.push(x, y, z, texture_index, side | ((light << 4) & 0xf0));
+    out.push(x + w, y, z + d, tex, side | ((light >> 4) & 0xf0));
+    out.push(x, y, z + d, tex, side | ((light >> 8) & 0xf0));
+    out.push(x, y, z, tex, side | ((light << 4) & 0xf0));
 };
 
-const addFaceLeft = (
-    vertices: number[],
+const addLeft = (
+    out: number[],
     x: number,
     y: number,
     z: number,
     w: number,
     h: number,
     d: number,
-    texture_index: number,
+    tex: number,
     light: number
 ) => {
     const side = 4;
 
-    vertices.push(x, y, z, texture_index, side | ((light << 4) & 0xf0));
-    vertices.push(x, y, z + d, texture_index, side | (light & 0xf0));
-    vertices.push(x, y + h, z + d, texture_index, side | ((light >> 4) & 0xf0));
+    out.push(x, y, z, tex, side | ((light << 4) & 0xf0));
+    out.push(x, y, z + d, tex, side | (light & 0xf0));
+    out.push(x, y + h, z + d, tex, side | ((light >> 4) & 0xf0));
 
-    vertices.push(x, y + h, z + d, texture_index, side | ((light >> 4) & 0xf0));
-    vertices.push(x, y + h, z, texture_index, side | ((light >> 8) & 0xf0));
-    vertices.push(x, y, z, texture_index, side | ((light << 4) & 0xf0));
+    out.push(x, y + h, z + d, tex, side | ((light >> 4) & 0xf0));
+    out.push(x, y + h, z, tex, side | ((light >> 8) & 0xf0));
+    out.push(x, y, z, tex, side | ((light << 4) & 0xf0));
 };
 
-const addFaceRight = (
-    vertices: number[],
+const addRight = (
+    out: number[],
     x: number,
     y: number,
     z: number,
     w: number,
     h: number,
     d: number,
-    texture_index: number,
+    tex: number,
     light: number
 ) => {
     const side = 5;
     const xw = x + w;
 
-    vertices.push(xw, y, z, texture_index, side | ((light << 4) & 0xf0));
-    vertices.push(xw, y + h, z, texture_index, side | (light & 0xf0));
-    vertices.push(
-        xw,
-        y + h,
-        z + d,
-        texture_index,
-        side | ((light >> 4) & 0xf0)
-    );
+    out.push(xw, y, z, tex, side | ((light << 4) & 0xf0));
+    out.push(xw, y + h, z, tex, side | (light & 0xf0));
+    out.push(xw, y + h, z + d, tex, side | ((light >> 4) & 0xf0));
 
-    vertices.push(
-        xw,
-        y + h,
-        z + d,
-        texture_index,
-        side | ((light >> 4) & 0xf0)
-    );
-    vertices.push(xw, y, z + d, texture_index, side | ((light >> 8) & 0xf0));
-    vertices.push(xw, y, z, texture_index, side | ((light << 4) & 0xf0));
+    out.push(xw, y + h, z + d, tex, side | ((light >> 4) & 0xf0));
+    out.push(xw, y, z + d, tex, side | ((light >> 8) & 0xf0));
+    out.push(xw, y, z, tex, side | ((light << 4) & 0xf0));
 };
 
-const needsFront = (chunk:Chunk, x:number, y:number, z:number):boolean => {
-    if(z>=31){ return true; }
-    const b = chunk.getBlock(x,y,z+1);
+const needsFront = (chunk: Chunk, x: number, y: number, z: number): boolean => {
+    if (z >= 31) {
+        return true;
+    }
+    const b = chunk.getBlock(x, y, z + 1);
     return b === 0;
-}
+};
 
-const needsBack = (chunk:Chunk, x:number, y:number, z:number):boolean => {
-    if(z<=0){ return true; }
-    const b = chunk.getBlock(x,y,z-1);
+const needsBack = (chunk: Chunk, x: number, y: number, z: number): boolean => {
+    if (z <= 0) {
+        return true;
+    }
+    const b = chunk.getBlock(x, y, z - 1);
     return b === 0;
-}
+};
 
-const needsTop = (chunk:Chunk, x:number, y:number, z:number):boolean => {
-    if(y>=31){ return true; }
-    const b = chunk.getBlock(x,y+1,z);
+const needsTop = (chunk: Chunk, x: number, y: number, z: number): boolean => {
+    if (y >= 31) {
+        return true;
+    }
+    const b = chunk.getBlock(x, y + 1, z);
     return b === 0;
-}
+};
 
-const needsBottom = (chunk:Chunk, x:number, y:number, z:number):boolean => {
-    if(y<=0){ return true; }
-    const b = chunk.getBlock(x,y-1,z);
+const needsBottom = (
+    chunk: Chunk,
+    x: number,
+    y: number,
+    z: number
+): boolean => {
+    if (y <= 0) {
+        return true;
+    }
+    const b = chunk.getBlock(x, y - 1, z);
     return b === 0;
-}
+};
 
-const needsRight = (chunk:Chunk, x:number, y:number, z:number):boolean => {
-    if(x>=31){ return true; }
-    const b = chunk.getBlock(x+1,y,z);
+const needsRight = (chunk: Chunk, x: number, y: number, z: number): boolean => {
+    if (x >= 31) {
+        return true;
+    }
+    const b = chunk.getBlock(x + 1, y, z);
     return b === 0;
-}
+};
 
-const needsLeft = (chunk:Chunk, x:number, y:number, z:number):boolean => {
-    if(x<=0){ return true; }
-    const b = chunk.getBlock(x-1,y,z);
+const needsLeft = (chunk: Chunk, x: number, y: number, z: number): boolean => {
+    if (x <= 0) {
+        return true;
+    }
+    const b = chunk.getBlock(x - 1, y, z);
     return b === 0;
-}
+};
 
 export const meshgen = (chunk: Chunk): Uint8Array => {
     const light = 0xffff;
@@ -230,23 +212,23 @@ export const meshgen = (chunk: Chunk): Uint8Array => {
                     if (!bt) {
                         throw new Error(`Unknown block type: ${b}`);
                     }
-                    if(needsFront(chunk,x,y,z)){
-                        addFaceFront(ret, x, y, z, 1, 1, 1, bt.texFront, light);
+                    if (needsFront(chunk, x, y, z)) {
+                        addFront(ret, x, y, z, 1, 1, 1, bt.texFront, light);
                     }
-                    if(needsBack(chunk,x,y,z)){
-                        addFaceBack(ret, x, y, z, 1, 1, 1, bt.texBack, light);
+                    if (needsBack(chunk, x, y, z)) {
+                        addBack(ret, x, y, z, 1, 1, 1, bt.texBack, light);
                     }
-                    if(needsTop(chunk,x,y,z)){
-                        addFaceTop(ret, x, y, z, 1, 1, 1, bt.texTop, light);
+                    if (needsTop(chunk, x, y, z)) {
+                        addTop(ret, x, y, z, 1, 1, 1, bt.texTop, light);
                     }
-                    if(needsBottom(chunk,x,y,z)){
-                        addFaceBottom(ret, x, y, z, 1, 1, 1, bt.texBottom, light);
+                    if (needsBottom(chunk, x, y, z)) {
+                        addBottom(ret, x, y, z, 1, 1, 1, bt.texBottom, light);
                     }
-                    if(needsLeft(chunk,x,y,z)){
-                        addFaceLeft(ret, x, y, z, 1, 1, 1, bt.texLeft, light);
+                    if (needsLeft(chunk, x, y, z)) {
+                        addLeft(ret, x, y, z, 1, 1, 1, bt.texLeft, light);
                     }
-                    if(needsRight(chunk,x,y,z)){
-                        addFaceRight(ret, x, y, z, 1, 1, 1, bt.texRight, light);
+                    if (needsRight(chunk, x, y, z)) {
+                        addRight(ret, x, y, z, 1, 1, 1, bt.texRight, light);
                     }
                 }
             }

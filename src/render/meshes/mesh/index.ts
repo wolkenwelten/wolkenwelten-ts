@@ -1,49 +1,51 @@
+import { mat4 } from 'gl-matrix';
+
 import '../../../types';
 import { Shader } from '../../shader';
 import { Texture } from '../../texture';
 import { WavefrontFile, WavefrontObject } from './objLoader';
 export { WavefrontFile, WavefrontObject } from './objLoader';
 
-let gl: WebGL2RenderingContext;
-export let shader: Shader;
-
 import shaderVertSource from './mesh.vert?raw';
 import shaderFragSource from './mesh.frag?raw';
-import { mat4 } from 'gl-matrix';
-
-export const meshMeshInit = (glc: WebGL2RenderingContext) => {
-    gl = glc;
-    shader = new Shader(gl, 'textMesh', shaderVertSource, shaderFragSource, [
-        'cur_tex',
-        'mat_mvp',
-    ]);
-};
-
 import pearObjSource from '../../../../assets/gfx/pear.obj?raw';
 import pearPng from '../../../../assets/gfx/pear.png';
 
-export const createPear = (): Mesh => {
-    const tex = new Texture(gl, 'pear', pearPng);
-    const mesh = new Mesh(tex);
-    const obj = new WavefrontFile(pearObjSource);
-    mesh.addObj(obj.objects[0]);
-    mesh.finish();
-    return mesh;
-};
-
 export class Mesh {
+    static gl: WebGL2RenderingContext;
+    static shader: Shader;
+
     vertices: number[] = [];
     elementCount = 0;
     texture: Texture;
     vao: WebGLVertexArrayObject;
     finished = false;
 
+    static createPear(): Mesh {
+        const tex = new Texture(this.gl, 'pear', pearPng);
+        const mesh = new Mesh(tex);
+        const obj = new WavefrontFile(pearObjSource);
+        mesh.addObj(obj.objects[0]);
+        mesh.finish();
+        return mesh;
+    }
+
+    static init(glc: WebGL2RenderingContext) {
+        this.gl = glc;
+        this.shader = new Shader(
+            this.gl,
+            'textMesh',
+            shaderVertSource,
+            shaderFragSource,
+            ['cur_tex', 'mat_mvp', 'in_color']
+        );
+    }
+
     constructor(texture: Texture) {
-        const vao = gl.createVertexArray();
+        const vao = Mesh.gl.createVertexArray();
         if (!vao) {
             throw new Error("Couldn't create VAO");
         }
-
         this.vao = vao;
         this.texture = texture;
     }
@@ -67,6 +69,8 @@ export class Mesh {
     }
 
     finish() {
+        const gl = Mesh.gl;
+
         gl.bindVertexArray(this.vao);
 
         const vertex_buffer = gl.createBuffer();
@@ -91,11 +95,15 @@ export class Mesh {
     }
 
     draw(mat_mvp: mat4) {
+        const gl = Mesh.gl;
         if (!this.finished) {
             throw new Error('Trying to draw unfinished mesh');
         }
-        shader.bind();
-        shader.uniform4fv('mat_mvp', mat_mvp);
+        Mesh.shader
+            .bind()
+            .uniform4fv('mat_mvp', mat_mvp)
+            .uniform4f('in_color', 1, 1, 1, 1);
+
         this.texture.bind();
         gl.bindVertexArray(this.vao);
         gl.drawArrays(gl.TRIANGLES, 0, this.elementCount);

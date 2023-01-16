@@ -2,31 +2,36 @@ import '../../../types';
 import { Shader } from '../../shader';
 import { Texture } from '../../texture';
 
-let gl: WebGL2RenderingContext;
-export let shader: Shader;
-export let texture: Texture;
-
 import shaderVertSource from './text.vert?raw';
 import shaderFragSource from './text.frag?raw';
 import guiTextureUrl from '../../../../assets/gfx/gui.png';
 import { mat4 } from 'gl-matrix';
 
-export const textMeshInit = (glc: WebGL2RenderingContext) => {
-    gl = glc;
-    shader = new Shader(gl, 'textMesh', shaderVertSource, shaderFragSource, [
-        'cur_tex',
-        'mat_mvp',
-    ]);
-    texture = new Texture(gl, 'gui', guiTextureUrl);
-};
-
 export class TextMesh {
+    static gl: WebGL2RenderingContext;
+    static shader: Shader;
+    static texture: Texture;
+
     vertices: number[] = [];
     elementCount = 0;
     vao: WebGLVertexArrayObject;
     vbo: WebGLBuffer;
 
+    static init(glc: WebGL2RenderingContext) {
+        this.gl = glc;
+        this.shader = new Shader(
+            this.gl,
+            'textMesh',
+            shaderVertSource,
+            shaderFragSource,
+            ['cur_tex', 'mat_mvp']
+        );
+        this.texture = new Texture(this.gl, 'gui', guiTextureUrl);
+    }
+
     constructor() {
+        const gl = TextMesh.gl;
+
         this.vertices = [
             0, 1024, 0, 0, 0xffffffff,
 
@@ -79,11 +84,10 @@ export class TextMesh {
     }
 
     draw(mat_mvp: mat4) {
-        shader.bind();
-        shader.uniform4fv('mat_mvp', mat_mvp);
-        texture.bind();
+        const gl = TextMesh.gl;
+        TextMesh.shader.bind().uniform4fv('mat_mvp', mat_mvp);
+        TextMesh.texture.bind();
         gl.bindVertexArray(this.vao);
-
         gl.drawArrays(gl.TRIANGLES, 0, this.elementCount);
     }
 }

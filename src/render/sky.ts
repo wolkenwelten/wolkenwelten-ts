@@ -1,11 +1,11 @@
 import { mat4, vec3 } from 'gl-matrix';
 
-import { Texture } from '../texture';
-import { Mesh, WavefrontFile } from '../meshes/mesh';
-import { RenderManager } from '../';
+import { Texture } from './texture';
+import { Mesh, WavefrontFile } from './meshes/mesh';
+import { RenderManager } from '.';
 
-import skyDomeFile from '../../../assets/gfx/skydome.obj?raw';
-import skyTextureUrl from '../../../assets/gfx/sky.png';
+import skyDomeFile from '../../assets/gfx/skydome.obj?raw';
+import skyTextureUrl from '../../assets/gfx/sky.png';
 
 export class Sky {
     mesh: Mesh;

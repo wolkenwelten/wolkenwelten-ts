@@ -12,19 +12,19 @@ export class Chunk {
         this.x = x;
         this.y = y;
         this.z = z;
-        const seed = x^y^z;
-        if(seed & 32){
+        const seed = x ^ y ^ z;
+        if (seed & 32) {
             return;
         }
-        if(seed & 64){
+        if (seed & 64) {
             this.setSphere(16, 16, 16, 8, 2);
             this.setSphere(16, 15, 16, 8, 1);
             this.setSphere(16, 12, 16, 7, 3);
         } else {
-            if(seed & 128){
-                this.setBox(4,4,4,24,24,24,9);
-            } else{
-                this.setBox(8,8,8,16,16,16,13);
+            if (seed & 128) {
+                this.setBox(4, 4, 4, 24, 24, 24, 9);
+            } else {
+                this.setBox(8, 8, 8, 16, 16, 16, 13);
             }
         }
     }

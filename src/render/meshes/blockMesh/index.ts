@@ -3,39 +3,42 @@ import { Shader } from '../../shader';
 import { Texture } from '../../texture';
 import { Chunk } from '../../../world/chunk';
 
-let gl: WebGL2RenderingContext;
-export let shader: Shader;
-export let texture: Texture;
-
 import shaderVertSource from './block.vert?raw';
 import shaderFragSource from './block.frag?raw';
 import blockTextureUrl from '../../../../assets/gfx/blocks.png';
 import { mat4 } from 'gl-matrix';
 import { meshgen } from './meshgen';
 
-export const blockMeshInit = (glc: WebGL2RenderingContext) => {
-    gl = glc;
-    shader = new Shader(gl, 'blockMesh', shaderVertSource, shaderFragSource, [
-        'cur_tex',
-        'mat_mv',
-        'mat_mvp',
-        'trans_pos',
-    ]);
-    texture = new Texture(gl, 'gui', blockTextureUrl, '2DArray');
-    texture.nearest();
-};
-
-export const chunkIntoMesh = (chunk: Chunk): BlockMesh =>
-    new BlockMesh(meshgen(chunk), chunk.x, chunk.y, chunk.z);
-
 export class BlockMesh {
-    x:number;
-    y:number;
-    z:number;
+    static gl: WebGL2RenderingContext;
+    static shader: Shader;
+    static texture: Texture;
+
+    x: number;
+    y: number;
+    z: number;
     elementCount = 0;
     vao: WebGLVertexArrayObject;
 
-    constructor(vertices: Uint8Array, x:number, y:number, z:number) {
+    static init(glc: WebGL2RenderingContext) {
+        this.gl = glc;
+        this.shader = new Shader(
+            this.gl,
+            'blockMesh',
+            shaderVertSource,
+            shaderFragSource,
+            ['cur_tex', 'mat_mv', 'mat_mvp', 'trans_pos']
+        );
+        this.texture = new Texture(this.gl, 'gui', blockTextureUrl, '2DArray');
+        this.texture.nearest();
+    }
+
+    static fromChunk(chunk: Chunk): BlockMesh {
+        return new BlockMesh(meshgen(chunk), chunk.x, chunk.y, chunk.z);
+    }
+
+    constructor(vertices: Uint8Array, x: number, y: number, z: number) {
+        const gl = BlockMesh.gl;
         this.x = x;
         this.y = y;
         this.z = z;
@@ -66,18 +69,18 @@ export class BlockMesh {
     }
 
     static bindShaderAndTexture(projection: mat4, modelView: mat4) {
-        shader.bind();
-        shader.uniform4fv("mat_mv", modelView);
+        BlockMesh.shader.bind();
+        BlockMesh.shader.uniform4fv('mat_mv', modelView);
         const modelViewProjection = mat4.create();
         mat4.multiply(modelViewProjection, projection, modelView);
-        shader.uniform4fv('mat_mvp', modelViewProjection);
-        texture.bind();
+        BlockMesh.shader.uniform4fv('mat_mvp', modelViewProjection);
+        BlockMesh.texture.bind();
     }
 
     drawFast() {
-        shader.uniform3f("trans_pos", this.x, this.y, this.z);
-        gl.bindVertexArray(this.vao);
-        gl.drawArrays(gl.TRIANGLES, 0, this.elementCount);
+        BlockMesh.shader.uniform3f('trans_pos', this.x, this.y, this.z);
+        BlockMesh.gl.bindVertexArray(this.vao);
+        BlockMesh.gl.drawArrays(BlockMesh.gl.TRIANGLES, 0, this.elementCount);
     }
 
     draw(projection: mat4, modelView: mat4) {

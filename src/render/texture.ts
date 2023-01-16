@@ -162,6 +162,7 @@ export class Texture {
         const target = this.target();
         gl.texParameteri(target, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
         gl.texParameteri(target, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        return this;
     }
 
     repeat() {
@@ -169,6 +170,7 @@ export class Texture {
         const target = this.target();
         gl.texParameteri(target, gl.TEXTURE_WRAP_S, gl.REPEAT);
         gl.texParameteri(target, gl.TEXTURE_WRAP_T, gl.REPEAT);
+        return this;
     }
 
     linear() {
@@ -197,6 +199,7 @@ export class Texture {
                 this.gl.LINEAR
             );
         }
+        return this;
     }
 
     nearest() {
@@ -211,7 +214,7 @@ export class Texture {
             this.gl.texParameteri(
                 target,
                 this.gl.TEXTURE_MAG_FILTER,
-                this.gl.NEAREST_MIPMAP_NEAREST
+                this.gl.NEAREST
             );
         } else {
             this.gl.texParameteri(
@@ -225,6 +228,7 @@ export class Texture {
                 this.gl.NEAREST
             );
         }
+        return this;
     }
 
     bind() {
@@ -232,5 +236,6 @@ export class Texture {
             lastBoundTexture = this.texture;
             this.gl.bindTexture(this.target(), this.texture);
         }
+        return this;
     }
 }
