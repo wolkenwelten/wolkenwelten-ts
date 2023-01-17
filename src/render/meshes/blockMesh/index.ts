@@ -95,7 +95,7 @@ export class BlockMesh {
 
         gl.vertexAttribIPointer(2, 1, gl.UNSIGNED_BYTE, 5, 4);
         gl.enableVertexAttribArray(2);
-        this.elementCount = vertices.length / 5;
+        this.elementCount = ((vertices.length / 5)/4)*6;
     }
 
     static bindShaderAndTexture(projection: mat4, modelView: mat4) {
@@ -112,7 +112,7 @@ export class BlockMesh {
         BlockMesh.gl.bindVertexArray(this.vao);
         BlockMesh.gl.drawElements(
             BlockMesh.gl.TRIANGLES,
-            this.elementCount * 4,
+            this.elementCount,
             BlockMesh.gl.UNSIGNED_INT,
             0
         );
