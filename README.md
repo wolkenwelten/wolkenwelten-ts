@@ -12,7 +12,7 @@ Super early, pretty much nothing works whatsoever, so probably not that interest
 - [X] Omit hidden faces from voxel meshes
 - [X] Use indeces when rendering BlockMeshes
 - [X] Greedy meshing
-- [ ] Only render BlockMesh sides that can be seen
+- [X] Only render BlockMesh sides that can be seen
 - [ ] Frustum culling
 - [ ] Compile the Rust meshgen to WASM and measure the performance difference
 

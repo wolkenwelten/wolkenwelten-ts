@@ -282,7 +282,7 @@ const genFront = (vertices: number[], args: GenArgs): number => {
             }
         }
     }
-    return (vertices.length - start) / 4;
+    return (vertices.length - start) / 4 / 5;
 };
 
 const genBack = (vertices: number[], args: GenArgs) => {
@@ -331,7 +331,7 @@ const genBack = (vertices: number[], args: GenArgs) => {
             }
         }
     }
-    return (vertices.length - start) / 4;
+    return (vertices.length - start) / 4 / 5;
 };
 
 const genTop = (vertices: number[], args: GenArgs) => {
@@ -381,7 +381,7 @@ const genTop = (vertices: number[], args: GenArgs) => {
             }
         }
     }
-    return (vertices.length - start) / 4;
+    return (vertices.length - start) / 4 / 5;
 };
 
 const genBottom = (vertices: number[], args: GenArgs) => {
@@ -431,7 +431,7 @@ const genBottom = (vertices: number[], args: GenArgs) => {
             }
         }
     }
-    return (vertices.length - start) / 4;
+    return (vertices.length - start) / 4 / 5;
 };
 
 const genRight = (vertices: number[], args: GenArgs) => {
@@ -481,7 +481,7 @@ const genRight = (vertices: number[], args: GenArgs) => {
             }
         }
     }
-    return (vertices.length - start) / 4;
+    return (vertices.length - start) / 4 / 5;
 };
 
 const genLeft = (vertices: number[], args: GenArgs) => {
@@ -531,10 +531,10 @@ const genLeft = (vertices: number[], args: GenArgs) => {
             }
         }
     }
-    return (vertices.length - start) / 4;
+    return (vertices.length - start) / 4 / 5;
 };
 
-export const meshgen = (chunk: Chunk): Uint8Array => {
+export const meshgen = (chunk: Chunk): [Uint8Array, number[]] => {
     const vertices: number[] = [];
     const blockData = new Uint8Array(34 * 34 * 34);
     const sideCache = new Uint8Array(32 * 32 * 32);
@@ -542,15 +542,15 @@ export const meshgen = (chunk: Chunk): Uint8Array => {
     blitChunkData(blockData, chunk.blocks, 1, 1, 1);
     calcSideCache(sideCache, blockData);
 
-    const sideOffsets = [0, 0, 0, 0, 0, 0];
+    const sideSquareCount = [0, 0, 0, 0, 0, 0];
     const data = { blockData, sideCache, blockTypes: blocks };
 
-    sideOffsets[0] = genFront(vertices, data);
-    sideOffsets[1] = genBack(vertices, data);
-    sideOffsets[2] = genTop(vertices, data);
-    sideOffsets[3] = genBottom(vertices, data);
-    sideOffsets[4] = genLeft(vertices, data);
-    sideOffsets[5] = genRight(vertices, data);
+    sideSquareCount[0] = genFront(vertices, data);
+    sideSquareCount[1] = genBack(vertices, data);
+    sideSquareCount[2] = genTop(vertices, data);
+    sideSquareCount[3] = genBottom(vertices, data);
+    sideSquareCount[4] = genLeft(vertices, data);
+    sideSquareCount[5] = genRight(vertices, data);
 
-    return new Uint8Array(vertices);
+    return [new Uint8Array(vertices), sideSquareCount];
 };
