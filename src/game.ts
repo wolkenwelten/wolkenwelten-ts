@@ -30,7 +30,7 @@ export class Game {
             -3,
             30.5,
             -4,
-            Math.PI * 1.25,
+            Math.PI * 0.25,
             -Math.PI / 12
         );
 

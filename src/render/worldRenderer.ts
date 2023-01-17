@@ -30,12 +30,18 @@ export class WorldRenderer {
         return newMesh;
     }
 
+    calcMask(x:number,y:number,z:number):number {
+        return +(z <= 0)
+        | ((+(z>= 0)) << 1)
+        | ((+(y<= 0)) << 2)
+        | ((+(y>= 0)) << 3)
+        | ((+(x>= 0)) << 4)
+        | ((+(x<= 0)) << 5);
+    }
+
     draw(projectionMatrix: mat4, viewMatrix: mat4, cam: Entity) {
         this.renderer.gl.enable(this.renderer.gl.BLEND);
-        this.renderer.gl.blendFunc(
-            this.renderer.gl.SRC_ALPHA,
-            this.renderer.gl.ONE_MINUS_SRC_ALPHA
-        );
+
         BlockMesh.bindShaderAndTexture(projectionMatrix, viewMatrix);
         const cx = cam.x & ~31;
         const cy = cam.y & ~31;
@@ -46,7 +52,7 @@ export class WorldRenderer {
                     const nx = cx + x * 32;
                     const ny = cy + y * 32;
                     const nz = cz + z * 32;
-                    this.getMesh(nx, ny, nz)?.drawFast();
+                    this.getMesh(nx, ny, nz)?.drawFast(this.calcMask(x,y,z));
                 }
             }
         }
