@@ -1,8 +1,8 @@
 import { mat4, vec3 } from 'gl-matrix';
 
 import { Texture } from './texture';
-import { Mesh, WavefrontFile } from './meshes/mesh';
-import { RenderManager } from '.';
+import { Mesh, WavefrontFile } from './meshes/mesh/mesh';
+import { RenderManager } from './render';
 
 import skyDomeFile from '../../assets/gfx/skydome.obj?raw';
 import skyTextureUrl from '../../assets/gfx/sky.png';

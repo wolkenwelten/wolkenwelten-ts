@@ -1,3 +1,4 @@
+import { Game } from '../game';
 import { Chunk } from './chunk';
 export { Chunk } from './chunk';
 
@@ -8,6 +9,11 @@ export const coordinateToWorldKey = (x: number, y: number, z: number) =>
 
 export class World {
     chunks: Map<number, Chunk> = new Map();
+    game: Game;
+
+    constructor (game: Game) {
+        this.game = game;
+    }
 
     getChunk(x: number, y: number, z: number): Chunk | undefined {
         const chunk = this.chunks.get(coordinateToWorldKey(x, y, z));
@@ -27,7 +33,7 @@ export class World {
         if (chunk) {
             return chunk;
         }
-        const newChunk = new Chunk(x, y, z);
+        const newChunk = new Chunk(this.game.ticks, x, y, z);
         this.chunks.set(key, newChunk);
         return newChunk;
     }

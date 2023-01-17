@@ -1,10 +1,10 @@
-import { Character } from './entities';
+import { Character } from './entities/entities';
 import './game.css';
 
-import { InputManager } from './input';
-import { RenderManager } from './render';
-import { UIManager } from './ui';
-import { World } from './world';
+import { InputManager } from './input/input';
+import { RenderManager } from './render/render';
+import { UIManager } from './ui/ui';
+import { World } from './world/world';
 import { initDefaultBlocks } from './world/blockTypeDefaults';
 
 export interface GameConfig {
@@ -24,7 +24,7 @@ export class Game {
     constructor(config: GameConfig) {
         this.config = config;
         this.rootElement = config.parent;
-        this.world = new World();
+        this.world = new World(this);
         initDefaultBlocks();
         this.player = new Character(
             -3,

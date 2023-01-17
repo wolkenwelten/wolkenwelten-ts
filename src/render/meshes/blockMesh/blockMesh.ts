@@ -18,6 +18,7 @@ export class BlockMesh {
     x: number;
     y: number;
     z: number;
+    lastUpdated: number;
     elementCount = 0;
     sideSquareCount: number[];
     sideStart: number[];
@@ -66,14 +67,15 @@ export class BlockMesh {
 
     static fromChunk(chunk: Chunk): BlockMesh {
         const [vertices, sideSquareCount] = meshgen(chunk);
-        return new BlockMesh(vertices, sideSquareCount, chunk.x, chunk.y, chunk.z);
+        return new BlockMesh(chunk.lastUpdated, vertices, sideSquareCount, chunk.x, chunk.y, chunk.z);
     }
 
-    constructor(vertices: Uint8Array, sideSquareCount:number[], x: number, y: number, z: number) {
+    constructor(lastUpdated:number, vertices: Uint8Array, sideSquareCount:number[], x: number, y: number, z: number) {
         const gl = BlockMesh.gl;
         this.x = x;
         this.y = y;
         this.z = z;
+        this.lastUpdated = lastUpdated;
         this.elementCount = (vertices.length / 20) * 6;
 
         this.sideSquareCount = sideSquareCount;
