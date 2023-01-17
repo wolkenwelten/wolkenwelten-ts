@@ -1,7 +1,7 @@
 import { Game } from '../game';
 import { mat4 } from 'gl-matrix';
-import { TextMesh, meshInit, Mesh, BlockMesh } from './meshes';
-import { Entity } from '../entities';
+import { TextMesh, meshInit, Mesh, BlockMesh } from './meshes/meshes';
+import { Entity } from '../entities/entities';
 import { Sky } from './sky';
 import { WorldRenderer } from './worldRenderer';
 import { allTexturesLoaded } from './texture';
@@ -17,6 +17,8 @@ export class RenderManager {
     frames = 0;
     fps = 0;
     drawFrameClosure: () => void;
+    generateMeshClosue: () => void;
+    generateMeshClosureActive = false;
 
     testMesh: TextMesh;
     pearMesh: Mesh;
@@ -45,6 +47,7 @@ export class RenderManager {
         this.world = new WorldRenderer(this);
 
         this.drawFrameClosure = this.drawFrame.bind(this);
+        this.generateMeshClosue = this.generateMesh.bind(this);
         window.requestAnimationFrame(this.drawFrameClosure);
         setInterval(this.updateFPS.bind(this), 1000);
 
@@ -119,6 +122,16 @@ export class RenderManager {
         this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
     }
 
+    generateMesh() {
+        this.world.generateOneQueuedMesh();
+        this.world.generateOneQueuedMesh();
+        if(this.world.generatorQueue.length === 0){
+            this.generateMeshClosureActive = false;
+        } else {
+            setTimeout(this.generateMeshClosue,0);
+        }
+    }
+
     drawFrame() {
         window.requestAnimationFrame(this.drawFrameClosure);
         if (!allTexturesLoaded()) {
@@ -130,5 +143,9 @@ export class RenderManager {
         this.gl.clearColor(0.09, 0.478, 1, 1);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
         this.drawScene();
+        if(!this.generateMeshClosureActive && this.world.generatorQueue.length){
+            this.generateMeshClosureActive = true;
+            setTimeout(this.generateMeshClosue,0);
+        }
     }
 }

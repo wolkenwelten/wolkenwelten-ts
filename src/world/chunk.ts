@@ -3,15 +3,17 @@ const coordinateToOffset = (x: number, y: number, z: number) =>
 
 export class Chunk {
     blocks: Uint8Array;
+    lastUpdated: number;
     x: number;
     y: number;
     z: number;
 
-    constructor(x: number, y: number, z: number) {
+    constructor(lastUpdated:number, x: number, y: number, z: number) {
         this.blocks = new Uint8Array(32 * 32 * 32);
         this.x = x;
         this.y = y;
         this.z = z;
+        this.lastUpdated = lastUpdated;
         const seed = x ^ y ^ z;
         if (seed & 32) {
             return;
