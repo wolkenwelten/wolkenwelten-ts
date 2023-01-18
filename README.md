@@ -15,7 +15,11 @@ Super early, pretty much nothing works whatsoever, so probably not that interest
 - [X] Only render BlockMesh sides that can be seen
 - [X] Non-blocking mesh generation
 - [X] Frustum culling
-- [ ] Compile the Rust meshgen to WASM and measure the performance difference
+- [X] Simple lighting (ignoring neihbouring chunks)
+- [ ] Hidden surface removal across chunk boundaries
+- [ ] Complex lighting (across chunk boundaries)
+- [ ] Compile the Rust meshgen kernel to WASM and measure the performance difference
+- [ ] Port the meshgen kernel to AssemblyScript and compare against the Rust/TS versions
 
 ## Preview
 You can see the current state of the main branch here: https://wolkenwelten.github.io/wolkenwelten-ts/

@@ -1,15 +1,20 @@
+import { lightGenSimple } from "./lightGen";
+
 const coordinateToOffset = (x: number, y: number, z: number) =>
     (x & 0x1f) | ((y & 0x1f) << 5) | ((z & 0x1f) << 10);
 
 export class Chunk {
     blocks: Uint8Array;
     lastUpdated: number;
+    simpleLight: Uint8Array;
+    simpleLightLastUpdated = 0;
     x: number;
     y: number;
     z: number;
 
     constructor(lastUpdated:number, x: number, y: number, z: number) {
         this.blocks = new Uint8Array(32 * 32 * 32);
+        this.simpleLight = new Uint8Array(32 * 32 * 32);
         this.x = x;
         this.y = y;
         this.z = z;
@@ -29,6 +34,12 @@ export class Chunk {
                 this.setBox(8, 8, 8, 16, 16, 16, 13);
             }
         }
+    }
+
+    updateSimpleLight () {
+        if(this.simpleLightLastUpdated >= this.lastUpdated){return;}
+        lightGenSimple(this.simpleLight, this.blocks);
+        this.simpleLightLastUpdated = this.lastUpdated;
     }
 
     getBlock(x: number, y: number, z: number): number {

@@ -13,7 +13,7 @@ type QueueEntry = {
     z:number,
 }
 
-const RENDER_STEPS = 3;
+const RENDER_STEPS = 4;
 
 export class WorldRenderer {
     meshes: Map<number, BlockMesh> = new Map();

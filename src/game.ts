@@ -19,7 +19,7 @@ export class Game {
     ui: UIManager;
     player: Character;
     world: World;
-    ticks = 0;
+    ticks = 1;
 
     constructor(config: GameConfig) {
         this.config = config;
