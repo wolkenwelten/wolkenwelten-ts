@@ -2,7 +2,6 @@ import { Game } from '../game';
 import { mat4 } from 'gl-matrix';
 import { TextMesh, meshInit, Mesh, BlockMesh } from './meshes/meshes';
 import { Entity } from '../entities/entities';
-import { Sky } from './sky';
 import { WorldRenderer } from './worldRenderer';
 import { allTexturesLoaded } from './texture';
 
@@ -23,7 +22,6 @@ export class RenderManager {
     testMesh: TextMesh;
     pearMesh: Mesh;
     cam?: Entity;
-    sky: Sky;
     world: WorldRenderer;
 
     constructor(game: Game) {
@@ -41,7 +39,6 @@ export class RenderManager {
         this.initGLContext();
         meshInit(gl);
 
-        this.sky = new Sky(this);
         this.testMesh = new TextMesh();
         this.pearMesh = Mesh.createPear();
         this.world = new WorldRenderer(this);
@@ -82,7 +79,7 @@ export class RenderManager {
             (this.fov * Math.PI) / 180,
             this.width / this.height,
             0.1,
-            128.0
+            512.0
         );
 
         const viewMatrix = mat4.create();
@@ -93,7 +90,6 @@ export class RenderManager {
             -this.cam.y,
             -this.cam.z,
         ]);
-        //this.sky.draw(projectionMatrix, viewMatrix);
         this.world.draw(projectionMatrix, viewMatrix, this.cam);
 
         const modelMatrix = mat4.create();
