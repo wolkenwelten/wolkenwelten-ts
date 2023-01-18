@@ -42,6 +42,7 @@ export class Game {
     }
 
     tick() {
+        this.ticks++;
         this.input.tick();
     }
 }

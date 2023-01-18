@@ -62,6 +62,7 @@ export class WorldRenderer {
         let skipped = 0;
 
         this.generatorQueue.length = 0;
+        const ticks = this.renderer.game.ticks;
         for (let x = -RENDER_STEPS; x <= RENDER_STEPS; x++) {
             for (let y = -RENDER_STEPS; y <= RENDER_STEPS; y++) {
                 for (let z = -RENDER_STEPS; z <= RENDER_STEPS; z++) {
@@ -75,7 +76,8 @@ export class WorldRenderer {
                     drawn++;
                     const mesh = this.getMesh(nx, ny, nz);
                     if(mesh){
-                        mesh.drawFast(this.calcMask(x,y,z));
+                        const alpha = Math.min(1.0, (ticks - mesh.lastUpdated) * (1.0/16.0));
+                        mesh.drawFast(this.calcMask(x,y,z), alpha);
                     } else {
                         const dx = cam.x - nx;
                         const dy = cam.y - ny;

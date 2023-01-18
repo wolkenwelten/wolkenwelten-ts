@@ -58,7 +58,7 @@ export class BlockMesh {
             'blockMesh',
             shaderVertSource,
             shaderFragSource,
-            ['cur_tex', 'mat_mv', 'mat_mvp', 'trans_pos']
+            ['cur_tex', 'mat_mv', 'mat_mvp', 'trans_pos', "alpha"]
         );
         this.texture = new Texture(this.gl, 'gui', blockTextureUrl, '2DArray');
         this.texture.nearest();
@@ -122,9 +122,10 @@ export class BlockMesh {
         BlockMesh.texture.bind();
     }
 
-    drawFast(mask:number) {
+    drawFast(mask:number,alpha:number) {
         BlockMesh.gl.bindVertexArray(this.vao);
         BlockMesh.shader.uniform3f('trans_pos', this.x, this.y, this.z);
+        BlockMesh.shader.uniform1f('alpha', alpha);
         if (mask === 0) {
             return;
         } else if(mask === 0x3F) {
@@ -147,8 +148,8 @@ export class BlockMesh {
         }
     }
 
-    draw(projection: mat4, modelView: mat4, mask:number) {
+    draw(projection: mat4, modelView: mat4, mask:number, alpha:number) {
         BlockMesh.bindShaderAndTexture(projection, modelView);
-        this.drawFast(mask);
+        this.drawFast(mask,alpha);
     }
 }
