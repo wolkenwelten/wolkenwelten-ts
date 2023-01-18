@@ -11,7 +11,7 @@ export class RenderManager {
     canvas: HTMLCanvasElement;
     gl: WebGL2RenderingContext;
     fov = 60;
-    renderDistance = 192.0;
+    renderDistance = 128.0;
     width = 640;
     height = 480;
     frames = 0;
@@ -123,7 +123,6 @@ export class RenderManager {
     }
 
     generateMesh() {
-        this.world.generateOneQueuedMesh();
         this.world.generateOneQueuedMesh();
         if(this.world.generatorQueue.length === 0){
             this.generateMeshClosureActive = false;
