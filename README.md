@@ -14,7 +14,7 @@ Super early, pretty much nothing works whatsoever, so probably not that interest
 - [X] Greedy meshing
 - [X] Only render BlockMesh sides that can be seen
 - [X] Non-blocking mesh generation
-- [ ] Frustum culling
+- [X] Frustum culling
 - [ ] Compile the Rust meshgen to WASM and measure the performance difference
 
 ## Preview
