@@ -1,5 +1,6 @@
-import { mat4 } from 'gl-matrix';
+import { mat4, vec4 } from 'gl-matrix';
 
+import { Frustum } from './frustum';
 import { BlockMesh } from './meshes/meshes';
 import { RenderManager } from './render';
 import { Entity } from '../entities/entities';
@@ -56,6 +57,10 @@ export class WorldRenderer {
         const cx = cam.x & ~31;
         const cy = cam.y & ~31;
         const cz = cam.z & ~31;
+        const frustum = new Frustum(projectionMatrix, viewMatrix);
+        let drawn = 0;
+        let skipped = 0;
+
         this.generatorQueue.length = 0;
         for (let x = -RENDER_STEPS; x <= RENDER_STEPS; x++) {
             for (let y = -RENDER_STEPS; y <= RENDER_STEPS; y++) {
@@ -63,6 +68,11 @@ export class WorldRenderer {
                     const nx = cx + x * 32;
                     const ny = cy + y * 32;
                     const nz = cz + z * 32;
+                    if(!frustum.containsCube(vec4.fromValues(nx,ny,nz,1))){
+                        skipped++;
+                        continue;
+                    }
+                    drawn++;
                     const mesh = this.getMesh(nx, ny, nz);
                     if(mesh){
                         mesh.drawFast(this.calcMask(x,y,z));
@@ -76,6 +86,7 @@ export class WorldRenderer {
                 }
             }
         }
+        this.renderer.game.ui.debugInfo.innerText = `Frustum Culling Info:\nDrawn:${drawn}\nCulled:${skipped}`
         if(this.generatorQueue.length){
             this.generatorQueue.sort((a,b) => b.dd - a.dd);
         }
