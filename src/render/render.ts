@@ -19,7 +19,7 @@ export class RenderManager {
     generateMeshClosue: () => void;
     generateMeshClosureActive = false;
 
-    testMesh: TextMesh;
+    crosshairMesh: TextMesh;
     pearMesh: Mesh;
     cam?: Entity;
     world: WorldRenderer;
@@ -39,7 +39,7 @@ export class RenderManager {
         this.initGLContext();
         meshInit(gl);
 
-        this.testMesh = new TextMesh();
+        this.crosshairMesh = new TextMesh();
         this.pearMesh = Mesh.createPear();
         this.world = new WorldRenderer(this);
 
@@ -108,6 +108,29 @@ export class RenderManager {
         mat4.translate(modelViewMatrix, modelViewMatrix, [1.5, -0.75, -1.75]);
         mat4.multiply(modelViewMatrix, projectionMatrix, modelViewMatrix);
         this.pearMesh.draw(modelViewMatrix);
+
+        this.drawHud2D();
+    }
+
+    drawHud2D() {
+        const projectionMatrix = mat4.create();
+        mat4.ortho(
+            projectionMatrix,
+            0,
+            this.width,
+            this.height,
+            0,
+            -128,
+            128
+        );
+
+        this.gl.enable(this.gl.BLEND);
+        this.crosshairMesh.draw(projectionMatrix);
+        this.gl.disable(this.gl.BLEND);
+    }
+
+    rebuildCrosshair() {
+        this.crosshairMesh.pushBox(this.width/2 - 16, this.height/2 - 16,32,32,72 * (1/128),1-(4*(1/128)),4*(1/128),4*(1/128),0xFFFFFFFF);
     }
 
     resize() {
@@ -116,6 +139,7 @@ export class RenderManager {
         this.canvas.width = this.width;
         this.canvas.height = this.height;
         this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+        this.rebuildCrosshair();
     }
 
     generateMesh() {
@@ -135,6 +159,7 @@ export class RenderManager {
         this.frames++;
         this.fps++;
 
+        //this.testMesh.pushString(8,64,2,0xFFFFFFFF, `Current frame:${this.frames}`);
         this.gl.clearColor(0.09, 0.478, 1, 1);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
         this.drawScene();
