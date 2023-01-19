@@ -11,15 +11,15 @@ export class InputManager {
         window.addEventListener('keydown', (e) => that.keystates.add(e.code));
         window.addEventListener('keyup', (e) => that.keystates.delete(e.code));
 
-        that.game.rootElement.addEventListener('click', (e) => {
-            if (!document.pointerLockElement) {
-                that.game.rootElement.requestPointerLock();
-            }
+        that.game.rootElement.addEventListener('mousedown', async (e) => {
             if (!document.fullscreenElement) {
-                that.game.rootElement.requestFullscreen();
+                await that.game.rootElement.requestFullscreen();
             }
-        });
-        document.addEventListener(
+            if (!document.pointerLockElement) {
+                await that.game.rootElement.requestPointerLock();
+            }
+        }, false);
+        that.game.rootElement.addEventListener(
             'mousemove',
             (e) => {
                 if (document.pointerLockElement) {
