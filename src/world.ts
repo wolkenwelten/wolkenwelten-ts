@@ -43,6 +43,19 @@ export class World {
         return chunk;
     }
 
+    isLoaded(x: number, y: number, z: number): boolean {
+        const chunk = this.getChunk(
+            Math.floor(x) & ~0x1f,
+            Math.floor(y) & ~0x1f,
+            Math.floor(z) & ~0x1f
+        );
+        return Boolean(chunk);
+    }
+
+    isSolid(x: number, y: number, z: number): boolean {
+        return Boolean(this.getBlock(x, y, z));
+    }
+
     getOrGenChunk(x: number, y: number, z: number): Chunk {
         const key = coordinateToWorldKey(x, y, z);
         const chunk = this.chunks.get(key);

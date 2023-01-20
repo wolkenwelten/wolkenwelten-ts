@@ -48,7 +48,7 @@ export class InputManager {
     }
 
     update() {
-        const speed = this.keystates.has('ShiftLeft') ? 0.2 : 0.05;
+        const speed = this.keystates.has('ShiftLeft') ? 0.05 : 0.2;
         const movement = { x: 0, y: 0, z: 0 };
 
         if (this.keystates.has('KeyW')) {

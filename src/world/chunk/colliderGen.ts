@@ -1,5 +1,3 @@
 import { Chunk } from '../chunk';
 
-export const colliderGen = (chunk: Chunk) => {
-
-};
+export const colliderGen = (chunk: Chunk) => {};

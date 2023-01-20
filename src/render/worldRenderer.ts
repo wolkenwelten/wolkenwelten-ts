@@ -102,7 +102,13 @@ export class WorldRenderer {
             Culled:${skipped}
             Queue:${this.generatorQueue.length}
             Chunks:${this.renderer.game.world.chunks.size}
-            Meshes:${this.meshes.size}`;
+            Meshes:${this.meshes.size}
+            Player X:${cam.x.toFixed(2)} Y:${cam.y.toFixed(
+            2
+        )} Z:${cam.z.toFixed(2)}
+            Player VX:${cam.vx.toFixed(2)} VY:${cam.vy.toFixed(
+            2
+        )} VZ:${cam.vz.toFixed(2)}`;
 
         if (this.generatorQueue.length) {
             this.generatorQueue.sort((a, b) => b.dd - a.dd);

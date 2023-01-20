@@ -1,4 +1,3 @@
-
 const light = new Uint8Array(32 * 32);
 
 const sunlight = (out: Uint8Array, blocks: Uint8Array) => {
