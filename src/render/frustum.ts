@@ -7,8 +7,20 @@ export class Frustum {
 
     constructor() {
         this.clip = mat4.create();
-        this.rows = [vec4.create(), vec4.create(), vec4.create(), vec4.create()];
-        this.planes = [vec4.create(), vec4.create(), vec4.create(), vec4.create(), vec4.create(), vec4.create()];
+        this.rows = [
+            vec4.create(),
+            vec4.create(),
+            vec4.create(),
+            vec4.create(),
+        ];
+        this.planes = [
+            vec4.create(),
+            vec4.create(),
+            vec4.create(),
+            vec4.create(),
+            vec4.create(),
+            vec4.create(),
+        ];
     }
 
     build(projection: mat4, view: mat4) {

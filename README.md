@@ -1,5 +1,15 @@
 # WolkenWelten - TS
-An experiment in turning the Rust/TS relationship around, writing most of the game in TS and using Rust/WASM for the hot loops.
+A Voxel engine for the Web that respects your freedom.
+
+Runs on a Raspberry Pi 4.
+
+Fits on a 1.44MB floppy.
+
+## Try it!
+You can play the newest version here: https://wolkenwelten.github.io/wolkenwelten-ts/
+
+## History
+While integrating V8 into my Rust Voxel engine, I started experimenting with turning things around, writing most of the engine in TypeScript and using WASM for the tricky bits. Turns out Chrome/Safari are plenty fast and run at ~60FPS on my ~10 year old workstation already without having to use WASM (Firefox sadly seems to be quite slow at anything WebGL related).
 
 ## Status
 Super early, pretty much nothing works whatsoever, so probably not that interesting (yet).
@@ -18,14 +28,13 @@ Super early, pretty much nothing works whatsoever, so probably not that interest
 - [X] Simple lighting (ignoring neihbouring chunks)
 - [X] Buggy placeholder player physics
 - [X] Simple Chunk/BlockMesh GC
-- [ ] Experiment with integrating cannon-es for physics
 - [ ] Hidden surface removal across chunk boundaries
 - [ ] Complex lighting (across chunk boundaries)
 - [ ] Compile the Rust meshgen kernel to WASM and measure the performance difference
 - [ ] Port the meshgen kernel to AssemblyScript and compare against the Rust/TS versions
 
-## Preview
-You can see the current state of the main branch here: https://wolkenwelten.github.io/wolkenwelten-ts/
+## Hardware Support
+I try to make sure that it also runs on cheap/older hardware and regularly test on my Raspberry PI 4 which gets ~50-60FPS at 720p in Chromium (make sure to use the 64-bit version). Additionally I make sure that it runs on an old Sandybridge x220 Thinkpad (Linux is much more performant here, although it kinda runs on Win10).
 
 ## Development
 To set up a development environment you only need NodeJS(v16+) and NPM installed
