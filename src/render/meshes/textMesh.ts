@@ -1,10 +1,10 @@
-import '../../../types';
-import { Shader } from '../../shader';
-import { Texture } from '../../texture';
+import '../../types';
+import { Shader } from '../shader';
+import { Texture } from '../texture';
 
-import shaderVertSource from './text.vert?raw';
-import shaderFragSource from './text.frag?raw';
-import guiTextureUrl from '../../../../assets/gfx/gui.png';
+import shaderVertSource from './textMesh/text.vert?raw';
+import shaderFragSource from './textMesh/text.frag?raw';
+import guiTextureUrl from '../../../assets/gfx/gui.png';
 import { mat4 } from 'gl-matrix';
 
 export class TextMesh {
@@ -76,22 +76,28 @@ export class TextMesh {
         TextMesh.shader.bind().uniform4fv('mat_mvp', mat_mvp);
         TextMesh.texture.bind();
         gl.bindVertexArray(this.vao);
-        if(!this.ready){
+        if (!this.ready) {
             this.finish();
         }
         gl.drawArrays(gl.TRIANGLES, 0, this.elementCount);
     }
 
-    pushVertex (x:number, y:number, u:number, v:number, color:number) {
+    pushVertex(x: number, y: number, u: number, v: number, color: number) {
         this.ready = false;
-        this.vertices.push(x,y,u,v,color);
+        this.vertices.push(x, y, u, v, color);
         return this;
     }
 
     pushBox(
-        x:number, y:number, w:number, h:number,
-        u:number, v:number, uw:number, vh:number,
-        rgba:number
+        x: number,
+        y: number,
+        w: number,
+        h: number,
+        u: number,
+        v: number,
+        uw: number,
+        vh: number,
+        rgba: number
     ) {
         this.pushVertex(x, y + h, u, v + vh, rgba)
             .pushVertex(x + w, y, u + uw, v, rgba)
@@ -107,10 +113,10 @@ export class TextMesh {
         y: number,
         size: number,
         rgba: number,
-        fill_state: number,
+        fill_state: number
     ) {
-        const u = (128 - 20 + fill_state * 4) * (1/128);
-        const v = 1-((128 - 4) * (1/128));
+        const u = (128 - 20 + fill_state * 4) * (1 / 128);
+        const v = 1 - (128 - 4) * (1 / 128);
         this.pushBox(x, y, size, size, u, v, 4, 4, rgba);
         return this;
     }
@@ -118,38 +124,38 @@ export class TextMesh {
     pushGlyph(x: number, y: number, size: number, rgba: number, c: number) {
         const glyphWidth = 8 * size;
 
-        if(x < -glyphWidth) {
+        if (x < -glyphWidth) {
             return this;
         }
-        if(y < -glyphWidth){
+        if (y < -glyphWidth) {
             return this;
         }
-        if((c === 0) || (c === 20) || (c >= 128)){
+        if (c === 0 || c === 20 || c >= 128) {
             return this;
         }
 
-        let u = (32 + ((c & 0xF) * Math.min(size,2))) * (1/128);
-        let v = 1 - (((((c >> 4) & 0xF) + 1) * Math.min(size,2)) * (1/128));
+        let u = (32 + (c & 0xf) * Math.min(size, 2)) * (1 / 128);
+        let v = 1 - (((c >> 4) & 0xf) + 1) * Math.min(size, 2) * (1 / 128);
 
         this.pushBox(
-            x, y, glyphWidth, glyphWidth,
-            u, v, Math.min(size,2) * (1/128), Math.min(size,2) * (1/128),
-            rgba,
+            x,
+            y,
+            glyphWidth,
+            glyphWidth,
+            u,
+            v,
+            Math.min(size, 2) * (1 / 128),
+            Math.min(size, 2) * (1 / 128),
+            rgba
         );
         return this;
     }
 
-    pushString(
-        x: number,
-        y: number,
-        size: number,
-        rgba: number,
-        text: string,
-    ) {
+    pushString(x: number, y: number, size: number, rgba: number, text: string) {
         const glyphWidth = 8 * size;
-        for(let i=0;i<text.length;i++){
+        for (let i = 0; i < text.length; i++) {
             const c = text.charCodeAt(i);
-            const cx = x + (i * glyphWidth);
+            const cx = x + i * glyphWidth;
             this.pushGlyph(cx, y, size, rgba, c);
         }
         return this;

@@ -1,7 +1,6 @@
-import { Game } from '../game';
-import { Entity } from './entities/entity';
-import { Chunk } from './chunk';
-export { Chunk } from './chunk';
+import { Game } from './game';
+import { Entity } from './world/entity';
+import { Chunk } from './world/chunk';
 
 export const coordinateToWorldKey = (x: number, y: number, z: number) =>
     ((x >> 5) & 0xffff) +
@@ -10,16 +9,26 @@ export const coordinateToWorldKey = (x: number, y: number, z: number) =>
 
 export class World {
     chunks: Map<number, Chunk> = new Map();
-    entities: Entity[] = [];
+    entities: Set<Entity> = new Set();
     game: Game;
 
-    constructor (game: Game) {
+    constructor(game: Game) {
         this.game = game;
     }
 
     getBlock(x: number, y: number, z: number): number | undefined {
-        const chunk = this.getChunk(Math.floor(x) & ~0x1F, Math.floor(y) & ~0x1F, Math.floor(z) & ~0x1F);
-        return chunk ? chunk.getBlock(Math.floor(x) & 0x1f, Math.floor(y) & 0x1f, Math.floor(z) & 0x1f) : undefined;
+        const chunk = this.getChunk(
+            Math.floor(x) & ~0x1f,
+            Math.floor(y) & ~0x1f,
+            Math.floor(z) & ~0x1f
+        );
+        return chunk
+            ? chunk.getBlock(
+                  Math.floor(x) & 0x1f,
+                  Math.floor(y) & 0x1f,
+                  Math.floor(z) & 0x1f
+              )
+            : undefined;
     }
 
     getChunk(x: number, y: number, z: number): Chunk | undefined {
@@ -40,7 +49,7 @@ export class World {
         if (chunk) {
             return chunk;
         }
-        const newChunk = new Chunk(this.game.ticks, x, y, z);
+        const newChunk = new Chunk(this, x, y, z);
         this.chunks.set(key, newChunk);
         return newChunk;
     }
@@ -50,12 +59,30 @@ export class World {
     }
 
     update() {
-        for(const entity of this.entities) {
+        for (const entity of this.entities) {
             entity.update(this);
         }
     }
 
     addEntity(entity: Entity) {
-        this.entities.push(entity);
+        this.entities.add(entity);
+    }
+
+    removeEntity(entity: Entity) {
+        this.entities.delete(entity);
+    }
+
+    gc() {
+        const maxDistance =
+            this.game.render.renderDistance *
+            this.game.render.renderDistance *
+            4;
+        for (const chunk of this.chunks.values()) {
+            if (chunk.gc(maxDistance, this.game.player)) {
+                const key = coordinateToWorldKey(chunk.x, chunk.y, chunk.z);
+                this.chunks.delete(key);
+                this.game.render.world.meshes.delete(key);
+            }
+        }
     }
 }

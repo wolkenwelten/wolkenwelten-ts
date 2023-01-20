@@ -238,42 +238,58 @@ class PlaneEntry {
     }
 }
 
-const lightLeftRight = (lightData:Uint8Array, x:number, y:number, z:number) => {
-    const a = lightData[(x*34*34)+(y*34)+z];
-    const b = lightData[(x*34*34)+((y+1)*34)+z];
-    const c = lightData[(x*34*34)+(y*34)+z+1];
-    const d = lightData[(x*34*34)+((y+1)*34)+z+1];
-    return Math.min(((a + b + c + d) / 4),15);
-}
-
-const lightTopBottom = (lightData:Uint8Array, x:number, y:number, z:number) => {
-    const a = lightData[(x*34*34) + (y*34) + z];
-    const b = lightData[(x*34*34) + (y*34) + z+1];
-    const c = lightData[((x+1)*34*34) + (y*34) + z];
-    const d = lightData[((x+1)*34*34) + (y*34) + z + 1];
-    return Math.min(((a + b + c + d) / 4),15);
-}
-
-const lightFrontBack = (lightData:Uint8Array, x:number, y:number, z:number) => {
-    const a = lightData[(x*34*34) + (y*34) + z];
-    const b = lightData[(x*34*34) + ((y+1)*34) + z];
-    const c = lightData[((x+1)*34*34) + (y*34) + z];
-    const d = lightData[((x+1)*34*34) + ((y+1)*34) + z];
-    return Math.min(((a + b + c + d) / 4),15);
+const lightLeftRight = (
+    lightData: Uint8Array,
+    x: number,
+    y: number,
+    z: number
+) => {
+    const a = lightData[x * 34 * 34 + y * 34 + z];
+    const b = lightData[x * 34 * 34 + (y + 1) * 34 + z];
+    const c = lightData[x * 34 * 34 + y * 34 + z + 1];
+    const d = lightData[x * 34 * 34 + (y + 1) * 34 + z + 1];
+    return Math.min((a + b + c + d) / 4, 15);
 };
+
+const lightTopBottom = (
+    lightData: Uint8Array,
+    x: number,
+    y: number,
+    z: number
+) => {
+    const a = lightData[x * 34 * 34 + y * 34 + z];
+    const b = lightData[x * 34 * 34 + y * 34 + z + 1];
+    const c = lightData[(x + 1) * 34 * 34 + y * 34 + z];
+    const d = lightData[(x + 1) * 34 * 34 + y * 34 + z + 1];
+    return Math.min((a + b + c + d) / 4, 15);
+};
+
+const lightFrontBack = (
+    lightData: Uint8Array,
+    x: number,
+    y: number,
+    z: number
+) => {
+    const a = lightData[x * 34 * 34 + y * 34 + z];
+    const b = lightData[x * 34 * 34 + (y + 1) * 34 + z];
+    const c = lightData[(x + 1) * 34 * 34 + y * 34 + z];
+    const d = lightData[(x + 1) * 34 * 34 + (y + 1) * 34 + z];
+    return Math.min((a + b + c + d) / 4, 15);
+};
+
+const plane = new PlaneEntry();
 
 const genFront = (vertices: number[], args: GenArgs): number => {
     const start = vertices.length;
     const { sideCache, blockData, lightData } = args;
     // First we slice the chunk into many, zero-initialized, planes
-    const plane = new PlaneEntry();
     for (let z = 0; z < 32; z++) {
         let found = 0;
         for (let y = 0; y < 32; y++) {
             for (let x = 0; x < 32; x++) {
                 // Skip all faces that can't be seen, due to a block
                 // being right in front of that particular face.
-                const off = y*32+x;
+                const off = y * 32 + x;
                 if ((sideCache[x * 32 * 32 + y * 32 + z] & 1) === 0) {
                     plane.block[off] = 0;
                     continue;
@@ -284,10 +300,11 @@ const genFront = (vertices: number[], args: GenArgs): number => {
                 plane.height[off] = 1;
                 plane.block[off] =
                     blockData[blockBufferPosToOffset(x + 1, y + 1, z + 1)];
-                plane.light[off] = lightFrontBack(lightData, x, y, z + 2)
-                    | (lightFrontBack(lightData, x + 1, y, z + 2) << 4)
-                    | (lightFrontBack(lightData, x + 1, y + 1, z + 2) << 8)
-                    | (lightFrontBack(lightData, x, y + 1, z + 2) << 12);
+                plane.light[off] =
+                    lightFrontBack(lightData, x, y, z + 2) |
+                    (lightFrontBack(lightData, x + 1, y, z + 2) << 4) |
+                    (lightFrontBack(lightData, x + 1, y + 1, z + 2) << 8) |
+                    (lightFrontBack(lightData, x, y + 1, z + 2) << 12);
             }
         }
         // If not a single face can be seen then we can skip this slice
@@ -298,7 +315,7 @@ const genFront = (vertices: number[], args: GenArgs): number => {
         const cd = 1;
         for (let y = 0; y < 32; y++) {
             for (let x = 0; x < 32; x++) {
-                const off = y*32+x;
+                const off = y * 32 + x;
                 if (plane.block[off] === 0) {
                     continue;
                 }
@@ -316,14 +333,13 @@ const genFront = (vertices: number[], args: GenArgs): number => {
 const genBack = (vertices: number[], args: GenArgs) => {
     const start = vertices.length;
     const { sideCache, blockData, lightData } = args;
-    const plane = new PlaneEntry();
     for (let z = 0; z < 32; z++) {
         let found = 0;
         for (let y = 0; y < 32; y++) {
             for (let x = 0; x < 32; x++) {
                 // Skip all faces that can't be seen, due to a block
                 // being right in front of that particular face.
-                const off = y*32+x;
+                const off = y * 32 + x;
                 if ((sideCache[x * 32 * 32 + y * 32 + z] & 2) === 0) {
                     plane.block[off] = 0;
                     continue;
@@ -334,10 +350,11 @@ const genBack = (vertices: number[], args: GenArgs) => {
                 plane.height[off] = 1;
                 plane.block[off] =
                     blockData[blockBufferPosToOffset(x + 1, y + 1, z + 1)];
-                plane.light[off] = lightFrontBack(lightData, x, y, z)
-                    | (lightFrontBack(lightData, x + 1, y, z) << 4)
-                    | (lightFrontBack(lightData, x + 1, y + 1, z) << 8)
-                    | (lightFrontBack(lightData, x, y + 1, z) << 12);
+                plane.light[off] =
+                    lightFrontBack(lightData, x, y, z) |
+                    (lightFrontBack(lightData, x + 1, y, z) << 4) |
+                    (lightFrontBack(lightData, x + 1, y + 1, z) << 8) |
+                    (lightFrontBack(lightData, x, y + 1, z) << 12);
             }
         }
         // If not a single face can be seen then we can skip this slice
@@ -348,7 +365,7 @@ const genBack = (vertices: number[], args: GenArgs) => {
         let cd = 1;
         for (let y = 0; y < 32; y++) {
             for (let x = 0; x < 32; x++) {
-                const off = y*32+x;
+                const off = y * 32 + x;
                 if (plane.block[off] === 0) {
                     continue;
                 }
@@ -366,14 +383,13 @@ const genBack = (vertices: number[], args: GenArgs) => {
 const genTop = (vertices: number[], args: GenArgs) => {
     const start = vertices.length;
     const { sideCache, blockData, lightData } = args;
-    const plane = new PlaneEntry();
     for (let y = 0; y < 32; y++) {
         let found = 0;
         for (let z = 0; z < 32; z++) {
             for (let x = 0; x < 32; x++) {
                 // Skip all faces that can't be seen, due to a block
                 // being right in front of that particular face.
-                const off = z*32+x;
+                const off = z * 32 + x;
                 if ((sideCache[x * 32 * 32 + y * 32 + z] & 4) === 0) {
                     plane.block[off] = 0;
                     continue;
@@ -384,10 +400,11 @@ const genTop = (vertices: number[], args: GenArgs) => {
                 plane.height[off] = 1;
                 plane.block[off] =
                     blockData[blockBufferPosToOffset(x + 1, y + 1, z + 1)];
-                plane.light[off] = lightTopBottom(lightData, x, y + 2, z)
-                    | (lightTopBottom(lightData, x, y + 2, z + 1) << 4)
-                    | (lightTopBottom(lightData, x + 1, y + 2, z + 1) << 8)
-                    | (lightTopBottom(lightData, x + 1, y + 2, z) << 12);
+                plane.light[off] =
+                    lightTopBottom(lightData, x, y + 2, z) |
+                    (lightTopBottom(lightData, x, y + 2, z + 1) << 4) |
+                    (lightTopBottom(lightData, x + 1, y + 2, z + 1) << 8) |
+                    (lightTopBottom(lightData, x + 1, y + 2, z) << 12);
             }
         }
         // If not a single face can be seen then we can skip this slice
@@ -398,7 +415,7 @@ const genTop = (vertices: number[], args: GenArgs) => {
         const ch = 1;
         for (let z = 0; z < 32; z++) {
             for (let x = 0; x < 32; x++) {
-                const off = z*32+x;
+                const off = z * 32 + x;
                 if (plane.block[off] === 0) {
                     continue;
                 }
@@ -416,14 +433,13 @@ const genTop = (vertices: number[], args: GenArgs) => {
 const genBottom = (vertices: number[], args: GenArgs) => {
     const start = vertices.length;
     const { sideCache, blockData, lightData } = args;
-    const plane = new PlaneEntry();
     for (let y = 0; y < 32; y++) {
         let found = 0;
         for (let z = 0; z < 32; z++) {
             for (let x = 0; x < 32; x++) {
                 // Skip all faces that can't be seen, due to a block
                 // being right in front of that particular face.
-                const off = z*32+x;
+                const off = z * 32 + x;
                 if ((sideCache[x * 32 * 32 + y * 32 + z] & 8) === 0) {
                     plane.block[off] = 0;
                     continue;
@@ -434,10 +450,11 @@ const genBottom = (vertices: number[], args: GenArgs) => {
                 plane.height[off] = 1;
                 plane.block[off] =
                     blockData[blockBufferPosToOffset(x + 1, y + 1, z + 1)];
-                plane.light[off] = lightTopBottom(lightData, x, y, z)
-                    | (lightTopBottom(lightData, x + 1, y, z) << 4)
-                    | (lightTopBottom(lightData, x + 1, y, z + 1) << 8)
-                    | (lightTopBottom(lightData, x, y, z + 1) << 12);
+                plane.light[off] =
+                    lightTopBottom(lightData, x, y, z) |
+                    (lightTopBottom(lightData, x + 1, y, z) << 4) |
+                    (lightTopBottom(lightData, x + 1, y, z + 1) << 8) |
+                    (lightTopBottom(lightData, x, y, z + 1) << 12);
             }
         }
         // If not a single face can be seen then we can skip this slice
@@ -448,7 +465,7 @@ const genBottom = (vertices: number[], args: GenArgs) => {
         const ch = 1;
         for (let z = 0; z < 32; z++) {
             for (let x = 0; x < 32; x++) {
-                const off = z*32+x;
+                const off = z * 32 + x;
                 if (plane.block[off] === 0) {
                     continue;
                 }
@@ -466,14 +483,13 @@ const genBottom = (vertices: number[], args: GenArgs) => {
 const genRight = (vertices: number[], args: GenArgs) => {
     const start = vertices.length;
     const { sideCache, blockData, lightData } = args;
-    const plane = new PlaneEntry();
     for (let x = 0; x < 32; x++) {
         let found = 0;
         for (let y = 0; y < 32; y++) {
             for (let z = 0; z < 32; z++) {
                 // Skip all faces that can't be seen, due to a block
                 // being right in front of that particular face.
-                const off = y*32+z;
+                const off = y * 32 + z;
                 if ((sideCache[x * 32 * 32 + y * 32 + z] & 16) === 0) {
                     plane.block[off] = 0;
                     continue;
@@ -484,10 +500,11 @@ const genRight = (vertices: number[], args: GenArgs) => {
                 plane.height[off] = 1;
                 plane.block[off] =
                     blockData[blockBufferPosToOffset(x + 1, y + 1, z + 1)];
-                plane.light[off] = lightLeftRight(lightData, x + 2, y, z)
-                    | (lightLeftRight(lightData, x + 2, y + 1, z) << 4)
-                    | (lightLeftRight(lightData, x + 2, y + 1, z + 1) << 8)
-                    | (lightLeftRight(lightData, x + 2, y, z + 1) << 12);
+                plane.light[off] =
+                    lightLeftRight(lightData, x + 2, y, z) |
+                    (lightLeftRight(lightData, x + 2, y + 1, z) << 4) |
+                    (lightLeftRight(lightData, x + 2, y + 1, z + 1) << 8) |
+                    (lightLeftRight(lightData, x + 2, y, z + 1) << 12);
             }
         }
         // If not a single face can be seen then we can skip this slice
@@ -498,7 +515,7 @@ const genRight = (vertices: number[], args: GenArgs) => {
         let cw = 1;
         for (let y = 0; y < 32; y++) {
             for (let z = 0; z < 32; z++) {
-                const off=y*32+z;
+                const off = y * 32 + z;
                 if (plane.block[off] === 0) {
                     continue;
                 }
@@ -516,14 +533,13 @@ const genRight = (vertices: number[], args: GenArgs) => {
 const genLeft = (vertices: number[], args: GenArgs) => {
     const start = vertices.length;
     const { sideCache, blockData, lightData } = args;
-    const plane = new PlaneEntry();
     for (let x = 0; x < 32; x++) {
         let found = 0;
         for (let y = 0; y < 32; y++) {
             for (let z = 0; z < 32; z++) {
                 // Skip all faces that can't be seen, due to a block
                 // being right in front of that particular face.
-                const off = y*32+z;
+                const off = y * 32 + z;
                 if ((sideCache[x * 32 * 32 + y * 32 + z] & 32) === 0) {
                     plane.block[off] = 0;
                     continue;
@@ -534,10 +550,11 @@ const genLeft = (vertices: number[], args: GenArgs) => {
                 plane.height[off] = 1;
                 plane.block[off] =
                     blockData[blockBufferPosToOffset(x + 1, y + 1, z + 1)];
-                    plane.light[off] = lightLeftRight(lightData, x, y, z)
-                    | (lightLeftRight(lightData, x, y, z + 1) << 4)
-                    | (lightLeftRight(lightData, x, y + 1, z + 1) << 8)
-                    | (lightLeftRight(lightData, x, y + 1, z) << 12);
+                plane.light[off] =
+                    lightLeftRight(lightData, x, y, z) |
+                    (lightLeftRight(lightData, x, y, z + 1) << 4) |
+                    (lightLeftRight(lightData, x, y + 1, z + 1) << 8) |
+                    (lightLeftRight(lightData, x, y + 1, z) << 12);
             }
         }
         // If not a single face can be seen then we can skip this slice
@@ -548,7 +565,7 @@ const genLeft = (vertices: number[], args: GenArgs) => {
         const cw = 1;
         for (let y = 0; y < 32; y++) {
             for (let z = 0; z < 32; z++) {
-                const off = y*32+z;
+                const off = y * 32 + z;
                 if (plane.block[off] === 0) {
                     continue;
                 }
@@ -563,12 +580,12 @@ const genLeft = (vertices: number[], args: GenArgs) => {
     return (vertices.length - start) / 4 / 5;
 };
 
+const blockData = new Uint8Array(34 * 34 * 34);
+const lightData = new Uint8Array(34 * 34 * 34);
+const sideCache = new Uint8Array(32 * 32 * 32);
 export const meshgen = (chunk: Chunk): [Uint8Array, number[]] => {
     chunk.updateSimpleLight();
     const vertices: number[] = [];
-    const blockData = new Uint8Array(34 * 34 * 34);
-    const lightData = new Uint8Array(34 * 34 * 34);
-    const sideCache = new Uint8Array(32 * 32 * 32);
 
     blitChunkData(blockData, chunk.blocks, 1, 1, 1);
     blitChunkData(lightData, chunk.simpleLight, 1, 1, 1);

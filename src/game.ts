@@ -1,11 +1,11 @@
-import { Character } from './world/entities/character';
+import { Character } from './world/entity/character';
 import './game.css';
 
-import { InputManager } from './input/input';
-import { RenderManager } from './render/render';
-import { UIManager } from './ui/ui';
-import { World } from './world/world';
-import { initDefaultBlocks } from './world/blockTypeDefaults';
+import { InputManager } from './input';
+import { RenderManager } from './render';
+import { UIManager } from './ui';
+import { World } from './world';
+import { initDefaultBlocks } from './world/blockType/blockTypeDefaults';
 
 export interface GameConfig {
     parent: HTMLElement;
@@ -40,11 +40,16 @@ export class Game {
         this.ui = new UIManager(this);
         this.input = new InputManager(this);
         setInterval(this.update.bind(this), 1000.0 / 60.0);
+        setInterval(this.gc.bind(this), 15000);
     }
 
     update() {
         this.ticks++;
         this.input.update();
         this.world.update();
+    }
+
+    gc() {
+        this.world.gc();
     }
 }

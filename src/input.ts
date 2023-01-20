@@ -1,4 +1,4 @@
-import { Game } from '../game';
+import { Game } from './game';
 
 export class InputManager {
     game: Game;
@@ -21,14 +21,18 @@ export class InputManager {
             that.game.player.noClip = !that.game.player.noClip;
         });
 
-        that.game.rootElement.addEventListener('mousedown', async (e) => {
-            if (!document.fullscreenElement) {
-                await that.game.rootElement.requestFullscreen();
-            }
-            if (!document.pointerLockElement) {
-                await that.game.rootElement.requestPointerLock();
-            }
-        }, false);
+        that.game.rootElement.addEventListener(
+            'mousedown',
+            async (e) => {
+                if (!document.fullscreenElement) {
+                    await that.game.rootElement.requestFullscreen();
+                }
+                if (!document.pointerLockElement) {
+                    await that.game.rootElement.requestPointerLock();
+                }
+            },
+            false
+        );
         that.game.rootElement.addEventListener(
             'mousemove',
             (e) => {
@@ -74,7 +78,7 @@ export class InputManager {
             }
         }
         const player = this.game.player;
-        if(player.noClip){
+        if (player.noClip) {
             player.fly(movement.x, movement.y, movement.z);
         } else {
             player.move(movement.x, movement.y, movement.z);
