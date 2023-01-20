@@ -1,4 +1,4 @@
-import { Character } from './entities/entities';
+import { Character } from './world/entities/character';
 import './game.css';
 
 import { InputManager } from './input/input';
@@ -27,22 +27,24 @@ export class Game {
         this.world = new World(this);
         initDefaultBlocks();
         this.player = new Character(
-            -3,
+            -16,
             30.5,
-            -4,
+            -16,
             Math.PI * 0.25,
             -Math.PI / 12
         );
+        this.world.addEntity(this.player);
 
         this.render = new RenderManager(this);
         this.render.cam = this.player;
         this.ui = new UIManager(this);
         this.input = new InputManager(this);
-        setInterval(this.tick.bind(this), 1000.0 / 60.0);
+        setInterval(this.update.bind(this), 1000.0 / 60.0);
     }
 
-    tick() {
+    update() {
         this.ticks++;
-        this.input.tick();
+        this.input.update();
+        this.world.update();
     }
 }

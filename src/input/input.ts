@@ -2,6 +2,7 @@ import { Game } from '../game';
 
 export class InputManager {
     game: Game;
+    keyHandler: Map<string, () => void> = new Map();
     keystates: Set<string> = new Set();
 
     constructor(game: Game) {
@@ -9,7 +10,16 @@ export class InputManager {
         const that = this;
 
         window.addEventListener('keydown', (e) => that.keystates.add(e.code));
-        window.addEventListener('keyup', (e) => that.keystates.delete(e.code));
+        window.addEventListener('keyup', (e) => {
+            that.keystates.delete(e.code);
+            const handler = that.keyHandler.get(e.code);
+            if (handler) {
+                handler();
+            }
+        });
+        this.keyHandler.set('KeyN', () => {
+            that.game.player.noClip = !that.game.player.noClip;
+        });
 
         that.game.rootElement.addEventListener('mousedown', async (e) => {
             if (!document.fullscreenElement) {
@@ -33,7 +43,7 @@ export class InputManager {
         );
     }
 
-    tick() {
+    update() {
         const speed = this.keystates.has('ShiftLeft') ? 0.2 : 0.05;
         const movement = { x: 0, y: 0, z: 0 };
 
@@ -63,7 +73,11 @@ export class InputManager {
                 document.exitPointerLock();
             }
         }
-
-        this.game.player.fly(movement.x, movement.y, movement.z);
+        const player = this.game.player;
+        if(player.noClip){
+            player.fly(movement.x, movement.y, movement.z);
+        } else {
+            player.move(movement.x, movement.y, movement.z);
+        }
     }
 }

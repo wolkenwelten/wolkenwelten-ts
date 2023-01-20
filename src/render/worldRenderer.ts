@@ -3,7 +3,7 @@ import { mat4, vec4 } from 'gl-matrix';
 import { Frustum } from './frustum';
 import { BlockMesh } from './meshes/meshes';
 import { RenderManager } from './render';
-import { Entity } from '../entities/entities';
+import { Entity } from '../world/entities/entity';
 import { coordinateToWorldKey } from '../world/world';
 
 type QueueEntry = {

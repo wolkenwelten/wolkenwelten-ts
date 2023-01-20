@@ -1,7 +1,7 @@
 import { Game } from '../game';
 import { mat4 } from 'gl-matrix';
 import { TextMesh, meshInit, Mesh, BlockMesh } from './meshes/meshes';
-import { Entity } from '../entities/entities';
+import { Entity } from '../world/entities/entity';
 import { WorldRenderer } from './worldRenderer';
 import { allTexturesLoaded } from './texture';
 
