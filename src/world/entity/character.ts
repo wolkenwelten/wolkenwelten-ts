@@ -1,5 +1,5 @@
-import { Entity } from './entity';
-import { World } from '../world';
+import { Entity } from '../entity';
+import { World } from '../../world';
 
 export class Character extends Entity {
     constructor(x: number, y: number, z: number, yaw: number, pitch: number) {

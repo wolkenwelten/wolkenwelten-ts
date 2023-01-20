@@ -1,7 +1,6 @@
-import { Game } from '../game';
-import { Entity } from './entities/entity';
-import { Chunk } from './chunk';
-export { Chunk } from './chunk';
+import { Game } from './game';
+import { Entity } from './world/entity';
+import { Chunk } from './world/chunk';
 
 export const coordinateToWorldKey = (x: number, y: number, z: number) =>
     ((x >> 5) & 0xffff) +
@@ -10,7 +9,7 @@ export const coordinateToWorldKey = (x: number, y: number, z: number) =>
 
 export class World {
     chunks: Map<number, Chunk> = new Map();
-    entities: Entity[] = [];
+    entities: Set<Entity> = new Set();
     game: Game;
 
     constructor(game: Game) {
@@ -50,7 +49,7 @@ export class World {
         if (chunk) {
             return chunk;
         }
-        const newChunk = new Chunk(this.game.ticks, x, y, z);
+        const newChunk = new Chunk(this, x, y, z);
         this.chunks.set(key, newChunk);
         return newChunk;
     }
@@ -66,7 +65,11 @@ export class World {
     }
 
     addEntity(entity: Entity) {
-        this.entities.push(entity);
+        this.entities.add(entity);
+    }
+
+    removeEntity(entity: Entity) {
+        this.entities.delete(entity);
     }
 
     gc() {
@@ -76,12 +79,9 @@ export class World {
             4;
         for (const chunk of this.chunks.values()) {
             if (chunk.gc(maxDistance, this.game.player)) {
-                this.chunks.delete(
-                    coordinateToWorldKey(chunk.x, chunk.y, chunk.z)
-                );
-                this.game.render.world.meshes.delete(
-                    coordinateToWorldKey(chunk.x, chunk.y, chunk.z)
-                );
+                const key = coordinateToWorldKey(chunk.x, chunk.y, chunk.z);
+                this.chunks.delete(key);
+                this.game.render.world.meshes.delete(key);
             }
         }
     }

@@ -1,5 +1,6 @@
-import { Entity } from './entities/entity';
-import { lightGenSimple } from './lightGen';
+import { Entity } from './entity';
+import { lightGenSimple } from './chunk/lightGen';
+import { World } from '../world';
 
 const coordinateToOffset = (x: number, y: number, z: number) =>
     (x & 0x1f) | ((y & 0x1f) << 5) | ((z & 0x1f) << 10);
@@ -12,14 +13,16 @@ export class Chunk {
     x: number;
     y: number;
     z: number;
+    world: World;
 
-    constructor(lastUpdated: number, x: number, y: number, z: number) {
+    constructor(world: World, x: number, y: number, z: number) {
         this.blocks = new Uint8Array(32 * 32 * 32);
         this.simpleLight = new Uint8Array(32 * 32 * 32);
         this.x = x;
         this.y = y;
         this.z = z;
-        this.lastUpdated = lastUpdated;
+        this.world = world;
+        this.lastUpdated = world.game.ticks;
         const seed = x ^ y ^ z;
         if (seed & 32) {
             return;

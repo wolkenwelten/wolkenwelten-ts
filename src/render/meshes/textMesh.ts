@@ -1,10 +1,10 @@
-import '../../../types';
-import { Shader } from '../../shader';
-import { Texture } from '../../texture';
+import '../../types';
+import { Shader } from '../shader';
+import { Texture } from '../texture';
 
-import shaderVertSource from './text.vert?raw';
-import shaderFragSource from './text.frag?raw';
-import guiTextureUrl from '../../../../assets/gfx/gui.png';
+import shaderVertSource from './textMesh/text.vert?raw';
+import shaderFragSource from './textMesh/text.frag?raw';
+import guiTextureUrl from '../../../assets/gfx/gui.png';
 import { mat4 } from 'gl-matrix';
 
 export class TextMesh {

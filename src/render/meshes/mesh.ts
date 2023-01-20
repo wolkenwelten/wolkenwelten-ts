@@ -1,15 +1,15 @@
 import { mat4 } from 'gl-matrix';
 
-import '../../../types';
-import { Shader } from '../../shader';
-import { Texture } from '../../texture';
-import { WavefrontFile, WavefrontObject } from './objLoader';
-export { WavefrontFile, WavefrontObject } from './objLoader';
+import '../../types';
+import { Shader } from '../shader';
+import { Texture } from '../texture';
+import { WavefrontFile, WavefrontObject } from './mesh/objLoader';
+export { WavefrontFile, WavefrontObject } from './mesh/objLoader';
 
-import shaderVertSource from './mesh.vert?raw';
-import shaderFragSource from './mesh.frag?raw';
-import pearObjSource from '../../../../assets/gfx/pear.obj?raw';
-import pearPng from '../../../../assets/gfx/pear.png';
+import shaderVertSource from './mesh/mesh.vert?raw';
+import shaderFragSource from './mesh/mesh.frag?raw';
+import pearObjSource from '../../../assets/gfx/pear.obj?raw';
+import pearPng from '../../../assets/gfx/pear.png';
 
 export class Mesh {
     static gl: WebGL2RenderingContext;

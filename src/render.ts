@@ -1,16 +1,16 @@
-import { Game } from '../game';
+import { Game } from './game';
 import { mat4 } from 'gl-matrix';
-import { TextMesh, meshInit, Mesh, BlockMesh } from './meshes/meshes';
-import { Entity } from '../world/entities/entity';
-import { WorldRenderer } from './worldRenderer';
-import { allTexturesLoaded } from './texture';
+import { TextMesh, meshInit, Mesh, BlockMesh } from './render/meshes';
+import { Entity } from './world/entity';
+import { WorldRenderer } from './render/worldRenderer';
+import { allTexturesLoaded } from './render/texture';
 
 export class RenderManager {
     game: Game;
     canvas: HTMLCanvasElement;
     gl: WebGL2RenderingContext;
     fov = 60;
-    renderDistance = 128.0;
+    renderDistance = 160.0;
     width = 640;
     height = 480;
     frames = 0;

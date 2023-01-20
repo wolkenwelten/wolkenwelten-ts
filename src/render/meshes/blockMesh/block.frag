@@ -4,7 +4,7 @@ precision lowp sampler2DArray;
 
 uniform sampler2DArray cur_tex;
 uniform float alpha;
-const float fade_distance = 128.0;
+const float fade_distance = 160.0;
 const float fade_start = fade_distance - 8.0;
 
 in vec3 view_position;

@@ -1,11 +1,11 @@
-import { Character } from './world/entities/character';
+import { Character } from './world/entity/character';
 import './game.css';
 
-import { InputManager } from './input/input';
-import { RenderManager } from './render/render';
-import { UIManager } from './ui/ui';
-import { World } from './world/world';
-import { initDefaultBlocks } from './world/blockTypeDefaults';
+import { InputManager } from './input';
+import { RenderManager } from './render';
+import { UIManager } from './ui';
+import { World } from './world';
+import { initDefaultBlocks } from './world/blockType/blockTypeDefaults';
 
 export interface GameConfig {
     parent: HTMLElement;

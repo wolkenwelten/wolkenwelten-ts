@@ -1,10 +1,10 @@
 import { mat4, vec4 } from 'gl-matrix';
 
 import { Frustum } from './frustum';
-import { BlockMesh } from './meshes/meshes';
-import { RenderManager } from './render';
-import { Entity } from '../world/entities/entity';
-import { coordinateToWorldKey } from '../world/world';
+import { BlockMesh } from './meshes';
+import { RenderManager } from '../render';
+import { Entity } from '../world/entity';
+import { coordinateToWorldKey } from '../world';
 
 type QueueEntry = {
     dd: number;
@@ -13,7 +13,7 @@ type QueueEntry = {
     z: number;
 };
 
-const RENDER_STEPS = 4;
+const RENDER_STEPS = 5;
 
 export class WorldRenderer {
     meshes: Map<number, BlockMesh> = new Map();
