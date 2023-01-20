@@ -40,11 +40,16 @@ export class Game {
         this.ui = new UIManager(this);
         this.input = new InputManager(this);
         setInterval(this.update.bind(this), 1000.0 / 60.0);
+        setInterval(this.gc.bind(this), 15000);
     }
 
     update() {
         this.ticks++;
         this.input.update();
         this.world.update();
+    }
+
+    gc() {
+        this.world.gc();
     }
 }

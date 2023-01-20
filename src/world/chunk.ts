@@ -1,4 +1,5 @@
-import { lightGenSimple } from "./lightGen";
+import { Entity } from './entities/entity';
+import { lightGenSimple } from './lightGen';
 
 const coordinateToOffset = (x: number, y: number, z: number) =>
     (x & 0x1f) | ((y & 0x1f) << 5) | ((z & 0x1f) << 10);
@@ -12,7 +13,7 @@ export class Chunk {
     y: number;
     z: number;
 
-    constructor(lastUpdated:number, x: number, y: number, z: number) {
+    constructor(lastUpdated: number, x: number, y: number, z: number) {
         this.blocks = new Uint8Array(32 * 32 * 32);
         this.simpleLight = new Uint8Array(32 * 32 * 32);
         this.x = x;
@@ -36,8 +37,10 @@ export class Chunk {
         }
     }
 
-    updateSimpleLight () {
-        if(this.simpleLightLastUpdated >= this.lastUpdated){return;}
+    updateSimpleLight() {
+        if (this.simpleLightLastUpdated >= this.lastUpdated) {
+            return;
+        }
         lightGenSimple(this.simpleLight, this.blocks);
         this.simpleLightLastUpdated = this.lastUpdated;
     }
@@ -103,5 +106,13 @@ export class Chunk {
                 }
             }
         }
+    }
+
+    gc(maxDistance: number, entity: Entity) {
+        const dx = this.x - entity.x;
+        const dy = this.y - entity.y;
+        const dz = this.z - entity.z;
+        const d = dx * dx + dy * dy + dz * dz;
+        return d > maxDistance;
     }
 }

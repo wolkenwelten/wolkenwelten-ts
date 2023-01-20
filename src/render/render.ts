@@ -62,10 +62,7 @@ export class RenderManager {
         this.gl.clearColor(0.5, 0.3, 0.1, 1.0);
         this.gl.enable(this.gl.DEPTH_TEST);
         this.gl.enable(this.gl.CULL_FACE);
-        this.gl.blendFunc(
-            this.gl.SRC_ALPHA,
-            this.gl.ONE_MINUS_SRC_ALPHA
-        );
+        this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
     }
 
     drawScene() {
@@ -114,15 +111,7 @@ export class RenderManager {
 
     drawHud2D() {
         const projectionMatrix = mat4.create();
-        mat4.ortho(
-            projectionMatrix,
-            0,
-            this.width,
-            this.height,
-            0,
-            -128,
-            128
-        );
+        mat4.ortho(projectionMatrix, 0, this.width, this.height, 0, -128, 128);
 
         this.gl.enable(this.gl.BLEND);
         this.crosshairMesh.draw(projectionMatrix);
@@ -130,7 +119,17 @@ export class RenderManager {
     }
 
     rebuildCrosshair() {
-        this.crosshairMesh.pushBox(this.width/2 - 16, this.height/2 - 16,32,32,72 * (1/128),1-(4*(1/128)),4*(1/128),4*(1/128),0xFFFFFFFF);
+        this.crosshairMesh.pushBox(
+            this.width / 2 - 16,
+            this.height / 2 - 16,
+            32,
+            32,
+            72 * (1 / 128),
+            1 - 4 * (1 / 128),
+            4 * (1 / 128),
+            4 * (1 / 128),
+            0xffffffff
+        );
     }
 
     resize() {
@@ -144,10 +143,10 @@ export class RenderManager {
 
     generateMesh() {
         this.world.generateOneQueuedMesh();
-        if(this.world.generatorQueue.length === 0){
+        if (this.world.generatorQueue.length === 0) {
             this.generateMeshClosureActive = false;
         } else {
-            setTimeout(this.generateMeshClosue,0);
+            setTimeout(this.generateMeshClosue, 0);
         }
     }
 
@@ -163,9 +162,12 @@ export class RenderManager {
         this.gl.clearColor(0.09, 0.478, 1, 1);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
         this.drawScene();
-        if(!this.generateMeshClosureActive && this.world.generatorQueue.length){
+        if (
+            !this.generateMeshClosureActive &&
+            this.world.generatorQueue.length
+        ) {
             this.generateMeshClosureActive = true;
-            setTimeout(this.generateMeshClosue,0);
+            setTimeout(this.generateMeshClosue, 0);
         }
     }
 }

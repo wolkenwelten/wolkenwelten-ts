@@ -13,7 +13,7 @@ export class Character extends Entity {
 
     /* Walk/Run according to the direction of the Entity, ignores pitch */
     move(ox: number, oy: number, oz: number) {
-        if(ox === 0 && oz === 0) {
+        if (ox === 0 && oz === 0) {
             this.vx *= 0.9;
             this.vz *= 0.9;
         } else {
@@ -23,52 +23,66 @@ export class Character extends Entity {
             this.vz = this.vz * 0.96 + noz * 0.04;
         }
 
-        if((oy > 0) && (this.vy === 0)){
+        if (oy > 0 && this.vy === 0) {
             this.vy += 0.17;
         }
     }
 
     collidesBottom(world: World) {
-        return Boolean(world.getBlock(this.x, this.y-1, this.z))
-            || Boolean(world.getBlock(this.x, this.y-2, this.z));
+        return (
+            Boolean(world.getBlock(this.x, this.y - 1, this.z)) ||
+            Boolean(world.getBlock(this.x, this.y - 2, this.z))
+        );
     }
 
     collidesFront(world: World) {
-        return Boolean(world.getBlock(this.x, this.y, this.z+1))
-            || Boolean(world.getBlock(this.x, this.y-1, this.z+1));
+        return (
+            Boolean(world.getBlock(this.x, this.y, this.z + 1)) ||
+            Boolean(world.getBlock(this.x, this.y - 1, this.z + 1))
+        );
     }
 
     collidesBack(world: World) {
-        return Boolean(world.getBlock(this.x, this.y, this.z-1))
-            || Boolean(world.getBlock(this.x, this.y-1, this.z-1));
+        return (
+            Boolean(world.getBlock(this.x, this.y, this.z - 1)) ||
+            Boolean(world.getBlock(this.x, this.y - 1, this.z - 1))
+        );
     }
 
     collidesLeft(world: World) {
-        return Boolean(world.getBlock(this.x-1, this.y, this.z))
-            || Boolean(world.getBlock(this.x-1, this.y-1, this.z));
+        return (
+            Boolean(world.getBlock(this.x - 1, this.y, this.z)) ||
+            Boolean(world.getBlock(this.x - 1, this.y - 1, this.z))
+        );
     }
 
     collidesRight(world: World) {
-        return Boolean(world.getBlock(this.x+1, this.y, this.z))
-            || Boolean(world.getBlock(this.x+1, this.y-1, this.z));
+        return (
+            Boolean(world.getBlock(this.x + 1, this.y, this.z)) ||
+            Boolean(world.getBlock(this.x + 1, this.y - 1, this.z))
+        );
     }
 
     collidesTop(world: World) {
-        return Boolean(world.getBlock(this.x, this.y+1, this.z))
-            || Boolean(world.getBlock(this.x, this.y, this.z));
+        return (
+            Boolean(world.getBlock(this.x, this.y + 1, this.z)) ||
+            Boolean(world.getBlock(this.x, this.y, this.z))
+        );
     }
 
     collides(world: World) {
-        return this.collidesBack(world)
-            || this.collidesFront(world)
-            || this.collidesLeft(world)
-            || this.collidesRight(world)
-            || this.collidesTop(world)
-            || this.collidesBottom(world);
+        return (
+            this.collidesBack(world) ||
+            this.collidesFront(world) ||
+            this.collidesLeft(world) ||
+            this.collidesRight(world) ||
+            this.collidesTop(world) ||
+            this.collidesBottom(world)
+        );
     }
 
     update(world: World) {
-        if(this.noClip) {
+        if (this.noClip) {
             this.vx = this.vy = this.vz = 0;
             return;
         }
@@ -77,17 +91,17 @@ export class Character extends Entity {
         this.z += this.vz;
         this.vy -= 0.005;
 
-        if(this.collides(world)) {
+        if (this.collides(world)) {
             this.vy = 0;
         }
 
-        if(this.vx > 0.01 && this.collidesRight(world)) {
+        if (this.vx > 0.01 && this.collidesRight(world)) {
             this.vx *= -0.9;
         }
-        if(this.vx < -0.01 && this.collidesLeft(world)) {
+        if (this.vx < -0.01 && this.collidesLeft(world)) {
             this.vx *= -0.9;
         }
-        if(this.vz > 0.01 && this.collidesFront(world)) {
+        if (this.vz > 0.01 && this.collidesFront(world)) {
             this.vz *= -0.9;
         }
     }

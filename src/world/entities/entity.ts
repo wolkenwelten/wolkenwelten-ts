@@ -1,4 +1,4 @@
-import { World } from "../world";
+import { World } from '../world';
 
 export class Entity {
     x = 0;
@@ -44,13 +44,15 @@ export class Entity {
     }
 
     collides(world: World) {
-        return Boolean(world.getBlock(this.x, this.y+1, this.z))
-            || Boolean(world.getBlock(this.x, this.y, this.z))
-            || Boolean(world.getBlock(this.x, this.y-1, this.z));
+        return (
+            Boolean(world.getBlock(this.x, this.y + 1, this.z)) ||
+            Boolean(world.getBlock(this.x, this.y, this.z)) ||
+            Boolean(world.getBlock(this.x, this.y - 1, this.z))
+        );
     }
 
     update(world: World) {
-        if(this.noClip) {
+        if (this.noClip) {
             this.vx = this.vy = this.vz = 0;
             return;
         }
@@ -59,7 +61,7 @@ export class Entity {
         this.z += this.vz;
         this.vy -= 0.005;
 
-        if(this.collides(world)) {
+        if (this.collides(world)) {
             this.vy = 0;
         }
     }

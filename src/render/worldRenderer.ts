@@ -7,18 +7,18 @@ import { Entity } from '../world/entities/entity';
 import { coordinateToWorldKey } from '../world/world';
 
 type QueueEntry = {
-    dd:number,
-    x:number,
-    y:number,
-    z:number,
-}
+    dd: number;
+    x: number;
+    y: number;
+    z: number;
+};
 
 const RENDER_STEPS = 4;
 
 export class WorldRenderer {
     meshes: Map<number, BlockMesh> = new Map();
     renderer: RenderManager;
-    generatorQueue:QueueEntry[] = [];
+    generatorQueue: QueueEntry[] = [];
 
     constructor(renderer: RenderManager) {
         this.renderer = renderer;
@@ -26,8 +26,10 @@ export class WorldRenderer {
 
     generateOneQueuedMesh() {
         const entry = this.generatorQueue.pop();
-        if(!entry){return;}
-        const {x,y,z} = entry;
+        if (!entry) {
+            return;
+        }
+        const { x, y, z } = entry;
 
         const chunk = this.renderer.game.world.getOrGenChunk(x, y, z);
         const newMesh = BlockMesh.fromChunk(chunk);
@@ -42,13 +44,15 @@ export class WorldRenderer {
         return ret;
     }
 
-    calcMask(x:number,y:number,z:number):number {
-        return +(z <= 0)
-        | ((+(z>= 0)) << 1)
-        | ((+(y<= 0)) << 2)
-        | ((+(y>= 0)) << 3)
-        | ((+(x>= 0)) << 4)
-        | ((+(x<= 0)) << 5);
+    calcMask(x: number, y: number, z: number): number {
+        return (
+            +(z <= 0) |
+            (+(z >= 0) << 1) |
+            (+(y <= 0) << 2) |
+            (+(y >= 0) << 3) |
+            (+(x >= 0) << 4) |
+            (+(x <= 0) << 5)
+        );
     }
 
     draw(projectionMatrix: mat4, viewMatrix: mat4, cam: Entity) {
@@ -69,28 +73,37 @@ export class WorldRenderer {
                     const nx = cx + x * 32;
                     const ny = cy + y * 32;
                     const nz = cz + z * 32;
-                    if(!frustum.containsCube(vec4.fromValues(nx,ny,nz,1))){
+                    if (!frustum.containsCube(vec4.fromValues(nx, ny, nz, 1))) {
                         skipped++;
                         continue;
                     }
                     drawn++;
                     const mesh = this.getMesh(nx, ny, nz);
-                    if(mesh){
-                        const alpha = Math.min(1.0, (ticks - mesh.lastUpdated) * (1.0/16.0));
-                        mesh.drawFast(this.calcMask(x,y,z), alpha);
+                    if (mesh) {
+                        const alpha = Math.min(
+                            1.0,
+                            (ticks - mesh.lastUpdated) * (1.0 / 16.0)
+                        );
+                        mesh.drawFast(this.calcMask(x, y, z), alpha);
                     } else {
                         const dx = cam.x - nx;
                         const dy = cam.y - ny;
                         const dz = cam.z - nz;
-                        const dd = dx*dx + dy*dy + dz*dz;
-                        this.generatorQueue.push({dd,x:nx,y:ny,z:nz});
+                        const dd = dx * dx + dy * dy + dz * dz;
+                        this.generatorQueue.push({ dd, x: nx, y: ny, z: nz });
                     }
                 }
             }
         }
-        this.renderer.game.ui.debugInfo.innerText = `Frustum Culling Info:\nDrawn:${drawn}\nCulled:${skipped}`
-        if(this.generatorQueue.length){
-            this.generatorQueue.sort((a,b) => b.dd - a.dd);
+        this.renderer.game.ui.debugInfo.innerText = `Frustum Culling Info:
+            Drawn:${drawn}
+            Culled:${skipped}
+            Queue:${this.generatorQueue.length}
+            Chunks:${this.renderer.game.world.chunks.size}
+            Meshes:${this.meshes.size}`;
+
+        if (this.generatorQueue.length) {
+            this.generatorQueue.sort((a, b) => b.dd - a.dd);
         }
 
         this.renderer.gl.disable(this.renderer.gl.BLEND);

@@ -58,7 +58,7 @@ export class BlockMesh {
             'blockMesh',
             shaderVertSource,
             shaderFragSource,
-            ['cur_tex', 'mat_mv', 'mat_mvp', 'trans_pos', "alpha"]
+            ['cur_tex', 'mat_mv', 'mat_mvp', 'trans_pos', 'alpha']
         );
         this.texture = new Texture(this.gl, 'gui', blockTextureUrl, '2DArray');
         this.texture.nearest();
@@ -67,10 +67,24 @@ export class BlockMesh {
 
     static fromChunk(chunk: Chunk): BlockMesh {
         const [vertices, sideSquareCount] = meshgen(chunk);
-        return new BlockMesh(chunk.lastUpdated, vertices, sideSquareCount, chunk.x, chunk.y, chunk.z);
+        return new BlockMesh(
+            chunk.lastUpdated,
+            vertices,
+            sideSquareCount,
+            chunk.x,
+            chunk.y,
+            chunk.z
+        );
     }
 
-    constructor(lastUpdated:number, vertices: Uint8Array, sideSquareCount:number[], x: number, y: number, z: number) {
+    constructor(
+        lastUpdated: number,
+        vertices: Uint8Array,
+        sideSquareCount: number[],
+        x: number,
+        y: number,
+        z: number
+    ) {
         const gl = BlockMesh.gl;
         this.x = x;
         this.y = y;
@@ -79,12 +93,13 @@ export class BlockMesh {
         this.elementCount = (vertices.length / 20) * 6;
 
         this.sideSquareCount = sideSquareCount;
-        this.sideStart = [0,0,0,0,0,0];
-        for(let i=1;i<6;i++){
-            this.sideStart[i] = this.sideStart[i - 1] + this.sideSquareCount[i - 1];
+        this.sideStart = [0, 0, 0, 0, 0, 0];
+        for (let i = 1; i < 6; i++) {
+            this.sideStart[i] =
+                this.sideStart[i - 1] + this.sideSquareCount[i - 1];
         }
-        for(let i=0;i<6;i++){
-            this.sideStart[i] *= 6*4;
+        for (let i = 0; i < 6; i++) {
+            this.sideStart[i] *= 6 * 4;
             this.sideSquareCount[i] *= 6;
         }
 
@@ -122,13 +137,13 @@ export class BlockMesh {
         BlockMesh.texture.bind();
     }
 
-    drawFast(mask:number,alpha:number) {
+    drawFast(mask: number, alpha: number) {
         BlockMesh.gl.bindVertexArray(this.vao);
         BlockMesh.shader.uniform3f('trans_pos', this.x, this.y, this.z);
         BlockMesh.shader.uniform1f('alpha', alpha);
         if (mask === 0) {
             return;
-        } else if(mask === 0x3F) {
+        } else if (mask === 0x3f) {
             BlockMesh.gl.drawElements(
                 BlockMesh.gl.TRIANGLES,
                 this.elementCount,
@@ -136,9 +151,11 @@ export class BlockMesh {
                 0
             );
         } else {
-            for(let i=0;i<6;i++){
-                if((mask & (1 << i)) === 0){continue;}
-                 BlockMesh.gl.drawElements(
+            for (let i = 0; i < 6; i++) {
+                if ((mask & (1 << i)) === 0) {
+                    continue;
+                }
+                BlockMesh.gl.drawElements(
                     BlockMesh.gl.TRIANGLES,
                     this.sideSquareCount[i],
                     BlockMesh.gl.UNSIGNED_INT,
@@ -148,8 +165,8 @@ export class BlockMesh {
         }
     }
 
-    draw(projection: mat4, modelView: mat4, mask:number, alpha:number) {
+    draw(projection: mat4, modelView: mat4, mask: number, alpha: number) {
         BlockMesh.bindShaderAndTexture(projection, modelView);
-        this.drawFast(mask,alpha);
+        this.drawFast(mask, alpha);
     }
 }

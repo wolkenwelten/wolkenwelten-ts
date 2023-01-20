@@ -17,6 +17,7 @@ Super early, pretty much nothing works whatsoever, so probably not that interest
 - [X] Frustum culling
 - [X] Simple lighting (ignoring neihbouring chunks)
 - [X] Buggy placeholder player physics
+- [X] Simple Chunk/BlockMesh GC
 - [ ] Experiment with integrating cannon-es for physics
 - [ ] Hidden surface removal across chunk boundaries
 - [ ] Complex lighting (across chunk boundaries)
