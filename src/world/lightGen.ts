@@ -1,5 +1,7 @@
+
+const light = new Uint8Array(32 * 32);
+
 const sunlight = (out: Uint8Array, blocks: Uint8Array) => {
-    const light = new Uint8Array(32 * 32);
     for (let i = 0; i < 32 * 32; i++) {
         light[i] = 15;
     }

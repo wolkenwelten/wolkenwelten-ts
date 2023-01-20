@@ -277,11 +277,12 @@ const lightFrontBack = (
     return Math.min((a + b + c + d) / 4, 15);
 };
 
+const plane = new PlaneEntry();
+
 const genFront = (vertices: number[], args: GenArgs): number => {
     const start = vertices.length;
     const { sideCache, blockData, lightData } = args;
     // First we slice the chunk into many, zero-initialized, planes
-    const plane = new PlaneEntry();
     for (let z = 0; z < 32; z++) {
         let found = 0;
         for (let y = 0; y < 32; y++) {
@@ -332,7 +333,6 @@ const genFront = (vertices: number[], args: GenArgs): number => {
 const genBack = (vertices: number[], args: GenArgs) => {
     const start = vertices.length;
     const { sideCache, blockData, lightData } = args;
-    const plane = new PlaneEntry();
     for (let z = 0; z < 32; z++) {
         let found = 0;
         for (let y = 0; y < 32; y++) {
@@ -383,7 +383,6 @@ const genBack = (vertices: number[], args: GenArgs) => {
 const genTop = (vertices: number[], args: GenArgs) => {
     const start = vertices.length;
     const { sideCache, blockData, lightData } = args;
-    const plane = new PlaneEntry();
     for (let y = 0; y < 32; y++) {
         let found = 0;
         for (let z = 0; z < 32; z++) {
@@ -434,7 +433,6 @@ const genTop = (vertices: number[], args: GenArgs) => {
 const genBottom = (vertices: number[], args: GenArgs) => {
     const start = vertices.length;
     const { sideCache, blockData, lightData } = args;
-    const plane = new PlaneEntry();
     for (let y = 0; y < 32; y++) {
         let found = 0;
         for (let z = 0; z < 32; z++) {
@@ -485,7 +483,6 @@ const genBottom = (vertices: number[], args: GenArgs) => {
 const genRight = (vertices: number[], args: GenArgs) => {
     const start = vertices.length;
     const { sideCache, blockData, lightData } = args;
-    const plane = new PlaneEntry();
     for (let x = 0; x < 32; x++) {
         let found = 0;
         for (let y = 0; y < 32; y++) {
@@ -536,7 +533,6 @@ const genRight = (vertices: number[], args: GenArgs) => {
 const genLeft = (vertices: number[], args: GenArgs) => {
     const start = vertices.length;
     const { sideCache, blockData, lightData } = args;
-    const plane = new PlaneEntry();
     for (let x = 0; x < 32; x++) {
         let found = 0;
         for (let y = 0; y < 32; y++) {
@@ -584,12 +580,12 @@ const genLeft = (vertices: number[], args: GenArgs) => {
     return (vertices.length - start) / 4 / 5;
 };
 
+const blockData = new Uint8Array(34 * 34 * 34);
+const lightData = new Uint8Array(34 * 34 * 34);
+const sideCache = new Uint8Array(32 * 32 * 32);
 export const meshgen = (chunk: Chunk): [Uint8Array, number[]] => {
     chunk.updateSimpleLight();
     const vertices: number[] = [];
-    const blockData = new Uint8Array(34 * 34 * 34);
-    const lightData = new Uint8Array(34 * 34 * 34);
-    const sideCache = new Uint8Array(32 * 32 * 32);
 
     blitChunkData(blockData, chunk.blocks, 1, 1, 1);
     blitChunkData(lightData, chunk.simpleLight, 1, 1, 1);

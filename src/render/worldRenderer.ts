@@ -19,6 +19,7 @@ export class WorldRenderer {
     meshes: Map<number, BlockMesh> = new Map();
     renderer: RenderManager;
     generatorQueue: QueueEntry[] = [];
+    frustum = new Frustum();
 
     constructor(renderer: RenderManager) {
         this.renderer = renderer;
@@ -61,7 +62,8 @@ export class WorldRenderer {
         const cx = cam.x & ~31;
         const cy = cam.y & ~31;
         const cz = cam.z & ~31;
-        const frustum = new Frustum(projectionMatrix, viewMatrix);
+        const frustum = this.frustum;
+        frustum.build(projectionMatrix, viewMatrix);
         let drawn = 0;
         let skipped = 0;
 
