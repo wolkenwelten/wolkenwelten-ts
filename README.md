@@ -16,6 +16,8 @@ Super early, pretty much nothing works whatsoever, so probably not that interest
 - [X] Non-blocking mesh generation
 - [X] Frustum culling
 - [X] Simple lighting (ignoring neihbouring chunks)
+- [X] Buggy placeholder player physics
+- [ ] Experiment with integrating cannon-es for physics
 - [ ] Hidden surface removal across chunk boundaries
 - [ ] Complex lighting (across chunk boundaries)
 - [ ] Compile the Rust meshgen kernel to WASM and measure the performance difference

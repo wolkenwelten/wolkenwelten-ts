@@ -1,4 +1,5 @@
 import { Game } from '../game';
+import { Entity } from './entities/entity';
 import { Chunk } from './chunk';
 export { Chunk } from './chunk';
 
@@ -9,10 +10,16 @@ export const coordinateToWorldKey = (x: number, y: number, z: number) =>
 
 export class World {
     chunks: Map<number, Chunk> = new Map();
+    entities: Entity[] = [];
     game: Game;
 
     constructor (game: Game) {
         this.game = game;
+    }
+
+    getBlock(x: number, y: number, z: number): number | undefined {
+        const chunk = this.getChunk(Math.floor(x) & ~0x1F, Math.floor(y) & ~0x1F, Math.floor(z) & ~0x1F);
+        return chunk ? chunk.getBlock(Math.floor(x) & 0x1f, Math.floor(y) & 0x1f, Math.floor(z) & 0x1f) : undefined;
     }
 
     getChunk(x: number, y: number, z: number): Chunk | undefined {
@@ -20,7 +27,7 @@ export class World {
         if (chunk) {
             if (chunk.x !== x || chunk.y !== y || chunk.z !== z) {
                 throw new Error(
-                    'coordinateToWorldKey got something wrong: [${x},${y},${z}] !== [${chunk.x},${chunk.y},${chunk.z}]'
+                    `coordinateToWorldKey got something wrong: [${x},${y},${z}] !== [${chunk.x},${chunk.y},${chunk.z}]`
                 );
             }
         }
@@ -40,5 +47,15 @@ export class World {
 
     setChunk(x: number, y: number, z: number, chunk: Chunk) {
         this.chunks.set(coordinateToWorldKey(x, y, z), chunk);
+    }
+
+    update() {
+        for(const entity of this.entities) {
+            entity.update(this);
+        }
+    }
+
+    addEntity(entity: Entity) {
+        this.entities.push(entity);
     }
 }
