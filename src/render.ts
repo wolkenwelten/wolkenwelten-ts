@@ -1,6 +1,6 @@
 import { Game } from './game';
 import { mat4 } from 'gl-matrix';
-import { TextMesh, meshInit, Mesh, BlockMesh } from './render/meshes';
+import { meshInit, Mesh } from './render/meshes';
 import { Entity } from './world/entity';
 import { WorldRenderer } from './render/worldRenderer';
 import { allTexturesLoaded } from './render/texture';
@@ -20,7 +20,6 @@ export class RenderManager {
     generateMeshClosureActive = false;
     renderSizeMultiplier = 1;
 
-    crosshairMesh: TextMesh;
     pearMesh: Mesh;
     cam?: Entity;
     world: WorldRenderer;
@@ -40,7 +39,6 @@ export class RenderManager {
         this.initGLContext();
         meshInit(gl);
 
-        this.crosshairMesh = new TextMesh();
         this.pearMesh = Mesh.createPear();
         this.world = new WorldRenderer(this);
 

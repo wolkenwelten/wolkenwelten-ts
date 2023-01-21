@@ -8,6 +8,6 @@
     height:32px;
     margin-left:-16px;
     margin-top:-16px;
-    background: url('../../assets/gfx/crosshair.png') no-repeat;
+    background: url('../../../assets/gfx/crosshair.png') no-repeat;
     background-size: contain;
 }
