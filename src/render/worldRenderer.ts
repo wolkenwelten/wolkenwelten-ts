@@ -20,6 +20,9 @@ export class WorldRenderer {
     renderer: RenderManager;
     generatorQueue: QueueEntry[] = [];
     frustum = new Frustum();
+    chunksDrawn = 0;
+    chunksSkipped = 0;
+
 
     constructor(renderer: RenderManager) {
         this.renderer = renderer;
@@ -97,18 +100,8 @@ export class WorldRenderer {
                 }
             }
         }
-        this.renderer.game.ui.debugInfo.innerText = `Frustum Culling Info:
-            Drawn:${drawn}
-            Culled:${skipped}
-            Queue:${this.generatorQueue.length}
-            Chunks:${this.renderer.game.world.chunks.size}
-            Meshes:${this.meshes.size}
-            Player X:${cam.x.toFixed(2)} Y:${cam.y.toFixed(
-            2
-        )} Z:${cam.z.toFixed(2)}
-            Player VX:${cam.vx.toFixed(2)} VY:${cam.vy.toFixed(
-            2
-        )} VZ:${cam.vz.toFixed(2)}`;
+        this.chunksDrawn = drawn;
+        this.chunksSkipped = skipped;
 
         if (this.generatorQueue.length) {
             this.generatorQueue.sort((a, b) => b.dd - a.dd);

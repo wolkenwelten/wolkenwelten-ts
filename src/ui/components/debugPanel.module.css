@@ -1,0 +1,25 @@
+.panel {
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 4px;
+    background: rgba(0, 0, 0, 0.5);
+    border: solid 1px gold;
+    border-top: none;
+    border-left: none;
+    border-radius: 0 0 8px 0;
+}
+
+.table th {
+    text-align: left;
+    padding: 2;
+    border-collapse: collapse;
+    font-family: monospace;
+}
+
+.table td {
+    padding: 2;
+    border-collapse: collapse;
+    font-family: monospace;
+    padding-left:0.5rem;
+}
