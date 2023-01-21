@@ -39,6 +39,7 @@ export class Game {
         this.render.cam = this.player;
         this.ui = new UIManager(this);
         this.input = new InputManager(this);
+        setInterval(this.ui.updateDebugInfo.bind(this.ui), 100);
         setInterval(this.update.bind(this), 1000.0 / 60.0);
         setInterval(this.gc.bind(this), 15000);
     }
