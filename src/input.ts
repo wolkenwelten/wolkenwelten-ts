@@ -21,7 +21,7 @@ export class InputManager {
             that.game.player.noClip = !that.game.player.noClip;
         });
 
-        that.game.rootElement.addEventListener(
+        that.game.render.canvas.addEventListener(
             'mousedown',
             async (e) => {
                 if (!document.fullscreenElement) {

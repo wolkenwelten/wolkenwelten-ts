@@ -1,5 +1,4 @@
 import { Character } from './world/entity/character';
-import './game.css';
 
 import { InputManager } from './input';
 import { RenderManager } from './render';
