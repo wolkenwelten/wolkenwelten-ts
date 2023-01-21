@@ -5,6 +5,6 @@ import { H } from './h';
 
 export const FpsCounter:FunctionComponent<{fps: Signal<number>}> = ({fps}) => (
     <div className={ styles.fps }>
-        <H>Fps: {fps.value}</H>
+        <H>FPS: {fps.value}</H>
     </div>
 );

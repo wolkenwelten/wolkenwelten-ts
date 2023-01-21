@@ -93,10 +93,12 @@ export class TextMesh {
         y: number,
         w: number,
         h: number,
+
         u: number,
         v: number,
         uw: number,
         vh: number,
+        
         rgba: number
     ) {
         this.pushVertex(x, y + h, u, v + vh, rgba)

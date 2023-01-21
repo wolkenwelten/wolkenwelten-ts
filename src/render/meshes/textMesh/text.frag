@@ -1,6 +1,6 @@
 #version 300 es
-precision mediump float;
-precision mediump sampler2D;
+precision highp float;
+precision highp sampler2D;
 
 uniform sampler2D cur_tex;
 

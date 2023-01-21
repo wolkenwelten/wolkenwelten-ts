@@ -1,4 +1,5 @@
 import { h, FunctionComponent } from 'preact';
+import { useCallback, useState } from 'preact/hooks';
 import styles from './debugPanel.module.css';
 import { DebugInfo } from '../app';
 import { Signal } from '@preact/signals';
@@ -10,6 +11,13 @@ type Props = {
 
 export const DebugPanel:FunctionComponent<{ debugInfo: Signal<DebugInfo> }> = ({debugInfo}) => {
     const { drawn, culled, queue, chunks, meshes, player } = debugInfo.value;
+    const [renderHalfResolution, setRenderHalfResolution] = useState(false);
+    const toggleRenderHalfResolution = useCallback(() => {
+        setRenderHalfResolution(!renderHalfResolution);
+        window.wolkenwelten.render.renderSizeMultiplier = renderHalfResolution ? 1 : 0.5;
+        window.wolkenwelten.render.resize();
+    }, [renderHalfResolution]);
+
     return <div className={ styles.panel }>
         <H>Debug Panel</H>
         <table className={ styles.table }>
@@ -46,5 +54,6 @@ export const DebugPanel:FunctionComponent<{ debugInfo: Signal<DebugInfo> }> = ({
                 <td>{ player.vz.toFixed(3) }</td>
             </tr>
         </table>
+        <label>Render at half-resolution: <input type="checkbox" checked={ renderHalfResolution } onChange={ toggleRenderHalfResolution }></input></label>
     </div>;
 };

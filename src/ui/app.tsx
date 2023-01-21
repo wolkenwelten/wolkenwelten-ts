@@ -1,6 +1,7 @@
-import { render, h } from 'preact';
+import { h } from 'preact';
 import { DebugPanel } from './components/debugPanel';
 import { FpsCounter } from './components/fpsCounter';
+import { Crosshair } from './components/crosshair';
 import { Signal } from "@preact/signals";
 
 export type DebugInfo = {
@@ -28,6 +29,7 @@ export const App = ({fps, debugInfo}: AppProps) => {
     return <div>
         <DebugPanel debugInfo={debugInfo}/>
         <FpsCounter fps={fps}/>
+        <Crosshair/>
     </div>;
 };
 
