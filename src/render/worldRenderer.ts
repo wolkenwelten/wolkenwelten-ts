@@ -23,7 +23,6 @@ export class WorldRenderer {
     chunksDrawn = 0;
     chunksSkipped = 0;
 
-
     constructor(renderer: RenderManager) {
         this.renderer = renderer;
     }
