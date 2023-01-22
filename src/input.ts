@@ -3,15 +3,16 @@ import { Game } from './game';
 export class InputManager {
     game: Game;
     keyHandler: Map<string, () => void> = new Map();
-    keystates: Set<string> = new Set();
+    keyStates: Set<string> = new Set();
+    mouseStates: Set<number> = new Set();
 
     constructor(game: Game) {
         this.game = game;
         const that = this;
 
-        window.addEventListener('keydown', (e) => that.keystates.add(e.code));
+        window.addEventListener('keydown', (e) => that.keyStates.add(e.code));
         window.addEventListener('keyup', (e) => {
-            that.keystates.delete(e.code);
+            that.keyStates.delete(e.code);
             const handler = that.keyHandler.get(e.code);
             if (handler) {
                 handler();
@@ -34,6 +35,14 @@ export class InputManager {
             false
         );
         that.game.rootElement.addEventListener(
+            'mousedown',
+            (e) => that.mouseStates.add(e.button)
+        );
+        that.game.rootElement.addEventListener(
+            'mouseup',
+            (e) => that.mouseStates.delete(e.button)
+        );
+        that.game.rootElement.addEventListener(
             'mousemove',
             (e) => {
                 if (document.pointerLockElement) {
@@ -48,31 +57,31 @@ export class InputManager {
     }
 
     update() {
-        const speed = this.keystates.has('ShiftLeft') ? 0.05 : 0.2;
+        const speed = this.keyStates.has('ShiftLeft') ? 0.05 : 0.2;
         const movement = { x: 0, y: 0, z: 0 };
 
-        if (this.keystates.has('KeyW')) {
+        if (this.keyStates.has('KeyW')) {
             movement.z = -speed;
         }
-        if (this.keystates.has('KeyS')) {
+        if (this.keyStates.has('KeyS')) {
             movement.z = speed;
         }
-        if (this.keystates.has('KeyA')) {
+        if (this.keyStates.has('KeyA')) {
             movement.x = -speed;
         }
-        if (this.keystates.has('KeyD')) {
+        if (this.keyStates.has('KeyD')) {
             movement.x = speed;
         }
-        if (this.keystates.has('KeyF')) {
+        if (this.keyStates.has('KeyF')) {
             movement.y = -speed;
         }
-        if (this.keystates.has('KeyR')) {
+        if (this.keyStates.has('KeyR')) {
             movement.y = speed;
         }
-        if (this.keystates.has('Space')) {
+        if (this.keyStates.has('Space')) {
             movement.y = speed;
         }
-        if (this.keystates.has('Tab')) {
+        if (this.keyStates.has('Tab')) {
             if (document.pointerLockElement) {
                 document.exitPointerLock();
             }
@@ -82,6 +91,14 @@ export class InputManager {
             player.fly(movement.x, movement.y, movement.z);
         } else {
             player.move(movement.x, movement.y, movement.z);
+        }
+
+        if(this.mouseStates.has(0)) {
+            this.game.player.dig();
+        }
+
+        if(this.mouseStates.has(2)) {
+            this.game.player.placeBlock();
         }
     }
 }

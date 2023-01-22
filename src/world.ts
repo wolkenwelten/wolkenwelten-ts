@@ -16,6 +16,20 @@ export class World {
         this.game = game;
     }
 
+    setBlock(x: number, y: number, z: number, block: number) {
+        const chunk = this.getOrGenChunk(
+            Math.floor(x) & ~0x1f,
+            Math.floor(y) & ~0x1f,
+            Math.floor(z) & ~0x1f
+        );
+        chunk.setBlock(
+            Math.floor(x) & 0x1f,
+            Math.floor(y) & 0x1f,
+            Math.floor(z) & 0x1f,
+            block
+        );
+    }
+
     getBlock(x: number, y: number, z: number): number | undefined {
         const chunk = this.getChunk(
             Math.floor(x) & ~0x1f,
@@ -73,7 +87,7 @@ export class World {
 
     update() {
         for (const entity of this.entities) {
-            entity.update(this);
+            entity.update();
         }
     }
 

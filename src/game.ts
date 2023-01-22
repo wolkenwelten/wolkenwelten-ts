@@ -26,6 +26,7 @@ export class Game {
         this.world = new World(this);
         initDefaultBlocks();
         this.player = new Character(
+            this.world,
             -16,
             30.5,
             -16,
@@ -40,7 +41,7 @@ export class Game {
         this.input = new InputManager(this);
         setInterval(this.ui.updateDebugInfo.bind(this.ui), 100);
         setInterval(this.update.bind(this), 1000.0 / 60.0);
-        setInterval(this.gc.bind(this), 15000);
+        setInterval(this.gc.bind(this), 20000);
     }
 
     update() {

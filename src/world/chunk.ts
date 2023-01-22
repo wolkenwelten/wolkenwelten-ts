@@ -3,7 +3,7 @@ import { lightGenSimple } from './chunk/lightGen';
 import { World } from '../world';
 
 const coordinateToOffset = (x: number, y: number, z: number) =>
-    (x & 0x1f) | ((y & 0x1f) << 5) | ((z & 0x1f) << 10);
+    Math.floor(x) | (Math.floor(y) * 32) | (Math.floor(z) * 32 * 32);
 
 export class Chunk {
     blocks: Uint8Array;
@@ -56,6 +56,7 @@ export class Chunk {
     setBlock(x: number, y: number, z: number, block: number) {
         const i = coordinateToOffset(x, y, z);
         this.blocks[i] = block;
+        this.lastUpdated = this.world.game.ticks;
     }
 
     setBox(
