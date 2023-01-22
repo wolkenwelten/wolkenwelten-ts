@@ -153,7 +153,7 @@ const blitChunkData = (
             for (let z = zStart; z < zEnd; z++) {
                 const cz = z - offZ;
                 const blockOff = blockBufferPosToOffset(x, y, z);
-                const chunkOff = cx * 32 * 32 + cy * 32 + cz;
+                const chunkOff = cz * 32 * 32 + cy * 32 + cx; // Transposing the X and Z axes shouldn't be necessary
                 blockData[blockOff] = chunkData[chunkOff];
             }
         }

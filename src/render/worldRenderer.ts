@@ -35,10 +35,16 @@ export class WorldRenderer {
         const { x, y, z } = entry;
 
         const chunk = this.renderer.game.world.getOrGenChunk(x, y, z);
-        const newMesh = BlockMesh.fromChunk(chunk);
-        const key = coordinateToWorldKey(x, y, z);
-        this.meshes.set(key, newMesh);
-        return newMesh;
+        const oldMesh = this.getMesh(x, y, z);
+        if(!oldMesh) {
+            const newMesh = BlockMesh.fromChunk(chunk);
+            const key = coordinateToWorldKey(x, y, z);
+            this.meshes.set(key, newMesh);
+            return newMesh;
+        } else {
+            oldMesh.updateFromChunk(chunk);
+            return oldMesh;
+        }
     }
 
     getMesh(x: number, y: number, z: number): BlockMesh | undefined {
@@ -86,16 +92,16 @@ export class WorldRenderer {
                     if (mesh) {
                         const alpha = Math.min(
                             1.0,
-                            (ticks - mesh.lastUpdated) * (1.0 / 16.0)
+                            (ticks - mesh.createdAt) * (1.0 / 16.0)
                         );
                         mesh.drawFast(this.calcMask(x, y, z), alpha);
-                    } else {
-                        const dx = cam.x - nx;
-                        const dy = cam.y - ny;
-                        const dz = cam.z - nz;
-                        const dd = dx * dx + dy * dy + dz * dz;
-                        this.generatorQueue.push({ dd, x: nx, y: ny, z: nz });
+                        if(mesh.lastUpdated >= mesh.chunk.lastUpdated){continue;}
                     }
+                    const dx = cam.x - nx;
+                    const dy = cam.y - ny;
+                    const dz = cam.z - nz;
+                    const dd = dx * dx + dy * dy + dz * dz;
+                    this.generatorQueue.push({ dd, x: nx, y: ny, z: nz });
                 }
             }
         }

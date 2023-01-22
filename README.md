@@ -28,6 +28,8 @@ Super early, pretty much nothing works whatsoever, so probably not that interest
 - [X] Simple lighting (ignoring neihbouring chunks)
 - [X] Buggy placeholder player physics
 - [X] Simple Chunk/BlockMesh GC
+- [X] Integrate Preact for the UI
+- [X] Simple place/removal of blocks
 - [ ] Hidden surface removal across chunk boundaries
 - [ ] Complex lighting (across chunk boundaries)
 - [ ] Compile the Rust meshgen kernel to WASM and measure the performance difference
