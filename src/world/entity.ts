@@ -31,7 +31,7 @@ export class Entity {
 
     /* Fly into the direction the Entity is facing */
     fly(ox: number, oy: number, oz: number) {
-        const [nox, noy, noz] = this.direction(ox,oy,oz);
+        const [nox, noy, noz] = this.direction(ox, oy, oz);
         this.x += nox;
         this.y += noy;
         this.z += noz;
@@ -76,25 +76,25 @@ export class Entity {
         return [nox * vel, noy * vel, noz * vel];
     }
 
-    raycast(returnFront = false):[number, number, number] | null {
-        const [dx,dy,dz] = this.direction(0,0,-1,0.0625);
+    raycast(returnFront = false): [number, number, number] | null {
+        const [dx, dy, dz] = this.direction(0, 0, -1, 0.0625);
         let x = this.x;
         let y = this.y;
         let z = this.z;
         let lastX = Math.floor(this.x);
         let lastY = Math.floor(this.y);
         let lastZ = Math.floor(this.z);
-        if(this.world.isSolid(lastX, lastY, lastZ)) {
-            return [lastX,lastY,lastZ];
+        if (this.world.isSolid(lastX, lastY, lastZ)) {
+            return [lastX, lastY, lastZ];
         }
 
-        for(let i = 0; i < 64; i++) {
+        for (let i = 0; i < 64; i++) {
             const ix = Math.floor(x);
             const iy = Math.floor(y);
             const iz = Math.floor(z);
-            if(ix != lastX || iy != lastY || iz != lastZ) {
-                if(this.world.isSolid(ix, iy, iz)) {
-                    return returnFront ? [lastX,lastY,lastZ] : [ix,iy,iz];
+            if (ix != lastX || iy != lastY || iz != lastZ) {
+                if (this.world.isSolid(ix, iy, iz)) {
+                    return returnFront ? [lastX, lastY, lastZ] : [ix, iy, iz];
                 }
                 lastX = ix;
                 lastY = iy;

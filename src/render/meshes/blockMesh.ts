@@ -7,7 +7,7 @@ import shaderVertSource from './blockMesh/block.vert?raw';
 import shaderFragSource from './blockMesh/block.frag?raw';
 import blockTextureUrl from '../../../assets/gfx/blocks.png';
 import { mat4 } from 'gl-matrix';
-import { meshgen } from './blockMesh/meshgen';
+import { meshgenSimple, meshgenComplex } from './blockMesh/meshgen';
 
 export class BlockMesh {
     static gl: WebGL2RenderingContext;
@@ -63,22 +63,23 @@ export class BlockMesh {
             shaderFragSource,
             ['cur_tex', 'mat_mv', 'mat_mvp', 'trans_pos', 'alpha']
         );
-        this.texture = new Texture(this.gl, 'blocks', blockTextureUrl, '2DArray');
+        this.texture = new Texture(
+            this.gl,
+            'blocks',
+            blockTextureUrl,
+            '2DArray'
+        );
         this.texture.nearest();
         this.indeces = this.generateIndexBuffer(32 * 32 * 32 * 6);
     }
 
     static fromChunk(chunk: Chunk): BlockMesh {
-        const [vertices, sideSquareCount] = meshgen(chunk);
-        return new BlockMesh(
-            vertices,
-            sideSquareCount,
-            chunk
-        );
+        const [vertices, sideSquareCount] = meshgenComplex(chunk);
+        return new BlockMesh(vertices, sideSquareCount, chunk);
     }
 
     updateFromChunk(chunk: Chunk) {
-        const [vertices, sideSquareCount] = meshgen(chunk);
+        const [vertices, sideSquareCount] = meshgenComplex(chunk);
         this.update(vertices, sideSquareCount);
     }
 
@@ -112,11 +113,7 @@ export class BlockMesh {
         gl.enableVertexAttribArray(2);
     }
 
-    constructor(
-        vertices: Uint8Array,
-        sideSquareCount: number[],
-        chunk: Chunk
-    ) {
+    constructor(vertices: Uint8Array, sideSquareCount: number[], chunk: Chunk) {
         this.x = chunk.x;
         this.y = chunk.y;
         this.z = chunk.z;

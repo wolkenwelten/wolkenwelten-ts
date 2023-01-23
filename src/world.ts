@@ -105,7 +105,7 @@ export class World {
         const maxDistance =
             this.game.render.renderDistance *
             this.game.render.renderDistance *
-            4;
+            8;
         for (const chunk of this.chunks.values()) {
             if (chunk.gc(maxDistance, this.game.player)) {
                 const key = coordinateToWorldKey(chunk.x, chunk.y, chunk.z);

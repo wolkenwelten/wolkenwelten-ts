@@ -1,6 +1,10 @@
 import { Chunk } from '../../../world/chunk';
 import { blocks } from '../../../world/blockType';
 
+const blockData = new Uint8Array(34 * 34 * 34);
+const lightData = new Uint8Array(34 * 34 * 34);
+const sideCache = new Uint8Array(32 * 32 * 32);
+
 const sides = {
     front: 0,
     back: 1,
@@ -580,15 +584,54 @@ const genLeft = (vertices: number[], args: GenArgs) => {
     return (vertices.length - start) / 4 / 5;
 };
 
-const blockData = new Uint8Array(34 * 34 * 34);
-const lightData = new Uint8Array(34 * 34 * 34);
-const sideCache = new Uint8Array(32 * 32 * 32);
-export const meshgen = (chunk: Chunk): [Uint8Array, number[]] => {
+export const meshgenSimple = (chunk: Chunk): [Uint8Array, number[]] => {
     chunk.updateSimpleLight();
     const vertices: number[] = [];
 
     blitChunkData(blockData, chunk.blocks, 1, 1, 1);
     blitChunkData(lightData, chunk.simpleLight, 1, 1, 1);
+    calcSideCache(sideCache, blockData);
+
+    const sideSquareCount = [0, 0, 0, 0, 0, 0];
+    const data = { blockData, lightData, sideCache, blockTypes: blocks };
+
+    sideSquareCount[0] = genFront(vertices, data);
+    sideSquareCount[1] = genBack(vertices, data);
+    sideSquareCount[2] = genTop(vertices, data);
+    sideSquareCount[3] = genBottom(vertices, data);
+    sideSquareCount[4] = genLeft(vertices, data);
+    sideSquareCount[5] = genRight(vertices, data);
+
+    return [new Uint8Array(vertices), sideSquareCount];
+};
+
+export const meshgenComplex = (chunk: Chunk): [Uint8Array, number[]] => {
+    const vertices: number[] = [];
+    for (let x = -1; x <= 1; x++) {
+        for (let y = -1; y <= 1; y++) {
+            for (let z = -1; z <= 1; z++) {
+                const cx = chunk.x + x * 32;
+                const cy = chunk.y + y * 32;
+                const cz = chunk.z + z * 32;
+                const curChunk = chunk.world.getOrGenChunk(cx, cy, cz);
+                curChunk.updateSimpleLight();
+                blitChunkData(
+                    blockData,
+                    curChunk.blocks,
+                    1 + x * 32,
+                    1 + y * 32,
+                    1 + z * 32
+                );
+                blitChunkData(
+                    lightData,
+                    curChunk.simpleLight,
+                    1 + x * 32,
+                    1 + y * 32,
+                    1 + z * 32
+                );
+            }
+        }
+    }
     calcSideCache(sideCache, blockData);
 
     const sideSquareCount = [0, 0, 0, 0, 0, 0];

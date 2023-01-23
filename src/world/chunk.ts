@@ -29,10 +29,10 @@ export class Chunk {
         this.worldgen();
     }
 
-    worldgen(){
-        if(this.y < -512){
+    worldgen() {
+        if (this.y < -512) {
             worldgenUnderground(this);
-        } else if(this.y < 512) {
+        } else if (this.y < 512) {
             worldgenSurface(this);
         } else {
             worldgenSky(this);

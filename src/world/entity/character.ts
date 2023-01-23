@@ -13,7 +13,14 @@ export class Character extends Entity {
     movementZ = 0;
     lastAction = 0;
 
-    constructor(world: World, x: number, y: number, z: number, yaw: number, pitch: number) {
+    constructor(
+        world: World,
+        x: number,
+        y: number,
+        z: number,
+        yaw: number,
+        pitch: number
+    ) {
         super(world);
         this.x = x;
         this.y = y;
@@ -163,18 +170,26 @@ export class Character extends Entity {
     }
 
     dig() {
-        if (this.world.game.ticks < this.lastAction) { return; }
+        if (this.world.game.ticks < this.lastAction) {
+            return;
+        }
         const ray = this.raycast();
-        if (!ray) { return; }
+        if (!ray) {
+            return;
+        }
         this.cooldown(20);
         const [x, y, z] = ray;
         this.world.setBlock(x, y, z, 0);
     }
 
     placeBlock(block = 3) {
-        if (this.world.game.ticks < this.lastAction) { return; }
+        if (this.world.game.ticks < this.lastAction) {
+            return;
+        }
         const ray = this.raycast(true);
-        if (!ray) { return; }
+        if (!ray) {
+            return;
+        }
         this.cooldown(20);
         const [x, y, z] = ray;
         this.world.setBlock(x, y, z, block);

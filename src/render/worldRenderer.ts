@@ -36,7 +36,7 @@ export class WorldRenderer {
 
         const chunk = this.renderer.game.world.getOrGenChunk(x, y, z);
         const oldMesh = this.getMesh(x, y, z);
-        if(!oldMesh) {
+        if (!oldMesh) {
             const newMesh = BlockMesh.fromChunk(chunk);
             const key = coordinateToWorldKey(x, y, z);
             this.meshes.set(key, newMesh);
@@ -95,7 +95,9 @@ export class WorldRenderer {
                             (ticks - mesh.createdAt) * (1.0 / 16.0)
                         );
                         mesh.drawFast(this.calcMask(x, y, z), alpha);
-                        if(mesh.lastUpdated >= mesh.chunk.lastUpdated){continue;}
+                        if (mesh.lastUpdated >= mesh.chunk.lastUpdated) {
+                            continue;
+                        }
                     }
                     const dx = cam.x - nx;
                     const dy = cam.y - ny;
