@@ -1,6 +1,9 @@
 import { Entity } from './entity';
 import { lightGenSimple } from './chunk/lightGen';
 import { World } from '../world';
+import { worldgenSurface } from './worldgen/surface';
+import { worldgenSky } from './worldgen/sky';
+import { worldgenUnderground } from './worldgen/underground';
 
 const coordinateToOffset = (x: number, y: number, z: number) =>
     Math.floor(x) | (Math.floor(y) * 32) | (Math.floor(z) * 32 * 32);
@@ -23,20 +26,16 @@ export class Chunk {
         this.z = z;
         this.world = world;
         this.lastUpdated = world.game.ticks;
-        const seed = x ^ y ^ z;
-        if (seed & 32) {
-            return;
-        }
-        if (seed & 64) {
-            this.setSphere(16, 16, 16, 8, 2);
-            this.setSphere(16, 15, 16, 8, 1);
-            this.setSphere(16, 12, 16, 7, 3);
+        this.worldgen();
+    }
+
+    worldgen(){
+        if(this.y < -512){
+            worldgenUnderground(this);
+        } else if(this.y < 512) {
+            worldgenSurface(this);
         } else {
-            if (seed & 128) {
-                this.setBox(4, 4, 4, 24, 24, 24, 9);
-            } else {
-                this.setBox(8, 8, 8, 16, 16, 16, 13);
-            }
+            worldgenSky(this);
         }
     }
 
@@ -84,6 +83,7 @@ export class Chunk {
                 }
             }
         }
+        this.lastUpdated = this.world.game.ticks;
     }
 
     setSphere(cx: number, cy: number, cz: number, r: number, block: number) {
@@ -110,6 +110,7 @@ export class Chunk {
                 }
             }
         }
+        this.lastUpdated = this.world.game.ticks;
     }
 
     gc(maxDistance: number, entity: Entity) {

@@ -102,7 +102,7 @@ export class Character extends Entity {
         }
 
         if (this.movementY > 0 && this.mayJump()) {
-            this.vy = 0.17;
+            this.vy = 0.12;
         }
 
         if (this.isSolidPillar(this.x - 0.4, this.y - 0.8, this.z)) {
