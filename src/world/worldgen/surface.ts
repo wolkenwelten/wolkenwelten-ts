@@ -22,14 +22,20 @@ const grassHeight = (x: number, z: number):number => {
 }
 
 const plantTree = (chunk: Chunk, x:number, gh:number, z:number, treeHeight: number) => {
-    chunk.setBox(x-1,Math.floor(gh)+4,z-1,3,Math.min(treeHeight,32),3,6);
-    chunk.setBox(x-2,Math.floor(gh)+4,z,5,Math.min(treeHeight-3,32),1,6);
-    chunk.setBox(x,Math.floor(gh)+4,z-2,1,Math.min(treeHeight-3,32),5,6);
-    chunk.setBlock(x,Math.floor(gh)+treeHeight+4,z,6);
-    chunk.setBlock(x+1,Math.floor(gh)+treeHeight+3,z+1,0);
-    chunk.setBlock(x+1,Math.floor(gh)+treeHeight+3,z-1,0);
-    chunk.setBlock(x-1,Math.floor(gh)+treeHeight+3,z+1,0);
-    chunk.setBlock(x-1,Math.floor(gh)+treeHeight+3,z-1,0);
+    chunk.setBox(x-1,Math.floor(gh)+5,z-1,3,Math.min(treeHeight-2,32),3,6);
+    chunk.setBox(x-2,Math.floor(gh)+5,z,5,Math.min(treeHeight-4,32),1,6);
+    chunk.setBox(x,Math.floor(gh)+5,z-2,1,Math.min(treeHeight-4,32),5,6);
+    chunk.setBlock(x,Math.floor(gh)+treeHeight+3,z,6);
+    chunk.setBlock(x+1,Math.floor(gh)+treeHeight+2,z+1,0);
+    chunk.setBlock(x+1,Math.floor(gh)+treeHeight+2,z-1,0);
+    chunk.setBlock(x-1,Math.floor(gh)+treeHeight+2,z+1,0);
+    chunk.setBlock(x-1,Math.floor(gh)+treeHeight+2,z-1,0);
+
+    chunk.setBlock(x+1,Math.floor(gh)+4,z,6);
+    chunk.setBlock(x-1,Math.floor(gh)+4,z,6);
+    chunk.setBlock(x,Math.floor(gh)+4,z+1,6);
+    chunk.setBlock(x,Math.floor(gh)+4,z-1,6);
+
     chunk.setBox(x,Math.floor(gh-1),z,1,treeHeight,1,5);
 };
 
