@@ -34,13 +34,11 @@ export class InputManager {
             },
             false
         );
-        that.game.rootElement.addEventListener(
-            'mousedown',
-            (e) => that.mouseStates.add(e.button)
+        that.game.rootElement.addEventListener('mousedown', (e) =>
+            that.mouseStates.add(e.button)
         );
-        that.game.rootElement.addEventListener(
-            'mouseup',
-            (e) => that.mouseStates.delete(e.button)
+        that.game.rootElement.addEventListener('mouseup', (e) =>
+            that.mouseStates.delete(e.button)
         );
         that.game.rootElement.addEventListener(
             'mousemove',
@@ -88,17 +86,25 @@ export class InputManager {
         const player = this.game.player;
         if (player.noClip) {
             const speed = this.keyStates.has('ShiftLeft') ? 1.5 : 0.3;
-            player.fly(movement.x * speed, movement.y * speed, movement.z * speed);
+            player.fly(
+                movement.x * speed,
+                movement.y * speed,
+                movement.z * speed
+            );
         } else {
             const speed = this.keyStates.has('ShiftLeft') ? 0.05 : 0.2;
-            player.move(movement.x * speed, movement.y * speed, movement.z * speed);
+            player.move(
+                movement.x * speed,
+                movement.y * speed,
+                movement.z * speed
+            );
         }
 
-        if(this.mouseStates.has(0)) {
+        if (this.mouseStates.has(0)) {
             this.game.player.dig();
         }
 
-        if(this.mouseStates.has(2)) {
+        if (this.mouseStates.has(2)) {
             this.game.player.placeBlock();
         }
     }

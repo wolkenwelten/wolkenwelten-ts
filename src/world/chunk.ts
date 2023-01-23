@@ -18,6 +18,7 @@ export class Chunk {
     z: number;
     world: World;
 
+
     constructor(world: World, x: number, y: number, z: number) {
         this.blocks = new Uint8Array(32 * 32 * 32);
         this.simpleLight = new Uint8Array(32 * 32 * 32);
@@ -29,10 +30,10 @@ export class Chunk {
         this.worldgen();
     }
 
-    worldgen(){
-        if(this.y < -512){
+    worldgen() {
+        if (this.y < -512) {
             worldgenUnderground(this);
-        } else if(this.y < 512) {
+        } else if (this.y < 512) {
             worldgenSurface(this);
         } else {
             worldgenSky(this);

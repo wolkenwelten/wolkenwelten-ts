@@ -83,21 +83,9 @@ const lightBlur = (out: Uint8Array) => {
     lightBlurZ(out);
 };
 
-const ambientOcclusion = (out: Uint8Array, blocks: Uint8Array) => {
-    for (let x = 0; x < 32; x++) {
-        for (let y = 0; y < 32; y++) {
-            for (let z = 0; z < 32; z++) {
-                const off = x * 32 * 32 + y * 32 + z;
-                if (blocks[off] !== 0) {
-                    out[off] = out[off] >> 1;
-                }
-            }
-        }
-    }
-};
+
 
 export const lightGenSimple = (out: Uint8Array, blocks: Uint8Array) => {
     sunlight(out, blocks);
     lightBlur(out);
-    ambientOcclusion(out, blocks);
 };

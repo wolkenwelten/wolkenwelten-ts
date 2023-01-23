@@ -72,7 +72,7 @@ export class RenderManager {
         const projectionMatrix = mat4.create();
         mat4.perspective(
             projectionMatrix,
-            this.fov * Math.PI / 180,
+            (this.fov * Math.PI) / 180,
             this.width / this.height,
             0.1,
             512.0

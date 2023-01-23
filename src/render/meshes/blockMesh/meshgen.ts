@@ -1,5 +1,10 @@
 import { Chunk } from '../../../world/chunk';
 import { blocks } from '../../../world/blockType';
+import { glMatrix } from 'gl-matrix';
+
+const blockData = new Uint8Array(34 * 34 * 34);
+const lightData = new Uint8Array(34 * 34 * 34);
+const sideCache = new Uint8Array(32 * 32 * 32);
 
 const sides = {
     front: 0,
@@ -580,10 +585,86 @@ const genLeft = (vertices: number[], args: GenArgs) => {
     return (vertices.length - start) / 4 / 5;
 };
 
-const blockData = new Uint8Array(34 * 34 * 34);
-const lightData = new Uint8Array(34 * 34 * 34);
-const sideCache = new Uint8Array(32 * 32 * 32);
-export const meshgen = (chunk: Chunk): [Uint8Array, number[]] => {
+const lightBlurX = (out: Uint8Array) => {
+    for (let y = 0; y < 34; y++) {
+        for (let z = 0; z < 34; z++) {
+            let a = 0;
+            let b = 0;
+            for (let x = 0; x < 34; x++) {
+                const aOff = x * 34 * 34 + y * 34 + z;
+                a = Math.max(a, out[aOff]);
+                out[aOff] = a;
+                a = Math.max(0, a - 1);
+
+                const bx = 31 - x;
+                const bOff = bx * 34 * 34 + y * 34 + z;
+                b = Math.max(b, out[bOff]);
+                out[bOff] = b;
+                b = Math.max(0, b - 1);
+            }
+        }
+    }
+};
+
+const lightBlurY = (out: Uint8Array) => {
+    for (let x = 0; x < 34; x++) {
+        for (let z = 0; z < 34; z++) {
+            let a = 0;
+            let b = 0;
+            for (let y = 0; y < 34; y++) {
+                const aOff = x * 34 * 34 + y * 34 + z;
+                a = Math.max(a, out[aOff]);
+                out[aOff] = a;
+                a = Math.max(0, a - 1);
+
+                const by = 31 - y;
+                const bOff = x * 34 * 34 + by * 34 + z;
+                b = Math.max(b, out[bOff]);
+                out[bOff] = b;
+                b = Math.max(0, b - 1);
+            }
+        }
+    }
+};
+
+const lightBlurZ = (out: Uint8Array) => {
+    for (let x = 0; x < 34; x++) {
+        for (let y = 0; y < 34; y++) {
+            let a = 0;
+            let b = 0;
+            for (let z = 0; z < 34; z++) {
+                const aOff = x * 34 * 34 + y * 34 + z;
+                a = Math.max(a, out[aOff]);
+                out[aOff] = a;
+                a = Math.max(0, a - 1);
+
+                const bz = 31 - z;
+                const bOff = x * 34 * 34 + y * 34 + bz;
+                b = Math.max(b, out[bOff]);
+                out[bOff] = b;
+                b = Math.max(0, b - 1);
+            }
+        }
+    }
+};
+
+const ambientOcclusion = (out: Uint8Array, blocks: Uint8Array) => {
+    const end = 34*34*34 + 34*34 + 34;
+    for(let off=0;off<end;off++){
+        // Here we divide the light value by 2 when the position is occupied by a block
+        // Written this way so it's branchless and easier to optimize/vectorize
+        out[off] = out[off] >> (+(blocks[off] !== 0));
+    }
+};
+
+const finishLight = (light: Uint8Array, block: Uint8Array) => {
+    lightBlurX(light);
+    lightBlurY(light);
+    lightBlurZ(light);
+    ambientOcclusion(light, block);
+};
+
+export const meshgenSimple = (chunk: Chunk): [Uint8Array, number[]] => {
     chunk.updateSimpleLight();
     const vertices: number[] = [];
 
@@ -601,5 +682,47 @@ export const meshgen = (chunk: Chunk): [Uint8Array, number[]] => {
     sideSquareCount[4] = genLeft(vertices, data);
     sideSquareCount[5] = genRight(vertices, data);
 
+    return [new Uint8Array(vertices), sideSquareCount];
+};
+
+export const meshgenComplex = (chunk: Chunk): [Uint8Array, number[]] => {
+    const vertices: number[] = [];
+    for (let x = -1; x <= 1; x++) {
+        for (let y = -1; y <= 1; y++) {
+            for (let z = -1; z <= 1; z++) {
+                const cx = chunk.x + x * 32;
+                const cy = chunk.y + y * 32;
+                const cz = chunk.z + z * 32;
+                const curChunk = chunk.world.getOrGenChunk(cx, cy, cz);
+                curChunk.updateSimpleLight();
+                blitChunkData(
+                    blockData,
+                    curChunk.blocks,
+                    1 + x * 32,
+                    1 + y * 32,
+                    1 + z * 32
+                );
+                blitChunkData(
+                    lightData,
+                    curChunk.simpleLight,
+                    1 + x * 32,
+                    1 + y * 32,
+                    1 + z * 32
+                );
+            }
+        }
+    }
+    calcSideCache(sideCache, blockData);
+    finishLight(lightData, blockData);
+
+    const sideSquareCount = [0, 0, 0, 0, 0, 0];
+    const data = { blockData, lightData, sideCache, blockTypes: blocks };
+
+    sideSquareCount[0] = genFront(vertices, data);
+    sideSquareCount[1] = genBack(vertices, data);
+    sideSquareCount[2] = genTop(vertices, data);
+    sideSquareCount[3] = genBottom(vertices, data);
+    sideSquareCount[4] = genLeft(vertices, data);
+    sideSquareCount[5] = genRight(vertices, data);
     return [new Uint8Array(vertices), sideSquareCount];
 };
