@@ -10,9 +10,11 @@ export const coordinateToWorldKey = (x: number, y: number, z: number) =>
 export class World {
     chunks: Map<number, Chunk> = new Map();
     entities: Set<Entity> = new Set();
+    seed: number;
     game: Game;
 
     constructor(game: Game) {
+        this.seed = 1234;
         this.game = game;
     }
 

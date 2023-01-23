@@ -57,29 +57,28 @@ export class InputManager {
     }
 
     update() {
-        const speed = this.keyStates.has('ShiftLeft') ? 0.05 : 0.2;
         const movement = { x: 0, y: 0, z: 0 };
 
         if (this.keyStates.has('KeyW')) {
-            movement.z = -speed;
+            movement.z = -1;
         }
         if (this.keyStates.has('KeyS')) {
-            movement.z = speed;
+            movement.z = 1;
         }
         if (this.keyStates.has('KeyA')) {
-            movement.x = -speed;
+            movement.x = -1;
         }
         if (this.keyStates.has('KeyD')) {
-            movement.x = speed;
+            movement.x = 1;
         }
         if (this.keyStates.has('KeyF')) {
-            movement.y = -speed;
+            movement.y = -1;
         }
         if (this.keyStates.has('KeyR')) {
-            movement.y = speed;
+            movement.y = 1;
         }
         if (this.keyStates.has('Space')) {
-            movement.y = speed;
+            movement.y = 1;
         }
         if (this.keyStates.has('Tab')) {
             if (document.pointerLockElement) {
@@ -88,9 +87,11 @@ export class InputManager {
         }
         const player = this.game.player;
         if (player.noClip) {
-            player.fly(movement.x, movement.y, movement.z);
+            const speed = this.keyStates.has('ShiftLeft') ? 1.5 : 0.3;
+            player.fly(movement.x * speed, movement.y * speed, movement.z * speed);
         } else {
-            player.move(movement.x, movement.y, movement.z);
+            const speed = this.keyStates.has('ShiftLeft') ? 0.05 : 0.2;
+            player.move(movement.x * speed, movement.y * speed, movement.z * speed);
         }
 
         if(this.mouseStates.has(0)) {

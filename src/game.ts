@@ -6,6 +6,8 @@ import { UIManager } from './ui';
 import { World } from './world';
 import { initDefaultBlocks } from './world/blockType/blockTypeDefaults';
 
+import { LCG } from './util/prng';
+
 export interface GameConfig {
     parent: HTMLElement;
 }
@@ -18,6 +20,7 @@ export class Game {
     ui: UIManager;
     player: Character;
     world: World;
+    rng = new LCG(1234);
     ticks = 1;
 
     constructor(config: GameConfig) {
@@ -27,11 +30,11 @@ export class Game {
         initDefaultBlocks();
         this.player = new Character(
             this.world,
-            -16,
-            30.5,
-            -16,
+            20,
+            4,
+            845,
             Math.PI * 0.25,
-            -Math.PI / 12
+            Math.PI / 12
         );
         this.world.addEntity(this.player);
 

@@ -1,9 +1,7 @@
 const light = new Uint8Array(32 * 32);
 
 const sunlight = (out: Uint8Array, blocks: Uint8Array) => {
-    for (let i = 0; i < 32 * 32; i++) {
-        light[i] = 15;
-    }
+    light.fill(15);
     for (let y = 31; y >= 0; y--) {
         for (let x = 0; x < 32; x++) {
             for (let z = 0; z < 32; z++) {
@@ -91,7 +89,7 @@ const ambientOcclusion = (out: Uint8Array, blocks: Uint8Array) => {
             for (let z = 0; z < 32; z++) {
                 const off = x * 32 * 32 + y * 32 + z;
                 if (blocks[off] !== 0) {
-                    out[off] = out[off] >> 2;
+                    out[off] = out[off] >> 1;
                 }
             }
         }
