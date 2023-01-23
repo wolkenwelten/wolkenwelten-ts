@@ -1,6 +1,9 @@
 const isPowerOf2 = (value: number) => (value & (value - 1)) === 0;
 
-let lastBoundTexture: WebGLTexture | undefined;
+type MaybeWebGLTexture = WebGLTexture | undefined;
+
+let lastBoundTexture: MaybeWebGLTexture[] = [];
+let activeTextureUnit = 0;
 let texturesInFlight = 0;
 let texturesLoaded = 0;
 
@@ -70,6 +73,7 @@ export class Texture {
             that.clamp();
             texturesLoaded++;
         };
+        lastBoundTexture[activeTextureUnit] = this;
         image.src = url;
     }
 
@@ -127,7 +131,7 @@ export class Texture {
             that.nearest();
             that.repeat();
         };
-        lastBoundTexture = this;
+        lastBoundTexture[activeTextureUnit] = this;
         image.src = url;
     }
 
@@ -237,9 +241,13 @@ export class Texture {
         return this;
     }
 
-    bind() {
-        if (lastBoundTexture !== this.texture) {
-            lastBoundTexture = this.texture;
+    bind(unit = 0) {
+        if (lastBoundTexture[unit] !== this.texture) {
+            lastBoundTexture[unit] = this.texture;
+            if(unit !== activeTextureUnit){
+                activeTextureUnit = unit;
+                this.gl.activeTexture (this.gl.TEXTURE0 + unit);
+            }
             this.gl.bindTexture(this.target(), this.texture);
         }
         return this;

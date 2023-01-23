@@ -63,7 +63,7 @@ export class BlockMesh {
             shaderFragSource,
             ['cur_tex', 'mat_mv', 'mat_mvp', 'trans_pos', 'alpha']
         );
-        this.texture = new Texture(this.gl, 'gui', blockTextureUrl, '2DArray');
+        this.texture = new Texture(this.gl, 'blocks', blockTextureUrl, '2DArray');
         this.texture.nearest();
         this.indeces = this.generateIndexBuffer(32 * 32 * 32 * 6);
     }
@@ -137,11 +137,12 @@ export class BlockMesh {
 
     static bindShaderAndTexture(projection: mat4, modelView: mat4) {
         BlockMesh.shader.bind();
-        BlockMesh.shader.uniform4fv('mat_mv', modelView);
         const modelViewProjection = mat4.create();
         mat4.multiply(modelViewProjection, projection, modelView);
+        BlockMesh.shader.uniform4fv('mat_mv', modelView);
         BlockMesh.shader.uniform4fv('mat_mvp', modelViewProjection);
-        BlockMesh.texture.bind();
+        BlockMesh.shader.uniform1i('cur_tex', 1);
+        BlockMesh.texture.bind(1);
     }
 
     drawFast(mask: number, alpha: number) {
