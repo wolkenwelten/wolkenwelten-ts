@@ -6,7 +6,9 @@ import { worldgenSky } from './worldgen/sky';
 import { worldgenUnderground } from './worldgen/underground';
 
 const coordinateToOffset = (x: number, y: number, z: number) =>
-    Math.floor(x) | (Math.floor(y) * 32) | (Math.floor(z) * 32 * 32);
+    (Math.floor(x) & 0x1f) |
+    ((Math.floor(y) & 0x1f) * 32) |
+    ((Math.floor(z) & 0x1f) * 32 * 32);
 
 export class Chunk {
     blocks: Uint8Array;
@@ -17,7 +19,6 @@ export class Chunk {
     y: number;
     z: number;
     world: World;
-
 
     constructor(world: World, x: number, y: number, z: number) {
         this.blocks = new Uint8Array(32 * 32 * 32);
@@ -53,13 +54,17 @@ export class Chunk {
         return this.blocks[i];
     }
 
-    setBlock(x: number, y: number, z: number, block: number) {
+    setBlockUnsafe(x: number, y: number, z: number, block: number) {
         const i = coordinateToOffset(x, y, z);
         this.blocks[i] = block;
-        this.lastUpdated = this.world.game.ticks;
     }
 
-    setBox(
+    setBlock(x: number, y: number, z: number, block: number) {
+        this.setBlockUnsafe(x, y, z, block);
+        this.world.invalidatePosition(x, y, z);
+    }
+
+    setBoxUnsafe(
         cx: number,
         cy: number,
         cz: number,
@@ -84,10 +89,35 @@ export class Chunk {
                 }
             }
         }
-        this.lastUpdated = this.world.game.ticks;
     }
 
-    setSphere(cx: number, cy: number, cz: number, r: number, block: number) {
+    setBox(
+        cx: number,
+        cy: number,
+        cz: number,
+        w: number,
+        h: number,
+        d: number,
+        block: number
+    ) {
+        this.setBoxUnsafe(cx, cy, cz, w, h, d, block);
+        this.world.invalidatePosition(cx, cy, cz);
+        this.world.invalidatePosition(cx, cy, cz + d);
+        this.world.invalidatePosition(cx, cy + h, cz);
+        this.world.invalidatePosition(cx, cy + h, cz + 1);
+        this.world.invalidatePosition(cx + w, cy, cz);
+        this.world.invalidatePosition(cx + w, cy, cz + d);
+        this.world.invalidatePosition(cx + w, cy + h, cz);
+        this.world.invalidatePosition(cx + w, cy + h, cz + 1);
+    }
+
+    setSphereUnsafe(
+        cx: number,
+        cy: number,
+        cz: number,
+        r: number,
+        block: number
+    ) {
         const rrr = r * r;
         for (let x = -r; x <= r; x++) {
             for (let y = -r; y <= r; y++) {
@@ -111,7 +141,16 @@ export class Chunk {
                 }
             }
         }
-        this.lastUpdated = this.world.game.ticks;
+    }
+
+    setSphere(cx: number, cy: number, cz: number, r: number, block: number) {
+        this.setSphereUnsafe(cx, cy, cz, r, block);
+        this.world.invalidatePosition(cx - r, cy, cz);
+        this.world.invalidatePosition(cx + r, cy, cz);
+        this.world.invalidatePosition(cx, cy - r, cz);
+        this.world.invalidatePosition(cx, cy + r, cz);
+        this.world.invalidatePosition(cx, cy, cz - r);
+        this.world.invalidatePosition(cx, cy, cz + r);
     }
 
     gc(maxDistance: number, entity: Entity) {
@@ -120,5 +159,9 @@ export class Chunk {
         const dz = this.z - entity.z;
         const d = dx * dx + dy * dy + dz * dz;
         return d > maxDistance;
+    }
+
+    invalidate() {
+        this.lastUpdated = this.world.game.ticks;
     }
 }

@@ -3,9 +3,9 @@ import { Entity } from './world/entity';
 import { Chunk } from './world/chunk';
 
 export const coordinateToWorldKey = (x: number, y: number, z: number) =>
-    ((x >> 5) & 0xffff) +
-    ((y >> 5) & 0xffff) * 0x10000 +
-    ((z >> 5) & 0xffff) * 0x100000000;
+    ((Math.floor(x) >> 5) & 0xffff) +
+    ((Math.floor(y) >> 5) & 0xffff) * 0x10000 +
+    ((Math.floor(z) >> 5) & 0xffff) * 0x100000000;
 
 export class World {
     chunks: Map<number, Chunk> = new Map();
@@ -19,57 +19,23 @@ export class World {
     }
 
     setBlock(x: number, y: number, z: number, block: number) {
-        const chunk = this.getOrGenChunk(
-            Math.floor(x) & ~0x1f,
-            Math.floor(y) & ~0x1f,
-            Math.floor(z) & ~0x1f
-        );
-        chunk.setBlock(
-            Math.floor(x) & 0x1f,
-            Math.floor(y) & 0x1f,
-            Math.floor(z) & 0x1f,
-            block
-        );
+        this.getOrGenChunk(x, y, z)?.setBlock(x, y, z, block);
     }
 
     getBlock(x: number, y: number, z: number): number | undefined {
-        const chunk = this.getChunk(
-            Math.floor(x) & ~0x1f,
-            Math.floor(y) & ~0x1f,
-            Math.floor(z) & ~0x1f
-        );
-        return chunk
-            ? chunk.getBlock(
-                  Math.floor(x) & 0x1f,
-                  Math.floor(y) & 0x1f,
-                  Math.floor(z) & 0x1f
-              )
-            : undefined;
+        return this.getChunk(x, y, z)?.getBlock(x, y, z);
     }
 
     getChunk(x: number, y: number, z: number): Chunk | undefined {
-        const chunk = this.chunks.get(coordinateToWorldKey(x, y, z));
-        if (chunk) {
-            if (chunk.x !== x || chunk.y !== y || chunk.z !== z) {
-                throw new Error(
-                    `coordinateToWorldKey got something wrong: [${x},${y},${z}] !== [${chunk.x},${chunk.y},${chunk.z}]`
-                );
-            }
-        }
-        return chunk;
+        return this.chunks.get(coordinateToWorldKey(x, y, z));
     }
 
     isLoaded(x: number, y: number, z: number): boolean {
-        const chunk = this.getChunk(
-            Math.floor(x) & ~0x1f,
-            Math.floor(y) & ~0x1f,
-            Math.floor(z) & ~0x1f
-        );
-        return Boolean(chunk);
+        return Boolean(this.getChunk(x, y, z));
     }
 
     isSolid(x: number, y: number, z: number): boolean {
-        return Boolean(this.getBlock(x, y, z));
+        return Boolean(this.getBlock(x, y, z) !== 0);
     }
 
     getOrGenChunk(x: number, y: number, z: number): Chunk {
@@ -111,6 +77,23 @@ export class World {
                 const key = coordinateToWorldKey(chunk.x, chunk.y, chunk.z);
                 this.chunks.delete(key);
                 this.game.render.world.meshes.delete(key);
+            }
+        }
+    }
+
+    invalidatePosition(x: number, y: number, z: number) {
+        this.getChunk(x, y, z)?.invalidate();
+        const ox = ((x & 0x10) << 1) + (x & ~0x1f) - 32;
+        const oy = ((y & 0x10) << 1) + (y & ~0x1f) - 32;
+        const oz = ((z & 0x10) << 1) + (z & ~0x1f) - 32;
+        for (let ix = 0; ix < 2; ix++) {
+            for (let iy = 0; iy < 2; iy++) {
+                for (let iz = 0; iz < 2; iz++) {
+                    const cx = ox + ix * 32;
+                    const cy = oy + iy * 32;
+                    const cz = oz + iz * 32;
+                    this.getChunk(cx, cy, cz)?.invalidate();
+                }
             }
         }
     }

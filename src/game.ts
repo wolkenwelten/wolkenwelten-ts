@@ -30,11 +30,11 @@ export class Game {
         initDefaultBlocks();
         this.player = new Character(
             this.world,
-            60,
+            55,
             4,
-            855,
+            851,
             Math.PI * 0.25,
-            Math.PI / 24
+            -Math.PI / 18
         );
         this.world.addEntity(this.player);
 

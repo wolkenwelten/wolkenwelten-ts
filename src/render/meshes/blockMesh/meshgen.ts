@@ -649,11 +649,11 @@ const lightBlurZ = (out: Uint8Array) => {
 };
 
 const ambientOcclusion = (out: Uint8Array, blocks: Uint8Array) => {
-    const end = 34*34*34 + 34*34 + 34;
-    for(let off=0;off<end;off++){
+    const end = 34 * 34 * 34 + 34 * 34 + 34;
+    for (let off = 0; off < end; off++) {
         // Here we divide the light value by 2 when the position is occupied by a block
         // Written this way so it's branchless and easier to optimize/vectorize
-        out[off] = out[off] >> (+(blocks[off] !== 0));
+        out[off] = out[off] >> +(blocks[off] !== 0);
     }
 };
 
