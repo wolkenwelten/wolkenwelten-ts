@@ -18,6 +18,7 @@ export class Chunk {
     z: number;
     world: World;
 
+
     constructor(world: World, x: number, y: number, z: number) {
         this.blocks = new Uint8Array(32 * 32 * 32);
         this.simpleLight = new Uint8Array(32 * 32 * 32);

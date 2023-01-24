@@ -7,5 +7,7 @@ export default defineConfig({
   build: {
     sourcemap: true
   },
-  plugins: [preact()],
+  plugins: [preact({
+    prefreshEnabled: false
+  })],
 });
