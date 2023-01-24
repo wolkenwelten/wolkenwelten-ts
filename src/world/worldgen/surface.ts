@@ -30,7 +30,7 @@ const plantTree = (
     z: number,
     treeHeight: number
 ) => {
-    chunk.setBox(
+    chunk.setBoxUnsafe(
         x - 1,
         Math.floor(gh) + 5,
         z - 1,
@@ -39,7 +39,7 @@ const plantTree = (
         3,
         6
     );
-    chunk.setBox(
+    chunk.setBoxUnsafe(
         x - 2,
         Math.floor(gh) + 5,
         z,
@@ -48,7 +48,7 @@ const plantTree = (
         1,
         6
     );
-    chunk.setBox(
+    chunk.setBoxUnsafe(
         x,
         Math.floor(gh) + 5,
         z - 2,
@@ -57,18 +57,18 @@ const plantTree = (
         5,
         6
     );
-    chunk.setBlock(x, Math.floor(gh) + treeHeight + 3, z, 6);
-    chunk.setBlock(x + 1, Math.floor(gh) + treeHeight + 2, z + 1, 0);
-    chunk.setBlock(x + 1, Math.floor(gh) + treeHeight + 2, z - 1, 0);
-    chunk.setBlock(x - 1, Math.floor(gh) + treeHeight + 2, z + 1, 0);
-    chunk.setBlock(x - 1, Math.floor(gh) + treeHeight + 2, z - 1, 0);
+    chunk.setBlockUnsafe(x, Math.floor(gh) + treeHeight + 3, z, 6);
+    chunk.setBlockUnsafe(x + 1, Math.floor(gh) + treeHeight + 2, z + 1, 0);
+    chunk.setBlockUnsafe(x + 1, Math.floor(gh) + treeHeight + 2, z - 1, 0);
+    chunk.setBlockUnsafe(x - 1, Math.floor(gh) + treeHeight + 2, z + 1, 0);
+    chunk.setBlockUnsafe(x - 1, Math.floor(gh) + treeHeight + 2, z - 1, 0);
 
-    chunk.setBlock(x + 1, Math.floor(gh) + 4, z, 6);
-    chunk.setBlock(x - 1, Math.floor(gh) + 4, z, 6);
-    chunk.setBlock(x, Math.floor(gh) + 4, z + 1, 6);
-    chunk.setBlock(x, Math.floor(gh) + 4, z - 1, 6);
+    chunk.setBlockUnsafe(x + 1, Math.floor(gh) + 4, z, 6);
+    chunk.setBlockUnsafe(x - 1, Math.floor(gh) + 4, z, 6);
+    chunk.setBlockUnsafe(x, Math.floor(gh) + 4, z + 1, 6);
+    chunk.setBlockUnsafe(x, Math.floor(gh) + 4, z - 1, 6);
 
-    chunk.setBox(x, Math.floor(gh - 1), z, 1, treeHeight, 1, 5);
+    chunk.setBoxUnsafe(x, Math.floor(gh - 1), z, 1, treeHeight, 1, 5);
 };
 
 const plantRock = (
@@ -91,21 +91,26 @@ export const worldgenSurface = (chunk: Chunk) => {
             let endY = gh - chunk.y;
             if (endY >= 0) {
                 if (gh < 1) {
-                    chunk.setBox(x, 0, z, 1, Math.min(endY, 32), 1, 23);
+                    chunk.setBoxUnsafe(x, 0, z, 1, Math.min(endY, 32), 1, 23);
                     if (gh < -6) {
                         if (rng.bool(31)) {
-                            chunk.setBlock(x, Math.floor(endY), z, 3);
+                            chunk.setBlockUnsafe(x, Math.floor(endY), z, 3);
                             if (rng.bool(31)) {
-                                chunk.setBlock(x, Math.floor(endY) + 1, z, 3);
+                                chunk.setBlockUnsafe(
+                                    x,
+                                    Math.floor(endY) + 1,
+                                    z,
+                                    3
+                                );
                             }
                         }
                     }
                 } else if (gh > 24) {
-                    chunk.setBox(x, 0, z, 1, Math.min(endY, 32), 1, 3);
+                    chunk.setBoxUnsafe(x, 0, z, 1, Math.min(endY, 32), 1, 3);
                 } else {
-                    chunk.setBox(x, 0, z, 1, Math.min(endY, 32), 1, 1);
+                    chunk.setBoxUnsafe(x, 0, z, 1, Math.min(endY, 32), 1, 1);
                     if (endY < 32) {
-                        chunk.setBlock(x, Math.floor(endY), z, 2);
+                        chunk.setBlockUnsafe(x, Math.floor(endY), z, 2);
                         if (gh > 4 && gh < 23) {
                             if (
                                 x > 3 &&

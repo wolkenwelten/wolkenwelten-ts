@@ -83,8 +83,6 @@ const lightBlur = (out: Uint8Array) => {
     lightBlurZ(out);
 };
 
-
-
 export const lightGenSimple = (out: Uint8Array, blocks: Uint8Array) => {
     sunlight(out, blocks);
     lightBlur(out);
