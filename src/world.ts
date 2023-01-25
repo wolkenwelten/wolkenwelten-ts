@@ -95,7 +95,7 @@ export class World {
             if (chunk.gc(maxDistance, this.game.player)) {
                 const key = coordinateToWorldKey(chunk.x, chunk.y, chunk.z);
                 this.chunks.delete(key);
-                this.game.render.world.meshes.delete(key);
+                this.game.render.dropBlockMesh(chunk.x, chunk.y, chunk.z);
             }
         }
     }

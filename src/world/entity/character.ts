@@ -113,7 +113,7 @@ export class Character extends Entity {
         } else if (this.movementY > 0 && this.mayJump()) {
             this.vy = 0.12;
         }
-        if (this.movementY > 0 && this.maySwim() && (Math.abs(this.vy) < 0.07)) {
+        if (this.movementY > 0 && this.maySwim() && Math.abs(this.vy) < 0.07) {
             this.vy = 0.06;
             this.vx *= 0.7;
             this.vz *= 0.7;

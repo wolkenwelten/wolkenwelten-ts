@@ -4,6 +4,7 @@ import { meshInit, Mesh } from './render/meshes';
 import { Entity } from './world/entity';
 import { WorldRenderer } from './render/worldRenderer';
 import { allTexturesLoaded } from './render/texture';
+import { coordinateToWorldKey } from './world';
 
 export class RenderManager {
     game: Game;
@@ -158,5 +159,16 @@ export class RenderManager {
                 this.canvasWrapper.classList.add('fx-underwater');
             }
         }
+    }
+
+    dropBlockMesh(x: number, y: number, z: number) {
+        const key = coordinateToWorldKey(x, y, z);
+        const mesh = this.world.meshes.get(key);
+        if (!mesh) {
+            return;
+        }
+        this.world.meshes.delete(key);
+        this.gl.deleteBuffer(mesh.vbo);
+        this.gl.deleteVertexArray(mesh.vao);
     }
 }
