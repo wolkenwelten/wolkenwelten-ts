@@ -1,10 +1,22 @@
 import { Chunk } from '../../../world/chunk';
-import { blocks } from '../../../world/blockType';
-import { glMatrix } from 'gl-matrix';
+import { blocks as worldBlocks, BlockType } from '../../../world/blockType';
+import { lightGenSimple } from '../../../world/chunk/lightGen';
+
+const createIdentityBlocks = () => {
+    const ret = [];
+    ret.push(new BlockType(0, 'Void').withInvisible());
+    for (let i = 1; i < 256; i++) {
+        ret.push(new BlockType(i, '').withTexture(i));
+    }
+    return ret;
+};
 
 const blockData = new Uint8Array(34 * 34 * 34);
 const lightData = new Uint8Array(34 * 34 * 34);
 const sideCache = new Uint8Array(32 * 32 * 32);
+const tmpSimpleLight = new Uint8Array(32 * 32 * 32);
+const identityBlocks = createIdentityBlocks();
+console.log(identityBlocks);
 
 const sides = {
     front: 0,
@@ -169,7 +181,8 @@ const calcSides = (
     x: number,
     y: number,
     z: number,
-    blockData: Uint8Array
+    blockData: Uint8Array,
+    blocks: BlockType[]
 ): number => {
     const off = blockBufferPosToOffset(x, y, z);
 
@@ -220,12 +233,22 @@ const calcSides = (
     }
 };
 
-const calcSideCache = (sideCache: Uint8Array, blockData: Uint8Array) => {
+const calcSideCache = (
+    sideCache: Uint8Array,
+    blockData: Uint8Array,
+    blocks: BlockType[]
+) => {
     let off = 0;
     for (let x = 0; x < 32; x++) {
         for (let y = 0; y < 32; y++) {
             for (let z = 0; z < 32; z++) {
-                sideCache[off++] = calcSides(x + 1, y + 1, z + 1, blockData);
+                sideCache[off++] = calcSides(
+                    x + 1,
+                    y + 1,
+                    z + 1,
+                    blockData,
+                    blocks
+                );
             }
         }
     }
@@ -235,6 +258,7 @@ interface GenArgs {
     blockData: Uint8Array;
     lightData: Uint8Array;
     sideCache: Uint8Array;
+    blocks: BlockType[];
     seeThrough: boolean;
 }
 
@@ -322,7 +346,7 @@ const plane = new PlaneEntry();
 
 const genFront = (vertices: number[], args: GenArgs): number => {
     const start = vertices.length;
-    const { sideCache, blockData, lightData } = args;
+    const { blocks, sideCache, blockData, lightData } = args;
     // First we slice the chunk into many, zero-initialized, planes
     for (let z = 0; z < 32; z++) {
         let found = 0;
@@ -377,7 +401,7 @@ const genFront = (vertices: number[], args: GenArgs): number => {
 
 const genBack = (vertices: number[], args: GenArgs) => {
     const start = vertices.length;
-    const { sideCache, blockData, lightData } = args;
+    const { blocks, sideCache, blockData, lightData } = args;
     for (let z = 0; z < 32; z++) {
         let found = 0;
         for (let y = 0; y < 32; y++) {
@@ -431,7 +455,7 @@ const genBack = (vertices: number[], args: GenArgs) => {
 
 const genTop = (vertices: number[], args: GenArgs) => {
     const start = vertices.length;
-    const { sideCache, blockData, lightData } = args;
+    const { blocks, sideCache, blockData, lightData } = args;
     for (let y = 0; y < 32; y++) {
         let found = 0;
         for (let z = 0; z < 32; z++) {
@@ -485,7 +509,7 @@ const genTop = (vertices: number[], args: GenArgs) => {
 
 const genBottom = (vertices: number[], args: GenArgs) => {
     const start = vertices.length;
-    const { sideCache, blockData, lightData } = args;
+    const { blocks, sideCache, blockData, lightData } = args;
     for (let y = 0; y < 32; y++) {
         let found = 0;
         for (let z = 0; z < 32; z++) {
@@ -539,7 +563,7 @@ const genBottom = (vertices: number[], args: GenArgs) => {
 
 const genRight = (vertices: number[], args: GenArgs) => {
     const start = vertices.length;
-    const { sideCache, blockData, lightData } = args;
+    const { blocks, sideCache, blockData, lightData } = args;
     for (let x = 0; x < 32; x++) {
         let found = 0;
         for (let y = 0; y < 32; y++) {
@@ -593,7 +617,7 @@ const genRight = (vertices: number[], args: GenArgs) => {
 
 const genLeft = (vertices: number[], args: GenArgs) => {
     const start = vertices.length;
-    const { sideCache, blockData, lightData } = args;
+    const { blocks, sideCache, blockData, lightData } = args;
     for (let x = 0; x < 32; x++) {
         let found = 0;
         for (let y = 0; y < 32; y++) {
@@ -724,31 +748,29 @@ const finishLight = (light: Uint8Array, block: Uint8Array) => {
     ambientOcclusion(light, block);
 };
 
-export const meshgenSimple = (chunk: Chunk): [Uint8Array, number[]] => {
-    chunk.updateSimpleLight();
+export const meshgenSimple = (blocks: Uint8Array): [Uint8Array, number] => {
     const vertices: number[] = [];
+    lightGenSimple(tmpSimpleLight, blocks);
+    blitChunkData(blockData, blocks, 1, 1, 1);
+    blitChunkData(lightData, tmpSimpleLight, 1, 1, 1);
+    calcSideCache(sideCache, blockData, identityBlocks);
 
-    blitChunkData(blockData, chunk.blocks, 1, 1, 1);
-    blitChunkData(lightData, chunk.simpleLight, 1, 1, 1);
-    calcSideCache(sideCache, blockData);
-
-    const sideSquareCount = [0, 0, 0, 0, 0, 0];
     const data = {
         blockData,
         lightData,
         sideCache,
-        blockTypes: blocks,
+        blocks: identityBlocks,
         seeThrough: false,
     };
 
-    sideSquareCount[0] = genFront(vertices, data);
-    sideSquareCount[1] = genBack(vertices, data);
-    sideSquareCount[2] = genTop(vertices, data);
-    sideSquareCount[3] = genBottom(vertices, data);
-    sideSquareCount[4] = genLeft(vertices, data);
-    sideSquareCount[5] = genRight(vertices, data);
+    let elementCount = genFront(vertices, data);
+    elementCount += genBack(vertices, data);
+    elementCount += genTop(vertices, data);
+    elementCount += genBottom(vertices, data);
+    elementCount += genLeft(vertices, data);
+    elementCount += genRight(vertices, data);
 
-    return [new Uint8Array(vertices), sideSquareCount];
+    return [new Uint8Array(vertices), elementCount];
 };
 
 export const meshgenComplex = (chunk: Chunk): [Uint8Array, number[]] => {
@@ -778,7 +800,7 @@ export const meshgenComplex = (chunk: Chunk): [Uint8Array, number[]] => {
             }
         }
     }
-    calcSideCache(sideCache, blockData);
+    calcSideCache(sideCache, blockData, worldBlocks);
     finishLight(lightData, blockData);
 
     const sideSquareCount = [0, 0, 0, 0, 0, 0];
@@ -786,7 +808,7 @@ export const meshgenComplex = (chunk: Chunk): [Uint8Array, number[]] => {
         blockData,
         lightData,
         sideCache,
-        blockTypes: blocks,
+        blocks: worldBlocks,
         seeThrough: false,
     };
 

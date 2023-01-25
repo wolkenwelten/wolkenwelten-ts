@@ -13,13 +13,16 @@ export class Character extends Entity {
     movementZ = 0;
     lastAction = 0;
 
+    hitAnimation = -1;
+
     constructor(
         world: World,
         x: number,
         y: number,
         z: number,
         yaw: number,
-        pitch: number
+        pitch: number,
+        noClip = false
     ) {
         super(world);
         this.x = x;
@@ -27,6 +30,7 @@ export class Character extends Entity {
         this.z = z;
         this.yaw = yaw;
         this.pitch = pitch;
+        this.noClip = noClip;
     }
 
     /* Walk/Run according to the direction of the Entity, ignores pitch */
@@ -53,9 +57,8 @@ export class Character extends Entity {
     }
 
     rotate(yaw: number, pitch: number) {
-        this.yaw = (this.yaw + yaw) % (Math.PI*2);
-        this.pitch = clamp(this.pitch + pitch, -Math.PI/2, Math.PI/2);
-
+        this.yaw = (this.yaw + yaw) % (Math.PI * 2);
+        this.pitch = clamp(this.pitch + pitch, -Math.PI / 2, Math.PI / 2);
     }
 
     isDead(): boolean {
@@ -203,6 +206,7 @@ export class Character extends Entity {
         this.cooldown(20);
         const [x, y, z] = ray;
         this.world.setBlock(x, y, z, 0);
+        this.hitAnimation = this.world.game.render.frames;
     }
 
     placeBlock(block = 3) {
@@ -216,5 +220,6 @@ export class Character extends Entity {
         this.cooldown(20);
         const [x, y, z] = ray;
         this.world.setBlock(x, y, z, block);
+        this.hitAnimation = this.world.game.render.frames;
     }
 }

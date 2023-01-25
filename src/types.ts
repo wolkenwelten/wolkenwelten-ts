@@ -3,6 +3,11 @@ declare module '*?raw' {
     export default content;
 }
 
+declare module '*?url' {
+    const content: string;
+    export default content;
+}
+
 declare module '*.png' {
     const content: string;
     export default content;

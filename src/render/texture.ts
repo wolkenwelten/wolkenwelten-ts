@@ -13,13 +13,14 @@ export class Texture {
     name: string;
     texture: WebGLTexture;
     hasMipmap = false;
-    type: '2D' | '2DArray';
+    type: '2D' | '2DArray' | 'LUT';
     gl: WebGL2RenderingContext;
+    colors: number[] = [];
+    dirtyLUT = false;
 
     loadTexture2D(url: string) {
         texturesInFlight++;
         const gl = this.gl;
-        const texture = this.texture;
         this.bind();
 
         const level = 0;
@@ -79,7 +80,6 @@ export class Texture {
 
     loadTexture2DArray(url: string) {
         const gl = this.gl;
-        const texture = this.texture;
         this.bind();
 
         const level = 0;
@@ -135,11 +135,56 @@ export class Texture {
         image.src = url;
     }
 
+    updateLUT() {
+        const gl = this.gl;
+        this.gl.activeTexture(this.gl.TEXTURE0);
+        this.gl.bindTexture(this.target(), this.texture);
+        lastBoundTexture[0] = this.texture;
+
+        const level = 0;
+        const internalFormat = gl.RGBA;
+        const width = 256;
+        const height = 1;
+        const border = 0;
+        const srcFormat = gl.RGBA;
+        const srcType = gl.UNSIGNED_BYTE;
+        const pixel = new Uint8Array(this.colors);
+        gl.texImage2D(
+            gl.TEXTURE_2D,
+            level,
+            internalFormat,
+            width,
+            height,
+            border,
+            srcFormat,
+            srcType,
+            pixel
+        );
+        this.dirtyLUT = false;
+    }
+
+    createLUT() {
+        for (let i = 0; i < 256; i++) {
+            this.colors.push(255 * (i & 1), 48, 128, 255);
+        }
+        this.updateLUT();
+    }
+
+    setLUTEntry(i: number, color: number) {
+        const off = (i - 1) * 4;
+        this.colors[off] = color & 0xff;
+        this.colors[off + 1] = (color >> 8) & 0xff;
+        this.colors[off + 2] = (color >> 16) & 0xff;
+        this.colors[off + 3] = (color >> 24) & 0xff;
+
+        this.dirtyLUT = true;
+    }
+
     constructor(
         gl: WebGL2RenderingContext,
         name: string,
         url: string,
-        type: '2D' | '2DArray' = '2D'
+        type: '2D' | '2DArray' | 'LUT' = '2D'
     ) {
         this.name = name;
         this.gl = gl;
@@ -157,6 +202,11 @@ export class Texture {
                 break;
             case '2DArray':
                 this.loadTexture2DArray(url);
+                break;
+            case 'LUT':
+                this.bind();
+                this.createLUT();
+                this.nearest();
                 break;
         }
     }
@@ -242,6 +292,9 @@ export class Texture {
     }
 
     bind(unit = 0) {
+        if (this.dirtyLUT) {
+            this.updateLUT();
+        }
         if (lastBoundTexture[unit] !== this.texture) {
             lastBoundTexture[unit] = this.texture;
             if (unit !== activeTextureUnit) {

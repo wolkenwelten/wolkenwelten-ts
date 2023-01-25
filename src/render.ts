@@ -1,10 +1,12 @@
 import { Game } from './game';
-import { mat4 } from 'gl-matrix';
-import { meshInit, Mesh } from './render/meshes';
+import { mat4, vec3 } from 'gl-matrix';
+import { meshInit, Mesh, VoxelMesh } from './render/meshes';
 import { Entity } from './world/entity';
 import { WorldRenderer } from './render/worldRenderer';
 import { allTexturesLoaded } from './render/texture';
 import { coordinateToWorldKey } from './world';
+
+import voxelFistFile from '../assets/vox/fist.vox?url';
 
 export class RenderManager {
     game: Game;
@@ -23,6 +25,7 @@ export class RenderManager {
     renderSizeMultiplier = 1;
 
     pearMesh: Mesh;
+    fistMesh: VoxelMesh;
     cam?: Entity;
     world: WorldRenderer;
 
@@ -46,6 +49,7 @@ export class RenderManager {
 
         this.pearMesh = Mesh.createPear();
         this.world = new WorldRenderer(this);
+        this.fistMesh = VoxelMesh.fromVoxFile(voxelFistFile);
 
         this.drawFrameClosure = this.drawFrame.bind(this);
         this.generateMeshClosue = this.generateMesh.bind(this);
@@ -93,14 +97,6 @@ export class RenderManager {
         ]);
         this.world.draw(projectionMatrix, viewMatrix, this.cam);
 
-        /*
-        const modelMatrix = mat4.create();
-        mat4.rotateY(modelMatrix, modelMatrix, this.frames / 140);
-        mat4.multiply(modelMatrix, viewMatrix, modelMatrix);
-        mat4.multiply(modelMatrix, projectionMatrix, modelMatrix);
-        this.pearMesh.draw(modelMatrix);
-        */
-
         this.drawHud(projectionMatrix);
     }
 
@@ -108,9 +104,23 @@ export class RenderManager {
         this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
 
         const modelViewMatrix = mat4.create();
-        mat4.translate(modelViewMatrix, modelViewMatrix, [1.5, -0.75, -1.75]);
-        mat4.multiply(modelViewMatrix, projectionMatrix, modelViewMatrix);
-        this.pearMesh.draw(modelViewMatrix);
+        mat4.translate(modelViewMatrix, modelViewMatrix, [0.35, -0.75, -1.5]);
+        mat4.scale(
+            modelViewMatrix,
+            modelViewMatrix,
+            vec3.fromValues(1 / 32, 1 / 32, 1 / 32)
+        );
+        let r = Math.PI * 0.1;
+        if (this.game.player.hitAnimation >= 0) {
+            const t = (this.frames - this.game.player.hitAnimation) / 15.0;
+            if (t > 1) {
+                this.game.player.hitAnimation = -1;
+            } else {
+                r = Math.PI * (0.1 - Math.sin(t * Math.PI) * 0.125);
+            }
+        }
+        mat4.rotateX(modelViewMatrix, modelViewMatrix, r);
+        this.fistMesh.draw(projectionMatrix, modelViewMatrix, 1.0);
     }
 
     resize() {

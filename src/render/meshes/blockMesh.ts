@@ -7,7 +7,7 @@ import shaderVertSource from './blockMesh/block.vert?raw';
 import shaderFragSource from './blockMesh/block.frag?raw';
 import blockTextureUrl from '../../../assets/gfx/blocks.png';
 import { mat4 } from 'gl-matrix';
-import { meshgenSimple, meshgenComplex } from './blockMesh/meshgen';
+import { meshgenComplex } from './blockMesh/meshgen';
 
 export class BlockMesh {
     static gl: WebGL2RenderingContext;

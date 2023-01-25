@@ -131,7 +131,7 @@ export const worldgenSurface = (chunk: Chunk) => {
                     chunk.setBoxUnsafe(x, 0, z, 1, Math.min(endY, 32), 1, 1);
                     if (endY < 32) {
                         chunk.setBlockUnsafe(x, Math.floor(endY), z, 2);
-                        if (gh > 4 && gh < 23) {
+                        if (gh > 3 && gh < 23) {
                             if (
                                 x > 3 &&
                                 x < 29 &&

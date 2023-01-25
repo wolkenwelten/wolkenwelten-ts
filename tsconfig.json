@@ -16,9 +16,9 @@
         "noImplicitAny": true,
         "strict": true,
         "plugins": [{ "name": "typescript-plugin-css-modules" }],
-        "types": []
+        "types": ["node"]
     },
     "files": [
         "src/main.ts"
-    ]
+    ],
 }

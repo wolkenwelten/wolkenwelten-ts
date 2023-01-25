@@ -5,7 +5,8 @@ import preact from '@preact/preset-vite'
 export default defineConfig({
   base: '',
   build: {
-    sourcemap: true
+    sourcemap: true,
+    assetsInlineLimit: 32768
   },
   plugins: [preact({
     prefreshEnabled: false

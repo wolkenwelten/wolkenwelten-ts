@@ -32,7 +32,7 @@ export class Game {
         this.player = new Character(
             this.world,
             55,
-            16,
+            2,
             955,
             Math.PI * 0.25,
             -Math.PI / 18
