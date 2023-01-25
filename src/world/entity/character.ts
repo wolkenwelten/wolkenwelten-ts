@@ -45,6 +45,19 @@ export class Character extends Entity {
         }
     }
 
+    fly(ox: number, oy: number, oz: number) {
+        const [nox, noy, noz] = this.direction(ox, oy, oz);
+        this.movementX = nox;
+        this.movementY = noy;
+        this.movementZ = noz;
+    }
+
+    rotate(yaw: number, pitch: number) {
+        this.yaw = (this.yaw + yaw) % (Math.PI*2);
+        this.pitch = clamp(this.pitch + pitch, -Math.PI/2, Math.PI/2);
+
+    }
+
     isDead(): boolean {
         return false;
     }
@@ -76,6 +89,9 @@ export class Character extends Entity {
 
         if (this.noClip) {
             this.vx = this.vy = this.vz = 0;
+            this.x += this.movementX;
+            this.y += this.movementY;
+            this.z += this.movementZ;
             return;
         }
 
