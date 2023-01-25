@@ -1,4 +1,17 @@
-<shell.nix
+# OSX Files
+Icon?
+.DS_Store
+._*
+xcuserdata/
+*.xcscmblueprint
+*.xccheckout
+/DerivedData/
 
 **/node_modules/
 dist/
+
+*.kate-swp
+*.blend1
+*.stackdump
+*.core
+*.dSYM

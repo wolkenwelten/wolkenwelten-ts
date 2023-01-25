@@ -24,6 +24,9 @@ export class BlockType {
 
     minigCat: MiningCat = 'Pickaxe';
     health = 100;
+    liquid = false;
+    seeThrough = false;
+    invisible = false;
 
     constructor(id: number, name: string) {
         this.id = id;
@@ -83,6 +86,21 @@ export class BlockType {
 
     withBlockHealth(health: number) {
         this.health = health;
+        return this;
+    }
+
+    withLiquid(liquid = true) {
+        this.liquid = liquid;
+        return this;
+    }
+
+    withSeeThrough(seeThrough = true) {
+        this.seeThrough = seeThrough;
+        return this;
+    }
+
+    withInvisible(invisible = true) {
+        this.seeThrough = this.invisible = invisible;
         return this;
     }
 }

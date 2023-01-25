@@ -22,13 +22,15 @@ export class InputManager {
             that.game.player.noClip = !that.game.player.noClip;
         });
 
-        that.game.render.canvas.addEventListener(
+        that.game.render.canvasWrapper.addEventListener(
             'mousedown',
             async (e) => {
                 if (!document.fullscreenElement) {
+                    that.game.player.cooldown(15);
                     await that.game.rootElement.requestFullscreen();
                 }
                 if (!document.pointerLockElement) {
+                    that.game.player.cooldown(15);
                     await that.game.rootElement.requestPointerLock();
                 }
             },

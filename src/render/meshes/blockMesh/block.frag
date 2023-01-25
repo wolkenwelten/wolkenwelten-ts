@@ -21,6 +21,7 @@ void main() {
  | they have been generated so their sudden appearance is less jarring.
  */
 	vec3 light_color = vec3(light_value, light_value, light_value);
-	vec4 color = vec4(texture(cur_tex, tex_coord).rgb * light_color, 1.0);
+	vec4 rgba = texture(cur_tex, tex_coord).rgba;
+	vec4 color = vec4(rgba.rgb * light_color, rgba.a);
 	frag_color = color * (alpha * (1.0 - smoothstep(fade_start, fade_distance, length(view_position))));
 }

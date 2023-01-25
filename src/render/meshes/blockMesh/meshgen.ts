@@ -172,17 +172,52 @@ const calcSides = (
     blockData: Uint8Array
 ): number => {
     const off = blockBufferPosToOffset(x, y, z);
-    if (blockData[off] === 0) {
+
+    const cb = blockData[off];
+    const cbt = blocks[cb];
+    if (cbt.invisible) {
         return 0;
     }
-    return (
-        +(blockData[off + 1] == 0) |
-        (+(blockData[off - 1] == 0) << 1) |
-        (+(blockData[off + 34] == 0) << 2) |
-        (+(blockData[off - 34] == 0) << 3) |
-        (+(blockData[off + 34 * 34] == 0) << 4) |
-        (+(blockData[off - 34 * 34] == 0) << 5)
-    );
+    if (cbt.seeThrough) {
+        let ret = +(
+            blockData[off + 1] !== cb && blocks[blockData[off + 1]].seeThrough
+        );
+        ret |=
+            +(
+                blockData[off - 1] !== cb &&
+                blocks[blockData[off - 1]].seeThrough
+            ) << 1;
+        ret |=
+            +(
+                blockData[off + 34] !== cb &&
+                blocks[blockData[off + 34]].seeThrough
+            ) << 2;
+        ret |=
+            +(
+                blockData[off - 34] !== cb &&
+                blocks[blockData[off - 34]].seeThrough
+            ) << 3;
+        ret |=
+            +(
+                blockData[off + 34 * 34] !== cb &&
+                blocks[blockData[off + 34 * 34]].seeThrough
+            ) << 4;
+        ret |=
+            +(
+                blockData[off - 34 * 34] !== cb &&
+                blocks[blockData[off - 34 * 34]].seeThrough
+            ) << 5;
+        ret |= 1 << 6;
+        return ret;
+    } else {
+        let ret = +blocks[blockData[off + 1]].seeThrough;
+        ret |= +blocks[blockData[off - 1]].seeThrough << 1;
+        ret |= +blocks[blockData[off + 34]].seeThrough << 2;
+        ret |= +blocks[blockData[off - 34]].seeThrough << 3;
+        ret |= +blocks[blockData[off + 34 * 34]].seeThrough << 4;
+        ret |= +blocks[blockData[off - 34 * 34]].seeThrough << 5;
+        return ret;
+    }
 };
 
 const calcSideCache = (sideCache: Uint8Array, blockData: Uint8Array) => {
@@ -200,6 +235,7 @@ interface GenArgs {
     blockData: Uint8Array;
     lightData: Uint8Array;
     sideCache: Uint8Array;
+    seeThrough: boolean;
 }
 
 class PlaneEntry {
@@ -295,7 +331,11 @@ const genFront = (vertices: number[], args: GenArgs): number => {
                 // Skip all faces that can't be seen, due to a block
                 // being right in front of that particular face.
                 const off = y * 32 + x;
-                if ((sideCache[x * 32 * 32 + y * 32 + z] & 1) === 0) {
+                const side = sideCache[x * 32 * 32 + y * 32 + z];
+                if (
+                    (side & 1) === 0 ||
+                    args.seeThrough === ((side & (1 << 6)) === 0)
+                ) {
                     plane.block[off] = 0;
                     continue;
                 }
@@ -345,7 +385,11 @@ const genBack = (vertices: number[], args: GenArgs) => {
                 // Skip all faces that can't be seen, due to a block
                 // being right in front of that particular face.
                 const off = y * 32 + x;
-                if ((sideCache[x * 32 * 32 + y * 32 + z] & 2) === 0) {
+                const side = sideCache[x * 32 * 32 + y * 32 + z];
+                if (
+                    (side & 2) === 0 ||
+                    args.seeThrough === ((side & (1 << 6)) === 0)
+                ) {
                     plane.block[off] = 0;
                     continue;
                 }
@@ -395,7 +439,11 @@ const genTop = (vertices: number[], args: GenArgs) => {
                 // Skip all faces that can't be seen, due to a block
                 // being right in front of that particular face.
                 const off = z * 32 + x;
-                if ((sideCache[x * 32 * 32 + y * 32 + z] & 4) === 0) {
+                const side = sideCache[x * 32 * 32 + y * 32 + z];
+                if (
+                    (side & 4) === 0 ||
+                    args.seeThrough === ((side & (1 << 6)) === 0)
+                ) {
                     plane.block[off] = 0;
                     continue;
                 }
@@ -445,7 +493,11 @@ const genBottom = (vertices: number[], args: GenArgs) => {
                 // Skip all faces that can't be seen, due to a block
                 // being right in front of that particular face.
                 const off = z * 32 + x;
-                if ((sideCache[x * 32 * 32 + y * 32 + z] & 8) === 0) {
+                const side = sideCache[x * 32 * 32 + y * 32 + z];
+                if (
+                    (side & 8) === 0 ||
+                    args.seeThrough === ((side & (1 << 6)) === 0)
+                ) {
                     plane.block[off] = 0;
                     continue;
                 }
@@ -495,7 +547,11 @@ const genRight = (vertices: number[], args: GenArgs) => {
                 // Skip all faces that can't be seen, due to a block
                 // being right in front of that particular face.
                 const off = y * 32 + z;
-                if ((sideCache[x * 32 * 32 + y * 32 + z] & 16) === 0) {
+                const side = sideCache[x * 32 * 32 + y * 32 + z];
+                if (
+                    (side & 16) === 0 ||
+                    args.seeThrough === ((side & (1 << 6)) === 0)
+                ) {
                     plane.block[off] = 0;
                     continue;
                 }
@@ -545,7 +601,11 @@ const genLeft = (vertices: number[], args: GenArgs) => {
                 // Skip all faces that can't be seen, due to a block
                 // being right in front of that particular face.
                 const off = y * 32 + z;
-                if ((sideCache[x * 32 * 32 + y * 32 + z] & 32) === 0) {
+                const side = sideCache[x * 32 * 32 + y * 32 + z];
+                if (
+                    (side & 32) === 0 ||
+                    args.seeThrough === ((side & (1 << 6)) === 0)
+                ) {
                     plane.block[off] = 0;
                     continue;
                 }
@@ -673,7 +733,13 @@ export const meshgenSimple = (chunk: Chunk): [Uint8Array, number[]] => {
     calcSideCache(sideCache, blockData);
 
     const sideSquareCount = [0, 0, 0, 0, 0, 0];
-    const data = { blockData, lightData, sideCache, blockTypes: blocks };
+    const data = {
+        blockData,
+        lightData,
+        sideCache,
+        blockTypes: blocks,
+        seeThrough: false,
+    };
 
     sideSquareCount[0] = genFront(vertices, data);
     sideSquareCount[1] = genBack(vertices, data);
@@ -716,7 +782,13 @@ export const meshgenComplex = (chunk: Chunk): [Uint8Array, number[]] => {
     finishLight(lightData, blockData);
 
     const sideSquareCount = [0, 0, 0, 0, 0, 0];
-    const data = { blockData, lightData, sideCache, blockTypes: blocks };
+    const data = {
+        blockData,
+        lightData,
+        sideCache,
+        blockTypes: blocks,
+        seeThrough: false,
+    };
 
     sideSquareCount[0] = genFront(vertices, data);
     sideSquareCount[1] = genBack(vertices, data);
@@ -724,5 +796,13 @@ export const meshgenComplex = (chunk: Chunk): [Uint8Array, number[]] => {
     sideSquareCount[3] = genBottom(vertices, data);
     sideSquareCount[4] = genLeft(vertices, data);
     sideSquareCount[5] = genRight(vertices, data);
+    data.seeThrough = true;
+
+    sideSquareCount[6] = genFront(vertices, data);
+    sideSquareCount[7] = genBack(vertices, data);
+    sideSquareCount[8] = genTop(vertices, data);
+    sideSquareCount[9] = genBottom(vertices, data);
+    sideSquareCount[10] = genLeft(vertices, data);
+    sideSquareCount[11] = genRight(vertices, data);
     return [new Uint8Array(vertices), sideSquareCount];
 };

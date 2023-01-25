@@ -6,11 +6,18 @@ import { RenderManager } from '../render';
 import { Entity } from '../world/entity';
 import { coordinateToWorldKey } from '../world';
 
-type QueueEntry = {
+type GeneratorQueueEntry = {
     dd: number;
     x: number;
     y: number;
     z: number;
+};
+
+type DrawQueueEntry = {
+    mesh: BlockMesh;
+    dd: number;
+    mask: number;
+    alpha: number;
 };
 
 const RENDER_STEPS = 5;
@@ -18,7 +25,8 @@ const RENDER_STEPS = 5;
 export class WorldRenderer {
     meshes: Map<number, BlockMesh> = new Map();
     renderer: RenderManager;
-    generatorQueue: QueueEntry[] = [];
+    generatorQueue: GeneratorQueueEntry[] = [];
+    drawQueue: DrawQueueEntry[] = [];
     frustum = new Frustum();
     chunksDrawn = 0;
     chunksSkipped = 0;
@@ -76,6 +84,7 @@ export class WorldRenderer {
         let skipped = 0;
 
         this.generatorQueue.length = 0;
+        this.drawQueue.length = 0;
         const ticks = this.renderer.game.ticks;
         for (let x = -RENDER_STEPS; x <= RENDER_STEPS; x++) {
             for (let y = -RENDER_STEPS; y <= RENDER_STEPS; y++) {
@@ -88,21 +97,22 @@ export class WorldRenderer {
                         continue;
                     }
                     drawn++;
+                    const dx = cam.x - nx;
+                    const dy = cam.y - ny;
+                    const dz = cam.z - nz;
+                    const dd = dx * dx + dy * dy + dz * dz;
                     const mesh = this.getMesh(nx, ny, nz);
                     if (mesh) {
                         const alpha = Math.min(
                             1.0,
                             (ticks - mesh.createdAt) * (1.0 / 16.0)
                         );
-                        mesh.drawFast(this.calcMask(x, y, z), alpha);
+                        const mask = this.calcMask(x, y, z);
+                        this.drawQueue.push({ dd, mesh, mask, alpha });
                         if (mesh.lastUpdated >= mesh.chunk.lastUpdated) {
                             continue;
                         }
                     }
-                    const dx = cam.x - nx;
-                    const dy = cam.y - ny;
-                    const dz = cam.z - nz;
-                    const dd = dx * dx + dy * dy + dz * dz;
                     this.generatorQueue.push({ dd, x: nx, y: ny, z: nz });
                 }
             }
@@ -112,6 +122,17 @@ export class WorldRenderer {
 
         if (this.generatorQueue.length) {
             this.generatorQueue.sort((a, b) => b.dd - a.dd);
+        }
+
+        /* Here we sort all the chunks back to front, draw the solid blocks first and then
+         * draw all the seeThrough blocks like water. This is necessary for alpha blending to work properly.
+         */
+        this.drawQueue.sort((a, b) => b.dd - a.dd);
+        for (const { mesh, mask, alpha } of this.drawQueue) {
+            mesh.drawFast(mask, alpha, 0);
+        }
+        for (const { mesh, mask, alpha } of this.drawQueue) {
+            mesh.drawFast(mask, alpha, 6);
         }
 
         this.renderer.gl.disable(this.renderer.gl.BLEND);

@@ -1,6 +1,7 @@
 import { Game } from './game';
 import { Entity } from './world/entity';
 import { Chunk } from './world/chunk';
+import { blocks } from './world/blockType';
 
 export const coordinateToWorldKey = (x: number, y: number, z: number) =>
     ((Math.floor(x) >> 5) & 0xffff) +
@@ -16,6 +17,10 @@ export class World {
     constructor(game: Game) {
         this.seed = 1234;
         this.game = game;
+    }
+
+    blocks() {
+        return blocks;
     }
 
     setBlock(x: number, y: number, z: number, block: number) {
@@ -35,7 +40,21 @@ export class World {
     }
 
     isSolid(x: number, y: number, z: number): boolean {
-        return Boolean(this.getBlock(x, y, z) !== 0);
+        const b = this.getBlock(x, y, z);
+        if (!b) {
+            return false;
+        }
+        const bt = blocks[b];
+        return !bt.liquid;
+    }
+
+    isLiquid(x: number, y: number, z: number): boolean {
+        const b = this.getBlock(x, y, z);
+        if (!b) {
+            return false;
+        }
+        const bt = blocks[b];
+        return bt.liquid;
     }
 
     getOrGenChunk(x: number, y: number, z: number): Chunk {

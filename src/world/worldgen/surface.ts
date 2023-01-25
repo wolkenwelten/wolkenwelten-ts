@@ -78,7 +78,27 @@ const plantRock = (
     z: number,
     size: number
 ) => {
-    chunk.setSphere(x, gh, z, size, 3);
+    chunk.setSphereUnsafe(x, gh, z, size, 3);
+};
+
+const floodChunk = (chunk: Chunk, maxY: number) => {
+    const waterBlock = 24;
+    if (chunk.y > maxY) {
+        return;
+    }
+    for (let y = 0; y < 32; y++) {
+        if (y + chunk.y > maxY) {
+            break;
+        }
+        for (let x = 0; x < 32; x++) {
+            for (let z = 0; z < 32; z++) {
+                const b = chunk.getBlock(x, y, z);
+                if (b === 0) {
+                    chunk.setBlockUnsafe(x, y, z, waterBlock);
+                }
+            }
+        }
+    }
 };
 
 export const worldgenSurface = (chunk: Chunk) => {
@@ -138,4 +158,5 @@ export const worldgenSurface = (chunk: Chunk) => {
             }
         }
     }
+    floodChunk(chunk, -3);
 };

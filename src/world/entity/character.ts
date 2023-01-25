@@ -38,7 +38,7 @@ export class Character extends Entity {
             this.movementZ = ox * Math.sin(-this.yaw) + oz * Math.cos(this.yaw);
         }
 
-        if (oy > 0 && this.vy === 0) {
+        if (oy > 0) {
             this.movementY = 1;
         } else {
             this.movementY = 0;
@@ -50,11 +50,15 @@ export class Character extends Entity {
     }
 
     isUnderwater(): boolean {
-        return false;
+        return this.world.isLiquid(this.x, this.y, this.z);
     }
 
     mayJump(): boolean {
         return this.world.isSolid(this.x, this.y - 1.7, this.z);
+    }
+
+    maySwim(): boolean {
+        return this.world.isLiquid(this.x, this.y - 0.25, this.z);
     }
 
     isSolidPillar(x: number, y: number, z: number): boolean {
@@ -103,13 +107,16 @@ export class Character extends Entity {
         const oldVz = this.vz;
 
         if (underwater) {
-            this.vx *= 0.99;
             this.vy *= 0.98;
+            this.vx *= 0.99;
             this.vz *= 0.99;
-        }
-
-        if (this.movementY > 0 && this.mayJump()) {
+        } else if (this.movementY > 0 && this.mayJump()) {
             this.vy = 0.12;
+        }
+        if (this.movementY > 0 && this.maySwim() && (Math.abs(this.vy) < 0.07)) {
+            this.vy = 0.06;
+            this.vx *= 0.7;
+            this.vz *= 0.7;
         }
 
         if (this.isSolidPillar(this.x - 0.4, this.y - 0.8, this.z)) {

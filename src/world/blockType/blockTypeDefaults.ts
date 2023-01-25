@@ -2,7 +2,7 @@ import { addBlockType, blocks } from '../blockType';
 
 export const initDefaultBlocks = () => {
     blocks.length = 0;
-    addBlockType('Air');
+    addBlockType('Air').withInvisible();
 
     addBlockType('Dirt')
         .withTexture(1)
@@ -139,5 +139,12 @@ export const initDefaultBlocks = () => {
     addBlockType('Sand')
         .withTexture(24)
         .withColours(0xecd195ff, 0xd3a748ff)
+        .withBlockHealth(1400);
+
+    addBlockType('Sea Water')
+        .withTexture(25)
+        .withColours(0x0036d4ff, 0x0000bdff)
+        .withLiquid()
+        .withSeeThrough()
         .withBlockHealth(1400);
 };

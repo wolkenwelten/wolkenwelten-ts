@@ -8,6 +8,7 @@ import { allTexturesLoaded } from './render/texture';
 export class RenderManager {
     game: Game;
     canvas: HTMLCanvasElement;
+    canvasWrapper: HTMLElement;
     gl: WebGL2RenderingContext;
     fov = 60;
     renderDistance = 160.0;
@@ -24,11 +25,14 @@ export class RenderManager {
     cam?: Entity;
     world: WorldRenderer;
 
+    wasUnderwater = false;
+
     constructor(game: Game) {
         this.game = game;
-
         this.canvas = document.createElement('canvas');
-        game.rootElement.append(this.canvas);
+        this.canvasWrapper = document.createElement('div');
+        game.rootElement.append(this.canvasWrapper);
+        this.canvasWrapper.append(this.canvas);
         const gl = this.canvas.getContext('webgl2');
         if (!gl) {
             throw new Error(
@@ -88,11 +92,13 @@ export class RenderManager {
         ]);
         this.world.draw(projectionMatrix, viewMatrix, this.cam);
 
+        /*
         const modelMatrix = mat4.create();
         mat4.rotateY(modelMatrix, modelMatrix, this.frames / 140);
         mat4.multiply(modelMatrix, viewMatrix, modelMatrix);
         mat4.multiply(modelMatrix, projectionMatrix, modelMatrix);
         this.pearMesh.draw(modelMatrix);
+        */
 
         this.drawHud(projectionMatrix);
     }
@@ -124,6 +130,7 @@ export class RenderManager {
 
     drawFrame() {
         window.requestAnimationFrame(this.drawFrameClosure);
+        this.game.update(); // First we update the game world, so that we render the most up to version
         if (!allTexturesLoaded()) {
             return;
         }
@@ -139,6 +146,17 @@ export class RenderManager {
         ) {
             this.generateMeshClosureActive = true;
             setTimeout(this.generateMeshClosue, 0);
+        }
+        if (this.wasUnderwater) {
+            if (!this.game.player.isUnderwater()) {
+                this.wasUnderwater = false;
+                this.canvasWrapper.classList.remove('fx-underwater');
+            }
+        } else {
+            if (this.game.player.isUnderwater()) {
+                this.wasUnderwater = true;
+                this.canvasWrapper.classList.add('fx-underwater');
+            }
         }
     }
 }
