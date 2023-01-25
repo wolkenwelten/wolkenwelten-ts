@@ -22,6 +22,7 @@ export class Game {
     world: World;
     rng = new LCG(1234);
     ticks = 1;
+    startTime = +Date.now();
 
     constructor(config: GameConfig) {
         this.config = config;
@@ -31,8 +32,8 @@ export class Game {
         this.player = new Character(
             this.world,
             55,
-            4,
-            851,
+            32,
+            955,
             Math.PI * 0.25,
             -Math.PI / 18
         );
@@ -43,17 +44,31 @@ export class Game {
         this.ui = new UIManager(this);
         this.input = new InputManager(this);
         setInterval(this.ui.updateDebugInfo.bind(this.ui), 100);
-        setInterval(this.update.bind(this), 1000.0 / 60.0);
+        setInterval(this.input.update.bind(this.input), 1000 / 240);
         setInterval(this.gc.bind(this), 20000);
     }
 
+    // Run the game for a single tick
     update() {
-        this.ticks++;
-        this.input.update();
-        this.world.update();
+        let ticksRun = 0;
+        const goalTicks = this.millis() / (1000 / 60);
+        while (this.ticks < goalTicks) {
+            this.ticks++;
+            this.world.update();
+            if (++ticksRun > 16) {
+                this.ticks = goalTicks;
+                return; // Don't block for too long
+            }
+        }
     }
 
+    // Try and free some memory by discarding far away objects
     gc() {
         this.world.gc();
+    }
+
+    // Return the amount of milliseconds elapsed since the game started
+    millis(): number {
+        return +Date.now() - this.startTime;
     }
 }

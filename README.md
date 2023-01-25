@@ -1,9 +1,10 @@
 # WolkenWelten - TS
+
+![Have a screenshot](https://github.com/wolkenwelten/wolkenwelten-screenshots/raw/main/2023-01-25.png)
+
 A Voxel engine for the Web that respects your freedom.
 
-Runs on a Raspberry Pi 4.
-
-Fits on a 1.44MB floppy.
+Runs on a Raspberry Pi 4. Fits on a 1.44MB floppy.
 
 ## Try it!
 You can play the newest version here: https://wolkenwelten.github.io/wolkenwelten-ts/
@@ -32,6 +33,7 @@ Super early, pretty much nothing works whatsoever, so probably not that interest
 - [X] Simple place/removal of blocks
 - [X] Hidden surface removal across chunk boundaries
 - [X] Complex lighting (across chunk boundaries)
+- [X] Water
 - [ ] Compile the Rust meshgen kernel to WASM and measure the performance difference
 - [ ] Port the meshgen kernel to AssemblyScript and compare against the Rust/TS versions
 

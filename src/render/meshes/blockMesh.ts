@@ -87,17 +87,17 @@ export class BlockMesh {
         const gl = BlockMesh.gl;
 
         this.lastUpdated = this.chunk.lastUpdated;
-        this.elementCount = (vertices.length / 20) * 6;
         this.sideSquareCount = sideSquareCount;
         this.sideStart = [0, 0, 0, 0, 0, 0];
-        for (let i = 1; i < 6; i++) {
+        for (let i = 1; i < 12; i++) {
             this.sideStart[i] =
                 this.sideStart[i - 1] + this.sideSquareCount[i - 1];
         }
-        for (let i = 0; i < 6; i++) {
+        for (let i = 0; i < 12; i++) {
             this.sideStart[i] *= 6 * 4;
             this.sideSquareCount[i] *= 6;
         }
+        this.elementCount = this.sideStart[6] / 4;
         gl.bindVertexArray(this.vao);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, BlockMesh.indeces);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
@@ -142,29 +142,25 @@ export class BlockMesh {
         BlockMesh.texture.bind(1);
     }
 
-    drawFast(mask: number, alpha: number) {
+    drawFast(mask: number, alpha: number, sideOffset = 0) {
         BlockMesh.gl.bindVertexArray(this.vao);
         BlockMesh.shader.uniform3f('trans_pos', this.x, this.y, this.z);
         BlockMesh.shader.uniform1f('alpha', alpha);
         if (mask === 0) {
             return;
-        } else if (mask === 0x3f) {
-            BlockMesh.gl.drawElements(
-                BlockMesh.gl.TRIANGLES,
-                this.elementCount,
-                BlockMesh.gl.UNSIGNED_INT,
-                0
-            );
         } else {
             for (let i = 0; i < 6; i++) {
-                if ((mask & (1 << i)) === 0) {
+                if (
+                    (mask & (1 << i)) === 0 ||
+                    this.sideSquareCount[i + sideOffset] === 0
+                ) {
                     continue;
                 }
                 BlockMesh.gl.drawElements(
                     BlockMesh.gl.TRIANGLES,
-                    this.sideSquareCount[i],
+                    this.sideSquareCount[i + sideOffset],
                     BlockMesh.gl.UNSIGNED_INT,
-                    this.sideStart[i]
+                    this.sideStart[i + sideOffset]
                 );
             }
         }
