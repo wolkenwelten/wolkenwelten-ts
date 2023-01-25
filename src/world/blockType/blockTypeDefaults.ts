@@ -39,6 +39,7 @@ export const initDefaultBlocks = () => {
     addBlockType('Spruce leaves')
         .withTexture(5)
         .withColours(0x122c01ff, 0x0f2501ff)
+        .withLeaves()
         .withBlockHealth(1000);
 
     addBlockType('Dry grass')
@@ -69,6 +70,7 @@ export const initDefaultBlocks = () => {
 
     addBlockType('Oak leaves')
         .withTexture(10)
+        .withLeaves()
         .withColours(0x274200ff, 0x183300ff)
         .withBlockHealth(1000);
 

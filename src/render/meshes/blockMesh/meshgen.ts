@@ -178,6 +178,9 @@ const calcSides = (
     if (cbt.invisible) {
         return 0;
     }
+    if (cbt.leaves) {
+        return 0x3F | (+cbt.seeThrough << 6);
+    }
     if (cbt.seeThrough) {
         let ret = +(
             blockData[off + 1] !== cb && blocks[blockData[off + 1]].seeThrough

@@ -11,7 +11,7 @@ export class RenderManager {
     canvasWrapper: HTMLElement;
     gl: WebGL2RenderingContext;
     fov = 60;
-    renderDistance = 160.0;
+    renderDistance = 128.0;
     width = 640;
     height = 480;
     frames = 0;

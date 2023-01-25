@@ -20,7 +20,7 @@ type DrawQueueEntry = {
     alpha: number;
 };
 
-const RENDER_STEPS = 5;
+const RENDER_STEPS = 4;
 
 export class WorldRenderer {
     meshes: Map<number, BlockMesh> = new Map();

@@ -27,6 +27,7 @@ export class BlockType {
     liquid = false;
     seeThrough = false;
     invisible = false;
+    leaves = false;
 
     constructor(id: number, name: string) {
         this.id = id;
@@ -96,6 +97,11 @@ export class BlockType {
 
     withSeeThrough(seeThrough = true) {
         this.seeThrough = seeThrough;
+        return this;
+    }
+
+    withLeaves(leaves = true) {
+        this.seeThrough = this.leaves = leaves;
         return this;
     }
 
