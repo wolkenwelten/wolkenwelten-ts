@@ -1,6 +1,6 @@
 import { Game } from './game';
 import { mat4, vec3 } from 'gl-matrix';
-import { meshInit, Mesh, VoxelMesh } from './render/meshes';
+import { meshInit, VoxelMesh } from './render/meshes';
 import { Entity } from './world/entity';
 import { WorldRenderer } from './render/worldRenderer';
 import { allTexturesLoaded } from './render/texture';
@@ -22,14 +22,12 @@ export class RenderManager {
     drawFrameClosure: () => void;
     generateMeshClosue: () => void;
     generateMeshClosureActive = false;
+    wasUnderwater = false;
     renderSizeMultiplier = 1;
 
-    pearMesh: Mesh;
     fistMesh: VoxelMesh;
     cam?: Entity;
     world: WorldRenderer;
-
-    wasUnderwater = false;
 
     constructor(game: Game) {
         this.game = game;
@@ -47,7 +45,6 @@ export class RenderManager {
         this.initGLContext();
         meshInit(gl);
 
-        this.pearMesh = Mesh.createPear();
         this.world = new WorldRenderer(this);
         this.fistMesh = VoxelMesh.fromVoxFile(voxelFistFile);
 

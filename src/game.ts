@@ -1,11 +1,9 @@
 import { Character } from './world/entity/character';
-
 import { InputManager } from './input';
 import { RenderManager } from './render';
 import { UIManager } from './ui';
 import { World } from './world';
 import { initDefaultBlocks } from './world/blockType/blockTypeDefaults';
-
 import { LCG } from './util/prng';
 
 export interface GameConfig {
