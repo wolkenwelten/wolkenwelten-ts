@@ -16,7 +16,6 @@ const lightData = new Uint8Array(34 * 34 * 34);
 const sideCache = new Uint8Array(32 * 32 * 32);
 const tmpSimpleLight = new Uint8Array(32 * 32 * 32);
 const identityBlocks = createIdentityBlocks();
-console.log(identityBlocks);
 
 const sides = {
     front: 0,

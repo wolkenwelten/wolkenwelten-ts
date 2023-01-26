@@ -15,17 +15,17 @@ export class BlockMesh {
     static shader: Shader;
     static texture: Texture;
 
-    x: number;
-    y: number;
-    z: number;
-    createdAt = 0;
+    readonly x: number;
+    readonly y: number;
+    readonly z: number;
+    readonly createdAt: number;
     lastUpdated = 0;
     elementCount = 0;
     sideSquareCount: number[] = [];
     sideStart: number[] = [];
-    vao: WebGLVertexArrayObject;
-    vbo: WebGLBuffer;
-    chunk: Chunk;
+    readonly vao: WebGLVertexArrayObject;
+    readonly vbo: WebGLBuffer;
+    readonly chunk: Chunk;
 
     static generateIndexBuffer(squareCount: number) {
         const bufferSize = squareCount * 6;

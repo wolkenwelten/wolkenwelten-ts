@@ -1,7 +1,7 @@
 import { Entity } from '../entity';
 import { World } from '../../world';
 
-const CHARACTER_ACCELERATION = 0.05;
+const CHARACTER_ACCELERATION = 0.04;
 const CHARACTER_STOP_RATE = CHARACTER_ACCELERATION * 3.0;
 
 const clamp = (x: number, min: number, max: number) =>
@@ -134,8 +134,6 @@ export class Character extends Entity {
         }
         if (this.movementY > 0 && this.maySwim() && Math.abs(this.vy) < 0.07) {
             this.vy = 0.06;
-            this.vx *= 0.7;
-            this.vz *= 0.7;
         }
 
         if (this.isSolidPillar(this.x - 0.4, this.y - 0.8, this.z)) {

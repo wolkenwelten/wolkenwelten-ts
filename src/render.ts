@@ -142,7 +142,7 @@ export class RenderManager {
     drawFrame() {
         window.requestAnimationFrame(this.drawFrameClosure);
         this.game.update(); // First we update the game world, so that we render the most up to version
-        if (!allTexturesLoaded()) {
+        if (!this.game.ready || !allTexturesLoaded()) {
             return;
         }
         this.frames++;

@@ -1,10 +1,10 @@
 import { mat4 } from 'gl-matrix';
 
 export class Shader {
-    name: string;
-    program: WebGLProgram;
-    gl: WebGL2RenderingContext;
-    uniforms: Map<string, WebGLUniformLocation>;
+    readonly name: string;
+    readonly program: WebGLProgram;
+    readonly gl: WebGL2RenderingContext;
+    uniforms: Map<string, WebGLUniformLocation> = new Map();
 
     constructor(
         gl: WebGL2RenderingContext,
@@ -50,7 +50,6 @@ export class Shader {
         }
         this.program = program;
         this.gl = gl;
-        this.uniforms = new Map();
         for (const u of uniforms) {
             const loc = gl.getUniformLocation(program, u);
             if (!loc) {

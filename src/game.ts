@@ -23,6 +23,7 @@ export class Game {
     rng = new LCG(1234);
     ticks = 1;
     startTime = +Date.now();
+    ready = false;
 
     constructor(config: GameConfig) {
         this.config = config;
@@ -46,10 +47,19 @@ export class Game {
         setInterval(this.ui.updateDebugInfo.bind(this.ui), 100);
         setInterval(this.input.update.bind(this.input), 1000 / 240);
         setInterval(this.gc.bind(this), 20000);
+        setTimeout(this.init.bind(this), 0);
+    }
+
+    async init() {
+        await this.world.assets.init();
+        this.ready = true;
     }
 
     // Run the game for a single tick
     update() {
+        if (!this.ready) {
+            return;
+        }
         let ticksRun = 0;
         const goalTicks = this.millis() / (1000 / 60);
         while (this.ticks < goalTicks) {
@@ -64,6 +74,9 @@ export class Game {
 
     // Try and free some memory by discarding far away objects
     gc() {
+        if (!this.ready) {
+            return;
+        }
         this.world.gc();
     }
 

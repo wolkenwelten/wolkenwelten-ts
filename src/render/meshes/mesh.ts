@@ -15,10 +15,10 @@ export class Mesh {
     static gl: WebGL2RenderingContext;
     static shader: Shader;
 
+    readonly vao: WebGLVertexArrayObject;
+    readonly texture: Texture;
     vertices: number[] = [];
     elementCount = 0;
-    texture: Texture;
-    vao: WebGLVertexArrayObject;
     finished = false;
 
     static createPear(): Mesh {

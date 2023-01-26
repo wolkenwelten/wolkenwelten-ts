@@ -10,11 +10,11 @@ let texturesLoaded = 0;
 export const allTexturesLoaded = () => texturesLoaded >= texturesInFlight;
 
 export class Texture {
-    name: string;
-    texture: WebGLTexture;
+    readonly name: string;
+    readonly texture: WebGLTexture;
+    readonly type: '2D' | '2DArray' | 'LUT';
+    readonly gl: WebGL2RenderingContext;
     hasMipmap = false;
-    type: '2D' | '2DArray' | 'LUT';
-    gl: WebGL2RenderingContext;
     colors: number[] = [];
     dirtyLUT = false;
 

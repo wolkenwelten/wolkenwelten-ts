@@ -23,64 +23,6 @@ const grassHeight = (x: number, z: number): number => {
     return Math.max(-28, y);
 };
 
-const plantTree = (
-    chunk: Chunk,
-    x: number,
-    gh: number,
-    z: number,
-    treeHeight: number
-) => {
-    chunk.setBoxUnsafe(
-        x - 1,
-        Math.floor(gh) + 5,
-        z - 1,
-        3,
-        Math.min(treeHeight - 2, 32),
-        3,
-        6
-    );
-    chunk.setBoxUnsafe(
-        x - 2,
-        Math.floor(gh) + 5,
-        z,
-        5,
-        Math.min(treeHeight - 4, 32),
-        1,
-        6
-    );
-    chunk.setBoxUnsafe(
-        x,
-        Math.floor(gh) + 5,
-        z - 2,
-        1,
-        Math.min(treeHeight - 4, 32),
-        5,
-        6
-    );
-    chunk.setBlockUnsafe(x, Math.floor(gh) + treeHeight + 3, z, 6);
-    chunk.setBlockUnsafe(x + 1, Math.floor(gh) + treeHeight + 2, z + 1, 0);
-    chunk.setBlockUnsafe(x + 1, Math.floor(gh) + treeHeight + 2, z - 1, 0);
-    chunk.setBlockUnsafe(x - 1, Math.floor(gh) + treeHeight + 2, z + 1, 0);
-    chunk.setBlockUnsafe(x - 1, Math.floor(gh) + treeHeight + 2, z - 1, 0);
-
-    chunk.setBlockUnsafe(x + 1, Math.floor(gh) + 4, z, 6);
-    chunk.setBlockUnsafe(x - 1, Math.floor(gh) + 4, z, 6);
-    chunk.setBlockUnsafe(x, Math.floor(gh) + 4, z + 1, 6);
-    chunk.setBlockUnsafe(x, Math.floor(gh) + 4, z - 1, 6);
-
-    chunk.setBoxUnsafe(x, Math.floor(gh - 1), z, 1, treeHeight, 1, 5);
-};
-
-const plantRock = (
-    chunk: Chunk,
-    x: number,
-    gh: number,
-    z: number,
-    size: number
-) => {
-    chunk.setSphereUnsafe(x, gh, z, size, 3);
-};
-
 const floodChunk = (chunk: Chunk, maxY: number) => {
     const waterBlock = 24;
     if (chunk.y > maxY) {
@@ -102,6 +44,10 @@ const floodChunk = (chunk: Chunk, maxY: number) => {
 };
 
 export const worldgenSurface = (chunk: Chunk) => {
+    const assets = chunk.world.assets.assets;
+    if (!assets) {
+        return;
+    }
     const rng = new LCG([chunk.x, chunk.y, chunk.z, chunk.world.seed]);
     for (let x = 0; x < 32; x++) {
         for (let z = 0; z < 32; z++) {
@@ -133,24 +79,55 @@ export const worldgenSurface = (chunk: Chunk) => {
                         chunk.setBlockUnsafe(x, Math.floor(endY), z, 2);
                         if (gh > 3 && gh < 23) {
                             if (
-                                x > 3 &&
-                                x < 29 &&
-                                z > 3 &&
-                                z < 29 &&
-                                rng.bool(155)
+                                rng.bool(1725) &&
+                                assets.bushA.fits(chunk, x, gh, z)
                             ) {
-                                const treeHeight = rng.int(8, 11);
-                                plantTree(chunk, x, gh, z, treeHeight);
-                            }
-                            if (
-                                x > 3 &&
-                                x < 29 &&
-                                z > 3 &&
-                                z < 29 &&
-                                rng.bool(392)
+                                assets.bushA.blit(chunk, x, gh, z);
+                            } else if (
+                                rng.bool(1625) &&
+                                assets.bushB.fits(chunk, x, gh, z)
                             ) {
-                                const size = rng.int(2, 4);
-                                plantRock(chunk, x, gh, z, size);
+                                assets.bushB.blit(chunk, x, gh, z);
+                            } else if (
+                                rng.bool(1525) &&
+                                assets.bushC.fits(chunk, x, gh, z)
+                            ) {
+                                assets.bushC.blit(chunk, x, gh, z);
+                            } else if (
+                                rng.bool(1625) &&
+                                assets.rockA.fits(chunk, x, gh, z)
+                            ) {
+                                assets.rockA.blit(chunk, x, gh, z);
+                            } else if (
+                                rng.bool(1925) &&
+                                assets.rockB.fits(chunk, x, gh, z)
+                            ) {
+                                assets.rockB.blit(chunk, x, gh, z);
+                            } else if (
+                                rng.bool(1825) &&
+                                assets.rockC.fits(chunk, x, gh, z)
+                            ) {
+                                assets.rockC.blit(chunk, x, gh, z);
+                            } else if (
+                                rng.bool(620) &&
+                                assets.treeA.fits(chunk, x, gh - 3, z)
+                            ) {
+                                assets.treeA.blit(chunk, x, gh - 3, z);
+                            } else if (
+                                rng.bool(730) &&
+                                assets.treeB.fits(chunk, x, gh - 3, z)
+                            ) {
+                                assets.treeB.blit(chunk, x, gh - 3, z);
+                            } else if (
+                                rng.bool(630) &&
+                                assets.treeC.fits(chunk, x, gh - 2, z)
+                            ) {
+                                assets.treeC.blit(chunk, x, gh - 2, z);
+                            } else if (
+                                rng.bool(600) &&
+                                assets.spruceA.fits(chunk, x, gh - 3, z)
+                            ) {
+                                assets.spruceA.blit(chunk, x, gh - 3, z);
                             }
                         }
                     }

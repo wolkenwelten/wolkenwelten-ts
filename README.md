@@ -1,6 +1,6 @@
 # WolkenWelten - TS
 
-![Have a screenshot](https://github.com/wolkenwelten/wolkenwelten-screenshots/raw/main/2023-01-25.png)
+![Have a screenshot](https://github.com/wolkenwelten/wolkenwelten-screenshots/raw/main/2023-01-26.png)
 
 A Voxel engine for the Web that respects your freedom.
 
@@ -35,6 +35,7 @@ Super early, pretty much nothing works whatsoever, so probably not that interest
 - [X] Complex lighting (across chunk boundaries)
 - [X] Water
 - [X] Allow importing of .vox assets
+- [X] Use .vox assets for worldgen (trees/plants and so on)
 - [ ] Compile the Rust meshgen kernel to WASM and measure the performance difference
 - [ ] Port the meshgen kernel to AssemblyScript and compare against the Rust/TS versions
 

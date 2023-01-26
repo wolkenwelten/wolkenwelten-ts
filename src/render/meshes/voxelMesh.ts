@@ -18,8 +18,8 @@ export class VoxelMesh {
     static colorPalette: Map<number, number> = new Map();
 
     elementCount = 0;
-    vao: WebGLVertexArrayObject;
-    vbo: WebGLBuffer;
+    readonly vao: WebGLVertexArrayObject;
+    readonly vbo: WebGLBuffer;
 
     static init(glc: WebGL2RenderingContext) {
         this.gl = glc;
