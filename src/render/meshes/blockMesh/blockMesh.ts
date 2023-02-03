@@ -1,13 +1,13 @@
-import '../../types';
-import { Shader } from '../shader';
-import { Texture } from '../texture';
-import { Chunk } from '../../world/chunk/chunk';
+import '../../../types';
+import { Shader } from '../../shader';
+import { Texture } from '../../texture';
+import { Chunk } from '../../../world/chunk/chunk';
 
-import shaderVertSource from './blockMesh/block.vert?raw';
-import shaderFragSource from './blockMesh/block.frag?raw';
-import blockTextureUrl from '../../../assets/gfx/blocks.png';
+import shaderVertSource from './block.vert?raw';
+import shaderFragSource from './block.frag?raw';
+import blockTextureUrl from '../../../../assets/gfx/blocks.png';
 import { mat4 } from 'gl-matrix';
-import { meshgenComplex } from './blockMesh/meshgen';
+import { meshgenComplex } from '../meshgen';
 
 export class BlockMesh {
     static gl: WebGL2RenderingContext;

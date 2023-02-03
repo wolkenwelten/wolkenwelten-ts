@@ -23,7 +23,7 @@ void main(){
      | texture right now. If we ever add more we have to increase this value.
      | Here we also mirror the textures, so that they are the right side up.
      */
-	tex_coord = texture_index;
+	tex_coord = texture_index - 1u;
 
     /* Finally we extract the 4-bit lightness value, turn it into a float
      | in the range of 0.0-1.0 and then multiply it by itself to make the

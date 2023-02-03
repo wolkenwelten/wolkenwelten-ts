@@ -17,7 +17,7 @@ export class UIManager {
         game.rootElement.append(this.uiRoot);
         new FpsCounter(this.uiRoot, game);
         new Crosshair(this.uiRoot);
-        new InventoryBar(this.uiRoot);
+        new InventoryBar(this.uiRoot, game.player.inventory);
     }
 
     updateFPS(fps: number) {

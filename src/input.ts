@@ -21,6 +21,15 @@ export class InputManager {
         this.keyHandler.set('KeyN', () => {
             that.game.player.noClip = !that.game.player.noClip;
         });
+        this.keyHandler.set('KeyQ', () => {
+            that.game.player.dropItem();
+        });
+
+        for (let i = 0; i < 10; i++) {
+            this.keyHandler.set(`Digit${(i + 1) % 10}`, () => {
+                this.game.player.inventory.select(i);
+            });
+        }
 
         that.game.render.canvasWrapper.addEventListener(
             'mousedown',
@@ -42,6 +51,17 @@ export class InputManager {
         that.game.rootElement.addEventListener('mouseup', (e) =>
             that.mouseStates.delete(e.button)
         );
+        that.game.rootElement.addEventListener('wheel', (e) => {
+            const newSelection =
+                (that.game.player.inventory.selection +
+                    (e.deltaY > 0 ? 1 : -1)) %
+                that.game.player.inventory.items.length;
+            that.game.player.inventory.select(
+                newSelection >= 0
+                    ? newSelection
+                    : that.game.player.inventory.items.length - newSelection - 2
+            );
+        });
         that.game.rootElement.addEventListener(
             'mousemove',
             (e) => {
@@ -107,7 +127,7 @@ export class InputManager {
         }
 
         if (this.mouseStates.has(2)) {
-            this.game.player.placeBlock();
+            this.game.player.useItem();
         }
     }
 }

@@ -1,12 +1,12 @@
-import '../../types';
-import { Shader } from '../shader';
-import { Texture } from '../texture';
+import '../../../types';
+import { Shader } from '../../shader';
+import { Texture } from '../../texture';
 
-import shaderVertSource from './voxelMesh/voxel.vert?raw';
-import shaderFragSource from './voxelMesh/voxel.frag?raw';
+import shaderVertSource from './voxel.vert?raw';
+import shaderFragSource from './voxel.frag?raw';
 import { mat4 } from 'gl-matrix';
-import { BlockMesh } from './blockMesh';
-import { meshgenSimple } from './blockMesh/meshgen';
+import { BlockMesh } from '../blockMesh/blockMesh';
+import { meshgenSimple } from '../meshgen';
 import readVox from 'vox-reader';
 
 const tmpBlocks = new Uint8Array(32 * 32 * 32);

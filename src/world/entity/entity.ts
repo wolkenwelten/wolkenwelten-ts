@@ -27,9 +27,17 @@ export class Entity {
         world.addEntity(this);
     }
 
+    cooldown(ticks: number) {}
+
     destroy() {
         this.destroyed = true;
         this.world.removeEntity(this);
+    }
+
+    walkDirection(): [number, number] {
+        const x = Math.sin(this.yaw);
+        const z = Math.cos(this.yaw);
+        return [x, z];
     }
 
     /* Walk/Run according to the direction of the Entity, ignores pitch */
@@ -74,6 +82,8 @@ export class Entity {
 
         if (this.collides()) {
             this.vy = 0;
+            this.vx = 0;
+            this.vz = 0;
         }
     }
 
@@ -128,10 +138,9 @@ export class Entity {
             return;
         }
         const modelViewMatrix = mat4.create();
-        const yOff = Math.sin(this.id * 7 + this.world.game.ticks * 0.1) * 0.1;
         mat4.translate(modelViewMatrix, modelViewMatrix, [
             this.x,
-            this.y + yOff,
+            this.y,
             this.z,
         ]);
 

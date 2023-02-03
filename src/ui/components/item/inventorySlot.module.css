@@ -2,12 +2,16 @@
     display:inline-block;
     width:64px;
     height:64px;
+    position:relative;
     box-sizing: border-box;
+    padding:2px;
     border:solid 2px #999;
     border-bottom-color:#666;
     border-right-color:#666;
     background: rgba(0, 0, 0, 0.5);
-    transition: border-color 300ms;
+    transition: border-color 200ms, background-color 300ms;
+    text-align:left;
+    vertical-align: bottom;
 }
 
 .slot.active {
@@ -15,4 +19,19 @@
     border-left-color:gold;
     border-bottom-color: goldenrod;
     border-right-color: goldenrod;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.name {
+    display:block;
+    position:absolute;
+    left:2px;
+    top:2px;
+}
+
+.amount {
+    position:absolute;
+    right:2px;
+    bottom:2px;
+    font-family: 'Courier New', Courier, monospace;
 }

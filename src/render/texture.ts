@@ -294,6 +294,10 @@ export class Texture {
     bind(unit = 0) {
         if (this.dirtyLUT) {
             this.updateLUT();
+            activeTextureUnit = unit;
+            lastBoundTexture[unit] = this.texture;
+            this.gl.activeTexture(this.gl.TEXTURE0 + unit);
+            this.gl.bindTexture(this.target(), this.texture);
         }
         if (lastBoundTexture[unit] !== this.texture) {
             lastBoundTexture[unit] = this.texture;

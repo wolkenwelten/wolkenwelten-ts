@@ -3,6 +3,7 @@ import { Inventory } from '../item/inventory';
 import { World } from '../world';
 import { blocks } from '../blockType/blockType';
 import { mat4 } from 'gl-matrix';
+import { BlockItem } from '../item/blockItem';
 
 const CHARACTER_ACCELERATION = 0.04;
 const CHARACTER_STOP_RATE = CHARACTER_ACCELERATION * 3.0;
@@ -35,6 +36,8 @@ export class Character extends Entity {
         this.pitch = pitch;
         this.noClip = noClip;
         this.inventory = new Inventory(10);
+        this.inventory.add(new BlockItem(9, 10));
+        this.inventory.select(0);
     }
 
     /* Walk/Run according to the direction of the Entity, ignores pitch */
@@ -221,18 +224,33 @@ export class Character extends Entity {
         this.hitAnimation = this.world.game.render.frames;
     }
 
-    placeBlock(block = 3) {
+    useItem() {
         if (this.world.game.ticks < this.lastAction) {
             return;
         }
-        const ray = this.raycast(true);
-        if (!ray) {
+        const item = this.inventory.active();
+        if (!item) {
             return;
         }
-        this.cooldown(20);
-        const [x, y, z] = ray;
-        this.world.setBlock(x, y, z, block);
-        this.hitAnimation = this.world.game.render.frames;
+        if (item.use(this)) {
+            this.hitAnimation = this.world.game.render.frames;
+            this.inventory.updateAll();
+        }
+    }
+
+    dropItem() {
+        if (this.world.game.ticks < this.lastAction) {
+            return;
+        }
+        const item = this.inventory.active();
+        if (!item) {
+            return;
+        }
+        if (item.drop(this)) {
+            this.hitAnimation = this.world.game.render.frames;
+            this.inventory.items[this.inventory.selection] = undefined;
+            this.inventory.updateAll();
+        }
     }
 
     draw(projectionMatrix: mat4, viewMatrix: mat4, cam: Entity) {

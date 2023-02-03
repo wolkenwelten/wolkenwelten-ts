@@ -36,6 +36,10 @@ Super early, pretty much nothing works whatsoever, so probably not that interest
 - [X] Water
 - [X] Allow importing of .vox assets
 - [X] Use .vox assets for worldgen (trees/plants and so on)
+- [ ] Spawn ItemDrop's after mining a block
+- [ ] Player Inventory (drop/pickup/block place/active item)
+- [ ] Allow using of Items
+
 - [ ] Compile the Rust meshgen kernel to WASM and measure the performance difference
 - [ ] Port the meshgen kernel to AssemblyScript and compare against the Rust/TS versions
 

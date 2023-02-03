@@ -1,9 +1,9 @@
-import { Chunk } from '../../../world/chunk/chunk';
+import { Chunk } from '../../world/chunk/chunk';
 import {
     blocks as worldBlocks,
     BlockType,
-} from '../../../world/blockType/blockType';
-import { lightGenSimple } from '../../../world/chunk/lightGen';
+} from '../../world/blockType/blockType';
+import { lightGenSimple } from '../../world/chunk/lightGen';
 
 const createIdentityBlocks = () => {
     const ret = [];
