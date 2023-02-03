@@ -1,6 +1,11 @@
+import { mat4, vec3 } from 'gl-matrix';
+import { BlockMesh, VoxelMesh } from '../../render/meshes';
 import { World } from '../world';
 
+let entityCounter = 0;
+
 export class Entity {
+    id: number;
     x = 0;
     y = 0;
     z = 0;
@@ -17,7 +22,14 @@ export class Entity {
     world: World;
 
     constructor(world: World) {
+        this.id = ++entityCounter;
         this.world = world;
+        world.addEntity(this);
+    }
+
+    destroy() {
+        this.destroyed = true;
+        this.world.removeEntity(this);
     }
 
     /* Walk/Run according to the direction of the Entity, ignores pitch */
@@ -44,9 +56,9 @@ export class Entity {
 
     collides() {
         return (
-            Boolean(this.world.getBlock(this.x, this.y + 1, this.z)) ||
+            Boolean(this.world.getBlock(this.x, this.y + 0.3, this.z)) ||
             Boolean(this.world.getBlock(this.x, this.y, this.z)) ||
-            Boolean(this.world.getBlock(this.x, this.y - 1, this.z))
+            Boolean(this.world.getBlock(this.x, this.y - 0.3, this.z))
         );
     }
 
@@ -105,5 +117,32 @@ export class Entity {
             z += dz;
         }
         return null;
+    }
+
+    mesh(): VoxelMesh {
+        return this.world.game.render.bagMesh;
+    }
+
+    draw(projectionMatrix: mat4, viewMatrix: mat4, cam: Entity) {
+        if (this.destroyed) {
+            return;
+        }
+        const modelViewMatrix = mat4.create();
+        const yOff = Math.sin(this.id * 7 + this.world.game.ticks * 0.1) * 0.1;
+        mat4.translate(modelViewMatrix, modelViewMatrix, [
+            this.x,
+            this.y + yOff,
+            this.z,
+        ]);
+
+        mat4.scale(
+            modelViewMatrix,
+            modelViewMatrix,
+            vec3.fromValues(1 / 32, 1 / 32, 1 / 32)
+        );
+        mat4.mul(modelViewMatrix, viewMatrix, modelViewMatrix);
+
+        const mesh = this.mesh();
+        mesh.draw(projectionMatrix, modelViewMatrix, 1.0);
     }
 }

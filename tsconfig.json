@@ -5,14 +5,7 @@
         "module": "CommonJS",
         "sourceMap": true,
         "esModuleInterop": true,
-        "jsx": "preserve",
-        "jsxFactory": "h",
-        "jsxFragmentFactory": "Fragment",
         "skipLibCheck": true,
-        "paths": {
-            "react": ["./node_modules/preact/compat/"],
-            "react-dom": ["./node_modules/preact/compat/"]
-        },
         "noImplicitAny": true,
         "strict": true,
         "plugins": [{ "name": "typescript-plugin-css-modules" }],

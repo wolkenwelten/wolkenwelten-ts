@@ -1,7 +1,7 @@
 import '../../types';
 import { Shader } from '../shader';
 import { Texture } from '../texture';
-import { Chunk } from '../../world/chunk';
+import { Chunk } from '../../world/chunk/chunk';
 
 import shaderVertSource from './blockMesh/block.vert?raw';
 import shaderFragSource from './blockMesh/block.frag?raw';

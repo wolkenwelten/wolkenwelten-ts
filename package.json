@@ -8,21 +8,19 @@
         "build": "vite build",
         "preview": "vite preview",
         "pretty": "prettier --write \"src/**/*.ts\"",
-        "typecheck": "tsc -p ./tsconfig.json --noEmit"
+        "typecheck": "tsc -p ./tsconfig.json --noEmit",
+        "zip": "npm run build && zip -r ld-itch-compatible.zip dist/"
     },
     "author": "Benjamin Vincent Schulenburg <ben@wolkenwelten.net>",
     "license": "AGPL3",
     "devDependencies": {
-        "@preact/preset-vite": "latest",
         "@types/node": "^18.11.18",
         "prettier": "latest",
         "typescript": "latest",
         "vite": "latest"
     },
     "dependencies": {
-        "@preact/signals": "latest",
         "gl-matrix": "latest",
-        "preact": "latest",
         "vox-reader": "^2.1.2"
     }
 }

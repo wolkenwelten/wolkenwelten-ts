@@ -1,4 +1,4 @@
-import { addBlockType, blocks } from '../blockType';
+import { addBlockType, blocks } from './blockType';
 
 export const initDefaultBlocks = () => {
     blocks.length = 0;

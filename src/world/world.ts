@@ -1,8 +1,8 @@
-import { Game } from './game';
-import { Entity } from './world/entity';
-import { Chunk } from './world/chunk';
-import { blocks } from './world/blockType';
-import { WorldgenAssetManager } from './world/worldgen/assets';
+import { Game } from '../game';
+import { Entity } from './entity/entity';
+import { Chunk } from './chunk/chunk';
+import { blocks } from './blockType/blockType';
+import { WorldgenAssetManager } from './worldgen/assets';
 
 export const coordinateToWorldKey = (x: number, y: number, z: number) =>
     ((Math.floor(x) >> 5) & 0xffff) +

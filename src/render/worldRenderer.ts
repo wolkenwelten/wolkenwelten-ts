@@ -2,9 +2,9 @@ import { mat4, vec4 } from 'gl-matrix';
 
 import { Frustum } from './frustum';
 import { BlockMesh } from './meshes';
-import { RenderManager } from '../render';
-import { Entity } from '../world/entity';
-import { coordinateToWorldKey } from '../world';
+import { RenderManager } from '../render/render';
+import { Entity } from '../world/entity/entity';
+import { coordinateToWorldKey } from '../world/world';
 
 type GeneratorQueueEntry = {
     dd: number;
@@ -73,6 +73,10 @@ export class WorldRenderer {
     }
 
     draw(projectionMatrix: mat4, viewMatrix: mat4, cam: Entity) {
+        for (const entity of this.renderer.game.world.entities) {
+            entity.draw(projectionMatrix, viewMatrix, cam);
+        }
+
         this.renderer.gl.enable(this.renderer.gl.BLEND);
         BlockMesh.bindShaderAndTexture(projectionMatrix, viewMatrix);
         const cx = cam.x & ~31;
@@ -131,10 +135,10 @@ export class WorldRenderer {
         for (const { mesh, mask, alpha } of this.drawQueue) {
             mesh.drawFast(mask, alpha, 0);
         }
+
         for (const { mesh, mask, alpha } of this.drawQueue) {
             mesh.drawFast(mask, alpha, 6);
         }
-
         this.renderer.gl.disable(this.renderer.gl.BLEND);
     }
 }

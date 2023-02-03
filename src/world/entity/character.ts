@@ -1,5 +1,8 @@
-import { Entity } from '../entity';
-import { World } from '../../world';
+import { Entity } from './entity';
+import { Inventory } from '../item/inventory';
+import { World } from '../world';
+import { blocks } from '../blockType/blockType';
+import { mat4 } from 'gl-matrix';
 
 const CHARACTER_ACCELERATION = 0.04;
 const CHARACTER_STOP_RATE = CHARACTER_ACCELERATION * 3.0;
@@ -12,8 +15,8 @@ export class Character extends Entity {
     movementY = 0;
     movementZ = 0;
     lastAction = 0;
-
     hitAnimation = -1;
+    inventory: Inventory;
 
     constructor(
         world: World,
@@ -31,6 +34,7 @@ export class Character extends Entity {
         this.yaw = yaw;
         this.pitch = pitch;
         this.noClip = noClip;
+        this.inventory = new Inventory(10);
     }
 
     /* Walk/Run according to the direction of the Entity, ignores pitch */
@@ -75,6 +79,14 @@ export class Character extends Entity {
 
     maySwim(): boolean {
         return this.world.isLiquid(this.x, this.y - 0.25, this.z);
+    }
+
+    collides() {
+        return (
+            Boolean(this.world.getBlock(this.x, this.y + 1, this.z)) ||
+            Boolean(this.world.getBlock(this.x, this.y, this.z)) ||
+            Boolean(this.world.getBlock(this.x, this.y - 1, this.z))
+        );
     }
 
     isSolidPillar(x: number, y: number, z: number): boolean {
@@ -203,6 +215,8 @@ export class Character extends Entity {
         }
         this.cooldown(20);
         const [x, y, z] = ray;
+        const minedBlock = this.world.getBlock(x, y, z) || 0;
+        blocks[minedBlock]?.minedAt(this.world, x, y, z);
         this.world.setBlock(x, y, z, 0);
         this.hitAnimation = this.world.game.render.frames;
     }
@@ -219,5 +233,9 @@ export class Character extends Entity {
         const [x, y, z] = ray;
         this.world.setBlock(x, y, z, block);
         this.hitAnimation = this.world.game.render.frames;
+    }
+
+    draw(projectionMatrix: mat4, viewMatrix: mat4, cam: Entity) {
+        return;
     }
 }

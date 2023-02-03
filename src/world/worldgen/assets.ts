@@ -14,7 +14,7 @@ import voxTreeC from '../../../assets/wg/tree_c.vox?url';
 
 import voxSpruceA from '../../../assets/wg/spruce_a.vox?url';
 
-import { Chunk } from '../chunk';
+import { Chunk } from '../chunk/chunk';
 
 export class WorldgenAsset {
     w: number;

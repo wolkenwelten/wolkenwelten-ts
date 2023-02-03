@@ -1,9 +1,9 @@
-import { Entity } from './entity';
-import { lightGenSimple } from './chunk/lightGen';
+import { Entity } from '../entity/entity';
+import { lightGenSimple } from './lightGen';
 import { World } from '../world';
-import { worldgenSurface } from './worldgen/surface';
-import { worldgenSky } from './worldgen/sky';
-import { worldgenUnderground } from './worldgen/underground';
+import { worldgenSurface } from '../worldgen/surface';
+import { worldgenSky } from '../worldgen/sky';
+import { worldgenUnderground } from '../worldgen/underground';
 
 const coordinateToOffset = (x: number, y: number, z: number) =>
     (Math.floor(x) & 0x1f) |

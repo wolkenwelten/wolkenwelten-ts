@@ -1,12 +1,13 @@
-import { Game } from './game';
+import { Game } from '../game';
 import { mat4, vec3 } from 'gl-matrix';
-import { meshInit, VoxelMesh } from './render/meshes';
-import { Entity } from './world/entity';
-import { WorldRenderer } from './render/worldRenderer';
-import { allTexturesLoaded } from './render/texture';
-import { coordinateToWorldKey } from './world';
+import { meshInit, VoxelMesh } from './meshes';
+import { Entity } from '../world/entity/entity';
+import { WorldRenderer } from './worldRenderer';
+import { allTexturesLoaded } from './texture';
+import { coordinateToWorldKey } from '../world/world';
 
-import voxelFistFile from '../assets/vox/fist.vox?url';
+import voxelBagFile from '../../assets/vox/bag.vox?url';
+import voxelFistFile from '../../assets/vox/fist.vox?url';
 
 export class RenderManager {
     game: Game;
@@ -19,12 +20,14 @@ export class RenderManager {
     height = 480;
     frames = 0;
     fps = 0;
+    fpsCounter = 0;
     drawFrameClosure: () => void;
     generateMeshClosue: () => void;
     generateMeshClosureActive = false;
     wasUnderwater = false;
     renderSizeMultiplier = 1;
 
+    bagMesh: VoxelMesh;
     fistMesh: VoxelMesh;
     cam?: Entity;
     world: WorldRenderer;
@@ -47,6 +50,7 @@ export class RenderManager {
 
         this.world = new WorldRenderer(this);
         this.fistMesh = VoxelMesh.fromVoxFile(voxelFistFile);
+        this.bagMesh = VoxelMesh.fromVoxFile(voxelBagFile);
 
         this.drawFrameClosure = this.drawFrame.bind(this);
         this.generateMeshClosue = this.generateMesh.bind(this);
@@ -58,9 +62,8 @@ export class RenderManager {
     }
 
     updateFPS() {
-        const fps = this.fps;
-        this.fps = 0;
-        this.game.ui.updateFPS(fps);
+        this.fps = this.fpsCounter;
+        this.fpsCounter = 0;
     }
 
     initGLContext() {
@@ -143,7 +146,7 @@ export class RenderManager {
             return;
         }
         this.frames++;
-        this.fps++;
+        this.fpsCounter++;
 
         this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);

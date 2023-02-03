@@ -1,4 +1,4 @@
-import { Chunk } from '../chunk';
+import { Chunk } from '../chunk/chunk';
 import { LCG } from '../../util/prng';
 
 const grassHeight = (x: number, z: number): number => {

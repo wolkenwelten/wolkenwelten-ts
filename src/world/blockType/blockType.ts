@@ -1,3 +1,7 @@
+import { BlockItem } from '../item/blockItem';
+import { ItemDrop } from '../entity/itemDrop';
+import { World } from '../world';
+
 export const blocks: BlockType[] = [];
 export const addBlockType = (name: string): BlockType => {
     const id = blocks.length;
@@ -102,5 +106,12 @@ export class BlockType {
     withInvisible(invisible = true) {
         this.seeThrough = this.invisible = invisible;
         return this;
+    }
+
+    minedAt(world: World, x: number, y: number, z: number) {
+        if (this.id === 0) {
+            return;
+        }
+        new ItemDrop(world, x, y, z, new BlockItem(this.id, 1));
     }
 }

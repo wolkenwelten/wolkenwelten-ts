@@ -1,8 +1,8 @@
 import { Character } from './world/entity/character';
 import { InputManager } from './input';
-import { RenderManager } from './render';
-import { UIManager } from './ui';
-import { World } from './world';
+import { RenderManager } from './render/render';
+import { UIManager } from './ui/ui';
+import { World } from './world/world';
 import { initDefaultBlocks } from './world/blockType/blockTypeDefaults';
 import { LCG } from './util/prng';
 
@@ -30,8 +30,8 @@ export class Game {
         initDefaultBlocks();
         this.player = new Character(
             this.world,
-            55,
             2,
+            0,
             955,
             Math.PI * 0.25,
             -Math.PI / 18
@@ -42,7 +42,6 @@ export class Game {
         this.render.cam = this.player;
         this.ui = new UIManager(this);
         this.input = new InputManager(this);
-        setInterval(this.ui.updateDebugInfo.bind(this.ui), 100);
         setInterval(this.input.update.bind(this.input), 1000 / 240);
         setInterval(this.gc.bind(this), 20000);
         setTimeout(this.init.bind(this), 0);
