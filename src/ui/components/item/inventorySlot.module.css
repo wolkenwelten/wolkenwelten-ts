@@ -1,7 +1,7 @@
 .slot {
     display:inline-block;
-    width:64px;
-    height:64px;
+    width:80px;
+    height:80px;
     position:relative;
     box-sizing: border-box;
     padding:2px;
@@ -9,7 +9,7 @@
     border-bottom-color:#666;
     border-right-color:#666;
     background: rgba(0, 0, 0, 0.5);
-    transition: border-color 200ms, background-color 300ms;
+    transition: border-color 100ms, background-color 200ms;
     text-align:left;
     vertical-align: bottom;
 }
@@ -27,11 +27,24 @@
     position:absolute;
     left:2px;
     top:2px;
+    font-size:0.7rem;
+    color:#eee;
+    font-family: 'Courier New', Courier, monospace;
 }
 
 .amount {
     position:absolute;
     right:2px;
     bottom:2px;
+    font-size:1.3rem;
     font-family: 'Courier New', Courier, monospace;
+}
+
+.img {
+    display:block;
+    width:64px;
+    height:64px;
+    position:absolute;
+    left:6px;
+    top:6px;
 }

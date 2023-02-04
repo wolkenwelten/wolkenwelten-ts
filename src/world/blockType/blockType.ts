@@ -32,6 +32,8 @@ export class BlockType {
     seeThrough = false;
     invisible = false;
 
+    icon = '';
+
     constructor(id: number, name: string) {
         this.id = id;
         this.name = name;
@@ -112,6 +114,12 @@ export class BlockType {
         if (this.id === 0) {
             return;
         }
-        new ItemDrop(world, x, y, z, new BlockItem(this.id, 1));
+        new ItemDrop(
+            world,
+            x + 0.5,
+            y + 0.4,
+            z + 0.5,
+            new BlockItem(this.id, 1)
+        );
     }
 }

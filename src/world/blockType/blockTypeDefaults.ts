@@ -1,7 +1,10 @@
 import { addBlockType, blocks } from './blockType';
+import blockTextureUrl from '../../../assets/gfx/blocks.png';
+import { Game } from '../../game';
 
-export const initDefaultBlocks = () => {
+export const initDefaultBlocks = (game: Game) => {
     blocks.length = 0;
+    game.blockTextureUrl = blockTextureUrl;
     addBlockType('Air').withInvisible();
 
     addBlockType('Dirt')

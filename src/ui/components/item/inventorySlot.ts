@@ -6,10 +6,15 @@ export class InventorySlot {
     div: HTMLElement;
     name: HTMLElement;
     amount: HTMLElement;
+    img: HTMLImageElement;
 
     constructor(parent: HTMLElement, item: MaybeItem, active: boolean) {
         this.div = document.createElement('div');
         this.div.classList.add(styles.slot);
+
+        this.img = document.createElement('img');
+        this.img.classList.add(styles.img);
+        this.div.appendChild(this.img);
 
         this.name = document.createElement('div');
         this.name.classList.add(styles.name);
@@ -24,7 +29,13 @@ export class InventorySlot {
     }
 
     update(item: MaybeItem, active: boolean) {
-        this.name.innerText = item?.name || '';
+        const name = item?.name || '';
+        this.name.innerText = name;
+        if (name) {
+            this.div.setAttribute('title', name);
+        } else {
+            this.div.removeAttribute('title');
+        }
         if (active) {
             this.div.classList.add(styles.active);
         } else {
@@ -36,8 +47,12 @@ export class InventorySlot {
             } else {
                 this.amount.innerText = '';
             }
+            const icon = item.icon();
+            this.img.setAttribute('src', icon);
+            this.img.style.display = 'block';
         } else {
             this.amount.innerText = '';
+            this.img.style.display = 'none';
         }
     }
 }

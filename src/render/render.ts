@@ -46,7 +46,7 @@ export class RenderManager {
         }
         this.gl = gl;
         this.initGLContext();
-        meshInit(gl);
+        meshInit(game, gl);
 
         this.world = new WorldRenderer(this);
         this.fistMesh = VoxelMesh.fromVoxFile(voxelFistFile);

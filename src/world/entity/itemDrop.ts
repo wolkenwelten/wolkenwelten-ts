@@ -43,11 +43,12 @@ export class ItemDrop extends Entity {
             return;
         }
         const modelViewMatrix = mat4.create();
-        const yOff = Math.sin(this.id * 7 + this.world.game.ticks * 0.1) * 0.1;
+        const yOff =
+            Math.sin(this.id * 7 + this.world.game.ticks * 0.1) * 0.1 + 0.2;
         mat4.translate(modelViewMatrix, modelViewMatrix, [
-            this.x,
-            this.y + yOff,
-            this.z,
+            this.x - 0.5,
+            this.y + yOff - 0.5,
+            this.z - 0.5,
         ]);
 
         mat4.scale(

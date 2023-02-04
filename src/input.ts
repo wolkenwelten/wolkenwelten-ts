@@ -21,9 +21,6 @@ export class InputManager {
         this.keyHandler.set('KeyN', () => {
             that.game.player.noClip = !that.game.player.noClip;
         });
-        this.keyHandler.set('KeyQ', () => {
-            that.game.player.dropItem();
-        });
 
         for (let i = 0; i < 10; i++) {
             this.keyHandler.set(`Digit${(i + 1) % 10}`, () => {
@@ -79,6 +76,9 @@ export class InputManager {
     update() {
         const movement = { x: 0, y: 0, z: 0 };
 
+        if (this.keyStates.has('KeyQ')) {
+            this.game.player.dropItem();
+        }
         if (this.keyStates.has('KeyW')) {
             movement.z = -1;
         }

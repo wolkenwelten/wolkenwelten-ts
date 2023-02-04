@@ -5,9 +5,9 @@ import { Chunk } from '../../../world/chunk/chunk';
 
 import shaderVertSource from './block.vert?raw';
 import shaderFragSource from './block.frag?raw';
-import blockTextureUrl from '../../../../assets/gfx/blocks.png';
 import { mat4 } from 'gl-matrix';
 import { meshgenComplex } from '../meshgen';
+import { Game } from '../../../game';
 
 export class BlockMesh {
     static gl: WebGL2RenderingContext;
@@ -54,7 +54,7 @@ export class BlockMesh {
         return vbo;
     }
 
-    static init(glc: WebGL2RenderingContext) {
+    static init(game: Game, glc: WebGL2RenderingContext) {
         this.gl = glc;
         this.shader = new Shader(
             this.gl,
@@ -66,7 +66,7 @@ export class BlockMesh {
         this.texture = new Texture(
             this.gl,
             'blocks',
-            blockTextureUrl,
+            game.blockTextureUrl,
             '2DArray'
         );
         this.texture.nearest();

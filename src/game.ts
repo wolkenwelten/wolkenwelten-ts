@@ -4,6 +4,7 @@ import { RenderManager } from './render/render';
 import { UIManager } from './ui/ui';
 import { World } from './world/world';
 import { initDefaultBlocks } from './world/blockType/blockTypeDefaults';
+import { IconManager } from './util/icon';
 import { LCG } from './util/prng';
 
 export interface GameConfig {
@@ -14,6 +15,7 @@ export class Game {
     rootElement: HTMLElement;
     config: GameConfig;
     input: InputManager;
+    icon: IconManager;
     render: RenderManager;
     ui: UIManager;
     player: Character;
@@ -22,12 +24,15 @@ export class Game {
     ticks = 1;
     startTime = +Date.now();
     ready = false;
+    blockTextureUrl = '';
 
     constructor(config: GameConfig) {
         this.config = config;
         this.rootElement = config.parent;
+        this.icon = new IconManager(this);
         this.world = new World(this);
-        initDefaultBlocks();
+        initDefaultBlocks(this);
+        this.icon.buildAllBlockTypeIcons();
         this.player = new Character(
             this.world,
             2,

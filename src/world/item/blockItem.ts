@@ -1,5 +1,7 @@
 import { blocks } from '../blockType/blockType';
+import { Character } from '../entity/character';
 import { Entity } from '../entity/entity';
+import { ItemDrop } from '../entity/itemDrop';
 import { Inventory } from './inventory';
 import { Item } from './item';
 
@@ -36,6 +38,10 @@ export class BlockItem extends Item {
         return true;
     }
 
+    icon(): string {
+        return blocks[this.blockType].icon;
+    }
+
     addToExistingStacks(inventory: Inventory) {
         for (let i = 0; i < inventory.items.length; i++) {
             const item = inventory.items[i];
@@ -46,7 +52,7 @@ export class BlockItem extends Item {
                 continue;
             }
 
-            const spaceLeft = 99 - item.amount;
+            const spaceLeft = 100 - item.amount;
             if (spaceLeft > this.amount) {
                 item.amount += this.amount;
                 this.destroy();
@@ -56,5 +62,30 @@ export class BlockItem extends Item {
                 item.amount -= spaceLeft;
             }
         }
+    }
+
+    drop(e: Entity): boolean {
+        if (this.amount <= 1) {
+            return Item.prototype.drop.call(this, e);
+        }
+        this.amount--;
+        if (e instanceof Character) {
+            e.inventory.updateAll();
+            e.hitAnimation = e.world.game.render.frames;
+            e.cooldown(20);
+        }
+        const [vx, vz] = e.walkDirection();
+        const drop = new ItemDrop(
+            e.world,
+            e.x - vx,
+            e.y,
+            e.z - vz,
+            new BlockItem(this.blockType, 1)
+        );
+        drop.vy = 0.01;
+        drop.vx = vx * -0.1;
+        drop.vz = vz * -0.1;
+        drop.noCollect = true;
+        return false;
     }
 }

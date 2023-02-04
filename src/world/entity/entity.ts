@@ -139,9 +139,9 @@ export class Entity {
         }
         const modelViewMatrix = mat4.create();
         mat4.translate(modelViewMatrix, modelViewMatrix, [
-            this.x,
-            this.y,
-            this.z,
+            this.x - 0.5,
+            this.y - 0.5,
+            this.z - 0.5,
         ]);
 
         mat4.scale(

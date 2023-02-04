@@ -37,6 +37,9 @@ export class Character extends Entity {
         this.noClip = noClip;
         this.inventory = new Inventory(10);
         this.inventory.add(new BlockItem(9, 10));
+        this.inventory.add(new BlockItem(2, 90));
+        this.inventory.add(new BlockItem(3, 90));
+        this.inventory.add(new BlockItem(1, 10));
         this.inventory.select(0);
     }
 
