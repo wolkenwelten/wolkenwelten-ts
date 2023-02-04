@@ -28,7 +28,7 @@ export class VoxelMesh {
             'voxelMesh',
             shaderVertSource,
             shaderFragSource,
-            ['cur_tex', 'mat_mv', 'mat_mvp', 'alpha']
+            ['cur_tex', 'mat_mvp', 'alpha']
         );
         this.texture = new Texture(this.gl, 'voxelLUT', '', 'LUT');
         this.texture.nearest();
@@ -109,16 +109,13 @@ export class VoxelMesh {
         this.vbo = vertex_buffer;
     }
 
-    draw(projection: mat4, modelView: mat4, alpha: number) {
+    draw(modelViewProjection: mat4, alpha: number) {
         if (this.elementCount === 0) {
             return;
         }
         const gl = VoxelMesh.gl;
-        const modelViewProjection = mat4.create();
-        mat4.multiply(modelViewProjection, projection, modelView);
 
         VoxelMesh.shader.bind();
-        VoxelMesh.shader.uniform4fv('mat_mv', modelView);
         VoxelMesh.shader.uniform4fv('mat_mvp', modelViewProjection);
         VoxelMesh.shader.uniform1i('cur_tex', 2);
         VoxelMesh.shader.uniform1f('alpha', alpha);

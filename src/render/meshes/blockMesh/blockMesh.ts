@@ -19,13 +19,13 @@ export class BlockMesh {
     readonly y: number;
     readonly z: number;
     readonly createdAt: number;
+    readonly vao: WebGLVertexArrayObject;
+    readonly vbo: WebGLBuffer;
+    readonly chunk: Chunk;
     lastUpdated = 0;
     elementCount = 0;
     sideSquareCount: number[] = [];
     sideStart: number[] = [];
-    readonly vao: WebGLVertexArrayObject;
-    readonly vbo: WebGLBuffer;
-    readonly chunk: Chunk;
 
     static generateIndexBuffer(squareCount: number) {
         const bufferSize = squareCount * 6;

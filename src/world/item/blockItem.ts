@@ -1,7 +1,9 @@
+import { TriangleMesh, VoxelMesh } from '../../render/meshes';
 import { blocks } from '../blockType/blockType';
 import { Character } from '../entity/character';
 import { Entity } from '../entity/entity';
 import { ItemDrop } from '../entity/itemDrop';
+import { World } from '../world';
 import { Inventory } from './inventory';
 import { Item } from './item';
 
@@ -62,6 +64,10 @@ export class BlockItem extends Item {
                 item.amount -= spaceLeft;
             }
         }
+    }
+
+    mesh(world:World): TriangleMesh | VoxelMesh {
+        return world.game.render.blockTypeMeshes[this.blockType] || world.game.render.bagMesh;
     }
 
     drop(e: Entity): boolean {

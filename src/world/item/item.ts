@@ -1,5 +1,7 @@
+import { TriangleMesh, VoxelMesh } from '../../render/meshes';
 import { Entity } from '../entity/entity';
 import { ItemDrop } from '../entity/itemDrop';
+import { World } from '../world';
 import { Inventory } from './inventory';
 
 export type MaybeItem = Item | undefined;
@@ -28,6 +30,10 @@ export class Item {
         drop.vz = vz * -0.1;
         drop.noCollect = true;
         return true;
+    }
+
+    mesh(world:World): TriangleMesh | VoxelMesh {
+        return world.game.render.bagMesh;
     }
 
     addToExistingStacks(inventory: Inventory) {}

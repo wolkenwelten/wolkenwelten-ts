@@ -1,13 +1,15 @@
 import { Game } from '../game';
 import { mat4, vec3 } from 'gl-matrix';
-import { meshInit, ShadowMesh, VoxelMesh } from './meshes';
+import { BlockMesh, meshInit, ShadowMesh, TriangleMesh, VoxelMesh } from './meshes';
 import { Entity } from '../world/entity/entity';
 import { WorldRenderer } from './worldRenderer';
-import { allTexturesLoaded } from './texture';
+import { allTexturesLoaded, Texture } from './texture';
 import { coordinateToWorldKey } from '../world/world';
 
 import voxelBagFile from '../../assets/vox/bag.vox?url';
 import voxelFistFile from '../../assets/vox/fist.vox?url';
+import { clamp } from '../util/math';
+import { blocks } from '../world/blockType/blockType';
 
 export class RenderManager {
     game: Game;
@@ -30,8 +32,20 @@ export class RenderManager {
     shadows: ShadowMesh;
     bagMesh: VoxelMesh;
     fistMesh: VoxelMesh;
+    blockTypeMeshes: TriangleMesh[] = [];
     cam?: Entity;
     world: WorldRenderer;
+
+    generateBlockTypeMeshes() {
+        this.blockTypeMeshes.length = 0;
+        const tex = new Texture(this.gl, "blocks2D", this.game.blockTextureUrl, "2D");
+        for(let i=0;i<blocks.length;i++){
+            const mesh = new TriangleMesh(tex);
+            mesh.addBlockType(blocks[i]);
+            mesh.finish();
+            this.blockTypeMeshes[i] = mesh;
+        }
+    }
 
     constructor(game: Game) {
         this.game = game;
@@ -53,6 +67,7 @@ export class RenderManager {
         this.fistMesh = VoxelMesh.fromVoxFile(voxelFistFile);
         this.bagMesh = VoxelMesh.fromVoxFile(voxelBagFile);
         this.shadows = new ShadowMesh(game);
+        this.generateBlockTypeMeshes();
 
         this.drawFrameClosure = this.drawFrame.bind(this);
         this.generateMeshClosue = this.generateMesh.bind(this);
@@ -111,23 +126,27 @@ export class RenderManager {
         this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
 
         const modelViewMatrix = mat4.create();
-        mat4.translate(modelViewMatrix, modelViewMatrix, [0.35, -0.75, -1.5]);
+        let r = Math.PI * 0.1;
+        let rt = 0;
+        if (this.game.player.hitAnimation >= 0) {
+            const t = (this.frames - this.game.player.hitAnimation) / 20.0;
+            if (t > 1) {
+                this.game.player.hitAnimation = -1;
+            } else {
+                rt = t * Math.PI;
+                r = Math.PI * (0.1 - Math.sin(t * Math.PI) * 0.125);
+            }
+        }
+        const rl = Math.sin(rt);
+        mat4.translate(modelViewMatrix, modelViewMatrix, [1 - rl * 0.2, -0.5 + rl * 0.2, -1 - rl * 0.25]);
         mat4.scale(
             modelViewMatrix,
             modelViewMatrix,
             vec3.fromValues(1 / 32, 1 / 32, 1 / 32)
         );
-        let r = Math.PI * 0.1;
-        if (this.game.player.hitAnimation >= 0) {
-            const t = (this.frames - this.game.player.hitAnimation) / 15.0;
-            if (t > 1) {
-                this.game.player.hitAnimation = -1;
-            } else {
-                r = Math.PI * (0.1 - Math.sin(t * Math.PI) * 0.125);
-            }
-        }
         mat4.rotateX(modelViewMatrix, modelViewMatrix, r);
-        this.fistMesh.draw(projectionMatrix, modelViewMatrix, 1.0);
+        mat4.multiply(modelViewMatrix, projectionMatrix, modelViewMatrix);
+        this.fistMesh.draw(modelViewMatrix, 1.0);
     }
 
     resize() {

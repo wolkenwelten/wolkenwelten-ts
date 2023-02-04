@@ -129,7 +129,8 @@ export class ShadowMesh {
         const gl = ShadowMesh.gl;
         this.finish();
         ShadowMesh.shader.bind().uniform4fv('mat_mvp', mat_mvp);
-        ShadowMesh.texture.bind();
+        ShadowMesh.shader.bind().uniform1i('cur_tex', 3);
+        ShadowMesh.texture.bind(3);
         gl.enable(gl.POLYGON_OFFSET_FILL);
         gl.depthMask(false);
         gl.polygonOffset(-8, -8);

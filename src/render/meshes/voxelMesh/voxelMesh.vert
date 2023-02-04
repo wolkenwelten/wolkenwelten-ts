@@ -2,7 +2,6 @@
 precision highp float;
 
 uniform mat4 mat_mvp;
-uniform mat4 mat_mv;
 
 layout (location=0) in uvec3 pos;
 layout (location=1) in uint texture_index;
@@ -37,7 +36,5 @@ void main(){
      | a chunk can fit in 5-bits, without this step we would need 16-bit
      | values, per axis...
      */
-    vec4 world_position = vec4(pos, 1.0);
-    view_position = (mat_mv * world_position).xyz;
-	gl_Position = mat_mvp * world_position;
+	gl_Position = mat_mvp * (vec4(pos, 1.0) - vec4(16.0,16.0,16.0,0.0));
 }

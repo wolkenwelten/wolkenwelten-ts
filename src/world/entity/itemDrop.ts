@@ -3,6 +3,7 @@ import { World } from '../world';
 import { Item } from '../item/item';
 import { mat4, vec3 } from 'gl-matrix';
 import { off } from 'process';
+import { TriangleMesh, VoxelMesh } from '../../render/meshes';
 
 export class ItemDrop extends Entity {
     item: Item;
@@ -15,6 +16,10 @@ export class ItemDrop extends Entity {
         this.y = y;
         this.z = z;
         this.item = item;
+    }
+
+    mesh(): TriangleMesh | VoxelMesh {
+        return this.item.mesh(this.world);
     }
 
     update() {
@@ -45,11 +50,11 @@ export class ItemDrop extends Entity {
         this.world.game.render.shadows.add(this.x, this.y, this.z, 1);
         const modelViewMatrix = mat4.create();
         const yOff =
-            Math.sin(this.id * 7 + this.world.game.ticks * 0.1) * 0.1 + 0.2;
+            Math.sin(this.id * 7 + this.world.game.ticks * 0.07) * 0.1 + 0.2;
         mat4.translate(modelViewMatrix, modelViewMatrix, [
-            this.x - 0.5,
-            this.y + yOff - 0.5,
-            this.z - 0.5,
+            this.x,
+            this.y + yOff,
+            this.z,
         ]);
 
         mat4.scale(
@@ -57,9 +62,11 @@ export class ItemDrop extends Entity {
             modelViewMatrix,
             vec3.fromValues(1 / 32, 1 / 32, 1 / 32)
         );
+        mat4.rotateY(modelViewMatrix,
+            modelViewMatrix,
+            this.id * 7 + this.world.game.ticks * 0.01)
         mat4.mul(modelViewMatrix, viewMatrix, modelViewMatrix);
-
-        const mesh = this.mesh();
-        mesh.draw(projectionMatrix, modelViewMatrix, 1.0);
+        mat4.mul(modelViewMatrix, projectionMatrix, modelViewMatrix);
+        this.mesh().draw(modelViewMatrix, 1.0);
     }
 }

@@ -9,6 +9,7 @@ import { WavefrontFile, WavefrontObject } from './objLoader';
 
 import shaderVertSource from './triangleMesh.vert?raw';
 import shaderFragSource from './triangleMesh.frag?raw';
+import { BlockType } from '../../../world/blockType/blockType';
 
 export class TriangleMesh {
     static gl: WebGL2RenderingContext;
@@ -62,6 +63,83 @@ export class TriangleMesh {
             this.vertices.push(tex[0]);
             this.vertices.push(1.0 - tex[1]); // Gotta flip them
             this.vertices.push(1.0); // Lightness
+        }
+    }
+
+    addBlockType(bt:BlockType) {
+        const m = -8;
+        const p = 8;
+        {
+            const t = bt.texBack / 32;
+            const z = t + 1/64;
+            const l = 0.8;
+            this.vertices.push(m,m,m,0  ,t,l);
+            this.vertices.push(p,p,m,0.5,z,l);
+            this.vertices.push(p,m,m,0.5,t,l);
+
+            this.vertices.push(p,p,m,0.5,z,l);
+            this.vertices.push(m,m,m,0  ,t,l);
+            this.vertices.push(m,p,m,0  ,z,l);
+        }
+        {
+            const t = bt.texFront / 32;
+            const z = t + 1/64;
+            const l = 0.8;
+            this.vertices.push(m,m,p,0  ,t,l);
+            this.vertices.push(p,m,p,0.5,t,l);
+            this.vertices.push(p,p,p,0.5,z,l);
+
+            this.vertices.push(p,p,p,0.5,z,l);
+            this.vertices.push(m,p,p,0  ,z,l);
+            this.vertices.push(m,m,p,0  ,t,l);
+        }
+        {
+            const t = bt.texLeft / 32;
+            const z = t + 1/64;
+            const l = 0.8;
+            this.vertices.push(m,m,m,0  ,t,l);
+            this.vertices.push(m,m,p,0.5,t,l);
+            this.vertices.push(m,p,p,0.5,z,l);
+
+            this.vertices.push(m,p,p,0.5,z,l);
+            this.vertices.push(m,p,m,0  ,z,l);
+            this.vertices.push(m,m,m,0  ,t,l);
+        }
+        {
+            const t = bt.texRight / 32;
+            const z = t + 1/64;
+            const l = 0.8;
+            this.vertices.push(p,m,m,0  ,t,l);
+            this.vertices.push(p,p,p,0.5,z,l);
+            this.vertices.push(p,m,p,0.5,t,l);
+
+            this.vertices.push(p,p,p,0.5,z,l);
+            this.vertices.push(p,m,m,0  ,t,l);
+            this.vertices.push(p,p,m,0  ,z,l);
+        }
+        {
+            const t = bt.texTop / 32;
+            const z = t + 1/64;
+            const l = 1.0;
+            this.vertices.push(m,p,m,0  ,t,l);
+            this.vertices.push(m,p,p,0.5,t,l);
+            this.vertices.push(p,p,p,0.5,z,l);
+
+            this.vertices.push(p,p,p,0.5,z,l);
+            this.vertices.push(p,p,m,0  ,z,l);
+            this.vertices.push(m,p,m,0  ,t,l);
+        }
+        {
+            const t = bt.texBottom / 32;
+            const z = t + 1/64;
+            const l = 0.6;
+            this.vertices.push(m,m,m,0  ,t,l);
+            this.vertices.push(p,m,p,0.5,z,l);
+            this.vertices.push(m,m,p,0.5,t,l);
+
+            this.vertices.push(p,m,p,0.5,z,l);
+            this.vertices.push(m,m,m,0  ,t,l);
+            this.vertices.push(p,m,m,0  ,z,l);
         }
     }
 

@@ -31,13 +31,13 @@ export class IconManager {
         ctx.resetTransform();
         ctx.translate(0, 48);
         ctx.transform(1, 0.5, 0, -0.5, 0, 0);
-        ctx.filter = 'brightness(70%)';
+        ctx.filter = 'brightness(80%)';
         ctx.drawImage(bimg, 0, bt.texLeft * 64, 32, 32, 0, 0, 32, 64);
 
         ctx.resetTransform();
         ctx.translate(32, 64);
         ctx.transform(1, -0.5, 0, -0.5, 0, 0);
-        ctx.filter = 'brightness(40%)';
+        ctx.filter = 'brightness(60%)';
         ctx.drawImage(bimg, 0, bt.texRight * 64, 32, 32, 0, 0, 32, 64);
 
         bt.icon = this.canvas.toDataURL('image/png');

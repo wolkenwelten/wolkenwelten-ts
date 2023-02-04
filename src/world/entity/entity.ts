@@ -1,5 +1,5 @@
 import { mat4, vec3 } from 'gl-matrix';
-import { BlockMesh, VoxelMesh } from '../../render/meshes';
+import { BlockMesh, TriangleMesh, VoxelMesh } from '../../render/meshes';
 import { World } from '../world';
 
 let entityCounter = 0;
@@ -129,7 +129,7 @@ export class Entity {
         return null;
     }
 
-    mesh(): VoxelMesh {
+    mesh(): TriangleMesh | VoxelMesh {
         return this.world.game.render.bagMesh;
     }
 
@@ -140,9 +140,9 @@ export class Entity {
         this.world.game.render.shadows.add(this.x, this.y, this.z, 1);
         const modelViewMatrix = mat4.create();
         mat4.translate(modelViewMatrix, modelViewMatrix, [
-            this.x - 0.5,
-            this.y - 0.5,
-            this.z - 0.5,
+            this.x,
+            this.y,
+            this.z,
         ]);
 
         mat4.scale(
@@ -151,8 +151,7 @@ export class Entity {
             vec3.fromValues(1 / 32, 1 / 32, 1 / 32)
         );
         mat4.mul(modelViewMatrix, viewMatrix, modelViewMatrix);
-
-        const mesh = this.mesh();
-        mesh.draw(projectionMatrix, modelViewMatrix, 1.0);
+        mat4.mul(modelViewMatrix, projectionMatrix, modelViewMatrix);
+        this.mesh().draw(projectionMatrix, 1.0);
     }
 }
