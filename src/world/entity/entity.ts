@@ -137,6 +137,7 @@ export class Entity {
         if (this.destroyed) {
             return;
         }
+        this.world.game.render.shadows.add(this.x, this.y, this.z, 1);
         const modelViewMatrix = mat4.create();
         mat4.translate(modelViewMatrix, modelViewMatrix, [
             this.x - 0.5,

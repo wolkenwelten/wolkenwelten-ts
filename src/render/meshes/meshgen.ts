@@ -1,4 +1,5 @@
 import { Chunk } from '../../world/chunk/chunk';
+import { clamp } from '../../util/math';
 import {
     blocks as worldBlocks,
     BlockType,
@@ -146,8 +147,6 @@ const addRight = (
     out.push(xw, y, z + d, tex, side | ((light >> 8) & 0xf0));
 };
 
-const clamp = (num: number, min: number, max: number) =>
-    Math.min(Math.max(num, min), max);
 const blitChunkDataEnd = (off: number): [number, number] => [
     clamp(off, 0, 34),
     clamp(off + 32, 0, 34),

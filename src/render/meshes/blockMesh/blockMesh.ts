@@ -3,8 +3,8 @@ import { Shader } from '../../shader';
 import { Texture } from '../../texture';
 import { Chunk } from '../../../world/chunk/chunk';
 
-import shaderVertSource from './block.vert?raw';
-import shaderFragSource from './block.frag?raw';
+import shaderVertSource from './blockMesh.vert?raw';
+import shaderFragSource from './blockMesh.frag?raw';
 import { mat4 } from 'gl-matrix';
 import { meshgenComplex } from '../meshgen';
 import { Game } from '../../../game';

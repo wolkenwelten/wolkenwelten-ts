@@ -76,8 +76,6 @@ export class WorldRenderer {
         for (const entity of this.renderer.game.world.entities) {
             entity.draw(projectionMatrix, viewMatrix, cam);
         }
-
-        this.renderer.gl.enable(this.renderer.gl.BLEND);
         BlockMesh.bindShaderAndTexture(projectionMatrix, viewMatrix);
         const cx = cam.x & ~31;
         const cy = cam.y & ~31;
@@ -139,6 +137,5 @@ export class WorldRenderer {
         for (const { mesh, mask, alpha } of this.drawQueue) {
             mesh.drawFast(mask, alpha, 6);
         }
-        this.renderer.gl.disable(this.renderer.gl.BLEND);
     }
 }

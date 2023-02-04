@@ -1,6 +1,6 @@
 import { Game } from '../game';
 import { mat4, vec3 } from 'gl-matrix';
-import { meshInit, VoxelMesh } from './meshes';
+import { meshInit, ShadowMesh, VoxelMesh } from './meshes';
 import { Entity } from '../world/entity/entity';
 import { WorldRenderer } from './worldRenderer';
 import { allTexturesLoaded } from './texture';
@@ -27,6 +27,7 @@ export class RenderManager {
     wasUnderwater = false;
     renderSizeMultiplier = 1;
 
+    shadows: ShadowMesh;
     bagMesh: VoxelMesh;
     fistMesh: VoxelMesh;
     cam?: Entity;
@@ -51,6 +52,7 @@ export class RenderManager {
         this.world = new WorldRenderer(this);
         this.fistMesh = VoxelMesh.fromVoxFile(voxelFistFile);
         this.bagMesh = VoxelMesh.fromVoxFile(voxelBagFile);
+        this.shadows = new ShadowMesh(game);
 
         this.drawFrameClosure = this.drawFrame.bind(this);
         this.generateMeshClosue = this.generateMesh.bind(this);
@@ -95,7 +97,12 @@ export class RenderManager {
             -this.cam.y,
             -this.cam.z,
         ]);
+        this.gl.enable(this.gl.BLEND);
+
         this.world.draw(projectionMatrix, viewMatrix, this.cam);
+        mat4.multiply(viewMatrix, projectionMatrix, viewMatrix);
+        this.shadows.draw(viewMatrix);
+        this.gl.disable(this.gl.BLEND);
 
         this.drawHud(projectionMatrix);
     }

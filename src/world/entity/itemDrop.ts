@@ -42,6 +42,7 @@ export class ItemDrop extends Entity {
         if (this.destroyed) {
             return;
         }
+        this.world.game.render.shadows.add(this.x, this.y, this.z, 1);
         const modelViewMatrix = mat4.create();
         const yOff =
             Math.sin(this.id * 7 + this.world.game.ticks * 0.1) * 0.1 + 0.2;
