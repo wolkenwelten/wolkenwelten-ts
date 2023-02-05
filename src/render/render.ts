@@ -177,7 +177,12 @@ export class RenderManager {
     }
 
     generateMesh() {
-        this.world.generateOneQueuedMesh();
+        for (let i = 0; i < 4; i++) {
+            this.world.generateOneQueuedMesh();
+            if (this.world.queueEntryIsFarAway()) {
+                break;
+            }
+        }
         if (this.world.generatorQueue.length === 0) {
             this.generateMeshClosureActive = false;
         } else {

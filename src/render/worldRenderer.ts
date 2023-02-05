@@ -55,6 +55,21 @@ export class WorldRenderer {
         }
     }
 
+    queueEntryIsFarAway(): boolean {
+        const entry = this.generatorQueue[this.generatorQueue.length - 1];
+        if (!entry) {
+            return true;
+        }
+        const player = this.renderer.game.player;
+        const { x, y, z } = entry;
+        const dmax = Math.min(
+            Math.abs(x - player.x),
+            Math.abs(y - player.y),
+            Math.abs(z - player.z)
+        );
+        return dmax > 24;
+    }
+
     getMesh(x: number, y: number, z: number): BlockMesh | undefined {
         const key = coordinateToWorldKey(x, y, z);
         const ret = this.meshes.get(key);
