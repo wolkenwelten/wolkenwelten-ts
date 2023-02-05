@@ -4,6 +4,7 @@ import { World } from '../world';
 import { blocks } from '../blockType/blockType';
 import { mat4 } from 'gl-matrix';
 import { BlockItem } from '../item/blockItem';
+import { TriangleMesh, VoxelMesh } from '../../render/meshes';
 
 const CHARACTER_ACCELERATION = 0.04;
 const CHARACTER_STOP_RATE = CHARACTER_ACCELERATION * 3.0;
@@ -258,5 +259,14 @@ export class Character extends Entity {
 
     draw(projectionMatrix: mat4, viewMatrix: mat4, cam: Entity) {
         return;
+    }
+
+    hudMesh(): VoxelMesh | TriangleMesh {
+        const heldItem = this.inventory.active();
+        if (!heldItem) {
+            return this.world.game.render.fistMesh;
+        } else {
+            return heldItem.mesh(this.world);
+        }
     }
 }

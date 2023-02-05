@@ -1,6 +1,12 @@
 import { Game } from '../game';
 import { mat4, vec3 } from 'gl-matrix';
-import { BlockMesh, meshInit, ShadowMesh, TriangleMesh, VoxelMesh } from './meshes';
+import {
+    BlockMesh,
+    meshInit,
+    ShadowMesh,
+    TriangleMesh,
+    VoxelMesh,
+} from './meshes';
 import { Entity } from '../world/entity/entity';
 import { WorldRenderer } from './worldRenderer';
 import { allTexturesLoaded, Texture } from './texture';
@@ -38,8 +44,13 @@ export class RenderManager {
 
     generateBlockTypeMeshes() {
         this.blockTypeMeshes.length = 0;
-        const tex = new Texture(this.gl, "blocks2D", this.game.blockTextureUrl, "2D");
-        for(let i=0;i<blocks.length;i++){
+        const tex = new Texture(
+            this.gl,
+            'blocks2D',
+            this.game.blockTextureUrl,
+            '2D'
+        );
+        for (let i = 0; i < blocks.length; i++) {
             const mesh = new TriangleMesh(tex);
             mesh.addBlockType(blocks[i]);
             mesh.finish();
@@ -138,7 +149,11 @@ export class RenderManager {
             }
         }
         const rl = Math.sin(rt);
-        mat4.translate(modelViewMatrix, modelViewMatrix, [1 - rl * 0.2, -0.5 + rl * 0.2, -1 - rl * 0.25]);
+        mat4.translate(modelViewMatrix, modelViewMatrix, [
+            1 - rl * 0.2,
+            -0.5 + rl * 0.2,
+            -1 - rl * 0.25,
+        ]);
         mat4.scale(
             modelViewMatrix,
             modelViewMatrix,
@@ -146,7 +161,8 @@ export class RenderManager {
         );
         mat4.rotateX(modelViewMatrix, modelViewMatrix, r);
         mat4.multiply(modelViewMatrix, projectionMatrix, modelViewMatrix);
-        this.fistMesh.draw(modelViewMatrix, 1.0);
+        const mesh = this.game.player.hudMesh();
+        mesh.draw(modelViewMatrix, 1.0);
     }
 
     resize() {

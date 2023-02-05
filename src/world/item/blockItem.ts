@@ -66,8 +66,11 @@ export class BlockItem extends Item {
         }
     }
 
-    mesh(world:World): TriangleMesh | VoxelMesh {
-        return world.game.render.blockTypeMeshes[this.blockType] || world.game.render.bagMesh;
+    mesh(world: World): TriangleMesh | VoxelMesh {
+        return (
+            world.game.render.blockTypeMeshes[this.blockType] ||
+            world.game.render.bagMesh
+        );
     }
 
     drop(e: Entity): boolean {

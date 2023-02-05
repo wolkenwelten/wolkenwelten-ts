@@ -32,7 +32,7 @@ export class Item {
         return true;
     }
 
-    mesh(world:World): TriangleMesh | VoxelMesh {
+    mesh(world: World): TriangleMesh | VoxelMesh {
         return world.game.render.bagMesh;
     }
 

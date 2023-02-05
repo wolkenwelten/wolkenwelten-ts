@@ -62,9 +62,11 @@ export class ItemDrop extends Entity {
             modelViewMatrix,
             vec3.fromValues(1 / 32, 1 / 32, 1 / 32)
         );
-        mat4.rotateY(modelViewMatrix,
+        mat4.rotateY(
             modelViewMatrix,
-            this.id * 7 + this.world.game.ticks * 0.01)
+            modelViewMatrix,
+            this.id * 7 + this.world.game.ticks * 0.01
+        );
         mat4.mul(modelViewMatrix, viewMatrix, modelViewMatrix);
         mat4.mul(modelViewMatrix, projectionMatrix, modelViewMatrix);
         this.mesh().draw(modelViewMatrix, 1.0);
