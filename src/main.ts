@@ -16,5 +16,10 @@ const main = () => {
         parent: parent as HTMLElement,
     });
     window.wolkenwelten = game;
+    console.log(
+        "%cHello there,%c most of the game state is accessible as the 'wolkenwelten' object, happy hacking! :3",
+        'color:green',
+        'color:inherit'
+    );
 };
 setTimeout(main, 0);

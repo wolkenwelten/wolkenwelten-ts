@@ -34,9 +34,9 @@ export class Game {
         this.config = config;
         this.rootElement = config.parent;
         this.profiler = ProfilingManager.profiler();
-        this.icon = new IconManager(this);
         this.world = new World(this);
         initDefaultBlocks(this);
+        this.icon = new IconManager(this);
         this.icon.buildAllBlockTypeIcons();
         this.player = new Character(
             this.world,

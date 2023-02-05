@@ -9,7 +9,6 @@ export class InputManager {
     constructor(game: Game) {
         this.game = game;
         const that = this;
-
         window.addEventListener('keydown', (e) => that.keyStates.add(e.code));
         window.addEventListener('keyup', (e) => {
             that.keyStates.delete(e.code);
@@ -20,6 +19,11 @@ export class InputManager {
         });
         this.keyHandler.set('KeyN', () => {
             that.game.player.noClip = !that.game.player.noClip;
+        });
+        this.keyHandler.set('Tab', () => {
+            if (document.pointerLockElement) {
+                document.exitPointerLock();
+            }
         });
 
         for (let i = 0; i < 10; i++) {
@@ -99,11 +103,6 @@ export class InputManager {
         }
         if (this.keyStates.has('Space')) {
             movement.y = 1;
-        }
-        if (this.keyStates.has('Tab')) {
-            if (document.pointerLockElement) {
-                document.exitPointerLock();
-            }
         }
         const player = this.game.player;
         if (player.noClip) {
