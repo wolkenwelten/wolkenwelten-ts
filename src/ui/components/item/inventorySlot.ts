@@ -48,8 +48,13 @@ export class InventorySlot {
                 this.amount.innerText = '';
             }
             const icon = item.icon();
-            this.img.setAttribute('src', icon);
-            this.img.style.display = 'block';
+            if (icon) {
+                this.img.setAttribute('src', icon);
+                this.img.style.display = 'block';
+            } else {
+                this.amount.innerText = '';
+                this.img.style.display = 'none';
+            }
         } else {
             this.amount.innerText = '';
             this.img.style.display = 'none';

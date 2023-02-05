@@ -18,6 +18,12 @@ export class Character extends Entity {
     movementZ = 0;
     lastAction = 0;
     hitAnimation = -1;
+    walkCycleCounter = 0;
+
+    jumpAnimeFactor = 0;
+    inertiaX = 0;
+    inertiaZ = 0;
+
     inventory: Inventory;
 
     constructor(
@@ -46,6 +52,9 @@ export class Character extends Entity {
 
     /* Walk/Run according to the direction of the Entity, ignores pitch */
     move(ox: number, oy: number, oz: number) {
+        this.inertiaX = this.inertiaX * 0.97 + ox * -0.03;
+        this.inertiaZ = this.inertiaZ * 0.97 + oz * -0.03;
+
         if (ox === 0 && oz === 0) {
             this.movementX = this.movementZ = 0;
         } else {
@@ -125,6 +134,7 @@ export class Character extends Entity {
         const movementLength = Math.sqrt(
             this.movementX * this.movementX + this.movementZ * this.movementZ
         );
+        this.walkCycleCounter += Math.min(0.2, movementLength);
         let accel =
             movementLength > 0.01
                 ? CHARACTER_ACCELERATION
@@ -144,15 +154,19 @@ export class Character extends Entity {
         const oldVy = this.vy;
         const oldVz = this.vz;
 
+        this.jumpAnimeFactor = Math.max(0, this.jumpAnimeFactor * 0.97);
+
         if (underwater) {
             this.vy *= 0.98;
             this.vx *= 0.99;
             this.vz *= 0.99;
         } else if (this.movementY > 0 && this.mayJump()) {
             this.vy = 0.12;
+            this.jumpAnimeFactor = 1;
         }
         if (this.movementY > 0 && this.maySwim() && Math.abs(this.vy) < 0.07) {
             this.vy = 0.06;
+            this.jumpAnimeFactor = 0.5;
         }
 
         if (this.isSolidPillar(this.x - 0.4, this.y - 0.8, this.z)) {

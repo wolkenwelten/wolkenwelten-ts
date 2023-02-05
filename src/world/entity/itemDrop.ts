@@ -31,11 +31,16 @@ export class ItemDrop extends Entity {
         const dd = dx * dx + dy * dy + dz * dz;
 
         if (this.noCollect) {
-            if (dd > 2 * 2) {
+            if (dd > 2.4 * 2.4) {
                 this.noCollect = false;
             }
         } else {
-            if (dd < 2 * 2) {
+            if (dd < 2.4 * 2.4) {
+                this.vx += dx * 0.006;
+                this.vy += dy * 0.006;
+                this.vz += dz * 0.006;
+            }
+            if (dd < 1.3 * 1.3) {
                 if (player.inventory.add(this.item)) {
                     this.destroy();
                 }

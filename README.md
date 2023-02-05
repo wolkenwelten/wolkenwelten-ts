@@ -38,7 +38,7 @@ Super early, pretty much nothing works whatsoever, so probably not that interest
 - [X] Use .vox assets for worldgen (trees/plants and so on)
 - [X] Simple Mining (drop items after mining)
 - [X] Player Inventory (drop/pickup/block place/active item)
-- [ ] Simple shadows
+- [X] Simple shadows
 - [ ] Proper Mining
 
 - [ ] Compile the Rust meshgen kernel to WASM and measure the performance difference

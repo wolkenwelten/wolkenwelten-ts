@@ -148,11 +148,15 @@ export class RenderManager {
                 r = Math.PI * (0.1 - Math.sin(t * Math.PI) * 0.125);
             }
         }
+        const player = this.game.player;
+        const viewBob = Math.sin(player.walkCycleCounter) * 0.05;
+        const viewBobH = Math.sin(player.walkCycleCounter * 0.5) * 0.06;
+        const jumpOff = player.jumpAnimeFactor * -0.2;
         const rl = Math.sin(rt);
         mat4.translate(modelViewMatrix, modelViewMatrix, [
-            1 - rl * 0.2,
-            -0.5 + rl * 0.2,
-            -1 - rl * 0.25,
+            1 - rl * 0.2 + viewBobH + player.inertiaX * 0.5,
+            -0.5 + rl * 0.2 + viewBob + jumpOff,
+            -1 - rl * 0.25 + player.inertiaZ * 0.5,
         ]);
         mat4.scale(
             modelViewMatrix,
