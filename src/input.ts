@@ -121,6 +121,7 @@ export class InputManager {
             );
         }
 
+        this.game.player.miningActive = false;
         if (this.mouseStates.has(0)) {
             this.game.player.dig();
         }

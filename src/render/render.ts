@@ -3,7 +3,7 @@ import { mat4, vec3 } from 'gl-matrix';
 import {
     BlockMesh,
     meshInit,
-    ShadowMesh,
+    ShadowMesh as DecalMesh,
     TriangleMesh,
     VoxelMesh,
 } from './meshes';
@@ -35,7 +35,7 @@ export class RenderManager {
     wasUnderwater = false;
     renderSizeMultiplier = 1;
 
-    shadows: ShadowMesh;
+    decals: DecalMesh;
     bagMesh: VoxelMesh;
     fistMesh: VoxelMesh;
     blockTypeMeshes: TriangleMesh[] = [];
@@ -77,7 +77,7 @@ export class RenderManager {
         this.world = new WorldRenderer(this);
         this.fistMesh = VoxelMesh.fromVoxFile(voxelFistFile);
         this.bagMesh = VoxelMesh.fromVoxFile(voxelBagFile);
-        this.shadows = new ShadowMesh(game);
+        this.decals = new DecalMesh(game);
         this.generateBlockTypeMeshes();
 
         this.drawFrameClosure = this.drawFrame.bind(this);
@@ -127,7 +127,8 @@ export class RenderManager {
 
         this.world.draw(projectionMatrix, viewMatrix, this.cam);
         mat4.multiply(viewMatrix, projectionMatrix, viewMatrix);
-        this.shadows.draw(viewMatrix);
+        this.world.renderer.game.world.mining.draw(this.world.renderer);
+        this.decals.draw(viewMatrix);
         this.gl.disable(this.gl.BLEND);
 
         this.drawHud(projectionMatrix);

@@ -39,7 +39,7 @@ Super early, pretty much nothing works whatsoever, so probably not that interest
 - [X] Simple Mining (drop items after mining)
 - [X] Player Inventory (drop/pickup/block place/active item)
 - [X] Simple shadows
-- [ ] Proper Mining
+- [X] Proper Mining
 
 - [ ] Compile the Rust meshgen kernel to WASM and measure the performance difference
 - [ ] Port the meshgen kernel to AssemblyScript and compare against the Rust/TS versions

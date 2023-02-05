@@ -22,6 +22,10 @@ export class Item {
         return false;
     }
 
+    miningDamage(block: number): number {
+        return 1;
+    }
+
     drop(e: Entity): boolean {
         const drop = new ItemDrop(e.world, e.x, e.y, e.z, this);
         const [vx, vz] = e.walkDirection();

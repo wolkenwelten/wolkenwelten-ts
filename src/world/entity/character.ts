@@ -24,6 +24,11 @@ export class Character extends Entity {
     inertiaX = 0;
     inertiaZ = 0;
 
+    miningX = 0;
+    miningY = 0;
+    miningZ = 0;
+    miningActive = false;
+
     inventory: Inventory;
 
     constructor(
@@ -234,12 +239,19 @@ export class Character extends Entity {
         if (!ray) {
             return;
         }
-        this.cooldown(20);
         const [x, y, z] = ray;
         const minedBlock = this.world.getBlock(x, y, z) || 0;
-        blocks[minedBlock]?.minedAt(this.world, x, y, z);
-        this.world.setBlock(x, y, z, 0);
-        this.hitAnimation = this.world.game.render.frames;
+        if (minedBlock === 0) {
+            return;
+        }
+        this.miningActive = true;
+        this.miningX = x;
+        this.miningY = y;
+        this.miningZ = z;
+
+        if (this.world.game.render.frames > this.hitAnimation + 100) {
+            this.hitAnimation = this.world.game.render.frames;
+        }
     }
 
     useItem() {

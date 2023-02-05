@@ -2,6 +2,7 @@ import { Game } from '../game';
 import { Entity } from './entity/entity';
 import { Chunk } from './chunk/chunk';
 import { blocks } from './blockType/blockType';
+import { MiningManager } from './mining';
 import { WorldgenAssetManager } from './worldgen/assets';
 
 export const coordinateToWorldKey = (x: number, y: number, z: number) =>
@@ -13,12 +14,14 @@ export class World {
     chunks: Map<number, Chunk> = new Map();
     entities: Set<Entity> = new Set();
     seed: number;
+    mining: MiningManager;
     game: Game;
     assets: WorldgenAssetManager;
 
     constructor(game: Game) {
         this.seed = 1234;
         this.game = game;
+        this.mining = new MiningManager(this);
         this.assets = new WorldgenAssetManager();
     }
 
@@ -79,6 +82,7 @@ export class World {
         for (const entity of this.entities) {
             entity.update();
         }
+        this.mining.update();
     }
 
     addEntity(entity: Entity) {

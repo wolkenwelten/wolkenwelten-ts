@@ -1,6 +1,7 @@
 import { BlockItem } from '../item/blockItem';
 import { ItemDrop } from '../entity/itemDrop';
 import { World } from '../world';
+import { MaybeItem } from '../item/item';
 
 export const blocks: BlockType[] = [];
 export const addBlockType = (name: string): BlockType => {
@@ -110,7 +111,13 @@ export class BlockType {
         return this;
     }
 
-    minedAt(world: World, x: number, y: number, z: number) {
+    spawnMiningDrops(
+        world: World,
+        x: number,
+        y: number,
+        z: number,
+        tool: MaybeItem
+    ) {
         if (this.id === 0) {
             return;
         }
