@@ -1,3 +1,4 @@
+import profiler from '../../profiler';
 const light = new Uint8Array(32 * 32);
 
 const sunlight = (out: Uint8Array, blocks: Uint8Array) => {
@@ -84,6 +85,9 @@ const lightBlur = (out: Uint8Array) => {
 };
 
 export const lightGenSimple = (out: Uint8Array, blocks: Uint8Array) => {
+    const start = performance.now();
     sunlight(out, blocks);
     lightBlur(out);
+    const end = performance.now();
+    profiler.add('lightGenSimple', start, end);
 };

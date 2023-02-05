@@ -4,6 +4,7 @@ import { World } from '../world';
 import { worldgenSurface } from '../worldgen/surface';
 import { worldgenSky } from '../worldgen/sky';
 import { worldgenUnderground } from '../worldgen/underground';
+import profiler from '../../profiler';
 
 const coordinateToOffset = (x: number, y: number, z: number) =>
     (Math.floor(x) & 0x1f) |
@@ -32,6 +33,7 @@ export class Chunk {
     }
 
     worldgen() {
+        const start = performance.now();
         if (this.y < -512) {
             worldgenUnderground(this);
         } else if (this.y < 512) {
@@ -39,6 +41,8 @@ export class Chunk {
         } else {
             worldgenSky(this);
         }
+        const end = performance.now();
+        profiler.add('worldgen', start, end);
     }
 
     updateSimpleLight() {

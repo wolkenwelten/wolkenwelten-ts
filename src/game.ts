@@ -2,6 +2,7 @@ import { Character } from './world/entity/character';
 import { InputManager } from './input';
 import { RenderManager } from './render/render';
 import { PersistenceManager } from './persistence';
+import { ProfilingManager } from './profiler';
 import { UIManager } from './ui/ui';
 import { World } from './world/world';
 import { initDefaultBlocks } from './world/blockType/blockTypeDefaults';
@@ -21,6 +22,7 @@ export class Game {
     ui: UIManager;
     player: Character;
     persistence: PersistenceManager;
+    profiler: ProfilingManager;
     world: World;
     rng = new LCG(1234);
     ticks = 1;
@@ -31,6 +33,7 @@ export class Game {
     constructor(config: GameConfig) {
         this.config = config;
         this.rootElement = config.parent;
+        this.profiler = ProfilingManager.profiler();
         this.icon = new IconManager(this);
         this.world = new World(this);
         initDefaultBlocks(this);

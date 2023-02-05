@@ -1,4 +1,5 @@
 import { Chunk } from '../../world/chunk/chunk';
+import profiler from '../../profiler';
 import { clamp } from '../../util/math';
 import {
     blocks as worldBlocks,
@@ -168,11 +169,12 @@ const blitChunkData = (
         const cx = x - offX;
         for (let y = yStart; y < yEnd; y++) {
             const cy = y - offY;
+            let blockOff = blockBufferPosToOffset(x, y, zStart);
+            const cz = zStart - offZ;
+            let chunkOff = cz * 32 * 32 + cy * 32 + cx; // Transposing the X and Z axes shouldn't be necessary
             for (let z = zStart; z < zEnd; z++) {
-                const cz = z - offZ;
-                const blockOff = blockBufferPosToOffset(x, y, z);
-                const chunkOff = cz * 32 * 32 + cy * 32 + cx; // Transposing the X and Z axes shouldn't be necessary
-                blockData[blockOff] = chunkData[chunkOff];
+                blockData[blockOff++] = chunkData[chunkOff];
+                chunkOff += 32 * 32;
             }
         }
     }
@@ -183,54 +185,53 @@ const calcSides = (
     y: number,
     z: number,
     blockData: Uint8Array,
-    blocks: BlockType[]
+    blockSeeThrough: number[]
 ): number => {
     const off = blockBufferPosToOffset(x, y, z);
 
     const cb = blockData[off];
-    const cbt = blocks[cb];
-    if (cbt.invisible) {
+    if (cb === 0) {
         return 0;
     }
-    if (cbt.seeThrough) {
+    if (blockSeeThrough[cb]) {
         let ret = +(
-            blockData[off + 1] !== cb && blocks[blockData[off + 1]].seeThrough
+            blockData[off + 1] !== cb && blockSeeThrough[blockData[off + 1]]
         );
         ret |=
             +(
-                blockData[off - 1] !== cb &&
-                blocks[blockData[off - 1]].seeThrough
+                blockData[off - 1] !== cb && blockSeeThrough[blockData[off - 1]]
             ) << 1;
         ret |=
             +(
                 blockData[off + 34] !== cb &&
-                blocks[blockData[off + 34]].seeThrough
+                blockSeeThrough[blockData[off + 34]]
             ) << 2;
         ret |=
             +(
                 blockData[off - 34] !== cb &&
-                blocks[blockData[off - 34]].seeThrough
+                blockSeeThrough[blockData[off - 34]]
             ) << 3;
         ret |=
             +(
                 blockData[off + 34 * 34] !== cb &&
-                blocks[blockData[off + 34 * 34]].seeThrough
+                blockSeeThrough[blockData[off + 34 * 34]]
             ) << 4;
         ret |=
             +(
                 blockData[off - 34 * 34] !== cb &&
-                blocks[blockData[off - 34 * 34]].seeThrough
+                blockSeeThrough[blockData[off - 34 * 34]]
             ) << 5;
         ret |= 1 << 6;
         return ret;
     } else {
-        let ret = +blocks[blockData[off + 1]].seeThrough;
-        ret |= +blocks[blockData[off - 1]].seeThrough << 1;
-        ret |= +blocks[blockData[off + 34]].seeThrough << 2;
-        ret |= +blocks[blockData[off - 34]].seeThrough << 3;
-        ret |= +blocks[blockData[off + 34 * 34]].seeThrough << 4;
-        ret |= +blocks[blockData[off - 34 * 34]].seeThrough << 5;
-        return ret;
+        return (
+            blockSeeThrough[blockData[off + 1]] |
+            (blockSeeThrough[blockData[off - 1]] << 1) |
+            (blockSeeThrough[blockData[off + 34]] << 2) |
+            (blockSeeThrough[blockData[off - 34]] << 3) |
+            (blockSeeThrough[blockData[off + 34 * 34]] << 4) |
+            (blockSeeThrough[blockData[off - 34 * 34]] << 5)
+        );
     }
 };
 
@@ -240,6 +241,10 @@ const calcSideCache = (
     blocks: BlockType[]
 ) => {
     let off = 0;
+    const blockSeeThrough = [];
+    for (let i = 0; i < blocks.length; i++) {
+        blockSeeThrough[i] = blocks[i].seeThrough ? 1 : 0;
+    }
     for (let x = 0; x < 32; x++) {
         for (let y = 0; y < 32; y++) {
             for (let z = 0; z < 32; z++) {
@@ -248,7 +253,7 @@ const calcSideCache = (
                     y + 1,
                     z + 1,
                     blockData,
-                    blocks
+                    blockSeeThrough
                 );
             }
         }
@@ -270,13 +275,14 @@ class PlaneEntry {
     light = new Uint16Array(32 * 32);
 
     optimize() {
-        for (let y = 31; y >= 0; y--) {
-            for (let x = 31; x >= 0; x--) {
-                if (this.block[x * 32 + y] === 0) {
+        for (let x = 31; x >= 0; x--) {
+            const xOff = x * 32;
+            for (let y = 31; y >= 0; y--) {
+                if (this.block[xOff + y] === 0) {
                     continue;
                 }
                 if (x < 30) {
-                    const aOff = x * 32 + y;
+                    const aOff = xOff + y;
                     const bOff = aOff + 32;
                     if (
                         this.block[aOff] == this.block[bOff] &&
@@ -288,7 +294,7 @@ class PlaneEntry {
                     }
                 }
                 if (y < 30) {
-                    const aOff = x * 32 + y;
+                    const aOff = xOff + y;
                     const bOff = aOff + 1;
                     if (
                         this.block[aOff] == this.block[bOff] &&
@@ -351,21 +357,21 @@ const genFront = (vertices: number[], args: GenArgs): number => {
     // First we slice the chunk into many, zero-initialized, planes
     for (let z = 0; z < 32; z++) {
         let found = 0;
+        plane.block.fill(0);
         for (let y = 0; y < 32; y++) {
             for (let x = 0; x < 32; x++) {
                 // Skip all faces that can't be seen, due to a block
                 // being right in front of that particular face.
-                const off = y * 32 + x;
                 const side = sideCache[x * 32 * 32 + y * 32 + z];
                 if (
                     (side & 1) === 0 ||
                     args.seeThrough === ((side & (1 << 6)) === 0)
                 ) {
-                    plane.block[off] = 0;
                     continue;
                 }
+                const off = y * 32 + x;
                 // Gotta increment our counter so that we don't skip this chunk
-                found += 1;
+                found++;
                 plane.width[off] = 1;
                 plane.height[off] = 1;
                 plane.block[off] =
@@ -405,21 +411,21 @@ const genBack = (vertices: number[], args: GenArgs) => {
     const { blocks, sideCache, blockData, lightData } = args;
     for (let z = 0; z < 32; z++) {
         let found = 0;
+        plane.block.fill(0);
         for (let y = 0; y < 32; y++) {
             for (let x = 0; x < 32; x++) {
                 // Skip all faces that can't be seen, due to a block
                 // being right in front of that particular face.
-                const off = y * 32 + x;
                 const side = sideCache[x * 32 * 32 + y * 32 + z];
                 if (
                     (side & 2) === 0 ||
                     args.seeThrough === ((side & (1 << 6)) === 0)
                 ) {
-                    plane.block[off] = 0;
                     continue;
                 }
+                const off = y * 32 + x;
                 // Gotta increment our counter so that we don't skip this chunk
-                found += 1;
+                found++;
                 plane.width[off] = 1;
                 plane.height[off] = 1;
                 plane.block[off] =
@@ -459,21 +465,21 @@ const genTop = (vertices: number[], args: GenArgs) => {
     const { blocks, sideCache, blockData, lightData } = args;
     for (let y = 0; y < 32; y++) {
         let found = 0;
+        plane.block.fill(0);
         for (let z = 0; z < 32; z++) {
             for (let x = 0; x < 32; x++) {
                 // Skip all faces that can't be seen, due to a block
                 // being right in front of that particular face.
-                const off = z * 32 + x;
                 const side = sideCache[x * 32 * 32 + y * 32 + z];
                 if (
                     (side & 4) === 0 ||
                     args.seeThrough === ((side & (1 << 6)) === 0)
                 ) {
-                    plane.block[off] = 0;
                     continue;
                 }
+                const off = z * 32 + x;
                 // Gotta increment our counter so that we don't skip this chunk
-                found += 1;
+                found++;
                 plane.width[off] = 1;
                 plane.height[off] = 1;
                 plane.block[off] =
@@ -513,21 +519,21 @@ const genBottom = (vertices: number[], args: GenArgs) => {
     const { blocks, sideCache, blockData, lightData } = args;
     for (let y = 0; y < 32; y++) {
         let found = 0;
+        plane.block.fill(0);
         for (let z = 0; z < 32; z++) {
             for (let x = 0; x < 32; x++) {
                 // Skip all faces that can't be seen, due to a block
                 // being right in front of that particular face.
-                const off = z * 32 + x;
                 const side = sideCache[x * 32 * 32 + y * 32 + z];
                 if (
                     (side & 8) === 0 ||
                     args.seeThrough === ((side & (1 << 6)) === 0)
                 ) {
-                    plane.block[off] = 0;
                     continue;
                 }
+                const off = z * 32 + x;
                 // Gotta increment our counter so that we don't skip this chunk
-                found += 1;
+                found++;
                 plane.width[off] = 1;
                 plane.height[off] = 1;
                 plane.block[off] =
@@ -567,21 +573,21 @@ const genRight = (vertices: number[], args: GenArgs) => {
     const { blocks, sideCache, blockData, lightData } = args;
     for (let x = 0; x < 32; x++) {
         let found = 0;
+        plane.block.fill(0);
         for (let y = 0; y < 32; y++) {
             for (let z = 0; z < 32; z++) {
                 // Skip all faces that can't be seen, due to a block
                 // being right in front of that particular face.
-                const off = y * 32 + z;
                 const side = sideCache[x * 32 * 32 + y * 32 + z];
                 if (
                     (side & 16) === 0 ||
                     args.seeThrough === ((side & (1 << 6)) === 0)
                 ) {
-                    plane.block[off] = 0;
                     continue;
                 }
+                const off = y * 32 + z;
                 // Gotta increment our counter so that we don't skip this chunk
-                found += 1;
+                found++;
                 plane.width[off] = 1;
                 plane.height[off] = 1;
                 plane.block[off] =
@@ -621,21 +627,21 @@ const genLeft = (vertices: number[], args: GenArgs) => {
     const { blocks, sideCache, blockData, lightData } = args;
     for (let x = 0; x < 32; x++) {
         let found = 0;
+        plane.block.fill(0);
         for (let y = 0; y < 32; y++) {
             for (let z = 0; z < 32; z++) {
                 // Skip all faces that can't be seen, due to a block
                 // being right in front of that particular face.
-                const off = y * 32 + z;
                 const side = sideCache[x * 32 * 32 + y * 32 + z];
                 if (
                     (side & 32) === 0 ||
                     args.seeThrough === ((side & (1 << 6)) === 0)
                 ) {
-                    plane.block[off] = 0;
                     continue;
                 }
+                const off = y * 32 + z;
                 // Gotta increment our counter so that we don't skip this chunk
-                found += 1;
+                found++;
                 plane.width[off] = 1;
                 plane.height[off] = 1;
                 plane.block[off] =
@@ -738,18 +744,24 @@ const ambientOcclusion = (out: Uint8Array, blocks: Uint8Array) => {
     for (let off = 0; off < end; off++) {
         // Here we divide the light value by 2 when the position is occupied by a block
         // Written this way so it's branchless and easier to optimize/vectorize
-        out[off] = out[off] >> +(blocks[off] !== 0);
+        if (blocks[off]) {
+            out[off] = out[off] >> 1;
+        }
     }
 };
 
 const finishLight = (light: Uint8Array, block: Uint8Array) => {
+    const start = performance.now();
     lightBlurX(light);
     lightBlurY(light);
     lightBlurZ(light);
     ambientOcclusion(light, block);
+    const end = performance.now();
+    profiler.add('finishLight', start, end);
 };
 
 export const meshgenSimple = (blocks: Uint8Array): [Uint8Array, number] => {
+    const start = performance.now();
     const vertices: number[] = [];
     lightGenSimple(tmpSimpleLight, blocks);
     blitChunkData(blockData, blocks, 1, 1, 1);
@@ -771,10 +783,14 @@ export const meshgenSimple = (blocks: Uint8Array): [Uint8Array, number] => {
     elementCount += genLeft(vertices, data);
     elementCount += genRight(vertices, data);
 
-    return [new Uint8Array(vertices), elementCount];
+    const vertArr = new Uint8Array(vertices);
+    const end = performance.now();
+    profiler.add('meshgenSimple', start, end);
+    return [vertArr, elementCount];
 };
 
 export const meshgenComplex = (chunk: Chunk): [Uint8Array, number[]] => {
+    const start = performance.now();
     const vertices: number[] = [];
     for (let x = -1; x <= 1; x++) {
         for (let y = -1; y <= 1; y++) {
@@ -804,7 +820,7 @@ export const meshgenComplex = (chunk: Chunk): [Uint8Array, number[]] => {
     calcSideCache(sideCache, blockData, worldBlocks);
     finishLight(lightData, blockData);
 
-    const sideSquareCount = [0, 0, 0, 0, 0, 0];
+    const sideSquareCount = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     const data = {
         blockData,
         lightData,
@@ -827,5 +843,9 @@ export const meshgenComplex = (chunk: Chunk): [Uint8Array, number[]] => {
     sideSquareCount[9] = genBottom(vertices, data);
     sideSquareCount[10] = genLeft(vertices, data);
     sideSquareCount[11] = genRight(vertices, data);
-    return [new Uint8Array(vertices), sideSquareCount];
+
+    const vertArr = new Uint8Array(vertices);
+    const end = performance.now();
+    profiler.add('meshgenComplex', start, end);
+    return [vertArr, sideSquareCount];
 };
