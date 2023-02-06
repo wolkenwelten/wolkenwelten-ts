@@ -16,6 +16,7 @@ export interface MiningAction {
 
 export class MiningManager {
     world: World;
+    ticks = 0;
     minings: MiningAction[] = [];
 
     constructor(world: World) {
@@ -70,6 +71,7 @@ export class MiningManager {
         if (ret) {
             const bt = blocks[block];
             this.world.setBlock(x, y, z, 0);
+            this.world.game.render.particle.fxBlockBreak(x, y, z, bt);
             bt.spawnMiningDrops(this.world, x, y, z, tool);
         }
         return ret;
@@ -95,6 +97,13 @@ export class MiningManager {
             if (m.damageDealt < 0) {
                 this.minings[i] = this.minings[this.minings.length - 1];
                 this.minings.length--;
+            }
+        }
+        if ((++this.ticks & 7) == 0) {
+            for (let i = this.minings.length - 1; i >= 0; i--) {
+                const m = this.minings[i];
+                const bt = blocks[m.block];
+                this.world.game.render.particle.fxBlockMine(m.x, m.y, m.z, bt);
             }
         }
     }

@@ -9,6 +9,7 @@ import shaderVertSource from './decalMesh.vert?raw';
 import shaderFragSource from './decalMesh.frag?raw';
 import { Game } from '../../../game';
 import { mat4 } from 'gl-matrix';
+import { RenderManager } from '../../render';
 
 const uvs = 1 / 8;
 
@@ -16,7 +17,7 @@ export class DecalMesh {
     static gl: WebGL2RenderingContext;
     static shader: Shader;
     static texture: Texture;
-    game: Game;
+    renderer: RenderManager;
     vertices: Float32Array;
     endOfBuffer = 0;
     elementCount = 0;
@@ -37,18 +38,20 @@ export class DecalMesh {
         this.texture.linear();
     }
 
-    constructor(game: Game) {
-        this.game = game;
+    constructor(renderer: RenderManager) {
+        const gl = DecalMesh.gl;
+
+        this.renderer = renderer;
         this.vertices = new Float32Array(6 * 4 * 6 * 256);
-        const vao = DecalMesh.gl.createVertexArray();
+        const vao = gl.createVertexArray();
         if (!vao) {
             throw new Error("Couldn't create VAO");
         }
         this.vao = vao;
 
-        const vbo = DecalMesh.gl.createBuffer();
+        const vbo = gl.createBuffer();
         if (!vbo) {
-            throw new Error("Can't create new textMesh vertex buffer!");
+            throw new Error("Can't create new DecalMesh vertex buffer!");
         }
         this.vbo = vbo;
     }
@@ -56,13 +59,12 @@ export class DecalMesh {
     private finish() {
         const gl = DecalMesh.gl;
         gl.bindVertexArray(this.vao);
-
-        const vertex_buffer = gl.createBuffer();
-        if (!vertex_buffer) {
-            throw new Error("Can't create new textMesh vertex buffer!");
-        }
-        gl.bindBuffer(gl.ARRAY_BUFFER, vertex_buffer);
-        gl.bufferData(gl.ARRAY_BUFFER, this.vertices, gl.DYNAMIC_DRAW);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
+        gl.bufferData(
+            gl.ARRAY_BUFFER,
+            this.vertices.slice(0, this.endOfBuffer),
+            gl.DYNAMIC_DRAW
+        );
 
         gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 6 * 4, 0);
         gl.enableVertexAttribArray(0);
@@ -217,7 +219,7 @@ export class DecalMesh {
     addShadow(x: number, y: number, z: number, size: number) {
         for (let offY = 0; offY < 8; offY++) {
             const cy = y - offY;
-            if (this.game.world.isSolid(x, cy, z)) {
+            if (this.renderer.game.world.isSolid(x, cy, z)) {
                 const iy = Math.floor(cy) + 1;
                 const d = clamp(Math.abs(iy - y) / 7, 0, 1);
                 const lightness = 1 - d;

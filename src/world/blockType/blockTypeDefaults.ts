@@ -9,7 +9,7 @@ export const initDefaultBlocks = (game: Game) => {
 
     addBlockType('Dirt')
         .withTexture(1)
-        .withColours(0x110a00ff, 0x201200ff)
+        .withColours(0x311e00ff, 0x412800ff)
         .withMiningCat('Shovel')
         .withBlockHealth(200);
 
@@ -17,7 +17,7 @@ export const initDefaultBlocks = (game: Game) => {
         .withTexture(16)
         .withTextureTop(0)
         .withTextureBottom(1)
-        .withColours(0x081200ff, 0x110a00ff)
+        .withColours(0x003807ff, 0x412800ff)
         .withMiningCat('Shovel')
         .withBlockHealth(250);
 

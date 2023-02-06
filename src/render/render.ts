@@ -3,7 +3,7 @@ import { mat4, vec3 } from 'gl-matrix';
 import {
     BlockMesh,
     meshInit,
-    ShadowMesh as DecalMesh,
+    DecalMesh,
     TriangleMesh,
     VoxelMesh,
 } from './meshes';
@@ -16,6 +16,7 @@ import voxelBagFile from '../../assets/vox/bag.vox?url';
 import voxelFistFile from '../../assets/vox/fist.vox?url';
 import { clamp } from '../util/math';
 import { blocks } from '../world/blockType/blockType';
+import { ParticleMesh } from './meshes/particleMesh/particleMesh';
 
 export class RenderManager {
     game: Game;
@@ -36,6 +37,7 @@ export class RenderManager {
     renderSizeMultiplier = 1;
 
     decals: DecalMesh;
+    particle: ParticleMesh;
     bagMesh: VoxelMesh;
     fistMesh: VoxelMesh;
     blockTypeMeshes: TriangleMesh[] = [];
@@ -77,7 +79,8 @@ export class RenderManager {
         this.world = new WorldRenderer(this);
         this.fistMesh = VoxelMesh.fromVoxFile(voxelFistFile);
         this.bagMesh = VoxelMesh.fromVoxFile(voxelBagFile);
-        this.decals = new DecalMesh(game);
+        this.decals = new DecalMesh(this);
+        this.particle = new ParticleMesh(this);
         this.generateBlockTypeMeshes();
 
         this.drawFrameClosure = this.drawFrame.bind(this);
@@ -130,6 +133,7 @@ export class RenderManager {
         this.world.renderer.game.world.mining.draw(this.world.renderer);
         this.decals.draw(viewMatrix);
         this.gl.disable(this.gl.BLEND);
+        this.particle.draw(viewMatrix);
 
         this.drawHud(projectionMatrix);
     }

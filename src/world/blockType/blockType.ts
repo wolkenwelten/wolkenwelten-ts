@@ -2,6 +2,7 @@ import { BlockItem } from '../item/blockItem';
 import { ItemDrop } from '../entity/itemDrop';
 import { World } from '../world';
 import { MaybeItem } from '../item/item';
+import { abgrToRgba } from '../../util/math';
 
 export const blocks: BlockType[] = [];
 export const addBlockType = (name: string): BlockType => {
@@ -81,8 +82,8 @@ export class BlockType {
     }
 
     withColours(a: number, b: number) {
-        this.colorA = a;
-        this.colorB = b;
+        this.colorA = abgrToRgba(a);
+        this.colorB = abgrToRgba(b);
         return this;
     }
 
