@@ -5,6 +5,7 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
+        "assemble": "npx -p wabt wat2wasm ./wasm/wolkenwelten-meshgen-wasm/main.wat -o ./wasm/wolkenwelten-meshgen-wasm/main.wasm",
         "build": "vite build",
         "preview": "vite preview",
         "pretty": "prettier --write \"src/**/*.ts\"",
@@ -14,15 +15,17 @@
     "author": "Benjamin Vincent Schulenburg <ben@wolkenwelten.net>",
     "license": "AGPL3",
     "devDependencies": {
-        "@types/howler": "^2.2.7",
+        "@types/howler": "latest",
         "@types/node": "^18.11.18",
         "prettier": "latest",
         "typescript": "latest",
-        "vite": "latest"
+        "vite": "latest",
+        "vite-plugin-top-level-await": "latest",
+        "vite-plugin-wasm": "latest"
     },
     "dependencies": {
         "gl-matrix": "latest",
-        "howler": "^2.2.3",
-        "vox-reader": "^2.1.2"
+        "howler": "latest",
+        "vox-reader": "latest"
     }
 }

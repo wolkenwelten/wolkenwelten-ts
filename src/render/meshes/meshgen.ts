@@ -3,6 +3,8 @@ import profiler from '../../profiler';
 import { clamp } from '../../util/math';
 import { BlockType } from '../../world/blockType/blockType';
 import { lightGenSimple } from '../../world/chunk/lightGen';
+//import { finish_light } from '../../../wasm/wolkenwelten-meshgen-rs/pkg/wolkenwelten_meshgen_rs';
+//import { finish_light } from '../../../wasm/wolkenwelten-meshgen-c/main';
 
 const createIdentityBlocks = () => {
     const ret = [];
@@ -684,7 +686,7 @@ const lightBlurX = (out: Uint8Array) => {
                 out[aOff] = a;
                 a = Math.max(0, a - 1);
 
-                const bx = 31 - x;
+                const bx = 33 - x;
                 const bOff = bx * 34 * 34 + y * 34 + z;
                 b = Math.max(b, out[bOff]);
                 out[bOff] = b;
@@ -705,7 +707,7 @@ const lightBlurY = (out: Uint8Array) => {
                 out[aOff] = a;
                 a = Math.max(0, a - 1);
 
-                const by = 31 - y;
+                const by = 33 - y;
                 const bOff = x * 34 * 34 + by * 34 + z;
                 b = Math.max(b, out[bOff]);
                 out[bOff] = b;
@@ -726,7 +728,7 @@ const lightBlurZ = (out: Uint8Array) => {
                 out[aOff] = a;
                 a = Math.max(0, a - 1);
 
-                const bz = 31 - z;
+                const bz = 33 - z;
                 const bOff = x * 34 * 34 + y * 34 + bz;
                 b = Math.max(b, out[bOff]);
                 out[bOff] = b;
@@ -737,7 +739,7 @@ const lightBlurZ = (out: Uint8Array) => {
 };
 
 const ambientOcclusion = (out: Uint8Array, blocks: Uint8Array) => {
-    const end = 34 * 34 * 34 + 34 * 34 + 34;
+    const end = 34 * 34 * 34;
     for (let off = 0; off < end; off++) {
         // Here we divide the light value by 2 when the position is occupied by a block
         // Written this way so it's branchless and easier to optimize/vectorize
@@ -748,14 +750,10 @@ const ambientOcclusion = (out: Uint8Array, blocks: Uint8Array) => {
 };
 
 const finishLight = (light: Uint8Array, block: Uint8Array) => {
-    const start = performance.now();
     lightBlurX(light);
     lightBlurY(light);
     lightBlurZ(light);
     ambientOcclusion(light, block);
-    const end = performance.now();
-    profiler.add('finishLight', start, end);
-    return light;
 };
 
 export const meshgenSimple = (blocks: Uint8Array): [Uint8Array, number] => {
