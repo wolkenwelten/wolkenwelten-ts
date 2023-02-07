@@ -14,8 +14,6 @@ import { coordinateToWorldKey } from '../world/world';
 
 import voxelBagFile from '../../assets/vox/bag.vox?url';
 import voxelFistFile from '../../assets/vox/fist.vox?url';
-import { clamp } from '../util/math';
-import { blocks } from '../world/blockType/blockType';
 import { ParticleMesh } from './meshes/particleMesh/particleMesh';
 
 export class RenderManager {
@@ -41,7 +39,7 @@ export class RenderManager {
     bagMesh: VoxelMesh;
     fistMesh: VoxelMesh;
     blockTypeMeshes: TriangleMesh[] = [];
-    cam?: Entity;
+    cam: Entity;
     world: WorldRenderer;
 
     generateBlockTypeMeshes() {
@@ -52,20 +50,21 @@ export class RenderManager {
             this.game.blockTextureUrl,
             '2D'
         );
-        for (let i = 0; i < blocks.length; i++) {
+        for (let i = 0; i < this.game.world.blocks.length; i++) {
             const mesh = new TriangleMesh(tex);
-            mesh.addBlockType(blocks[i]);
+            mesh.addBlockType(this.game.world.blocks[i]);
             mesh.finish();
             this.blockTypeMeshes[i] = mesh;
         }
     }
 
-    constructor(game: Game) {
+    constructor(game: Game, cam: Entity) {
         this.game = game;
+        this.cam = cam;
         this.canvas = document.createElement('canvas');
         this.canvas.classList.add('wolkenwelten-canvas');
         this.canvasWrapper = document.createElement('div');
-        game.rootElement.append(this.canvasWrapper);
+        game.ui.rootElement.append(this.canvasWrapper);
         this.canvasWrapper.append(this.canvas);
         const gl = this.canvas.getContext('webgl2');
         if (!gl) {
@@ -106,10 +105,6 @@ export class RenderManager {
     }
 
     drawScene() {
-        if (!this.cam) {
-            return;
-        }
-
         const projectionMatrix = mat4.create();
         mat4.perspective(
             projectionMatrix,

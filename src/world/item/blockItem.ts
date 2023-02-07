@@ -1,5 +1,4 @@
 import { TriangleMesh, VoxelMesh } from '../../render/meshes';
-import { blocks } from '../blockType/blockType';
 import { Character } from '../entity/character';
 import { Entity } from '../entity/entity';
 import { ItemDrop } from '../entity/itemDrop';
@@ -11,19 +10,19 @@ export class BlockItem extends Item {
     blockType: number;
     amount: number;
 
-    constructor(blockType: number, amount: number) {
-        const bt = blocks[blockType];
+    constructor(world: World, blockType: number, amount: number) {
+        const bt = world.blocks[blockType];
         if (!bt) {
             throw new Error(`Invalid blockType: ${blockType}`);
         }
-        super(bt.name);
+        super(world, bt.name);
 
         this.blockType = blockType;
         this.amount = amount;
     }
 
     clone(): BlockItem {
-        return new BlockItem(this.blockType, this.amount);
+        return new BlockItem(this.world, this.blockType, this.amount);
     }
 
     use(e: Entity): boolean {
@@ -35,7 +34,7 @@ export class BlockItem extends Item {
             return false;
         }
         const [x, y, z] = ray;
-        blocks[this.blockType].playPlaceSound(e.world);
+        this.world.blocks[this.blockType].playPlaceSound(e.world);
         e.world.setBlock(x, y, z, this.blockType);
         if (--this.amount <= 0) {
             this.destroy();
@@ -46,7 +45,7 @@ export class BlockItem extends Item {
     }
 
     icon(): string {
-        return blocks[this.blockType].icon;
+        return this.world.blocks[this.blockType].icon;
     }
 
     addToExistingStacks(inventory: Inventory) {
@@ -94,7 +93,7 @@ export class BlockItem extends Item {
             e.x - vx,
             e.y,
             e.z - vz,
-            new BlockItem(this.blockType, 1)
+            new BlockItem(this.world, this.blockType, 1)
         );
         drop.vy = 0.01;
         drop.vx = vx * -0.1;

@@ -19,6 +19,7 @@ export class PersistenceManager {
         this.game = game;
         setInterval(this.persist.bind(this), 60000);
         addEventListener('beforeunload', this.persist.bind(this));
+        this.tryToLoad();
     }
 
     persist() {

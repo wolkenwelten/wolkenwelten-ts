@@ -2,7 +2,6 @@ import { Entity } from './entity';
 import { World } from '../world';
 import { Item } from '../item/item';
 import { mat4, vec3 } from 'gl-matrix';
-import { off } from 'process';
 import { TriangleMesh, VoxelMesh } from '../../render/meshes';
 
 export class ItemDrop extends Entity {

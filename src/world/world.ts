@@ -1,9 +1,10 @@
 import { Game } from '../game';
 import { Entity } from './entity/entity';
 import { Chunk } from './chunk/chunk';
-import { blocks } from './blockType/blockType';
+import { BlockType } from './blockType/blockType';
 import { MiningManager } from './mining';
 import { WorldgenAssetManager } from './worldgen/assets';
+import { initDefaultBlocks } from './blockType/blockTypeDefaults';
 
 export const coordinateToWorldKey = (x: number, y: number, z: number) =>
     ((Math.floor(x) >> 5) & 0xffff) +
@@ -17,17 +18,22 @@ export class World {
     mining: MiningManager;
     game: Game;
     assets: WorldgenAssetManager;
+    blocks: BlockType[] = [];
 
     constructor(game: Game) {
         this.seed = 1234;
         this.game = game;
         this.mining = new MiningManager(this);
         this.assets = new WorldgenAssetManager();
+        initDefaultBlocks(this);
     }
 
-    blocks() {
-        return blocks;
-    }
+    addBlockType = (name: string): BlockType => {
+        const id = this.blocks.length;
+        const ret = new BlockType(id, name);
+        this.blocks[id] = ret;
+        return ret;
+    };
 
     setBlock(x: number, y: number, z: number, block: number) {
         this.getOrGenChunk(x, y, z)?.setBlock(x, y, z, block);
@@ -50,7 +56,7 @@ export class World {
         if (!b) {
             return false;
         }
-        const bt = blocks[b];
+        const bt = this.blocks[b];
         return !bt.liquid;
     }
 
@@ -59,7 +65,7 @@ export class World {
         if (!b) {
             return false;
         }
-        const bt = blocks[b];
+        const bt = this.blocks[b];
         return bt.liquid;
     }
 

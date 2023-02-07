@@ -1,19 +1,21 @@
 import { Game } from '../game';
-import { blocks, BlockType } from '../world/blockType/blockType';
+import { UIManager } from './ui';
+import { BlockType } from '../world/blockType/blockType';
 
 export class IconManager {
-    game: Game;
+    ui: UIManager;
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
 
-    constructor(game: Game) {
-        this.game = game;
+    constructor(ui: UIManager) {
+        this.ui = ui;
         this.canvas = document.createElement('canvas');
         const ctx = this.canvas.getContext('2d');
         if (!ctx) {
             throw new Error("Couldn't create 2D context for building icons");
         }
         this.ctx = ctx;
+        this.buildAllBlockTypeIcons();
     }
 
     buildBlockTypeIcon(bimg: HTMLImageElement, bt: BlockType) {
@@ -50,11 +52,12 @@ export class IconManager {
         img.onload = () => {
             this.canvas.width = 64;
             this.canvas.height = 64;
+            const blocks = this.ui.game.world.blocks;
             for (let i = 0; i < blocks.length; i++) {
                 that.buildBlockTypeIcon(img, blocks[i]);
             }
-            that.game.player.inventory.updateAll();
+            that.ui.game.player.inventory.updateAll();
         };
-        img.src = this.game.blockTextureUrl;
+        img.src = this.ui.game.blockTextureUrl;
     }
 }

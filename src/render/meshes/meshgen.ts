@@ -1,10 +1,7 @@
 import { Chunk } from '../../world/chunk/chunk';
 import profiler from '../../profiler';
 import { clamp } from '../../util/math';
-import {
-    blocks as worldBlocks,
-    BlockType,
-} from '../../world/blockType/blockType';
+import { BlockType } from '../../world/blockType/blockType';
 import { lightGenSimple } from '../../world/chunk/lightGen';
 
 const createIdentityBlocks = () => {
@@ -758,6 +755,7 @@ const finishLight = (light: Uint8Array, block: Uint8Array) => {
     ambientOcclusion(light, block);
     const end = performance.now();
     profiler.add('finishLight', start, end);
+    return light;
 };
 
 export const meshgenSimple = (blocks: Uint8Array): [Uint8Array, number] => {
@@ -817,7 +815,7 @@ export const meshgenComplex = (chunk: Chunk): [Uint8Array, number[]] => {
             }
         }
     }
-    calcSideCache(sideCache, blockData, worldBlocks);
+    calcSideCache(sideCache, blockData, chunk.world.blocks);
     finishLight(lightData, blockData);
 
     const sideSquareCount = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -825,7 +823,7 @@ export const meshgenComplex = (chunk: Chunk): [Uint8Array, number[]] => {
         blockData,
         lightData,
         sideCache,
-        blocks: worldBlocks,
+        blocks: chunk.world.blocks,
         seeThrough: false,
     };
 

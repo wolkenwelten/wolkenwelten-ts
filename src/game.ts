@@ -6,43 +6,33 @@ import { PersistenceManager } from './persistence';
 import { ProfilingManager } from './profiler';
 import { UIManager } from './ui/ui';
 import { World } from './world/world';
-import { initDefaultBlocks } from './world/blockType/blockTypeDefaults';
-import { IconManager } from './util/icon';
-import { LCG } from './util/prng';
 
 export interface GameConfig {
     parent: HTMLElement;
 }
 
 export class Game {
-    rootElement: HTMLElement;
     config: GameConfig;
-
-    audio: AudioManager;
-    input: InputManager;
-    icon: IconManager;
-    render: RenderManager;
-    ui: UIManager;
-    player: Character;
     persistence: PersistenceManager;
     profiler: ProfilingManager;
     world: World;
 
-    rng = new LCG(1234);
+    audio: AudioManager;
+    input: InputManager;
+    render: RenderManager;
+    ui: UIManager;
+    player: Character;
+
     ticks = 1;
     startTime = +Date.now();
     ready = false;
+
     blockTextureUrl = '';
 
     constructor(config: GameConfig) {
         this.config = config;
-        this.rootElement = config.parent;
         this.profiler = ProfilingManager.profiler();
-        this.audio = new AudioManager(this);
         this.world = new World(this);
-        initDefaultBlocks(this);
-        this.icon = new IconManager(this);
-        this.icon.buildAllBlockTypeIcons();
         this.player = new Character(
             this.world,
             2,
@@ -53,13 +43,12 @@ export class Game {
         );
         this.world.addEntity(this.player);
         this.persistence = new PersistenceManager(this);
-        this.persistence.tryToLoad();
 
-        this.render = new RenderManager(this);
-        this.render.cam = this.player;
+        this.audio = new AudioManager(this);
         this.ui = new UIManager(this);
+        this.render = new RenderManager(this, this.player);
         this.input = new InputManager(this);
-        setInterval(this.input.update.bind(this.input), 1000 / 240);
+
         setInterval(this.gc.bind(this), 20000);
         setTimeout(this.init.bind(this), 0);
     }

@@ -1,7 +1,6 @@
 import { Entity } from './entity';
 import { Inventory } from '../item/inventory';
 import { World } from '../world';
-import { blocks } from '../blockType/blockType';
 import { mat4 } from 'gl-matrix';
 import { BlockItem } from '../item/blockItem';
 import { TriangleMesh, VoxelMesh } from '../../render/meshes';
@@ -49,10 +48,10 @@ export class Character extends Entity {
         this.pitch = pitch;
         this.noClip = noClip;
         this.inventory = new Inventory(10);
-        this.inventory.add(new BlockItem(9, 10));
-        this.inventory.add(new BlockItem(2, 90));
-        this.inventory.add(new BlockItem(3, 90));
-        this.inventory.add(new BlockItem(1, 10));
+        this.inventory.add(new BlockItem(world, 9, 10));
+        this.inventory.add(new BlockItem(world, 2, 90));
+        this.inventory.add(new BlockItem(world, 3, 90));
+        this.inventory.add(new BlockItem(world, 1, 10));
         this.inventory.select(0);
     }
 
@@ -262,7 +261,7 @@ export class Character extends Entity {
 
         if (this.world.game.render.frames > this.hitAnimation + 100) {
             this.hitAnimation = this.world.game.render.frames;
-            blocks[minedBlock].playMineSound(this.world);
+            this.world.blocks[minedBlock].playMineSound(this.world);
         }
     }
 

@@ -1,5 +1,5 @@
 import { mat4, vec3 } from 'gl-matrix';
-import { BlockMesh, TriangleMesh, VoxelMesh } from '../../render/meshes';
+import { TriangleMesh, VoxelMesh } from '../../render/meshes';
 import { World } from '../world';
 
 let entityCounter = 0;

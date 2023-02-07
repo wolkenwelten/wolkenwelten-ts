@@ -4,14 +4,6 @@ import { World } from '../world';
 import { Item, MaybeItem } from '../item/item';
 import { abgrToRgba } from '../../util/math';
 
-export const blocks: BlockType[] = [];
-export const addBlockType = (name: string): BlockType => {
-    const id = blocks.length;
-    const ret = new BlockType(id, name);
-    blocks[id] = ret;
-    return ret;
-};
-
 export type MiningCat = 'Pickaxe' | 'Shovel' | 'Axe';
 export type BlockTypeItemDropHandler = (
     world: World,
@@ -144,7 +136,7 @@ export class BlockType {
             x + 0.5,
             y + 0.4,
             z + 0.5,
-            new BlockItem(this.id, 1)
+            new BlockItem(world, this.id, 1)
         );
     }
 

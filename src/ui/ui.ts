@@ -3,28 +3,24 @@ import { Item, MaybeItem } from '../world/item/item';
 import { FpsCounter } from './components/fpsCounter';
 import { Crosshair } from './components/crosshair';
 import { InventoryBar } from './components/item/inventoryBar';
+import { IconManager } from './icon';
 
 export class UIManager {
     game: Game;
-    uiRoot: HTMLElement;
-    fps = 0;
-    inventory: MaybeItem[] = [];
+    rootElement: HTMLElement;
+    uiWrapper: HTMLElement;
+    icon: IconManager;
 
     constructor(game: Game) {
         this.game = game;
-        this.uiRoot = document.createElement('div');
-        this.uiRoot.id = 'wolkenwelten-ui-root';
-        game.rootElement.append(this.uiRoot);
-        new FpsCounter(this.uiRoot, game);
-        new Crosshair(this.uiRoot);
-        new InventoryBar(this.uiRoot, game.player.inventory);
-    }
+        this.rootElement = game.config.parent;
 
-    updateFPS(fps: number) {
-        this.fps = fps;
-    }
-
-    updateInventory() {
-        this.inventory = this.game.player.inventory.items;
+        this.uiWrapper = document.createElement('div');
+        this.uiWrapper.id = 'wolkenwelten-ui-root';
+        this.rootElement.append(this.uiWrapper);
+        this.icon = new IconManager(this);
+        new FpsCounter(this.uiWrapper, game);
+        new Crosshair(this.uiWrapper);
+        new InventoryBar(this.uiWrapper, game.player.inventory);
     }
 }

@@ -8,14 +8,16 @@ export type MaybeItem = Item | undefined;
 
 export class Item {
     name: string;
+    world: World;
     destroyed = false;
 
-    constructor(name: string) {
+    constructor(world: World, name: string) {
         this.name = name;
+        this.world = world;
     }
 
     clone(): Item {
-        return new Item(this.name);
+        return new Item(this.world, this.name);
     }
 
     destroy() {

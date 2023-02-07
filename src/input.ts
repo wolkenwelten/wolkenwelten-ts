@@ -9,6 +9,7 @@ export class InputManager {
     constructor(game: Game) {
         this.game = game;
         const that = this;
+        setInterval(this.update.bind(this), 1000 / 240);
         window.addEventListener('keydown', (e) => that.keyStates.add(e.code));
         window.addEventListener('keyup', (e) => {
             that.keyStates.delete(e.code);
@@ -37,22 +38,22 @@ export class InputManager {
             async (e) => {
                 if (!document.fullscreenElement) {
                     that.game.player.cooldown(15);
-                    await that.game.rootElement.requestFullscreen();
+                    await that.game.ui.rootElement.requestFullscreen();
                 }
                 if (!document.pointerLockElement) {
                     that.game.player.cooldown(15);
-                    await that.game.rootElement.requestPointerLock();
+                    await that.game.ui.rootElement.requestPointerLock();
                 }
             },
             false
         );
-        that.game.rootElement.addEventListener('mousedown', (e) =>
+        that.game.ui.rootElement.addEventListener('mousedown', (e) =>
             that.mouseStates.add(e.button)
         );
-        that.game.rootElement.addEventListener('mouseup', (e) =>
+        that.game.ui.rootElement.addEventListener('mouseup', (e) =>
             that.mouseStates.delete(e.button)
         );
-        that.game.rootElement.addEventListener('wheel', (e) => {
+        that.game.ui.rootElement.addEventListener('wheel', (e) => {
             const newSelection =
                 (that.game.player.inventory.selection +
                     (e.deltaY > 0 ? 1 : -1)) %
@@ -63,7 +64,7 @@ export class InputManager {
                     : that.game.player.inventory.items.length - newSelection - 2
             );
         });
-        that.game.rootElement.addEventListener(
+        that.game.ui.rootElement.addEventListener(
             'mousemove',
             (e) => {
                 if (document.pointerLockElement) {

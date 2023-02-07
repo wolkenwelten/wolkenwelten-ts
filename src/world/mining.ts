@@ -1,6 +1,5 @@
 import { RenderManager } from '../render/render';
 import { clamp } from '../util/math';
-import { blocks } from './blockType/blockType';
 import { MaybeItem } from './item/item';
 import { World } from './world';
 
@@ -30,7 +29,7 @@ export class MiningManager {
         block: number,
         damageDealt: number
     ): boolean {
-        const bt = blocks[block];
+        const bt = this.world.blocks[block];
         for (const m of this.minings) {
             if (m.x !== x) {
                 continue;
@@ -69,7 +68,7 @@ export class MiningManager {
         }
         const ret = this.doMine(x, y, z, block, tool?.miningDamage(block) || 1);
         if (ret) {
-            const bt = blocks[block];
+            const bt = this.world.blocks[block];
             this.world.setBlock(x, y, z, 0);
             this.world.game.render.particle.fxBlockBreak(x, y, z, bt);
             bt.spawnMiningDrops(this.world, x, y, z, tool);
@@ -91,7 +90,7 @@ export class MiningManager {
         for (let i = this.minings.length - 1; i >= 0; i--) {
             const m = this.minings[i];
             m.damageDealt -= m.v;
-            const bt = blocks[m.block];
+            const bt = this.world.blocks[m.block];
             m.progress = clamp(m.damageDealt / bt.health, 0, 1);
             m.v++;
             if (m.damageDealt < 0) {
@@ -102,7 +101,7 @@ export class MiningManager {
         if ((++this.ticks & 7) == 0) {
             for (let i = this.minings.length - 1; i >= 0; i--) {
                 const m = this.minings[i];
-                const bt = blocks[m.block];
+                const bt = this.world.blocks[m.block];
                 this.world.game.render.particle.fxBlockMine(m.x, m.y, m.z, bt);
             }
         }
