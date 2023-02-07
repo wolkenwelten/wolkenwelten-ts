@@ -22,6 +22,10 @@ export class BlockItem extends Item {
         this.amount = amount;
     }
 
+    clone(): BlockItem {
+        return new BlockItem(this.blockType, this.amount);
+    }
+
     use(e: Entity): boolean {
         if (this.destroyed) {
             return false;
@@ -31,6 +35,7 @@ export class BlockItem extends Item {
             return false;
         }
         const [x, y, z] = ray;
+        blocks[this.blockType].playPlaceSound(e.world);
         e.world.setBlock(x, y, z, this.blockType);
         if (--this.amount <= 0) {
             this.destroy();

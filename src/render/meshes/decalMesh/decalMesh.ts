@@ -250,7 +250,7 @@ export class DecalMesh {
         DecalMesh.texture.bind(3);
         gl.enable(gl.POLYGON_OFFSET_FILL);
         gl.depthMask(false);
-        gl.polygonOffset(-1, -1);
+        gl.polygonOffset(-2, -2);
 
         gl.drawArrays(gl.TRIANGLES, 0, this.elementCount);
         gl.disable(gl.POLYGON_OFFSET_FILL);

@@ -1,4 +1,5 @@
 import { Character } from './world/entity/character';
+import { AudioManager } from './audio';
 import { InputManager } from './input';
 import { RenderManager } from './render/render';
 import { PersistenceManager } from './persistence';
@@ -16,6 +17,8 @@ export interface GameConfig {
 export class Game {
     rootElement: HTMLElement;
     config: GameConfig;
+
+    audio: AudioManager;
     input: InputManager;
     icon: IconManager;
     render: RenderManager;
@@ -24,6 +27,7 @@ export class Game {
     persistence: PersistenceManager;
     profiler: ProfilingManager;
     world: World;
+
     rng = new LCG(1234);
     ticks = 1;
     startTime = +Date.now();
@@ -34,6 +38,7 @@ export class Game {
         this.config = config;
         this.rootElement = config.parent;
         this.profiler = ProfilingManager.profiler();
+        this.audio = new AudioManager(this);
         this.world = new World(this);
         initDefaultBlocks(this);
         this.icon = new IconManager(this);

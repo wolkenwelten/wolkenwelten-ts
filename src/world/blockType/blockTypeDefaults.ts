@@ -1,6 +1,7 @@
 import { addBlockType, blocks } from './blockType';
 import blockTextureUrl from '../../../assets/gfx/blocks.png';
 import { Game } from '../../game';
+import { BlockItem } from '../item/blockItem';
 
 export const initDefaultBlocks = (game: Game) => {
     blocks.length = 0;
@@ -19,6 +20,7 @@ export const initDefaultBlocks = (game: Game) => {
         .withTextureBottom(1)
         .withColours(0x003807ff, 0x412800ff)
         .withMiningCat('Shovel')
+        .withSimpleHandler(new BlockItem(1, 1))
         .withBlockHealth(250);
 
     addBlockType('Stone')
@@ -42,6 +44,7 @@ export const initDefaultBlocks = (game: Game) => {
     addBlockType('Spruce leaves')
         .withTexture(5)
         .withColours(0x122c01ff, 0x0f2501ff)
+        .withItemDropHandler(() => {})
         .withBlockHealth(100);
 
     addBlockType('Dry grass')
@@ -50,12 +53,14 @@ export const initDefaultBlocks = (game: Game) => {
         .withTextureBottom(1)
         .withColours(0x4b6411ff, 0x4f230aff)
         .withMiningCat('Shovel')
+        .withSimpleHandler(new BlockItem(1, 1))
         .withBlockHealth(200);
 
     addBlockType('Roots')
         .withTexture(7)
         .withColours(0x3e3214ff, 0x29200dff)
         .withMiningCat('Shovel')
+        .withSimpleHandler(new BlockItem(1, 1))
         .withBlockHealth(5000);
 
     addBlockType('Obsidian')
@@ -73,6 +78,7 @@ export const initDefaultBlocks = (game: Game) => {
     addBlockType('Oak leaves')
         .withTexture(10)
         .withColours(0x274200ff, 0x183300ff)
+        .withItemDropHandler(() => {})
         .withBlockHealth(100);
 
     addBlockType('Iron ore (hematite)')
@@ -104,6 +110,7 @@ export const initDefaultBlocks = (game: Game) => {
     addBlockType('Acacia leaves')
         .withTexture(15)
         .withColours(0x023000ff, 0x326f1cff)
+        .withItemDropHandler(() => {})
         .withBlockHealth(100);
 
     addBlockType('Boards')
@@ -121,6 +128,7 @@ export const initDefaultBlocks = (game: Game) => {
     addBlockType('Sakura leaves')
         .withTexture(19)
         .withColours(0xe87c99ff, 0xb5254dff)
+        .withItemDropHandler(() => {})
         .withBlockHealth(100);
 
     addBlockType('Birch log')
@@ -132,11 +140,13 @@ export const initDefaultBlocks = (game: Game) => {
     addBlockType('Flower bush')
         .withTexture(21)
         .withColours(0x274200ff, 0x183300ff)
+        .withItemDropHandler(() => {})
         .withBlockHealth(100);
 
     addBlockType('Date bush')
         .withTexture(23)
         .withColours(0x4f3300ff, 0x948312ff)
+        .withItemDropHandler(() => {})
         .withBlockHealth(100);
 
     addBlockType('Sand')
@@ -149,5 +159,6 @@ export const initDefaultBlocks = (game: Game) => {
         .withColours(0x0036d4ff, 0x0000bdff)
         .withLiquid()
         .withSeeThrough()
+        .withItemDropHandler(() => {})
         .withBlockHealth(140);
 };

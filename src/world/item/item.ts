@@ -14,6 +14,10 @@ export class Item {
         this.name = name;
     }
 
+    clone(): Item {
+        return new Item(this.name);
+    }
+
     destroy() {
         this.destroyed = true;
     }

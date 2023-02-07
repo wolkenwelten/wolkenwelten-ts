@@ -19,6 +19,7 @@ export class Character extends Entity {
     lastAction = 0;
     hitAnimation = -1;
     walkCycleCounter = 0;
+    nextStepSound = 0;
 
     jumpAnimeFactor = 0;
     inertiaX = 0;
@@ -140,6 +141,10 @@ export class Character extends Entity {
             this.movementX * this.movementX + this.movementZ * this.movementZ
         );
         this.walkCycleCounter += Math.min(0.2, movementLength);
+        if (this.walkCycleCounter > this.nextStepSound && this.mayJump()) {
+            this.nextStepSound = this.walkCycleCounter + 6;
+            this.world.game.audio.play('step', 0.5);
+        }
         let accel =
             movementLength > 0.01
                 ? CHARACTER_ACCELERATION
@@ -182,6 +187,12 @@ export class Character extends Entity {
         }
 
         if (this.world.isSolid(this.x, this.y - 1.7, this.z)) {
+            if (this.vy < -0.1) {
+                this.world.game.audio.play(
+                    'stomp',
+                    Math.min(1, Math.abs(this.vy) * 2)
+                );
+            }
             this.vy = Math.max(this.vy, 0);
         }
         if (this.world.isSolid(this.x, this.y + 0.7, this.z)) {
@@ -251,6 +262,7 @@ export class Character extends Entity {
 
         if (this.world.game.render.frames > this.hitAnimation + 100) {
             this.hitAnimation = this.world.game.render.frames;
+            blocks[minedBlock].playMineSound(this.world);
         }
     }
 

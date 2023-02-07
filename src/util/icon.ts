@@ -17,15 +17,16 @@ export class IconManager {
     }
 
     buildBlockTypeIcon(bimg: HTMLImageElement, bt: BlockType) {
-        this.canvas.width = 64;
-        this.canvas.height = 64;
         const ctx = this.ctx;
+
         ctx.fillStyle = '#ff4020';
         ctx.imageSmoothingEnabled = false;
+        ctx.resetTransform();
         ctx.clearRect(0, 0, 64, 64);
         ctx.translate(32, 0);
         ctx.transform(0.75, 0, 0, 0.375, 0, 0);
         ctx.rotate(Math.PI / 4);
+        ctx.filter = 'brightness(100%)';
         ctx.drawImage(bimg, 0, bt.texTop * 64, 32, 32, 0, 0, 64, 64);
 
         ctx.resetTransform();
@@ -47,6 +48,8 @@ export class IconManager {
         const that = this;
         const img = new Image();
         img.onload = () => {
+            this.canvas.width = 64;
+            this.canvas.height = 64;
             for (let i = 0; i < blocks.length; i++) {
                 that.buildBlockTypeIcon(img, blocks[i]);
             }

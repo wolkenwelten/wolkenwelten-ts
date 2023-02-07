@@ -63,6 +63,7 @@ export class RenderManager {
     constructor(game: Game) {
         this.game = game;
         this.canvas = document.createElement('canvas');
+        this.canvas.classList.add('wolkenwelten-canvas');
         this.canvasWrapper = document.createElement('div');
         game.rootElement.append(this.canvasWrapper);
         this.canvasWrapper.append(this.canvas);

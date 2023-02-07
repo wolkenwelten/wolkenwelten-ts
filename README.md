@@ -41,6 +41,7 @@ Super early, pretty much nothing works whatsoever, so probably not that interest
 - [X] Simple shadows
 - [X] Proper Mining
 - [X] Simple particle effect system
+- [X] Simple SFX
 
 - [ ] Compile the Rust meshgen kernel to WASM and measure the performance difference
 - [ ] Port the meshgen kernel to AssemblyScript and compare against the Rust/TS versions
