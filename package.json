@@ -22,7 +22,7 @@
     },
     "dependencies": {
         "gl-matrix": "latest",
-        "howler": "^2.2.3",
-        "vox-reader": "^2.1.2"
+        "howler": "latest",
+        "vox-reader": "latest"
     }
 }
