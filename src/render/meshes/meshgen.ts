@@ -145,10 +145,6 @@ const addRight = (
     out.push(xw, y, z + d, tex, side | ((light >> 8) & 0xf0));
 };
 
-const blitChunkDataEnd = (off: number): [number, number] => [
-    clamp(off, 0, 34),
-    clamp(off + 32, 0, 34),
-];
 const blockBufferPosToOffset = (x: number, y: number, z: number): number =>
     x * 34 * 34 + y * 34 + z;
 
@@ -159,14 +155,17 @@ const blitChunkData = (
     offY: number,
     offZ: number
 ) => {
-    const [xStart, xEnd] = blitChunkDataEnd(offX);
-    const [yStart, yEnd] = blitChunkDataEnd(offY);
-    const [zStart, zEnd] = blitChunkDataEnd(offZ);
+    const xStart = clamp(offX, 0, 34);
+    const xEnd = clamp(offX + 32, 0, 34);
+    const yStart = clamp(offY, 0, 34);
+    const yEnd = clamp(offY + 32, 0, 34);
+    const zStart = clamp(offZ, 0, 34);
+    const zEnd = clamp(offZ + 32, 0, 34);
     for (let x = xStart; x < xEnd; x++) {
         const cx = x - offX;
         for (let y = yStart; y < yEnd; y++) {
             const cy = y - offY;
-            let blockOff = blockBufferPosToOffset(x, y, zStart);
+            let blockOff = x * 34 * 34 + y * 34 + zStart;
             const cz = zStart - offZ;
             let chunkOff = cz * 32 * 32 + cy * 32 + cx; // Transposing the X and Z axes shouldn't be necessary
             for (let z = zStart; z < zEnd; z++) {
@@ -184,7 +183,7 @@ const calcSides = (
     blockData: Uint8Array,
     blockSeeThrough: number[]
 ): number => {
-    const off = blockBufferPosToOffset(x, y, z);
+    const off = x * 34 * 34 + y * 34 + z;
 
     const cb = blockData[off];
     if (cb === 0) {
@@ -678,7 +677,6 @@ const genLeft = (vertices: number[], args: GenArgs) => {
  * readable, it does result in somewhat faster code (~12% speedup in my measurements on V8/Chrome)
  */
 const lightBlur = (out: Uint8Array) => {
-    //const t = [0,0,0,0,0,0];
     for (let x = 0; x < 34; x++) {
         for (let z = 0; z < 34; z++) {
             let a = 0;
@@ -688,38 +686,25 @@ const lightBlur = (out: Uint8Array) => {
             let e = 0;
             let f = 0;
             for (let y = 0; y < 34; y++) {
-                const aOff = y * 34 * 34 + x * 34 + z;
-                a = Math.max(a, out[aOff]);
-                out[aOff] = a;
-                a = Math.max(0, a - 1);
+                const back = 33 - y;
 
-                const bx = 33 - y;
-                const bOff = bx * 34 * 34 + x * 34 + z;
-                b = Math.max(b, out[bOff]);
-                out[bOff] = b;
-                b = Math.max(0, b - 1);
+                const aOff = y * 34 * 34 + x * 34 + z;
+                out[aOff] = a = Math.max(a - 1, out[aOff]);
+
+                const bOff = back * 34 * 34 + x * 34 + z;
+                out[bOff] = b = Math.max(b - 1, out[bOff]);
 
                 const cOff = x * 34 * 34 + y * 34 + z;
-                c = Math.max(c, out[cOff]);
-                out[cOff] = c;
-                c = Math.max(0, c - 1);
+                out[cOff] = c = Math.max(c - 1, out[cOff]);
 
-                const dy = 33 - y;
-                const dOff = x * 34 * 34 + dy * 34 + z;
-                d = Math.max(d, out[dOff]);
-                out[dOff] = d;
-                d = Math.max(0, d - 1);
+                const dOff = x * 34 * 34 + back * 34 + z;
+                out[dOff] = d = Math.max(d - 1, out[dOff]);
 
                 const eOff = x * 34 * 34 + z * 34 + y;
-                e = Math.max(e, out[eOff]);
-                out[eOff] = e;
-                e = Math.max(0, e - 1);
+                out[eOff] = e = Math.max(e - 1, out[eOff]);
 
-                const fz = 33 - y;
-                const fOff = x * 34 * 34 + z * 34 + fz;
-                f = Math.max(f, out[fOff]);
-                out[fOff] = f;
-                f = Math.max(0, f - 1);
+                const fOff = x * 34 * 34 + z * 34 + back;
+                out[fOff] = f = Math.max(f - 1, out[fOff]);
             }
         }
     }
@@ -731,7 +716,7 @@ const ambientOcclusion = (out: Uint8Array, blocks: Uint8Array) => {
         // Here we divide the light value by 2 when the position is occupied by a block
         // Written this way so it's branchless and easier to optimize/vectorize
         if (blocks[off]) {
-            out[off] = out[off] >> 1;
+            out[off] = out[off] / 2;
         }
     }
 };
@@ -760,6 +745,7 @@ export const meshgenSimple = (blocks: Uint8Array): [Uint8Array, number] => {
         blocks: identityBlocks,
         seeThrough: false,
     };
+    ambientOcclusion(lightData, blockData);
 
     let elementCount = genFront(vertices, data);
     elementCount += genBack(vertices, data);
