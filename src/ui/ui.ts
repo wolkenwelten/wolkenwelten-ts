@@ -1,5 +1,5 @@
 import { Game } from '../game';
-import { Item, MaybeItem } from '../world/item/item';
+import { HealthBar } from './components/health/healthBar';
 import { FpsCounter } from './components/fpsCounter';
 import { Crosshair } from './components/crosshair';
 import { InventoryBar } from './components/item/inventoryBar';
@@ -20,6 +20,7 @@ export class UIManager {
         this.rootElement.append(this.uiWrapper);
         this.icon = new IconManager(this);
         new FpsCounter(this.uiWrapper, game);
+        new HealthBar(this.uiWrapper, game);
         new Crosshair(this.uiWrapper);
         new InventoryBar(this.uiWrapper, game.player.inventory);
     }

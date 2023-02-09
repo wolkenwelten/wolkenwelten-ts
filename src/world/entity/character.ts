@@ -29,6 +29,10 @@ export class Character extends Entity {
     miningZ = 0;
     miningActive = false;
 
+    health = 12;
+    maxHealth = 12;
+    isDead = false;
+
     inventory: Inventory;
 
     constructor(
@@ -53,6 +57,57 @@ export class Character extends Entity {
         this.inventory.add(new BlockItem(world, 3, 90));
         this.inventory.add(new BlockItem(world, 1, 10));
         this.inventory.select(0);
+    }
+
+    damage(rawAmount: number) {
+        if (rawAmount < 0) {
+            throw new Error(
+                "Can't damage by a negative amount, use the heal method instead"
+            );
+        }
+        this.health = Math.max(0, this.health - rawAmount);
+        if (this.health <= 0) {
+            if (!this.isDead) {
+                const event = new CustomEvent('playerDead', {
+                    detail: {
+                        rawAmount,
+                    },
+                });
+                this.world.game.ui.rootElement.dispatchEvent(event);
+                // Dispatch death event
+            }
+            this.isDead = true;
+        } else {
+            if (this === this.world.game.player) {
+                const event = new CustomEvent('playerDamage', {
+                    detail: {
+                        rawAmount,
+                        health: this.health,
+                        maxHealth: this.maxHealth,
+                    },
+                });
+                this.world.game.ui.rootElement.dispatchEvent(event);
+            }
+        }
+    }
+
+    heal(rawAmount: number) {
+        if (rawAmount < 0) {
+            throw new Error(
+                "Can't heal by a negative amount, use the damage method instead"
+            );
+        }
+        this.health = Math.min(this.maxHealth, this.health + rawAmount);
+        if (this === this.world.game.player) {
+            const event = new CustomEvent('playerHeal', {
+                detail: {
+                    rawAmount,
+                    health: this.health,
+                    maxHealth: this.maxHealth,
+                },
+            });
+            this.world.game.ui.rootElement.dispatchEvent(event);
+        }
     }
 
     /* Walk/Run according to the direction of the Entity, ignores pitch */
@@ -86,10 +141,6 @@ export class Character extends Entity {
         this.pitch = clamp(this.pitch + pitch, -Math.PI / 2, Math.PI / 2);
     }
 
-    isDead(): boolean {
-        return false;
-    }
-
     isUnderwater(): boolean {
         return this.world.isLiquid(this.x, this.y, this.z);
     }
@@ -119,7 +170,7 @@ export class Character extends Entity {
     }
 
     update() {
-        if (this.isDead()) {
+        if (this.isDead) {
             return;
         }
 
@@ -186,12 +237,6 @@ export class Character extends Entity {
         }
 
         if (this.world.isSolid(this.x, this.y - 1.7, this.z)) {
-            if (this.vy < -0.1) {
-                this.world.game.audio.play(
-                    'stomp',
-                    Math.min(1, Math.abs(this.vy) * 2)
-                );
-            }
             this.vy = Math.max(this.vy, 0);
         }
         if (this.world.isSolid(this.x, this.y + 0.7, this.z)) {
@@ -209,19 +254,14 @@ export class Character extends Entity {
         const dy = this.vy - oldVy;
         const dz = this.vz - oldVz;
         const force = Math.sqrt(dx * dx + dy * dy + dz * dz);
-        if (force > 0.01) {
-            // Stomp
+        if (force > 0.2) {
+            this.world.game.audio.play('stomp', 0.5);
         }
-        if (force > 0.05) {
-            const amount = force * 14.0;
+        if (force > 0.1) {
+            const amount = Math.floor(force * 4);
             if (amount > 0) {
-                const damage = amount * amount;
-                //self.health.damage(damage);
+                this.damage(amount * amount);
             }
-        }
-
-        if (this.isDead()) {
-            //reactor.dispatch(Message::CharacterDeath { pos: self.pos });
         }
 
         const len = this.vx * this.vx + this.vz * this.vz + this.vy * this.vy;

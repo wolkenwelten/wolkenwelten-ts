@@ -24,7 +24,8 @@ const lightBlur = (out: Uint8Array) => {
             let d = 0;
             let e = 0;
             let f = 0;
-            for (let y = 0; y < 32; y++) {a
+            for (let y = 0; y < 32; y++) {
+                a;
                 const back = 31 - y;
 
                 const aOff = y * 32 * 32 + x * 32 + z;
