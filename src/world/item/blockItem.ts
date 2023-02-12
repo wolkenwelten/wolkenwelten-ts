@@ -36,6 +36,7 @@ export class BlockItem extends Item {
         const [x, y, z] = ray;
         this.world.blocks[this.blockType].playPlaceSound(e.world);
         e.world.setBlock(x, y, z, this.blockType);
+        this.world.dangerZone.add(x - 1, y - 1, z - 1, 3, 3, 3);
         if (--this.amount <= 0) {
             this.destroy();
         }

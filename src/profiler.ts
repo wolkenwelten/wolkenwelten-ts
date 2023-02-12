@@ -25,7 +25,7 @@ export class ProfilingManager {
     }
 
     showResults() {
-        console.log('Profile Data:');
+        const tmp: any = {};
         for (const prof of this.profiles.values()) {
             const average =
                 prof.results.reduceRight((a, b) => a + b, 0) /
@@ -34,10 +34,15 @@ export class ProfilingManager {
             const best = sorted[0];
             const median = sorted[Math.floor(sorted.length / 2)];
             const worst = sorted[sorted.length - 1];
-            console.log(
-                `${prof.id} -> Avg: ${average}ms, Best: ${best}ms, Med: ${median}ms, Worst: ${worst}ms, Count: ${sorted.length}`
-            );
+            tmp[prof.id] = {
+                Average: average,
+                Best: best,
+                Median: median,
+                Worst: worst,
+                Samples: sorted.length,
+            };
         }
+        console.table(tmp);
     }
 }
 const profiler = new ProfilingManager();
