@@ -1,4 +1,4 @@
-import { coordinateToWorldKey, World } from './world';
+import { World } from './world';
 
 export interface DangerZoneEntry {
     x: number;
@@ -10,8 +10,9 @@ export interface DangerZoneEntry {
     d: number;
 }
 
+// Terrible hack, there is probably a better solution using BigInt's or Tuples
 export const coordinateToKey = (x: number, y: number, z: number) =>
-    Math.floor(x) + Math.floor(y) * 0x100000 + Math.floor(z) * 0x100000000000;
+    Math.floor(x) * Math.floor(y) * 0x100000 * Math.floor(z) * 0x100000000000;
 
 export class DangerZone {
     world: World;
@@ -74,6 +75,7 @@ export class DangerZone {
                         const cy = y + entry.y;
                         const cz = z + entry.z;
                         const key = coordinateToKey(cx, cy, cz);
+
                         if (!this.blocksVisited.has(key)) {
                             this.blocksVisited.add(key);
                             this.visit(cx, cy, cz);

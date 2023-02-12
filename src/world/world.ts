@@ -31,10 +31,11 @@ export class World {
         initDefaultBlocks(this);
     }
 
-    addBlockType = (name: string): BlockType => {
+    addBlockType = (longName: string, name?: string): BlockType => {
         const id = this.blocks.length;
-        const ret = new BlockType(id, name);
+        const ret = new BlockType(id, longName, name);
         this.blocks[id] = ret;
+        this.game.blocks[name || longName] = id;
         return ret;
     };
 

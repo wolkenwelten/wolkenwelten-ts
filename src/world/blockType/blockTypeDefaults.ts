@@ -40,21 +40,21 @@ export const initDefaultBlocks = (world: World) => {
         .withBlockHealth(700);
 
     world
-        .addBlockType('Spruce log')
+        .addBlockType('Spruce log', 'SpruceLog')
         .withTexture(4)
         .withColours(0x251b05ff, 0x1d1607ff)
         .withMiningCat('Axe')
         .withBlockHealth(600);
 
     world
-        .addBlockType('Spruce leaves')
+        .addBlockType('Spruce leaves', 'SpruceLeaves')
         .withTexture(5)
         .withColours(0x122c01ff, 0x0f2501ff)
         .withItemDropHandler(() => {})
         .withBlockHealth(100);
 
     world
-        .addBlockType('Dry grass')
+        .addBlockType('Dry grass', 'DryGrass')
         .withTexture(22)
         .withTextureTop(6)
         .withTextureBottom(1)
@@ -79,35 +79,35 @@ export const initDefaultBlocks = (world: World) => {
         .withBlockHealth(1400);
 
     world
-        .addBlockType('Oak log')
+        .addBlockType('Oak log', 'OakLog')
         .withTexture(9)
         .withColours(0x3c2c08ff, 0x2e2408ff)
         .withMiningCat('Axe')
         .withBlockHealth(700);
 
     world
-        .addBlockType('Oak leaves')
+        .addBlockType('Oak leaves', 'OakLeaves')
         .withTexture(10)
         .withColours(0x274200ff, 0x183300ff)
         .withItemDropHandler(() => {})
         .withBlockHealth(100);
 
     world
-        .addBlockType('Iron ore (hematite)')
+        .addBlockType('Iron ore (hematite)', 'IronOre')
         .withTexture(11)
         .withColours(0x725b5bff, 0x5e5e5eff)
         .withMiningCat('Pickaxe')
         .withBlockHealth(10000);
 
     world
-        .addBlockType('Marble block')
+        .addBlockType('Marble block', 'MarbleBlock')
         .withTexture(12)
         .withColours(0xf0f0f0ff, 0xf0f0f0ff)
         .withMiningCat('Pickaxe')
         .withBlockHealth(1000);
 
     world
-        .addBlockType('Marble pillar')
+        .addBlockType('Marble pillar', 'MarblePillar')
         .withTexture(13)
         .withTextureTop(12)
         .withTextureBottom(12)
@@ -116,14 +116,14 @@ export const initDefaultBlocks = (world: World) => {
         .withBlockHealth(1000);
 
     world
-        .addBlockType('Marble blocks')
+        .addBlockType('Marble blocks', 'MarbleBlocks')
         .withTexture(14)
         .withColours(0xf0f0f0ff, 0xf0f0f0ff)
         .withMiningCat('Pickaxe')
         .withBlockHealth(1000);
 
     world
-        .addBlockType('Acacia leaves')
+        .addBlockType('Acacia leaves', 'AcaciaLeaves')
         .withTexture(15)
         .withColours(0x023000ff, 0x326f1cff)
         .withItemDropHandler(() => {})
@@ -144,28 +144,28 @@ export const initDefaultBlocks = (world: World) => {
         .withBlockHealth(2000);
 
     world
-        .addBlockType('Sakura leaves')
+        .addBlockType('Sakura leaves', 'SakuraLeaves')
         .withTexture(19)
         .withColours(0xe87c99ff, 0xb5254dff)
         .withItemDropHandler(() => {})
         .withBlockHealth(100);
 
     world
-        .addBlockType('Birch log')
+        .addBlockType('Birch log', 'BirchLog')
         .withTexture(20)
         .withColours(0x555252ff, 0xa5a2a2ff)
         .withMiningCat('Axe')
         .withBlockHealth(600);
 
     world
-        .addBlockType('Flower bush')
+        .addBlockType('Flower bush', 'FlowerBush')
         .withTexture(21)
         .withColours(0x274200ff, 0x183300ff)
         .withItemDropHandler(() => {})
         .withBlockHealth(100);
 
     world
-        .addBlockType('Date bush')
+        .addBlockType('Date bush', 'DateBush')
         .withTexture(23)
         .withColours(0x4f3300ff, 0x948312ff)
         .withItemDropHandler(() => {})
@@ -178,7 +178,7 @@ export const initDefaultBlocks = (world: World) => {
         .withBlockHealth(140);
 
     world
-        .addBlockType('Sea Water')
+        .addBlockType('Sea Water', 'SeaWater')
         .withTexture(25)
         .withColours(0x0036d4ff, 0x0000bdff)
         .withLiquid()

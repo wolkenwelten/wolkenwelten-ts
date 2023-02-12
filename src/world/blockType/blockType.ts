@@ -16,6 +16,7 @@ export type BlockTypeItemDropHandler = (
 export class BlockType {
     id: number;
     name: string;
+    longName: string;
 
     texTop = 0;
     texBottom = 0;
@@ -37,9 +38,10 @@ export class BlockType {
     placeSound = 'pock';
     mineSound = 'tock';
 
-    constructor(id: number, name: string) {
+    constructor(id: number, longName: string, name?: string) {
         this.id = id;
-        this.name = name;
+        this.name = name || longName;
+        this.longName = longName;
     }
 
     withTexture(tex: number) {

@@ -1,4 +1,5 @@
 import { Character } from './world/entity/character';
+import { AdditionManager } from './add';
 import { AudioManager } from './audio';
 import { InputManager } from './input';
 import { RenderManager } from './render/render';
@@ -11,7 +12,13 @@ export interface GameConfig {
     parent: HTMLElement;
 }
 
+export interface BlockTypeRegistry {
+    [key: string]: number;
+}
+
 export class Game {
+    add: AdditionManager;
+    blocks: BlockTypeRegistry = {};
     config: GameConfig;
     persistence: PersistenceManager;
     profiler: ProfilingManager;
@@ -32,6 +39,7 @@ export class Game {
     constructor(config: GameConfig) {
         this.config = config;
         this.profiler = ProfilingManager.profiler();
+        this.add = new AdditionManager(this);
         this.world = new World(this);
         this.player = new Character(
             this.world,
