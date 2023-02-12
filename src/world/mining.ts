@@ -71,6 +71,7 @@ export class MiningManager {
             const bt = this.world.blocks[block];
             this.world.setBlock(x, y, z, 0);
             this.world.game.render.particle.fxBlockBreak(x, y, z, bt);
+            this.world.dangerZone.add(x - 1, y - 1, z - 1, 3, 3, 3);
             bt.spawnMiningDrops(this.world, x, y, z, tool);
         }
         return ret;

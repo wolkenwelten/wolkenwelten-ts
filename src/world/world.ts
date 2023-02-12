@@ -1,4 +1,5 @@
 import { Game } from '../game';
+import { DangerZone } from './dangerZone';
 import { Entity } from './entity/entity';
 import { Chunk } from './chunk/chunk';
 import { BlockType } from './blockType/blockType';
@@ -13,6 +14,7 @@ export const coordinateToWorldKey = (x: number, y: number, z: number) =>
 
 export class World {
     chunks: Map<number, Chunk> = new Map();
+    dangerZone: DangerZone;
     entities: Set<Entity> = new Set();
     seed: number;
     mining: MiningManager;
@@ -25,6 +27,7 @@ export class World {
         this.game = game;
         this.mining = new MiningManager(this);
         this.assets = new WorldgenAssetManager();
+        this.dangerZone = new DangerZone(this);
         initDefaultBlocks(this);
     }
 
@@ -89,6 +92,7 @@ export class World {
             entity.update();
         }
         this.mining.update();
+        this.dangerZone.update();
     }
 
     addEntity(entity: Entity) {
