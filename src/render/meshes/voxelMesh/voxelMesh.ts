@@ -36,7 +36,7 @@ export class VoxelMesh {
 
     static colorLookup(c: number): number {
         const entry = this.colorPalette.get(c);
-        if (entry) {
+        if (entry !== undefined) {
             return entry;
         } else {
             const i = this.colorPalette.size + 1;
@@ -69,11 +69,12 @@ export class VoxelMesh {
             const oz = 32 / 2 - Math.floor(size.z / 2);
             tmpBlocks.fill(0);
             for (const { x, y, z, i } of voxData.xyzi.values) {
-                const off = (y + oy) * 32 * 32 + (x + ox) + (z + oz) * 32;
-                const c = voxData.rgba.values[i];
-                const cc = c.r | (c.g << 8) | (c.b << 16) | (c.a << 24);
-                tmpBlocks[off] = VoxelMesh.colorLookup(cc);
+                const off = (y + oy) * 32 * 32 + (z + oz) * 32 + (x + ox);
+                const c = voxData.rgba.values[i - 1];
+                const rgb = c.r | (c.g << 8) | (c.b << 16);
+                tmpBlocks[off] = VoxelMesh.colorLookup(rgb);
             }
+
             const [vertices, elementCount] = meshgenSimple(tmpBlocks);
             mesh.update(vertices, elementCount);
         }, 0);

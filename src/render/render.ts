@@ -1,19 +1,11 @@
 import { Game } from '../game';
 import { mat4, vec3 } from 'gl-matrix';
-import {
-    BlockMesh,
-    meshInit,
-    DecalMesh,
-    TriangleMesh,
-    VoxelMesh,
-} from './meshes';
+import { DecalMesh, MeshList } from './meshes';
 import { Entity } from '../world/entity/entity';
 import { WorldRenderer } from './worldRenderer';
 import { allTexturesLoaded, Texture } from './texture';
 import { coordinateToWorldKey } from '../world/world';
 
-import voxelBagFile from '../../assets/vox/bag.vox?url';
-import voxelFistFile from '../../assets/vox/fist.vox?url';
 import { ParticleMesh } from './meshes/particleMesh/particleMesh';
 
 export class RenderManager {
@@ -36,27 +28,9 @@ export class RenderManager {
 
     decals: DecalMesh;
     particle: ParticleMesh;
-    bagMesh: VoxelMesh;
-    fistMesh: VoxelMesh;
-    blockTypeMeshes: TriangleMesh[] = [];
+    meshes: MeshList;
     cam: Entity;
     world: WorldRenderer;
-
-    generateBlockTypeMeshes() {
-        this.blockTypeMeshes.length = 0;
-        const tex = new Texture(
-            this.gl,
-            'blocks2D',
-            this.game.blockTextureUrl,
-            '2D'
-        );
-        for (let i = 0; i < this.game.world.blocks.length; i++) {
-            const mesh = new TriangleMesh(tex);
-            mesh.addBlockType(this.game.world.blocks[i]);
-            mesh.finish();
-            this.blockTypeMeshes[i] = mesh;
-        }
-    }
 
     constructor(game: Game, cam: Entity) {
         this.game = game;
@@ -74,14 +48,11 @@ export class RenderManager {
         }
         this.gl = gl;
         this.initGLContext();
-        meshInit(game, gl);
+        this.meshes = new MeshList(game, gl);
 
         this.world = new WorldRenderer(this);
-        this.fistMesh = VoxelMesh.fromVoxFile(voxelFistFile);
-        this.bagMesh = VoxelMesh.fromVoxFile(voxelBagFile);
         this.decals = new DecalMesh(this);
         this.particle = new ParticleMesh(this);
-        this.generateBlockTypeMeshes();
 
         this.drawFrameClosure = this.drawFrame.bind(this);
         this.generateMeshClosue = this.generateMesh.bind(this);

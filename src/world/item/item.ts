@@ -43,7 +43,7 @@ export class Item {
     }
 
     mesh(world: World): TriangleMesh | VoxelMesh {
-        return world.game.render.bagMesh;
+        return world.game.render.meshes.bag;
     }
 
     addToExistingStacks(inventory: Inventory) {}

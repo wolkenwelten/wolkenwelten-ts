@@ -175,7 +175,7 @@ export class Texture {
         this.colors[off] = color & 0xff;
         this.colors[off + 1] = (color >> 8) & 0xff;
         this.colors[off + 2] = (color >> 16) & 0xff;
-        this.colors[off + 3] = (color >> 24) & 0xff;
+        this.colors[off + 3] = 0xff;
 
         this.dirtyLUT = true;
     }

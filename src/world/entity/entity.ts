@@ -64,9 +64,9 @@ export class Entity {
 
     collides() {
         return (
-            Boolean(this.world.getBlock(this.x, this.y + 0.3, this.z)) ||
-            Boolean(this.world.getBlock(this.x, this.y, this.z)) ||
-            Boolean(this.world.getBlock(this.x, this.y - 0.3, this.z))
+            this.world.isSolid(this.x, this.y + 0.3, this.z) ||
+            this.world.isSolid(this.x, this.y, this.z) ||
+            this.world.isSolid(this.x, this.y - 0.3, this.z)
         );
     }
 
@@ -130,7 +130,7 @@ export class Entity {
     }
 
     mesh(): TriangleMesh | VoxelMesh {
-        return this.world.game.render.bagMesh;
+        return this.world.game.render.meshes.bag;
     }
 
     draw(projectionMatrix: mat4, viewMatrix: mat4, cam: Entity) {
@@ -141,7 +141,7 @@ export class Entity {
         const modelViewMatrix = mat4.create();
         mat4.translate(modelViewMatrix, modelViewMatrix, [
             this.x,
-            this.y,
+            this.y - 1 / 64,
             this.z,
         ]);
 
@@ -150,8 +150,9 @@ export class Entity {
             modelViewMatrix,
             vec3.fromValues(1 / 32, 1 / 32, 1 / 32)
         );
+        mat4.rotateY(modelViewMatrix, modelViewMatrix, this.yaw);
         mat4.mul(modelViewMatrix, viewMatrix, modelViewMatrix);
         mat4.mul(modelViewMatrix, projectionMatrix, modelViewMatrix);
-        this.mesh().draw(projectionMatrix, 1.0);
+        this.mesh().draw(modelViewMatrix, 1.0);
     }
 }

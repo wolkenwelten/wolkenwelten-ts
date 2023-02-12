@@ -341,7 +341,7 @@ export class Character extends Entity {
     hudMesh(): VoxelMesh | TriangleMesh {
         const heldItem = this.inventory.active();
         if (!heldItem) {
-            return this.world.game.render.fistMesh;
+            return this.world.game.render.meshes.fist;
         } else {
             return heldItem.mesh(this.world);
         }

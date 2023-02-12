@@ -73,8 +73,8 @@ export class BlockItem extends Item {
 
     mesh(world: World): TriangleMesh | VoxelMesh {
         return (
-            world.game.render.blockTypeMeshes[this.blockType] ||
-            world.game.render.bagMesh
+            world.game.render.meshes.blockType[this.blockType] ||
+            world.game.render.meshes.bag
         );
     }
 
