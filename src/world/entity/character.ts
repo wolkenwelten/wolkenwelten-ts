@@ -258,7 +258,7 @@ export class Character extends Entity {
             this.world.game.audio.play('stomp', 0.5);
         }
         if (force > 0.1) {
-            const amount = Math.floor(force * 4);
+            const amount = Math.floor(force * 2);
             if (amount > 0) {
                 this.damage(amount * amount);
             }
