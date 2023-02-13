@@ -78,18 +78,22 @@ export class Chunk {
         block: number
     ) {
         for (let x = cx; x < cx + w; x++) {
+            const xOff = Math.floor(x) & 0x1f;
+            if (x < 0 || x >= 32) {
+                continue;
+            }
             for (let y = cy; y < cy + h; y++) {
+                const yOff = (Math.floor(y) & 0x1f) * 32;
+                if (y < 0 || y >= 32) {
+                    continue;
+                }
                 for (let z = cz; z < cz + d; z++) {
-                    if (x < 0 || x >= 32) {
-                        continue;
-                    }
-                    if (y < 0 || y >= 32) {
-                        continue;
-                    }
                     if (z < 0 || z >= 32) {
                         continue;
                     }
-                    this.blocks[coordinateToOffset(x, y, z)] = block;
+                    const zOff = (Math.floor(z) & 0x1f) * (32 * 32);
+                    const off = xOff | yOff | zOff;
+                    this.blocks[off] = block;
                 }
             }
         }

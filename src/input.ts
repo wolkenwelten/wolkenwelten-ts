@@ -144,10 +144,13 @@ export class InputManager {
                 if (gamepad.buttons[2]?.pressed) {
                     movement.y = -1;
                 }
-                if (gamepad.buttons[3]?.pressed) {
+                if (
+                    gamepad.buttons[4]?.pressed ||
+                    gamepad.buttons[5]?.pressed
+                ) {
                     movement.sneak = true;
                 }
-                if (gamepad.buttons[4]?.pressed) {
+                if (gamepad.buttons[14]?.pressed) {
                     const key = gamepad.index | (4 << 8);
                     const cooldown = this.buttonCooldown.get(key) || 0;
                     if (cooldown < this.game.ticks) {
@@ -161,13 +164,13 @@ export class InputManager {
                                       newSelection -
                                       2
                         );
-                        this.buttonCooldown.set(key, this.game.ticks + 5);
+                        this.buttonCooldown.set(key, this.game.ticks + 20);
                     }
                 } else {
                     const key = gamepad.index | (4 << 8);
                     this.buttonCooldown.delete(key);
                 }
-                if (gamepad.buttons[5]?.pressed) {
+                if (gamepad.buttons[15]?.pressed) {
                     const key = gamepad.index | (5 << 8);
                     const cooldown = this.buttonCooldown.get(key) || 0;
                     if (cooldown < this.game.ticks) {
@@ -181,7 +184,7 @@ export class InputManager {
                                       newSelection -
                                       2
                         );
-                        this.buttonCooldown.set(key, this.game.ticks + 5);
+                        this.buttonCooldown.set(key, this.game.ticks + 20);
                     }
                 } else {
                     const key = gamepad.index | (5 << 8);
