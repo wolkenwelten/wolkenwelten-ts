@@ -4,6 +4,7 @@ import { World } from '../world';
 import { mat4 } from 'gl-matrix';
 import { BlockItem } from '../item/blockItem';
 import { TriangleMesh, VoxelMesh } from '../../render/meshes';
+import { CrabMeatRaw } from '../item/food/crabMeatRaw';
 
 const CHARACTER_ACCELERATION = 0.04;
 const CHARACTER_STOP_RATE = CHARACTER_ACCELERATION * 3.0;
@@ -16,7 +17,7 @@ export class Character extends Entity {
     movementY = 0;
     movementZ = 0;
     lastAction = 0;
-    hitAnimation = -1;
+    hitAnimation = -100;
     walkCycleCounter = 0;
     nextStepSound = 0;
 
@@ -52,6 +53,7 @@ export class Character extends Entity {
         this.pitch = pitch;
         this.noClip = noClip;
         this.inventory = new Inventory(10);
+        this.inventory.add(new CrabMeatRaw(world));
         this.inventory.add(new BlockItem(world, 9, 10));
         this.inventory.add(new BlockItem(world, 2, 90));
         this.inventory.add(new BlockItem(world, 3, 90));
@@ -282,9 +284,6 @@ export class Character extends Entity {
     }
 
     dig() {
-        if (this.world.game.ticks < this.lastAction) {
-            return;
-        }
         const ray = this.raycast();
         if (!ray) {
             return;
@@ -298,10 +297,64 @@ export class Character extends Entity {
         this.miningX = x;
         this.miningY = y;
         this.miningZ = z;
+    }
 
-        if (this.world.game.render.frames > this.hitAnimation + 100) {
+    attack(radius = 2): boolean {
+        const [vx, vy, vz] = this.direction(0, 0, radius * -0.6);
+        const x = this.x + vx;
+        const y = this.y + vy;
+        const z = this.z + vz;
+        let hit = false;
+        const rr = radius * radius;
+        for (const e of this.world.entities) {
+            if (e === this) {
+                continue;
+            }
+            const dx = e.x - x;
+            const dy = e.y - y;
+            const dz = e.z - z;
+            const dd = dx * dx + dy * dy + dz * dz;
+            if (dd < rr) {
+                hit = true;
+                this.world.game.render.particle.fxStrike(e.x, e.y, e.z);
+                const dm = Math.max(Math.abs(dx), Math.abs(dz));
+                const ndx = dx / dm;
+                const ndz = dz / dm;
+                e.vx += ndx * 0.2;
+                e.vy += 0.06;
+                e.vz += ndz * 0.2;
+                e.damage(1);
+            }
+        }
+
+        return hit;
+    }
+
+    strike() {
+        if (this.world.game.ticks < this.lastAction) {
+            this.dig();
+            return;
+        }
+
+        if (this.world.game.render.frames > this.hitAnimation + 60) {
             this.hitAnimation = this.world.game.render.frames;
-            this.world.blocks[minedBlock].playMineSound(this.world);
+            const hit = this.attack();
+            if (hit) {
+                this.world.game.audio.play('punch');
+            } else {
+                this.world.game.audio.play('punchMiss');
+            }
+            if (this.miningActive) {
+                const minedBlock =
+                    this.world.getBlock(
+                        this.miningX,
+                        this.miningY,
+                        this.miningZ
+                    ) || 0;
+                this.world.blocks[minedBlock].playMineSound(this.world);
+            }
+        } else {
+            this.dig();
         }
     }
 

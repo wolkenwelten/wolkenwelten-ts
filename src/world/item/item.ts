@@ -4,6 +4,8 @@ import { ItemDrop } from '../entity/itemDrop';
 import { World } from '../world';
 import { Inventory } from './inventory';
 
+import itemIcon from '../../../assets/gfx/items/rawCrabMeat.png';
+
 export type MaybeItem = Item | undefined;
 
 export class Item {
@@ -22,6 +24,10 @@ export class Item {
 
     destroy() {
         this.destroyed = true;
+    }
+
+    icon(): string {
+        return itemIcon;
     }
 
     use(e: Entity): boolean {

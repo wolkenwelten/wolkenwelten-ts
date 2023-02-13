@@ -1,5 +1,5 @@
 import { BlockItem } from '../../../world/item/blockItem';
-import { MaybeItem } from '../../../world/item/item';
+import { Item, MaybeItem } from '../../../world/item/item';
 import styles from './inventorySlot.module.css';
 
 export class InventorySlot {
@@ -47,6 +47,15 @@ export class InventorySlot {
             } else {
                 this.amount.innerText = '';
             }
+            const icon = item.icon();
+            if (icon) {
+                this.img.setAttribute('src', icon);
+                this.img.style.display = 'block';
+            } else {
+                this.amount.innerText = '';
+                this.img.style.display = 'none';
+            }
+        } else if (item instanceof Item) {
             const icon = item.icon();
             if (icon) {
                 this.img.setAttribute('src', icon);

@@ -1,6 +1,7 @@
 import { VoxelMesh } from '../../../render/meshes';
 import { World } from '../../world';
 import { Mob } from './mob';
+import { CrabMeatRaw } from '../../item/food/crabMeatRaw';
 
 export type CrabState = 'idle' | 'walk' | 'turnLeft' | 'turnRight' | 'walkBack';
 
@@ -12,11 +13,24 @@ export class Crab extends Mob {
     gvx = 0;
     gvz = 0;
 
+    health = 4;
+    maxHealth = 4;
+
     constructor(world: World, x: number, y: number, z: number) {
         super(world, x, y, z);
         this.state = 'idle';
         this.ticksInState = this.id * 123;
         this.stateTransitions = this.id * 123;
+    }
+
+    onDeath() {
+        this.world.game.render.particle.fxDeath(this.x, this.y, this.z);
+        this.world.game.add.itemDrop(
+            this.x,
+            this.y,
+            this.z,
+            new CrabMeatRaw(this.world)
+        );
     }
 
     mesh(): VoxelMesh {
@@ -113,10 +127,6 @@ export class Crab extends Mob {
     }
 
     updatePhysics() {
-        const accel = 0.5;
-        this.vx = this.vx * (1.0 - accel) + this.gvx * 0.01 * accel;
-        this.vz = this.vz * (1.0 - accel) + this.gvz * 0.01 * accel;
-
         if (this.isSolidPillar(this.x - 0.4, this.y, this.z)) {
             this.vx = Math.max(0, this.vx);
         }
@@ -133,6 +143,9 @@ export class Crab extends Mob {
 
         if (this.isSolidPillar(this.x, this.y - 8 / 32, this.z)) {
             this.vy = Math.max(0, this.vy);
+            const accel = 0.5;
+            this.vx = this.vx * (1.0 - accel) + this.gvx * 0.01 * accel;
+            this.vz = this.vz * (1.0 - accel) + this.gvz * 0.01 * accel;
         }
         if (this.isSolidPillar(this.x, this.y + 0.2, this.z)) {
             this.vy = Math.min(0, this.vy);

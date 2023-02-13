@@ -75,7 +75,13 @@ export class RenderManager {
         this.gl.clearColor(0.09, 0.478, 1, 1);
     }
 
+    updateFOV() {
+        const shouldFOV = 60;
+        this.fov = this.fov * 0.95 + shouldFOV * 0.05;
+    }
+
     drawScene() {
+        this.updateFOV();
         const projectionMatrix = mat4.create();
         mat4.perspective(
             projectionMatrix,

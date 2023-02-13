@@ -82,7 +82,7 @@ export class InputManager {
 
     update() {
         const movement = { x: 0, y: 0, z: 0, sneak: false };
-        const actions = { dig: false, place: false };
+        const actions = { primary: false, secondary: false };
 
         if (this.keyStates.has('KeyQ')) {
             this.game.player.dropItem();
@@ -202,7 +202,7 @@ export class InputManager {
                         !gamepad.buttons[7].value ||
                         gamepad.buttons[7].value > 0.5
                     ) {
-                        actions.dig = true;
+                        actions.primary = true;
                     }
                 }
                 if (gamepad.buttons[6]?.pressed) {
@@ -210,7 +210,7 @@ export class InputManager {
                         !gamepad.buttons[6].value ||
                         gamepad.buttons[6].value > 0.5
                     ) {
-                        actions.place = true;
+                        actions.secondary = true;
                     }
                 }
                 //console.log(gamepad.buttons.map((b,i) => b.pressed ? `${i}: ${b.value}` : '').join(' '));
@@ -235,17 +235,17 @@ export class InputManager {
 
         this.game.player.miningActive = false;
         if (this.mouseStates.has(0)) {
-            actions.dig = true;
+            actions.primary = true;
         }
 
         if (this.mouseStates.has(2)) {
-            actions.place = true;
+            actions.secondary = true;
         }
 
-        if (actions.dig) {
-            this.game.player.dig();
+        if (actions.primary) {
+            this.game.player.strike();
         }
-        if (actions.place) {
+        if (actions.secondary) {
             this.game.player.useItem();
         }
     }

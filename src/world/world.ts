@@ -91,6 +91,9 @@ export class World {
     update() {
         for (const entity of this.entities) {
             entity.update();
+            if (entity.isDead) {
+                this.removeEntity(entity);
+            }
         }
         this.mining.update();
         this.dangerZone.update();

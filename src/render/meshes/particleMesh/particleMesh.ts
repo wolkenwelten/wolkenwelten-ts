@@ -128,6 +128,42 @@ export class ParticleMesh {
         }
     }
 
+    fxStrike(x: number, y: number, z: number) {
+        for (let i = 0; i < 32; i++) {
+            const cx = x + Math.random() * 0.5;
+            const cy = y + Math.random() * 0.5;
+            const cz = z + Math.random() * 0.5;
+            const cs = 256;
+            let cc = 0xff20c0e0;
+            cc |= (Math.random() * 32) | 0;
+            cc |= ((Math.random() * 16) | 0) << 8;
+            cc |= ((Math.random() * 16) | 0) << 16;
+            const vx = (Math.random() - 0.5) * 0.06;
+            const vy = Math.random() * 0.05;
+            const vz = (Math.random() - 0.5) * 0.06;
+            const vs = -15;
+            this.add(cx, cy, cz, cs, cc, vx, vy, vz, vs);
+        }
+    }
+
+    fxDeath(x: number, y: number, z: number) {
+        for (let i = 0; i < 96; i++) {
+            const cx = x + Math.random();
+            const cy = y + Math.random();
+            const cz = z + Math.random();
+            const cs = 256;
+            let cc = 0xff0020e0;
+            cc |= (Math.random() * 32) | 0;
+            cc |= ((Math.random() * 32) | 0) << 8;
+            cc |= ((Math.random() * 8) | 0) << 16;
+            const vx = (Math.random() - 0.5) * 0.1;
+            const vy = Math.random() * 0.08;
+            const vz = (Math.random() - 0.5) * 0.1;
+            const vs = -15;
+            this.add(cx, cy, cz, cs, cc, vx, vy, vz, vs);
+        }
+    }
+
     private update() {
         for (let i = this.particleCount - 1; i >= 0; i--) {
             const bufOff = i * 5;

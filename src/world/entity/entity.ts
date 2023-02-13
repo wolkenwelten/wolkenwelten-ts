@@ -21,6 +21,10 @@ export class Entity {
     noClip = false;
     world: World;
 
+    health = 12;
+    maxHealth = 12;
+    isDead = false;
+
     constructor(world: World) {
         this.id = ++entityCounter;
         this.world = world;
@@ -68,6 +72,23 @@ export class Entity {
             this.world.isSolid(this.x, this.y, this.z) ||
             this.world.isSolid(this.x, this.y - 0.3, this.z)
         );
+    }
+
+    onDeath() {}
+
+    damage(rawAmount: number) {
+        this.health = Math.min(
+            this.maxHealth,
+            Math.max(0, this.health - rawAmount)
+        );
+        if (this.health <= 0) {
+            this.isDead = true;
+            this.onDeath();
+        }
+    }
+
+    heal(rawAmount: number) {
+        return this.damage(-rawAmount);
     }
 
     update() {

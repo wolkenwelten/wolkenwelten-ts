@@ -1,20 +1,26 @@
 import { Game } from './game';
 import { Howl } from 'howler';
 
+import chompUrl from '../assets/sfx/chomp.ogg?url';
 import pockUrl from '../assets/sfx/pock.ogg?url';
 import tockUrl from '../assets/sfx/tock.ogg?url';
 import stepUrl from '../assets/sfx/step.ogg?url';
 import stompUrl from '../assets/sfx/stomp.ogg?url';
+import punchUrl from '../assets/sfx/punch.ogg?url';
+import punchMissUrl from '../assets/sfx/punchMiss.ogg?url';
 
 export class AudioManager {
     game: Game;
     assets: Map<string, string> = new Map();
 
     addDefaultAssets() {
+        this.add('chomp', chompUrl);
         this.add('pock', pockUrl);
         this.add('tock', tockUrl);
         this.add('step', stepUrl);
         this.add('stomp', stompUrl);
+        this.add('punch', punchUrl);
+        this.add('punchMiss', punchMissUrl);
     }
 
     constructor(game: Game) {
