@@ -5,6 +5,7 @@ import { mat4 } from 'gl-matrix';
 import { BlockItem } from '../item/blockItem';
 import { TriangleMesh, VoxelMesh } from '../../render/meshes';
 import { CrabMeatRaw } from '../item/food/crabMeatRaw';
+import { ItemDrop } from './itemDrop';
 
 const CHARACTER_ACCELERATION = 0.04;
 const CHARACTER_STOP_RATE = CHARACTER_ACCELERATION * 3.0;
@@ -307,7 +308,7 @@ export class Character extends Entity {
         let hit = false;
         const rr = radius * radius;
         for (const e of this.world.entities) {
-            if (e === this) {
+            if (e === this || e instanceof ItemDrop) {
                 continue;
             }
             const dx = e.x - x;

@@ -112,7 +112,7 @@ export class Crab extends Mob {
             case 'turnLeft':
                 this.yaw += 0.01;
                 break;
-            case 'turnLeft':
+            case 'turnRight':
                 this.yaw -= 0.01;
                 break;
         }

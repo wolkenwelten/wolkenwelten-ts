@@ -1,6 +1,6 @@
 # WolkenWelten - TS
 
-![Have a screenshot](https://github.com/wolkenwelten/wolkenwelten-screenshots/raw/main/2023-02-04.png)
+![Have a screenshot](https://github.com/wolkenwelten/wolkenwelten-screenshots/raw/main/2023-02-13.png)
 
 A Voxel engine for the Web that respects your freedom.
 

@@ -1,7 +1,27 @@
 import blockTextureUrl from '../../../assets/gfx/blocks.png';
+import { ItemDrop } from '../entity/itemDrop';
 
 import { BlockItem } from '../item/blockItem';
+import { MaybeItem } from '../item/item';
 import { World } from '../world';
+
+import { Branch } from '../item/material/branch';
+import { Stick } from '../item/material/stick';
+
+const leafDropHandler = (
+    world: World,
+    x: number,
+    y: number,
+    z: number,
+    tool: MaybeItem
+) => {
+    const t = world.game.ticks & 7;
+    if (t === 0) {
+        new ItemDrop(world, x + 0.5, y + 0.4, z + 0.5, new Branch(world));
+    } else if (t < 3) {
+        new ItemDrop(world, x + 0.5, y + 0.4, z + 0.5, new Stick(world));
+    }
+};
 
 export const initDefaultBlocks = (world: World) => {
     world.blocks.length = 0;
@@ -50,7 +70,7 @@ export const initDefaultBlocks = (world: World) => {
         .addBlockType('Spruce leaves', 'SpruceLeaves')
         .withTexture(5)
         .withColours(0x122c01ff, 0x0f2501ff)
-        .withItemDropHandler(() => {})
+        .withItemDropHandler(leafDropHandler)
         .withBlockHealth(100);
 
     world
@@ -89,7 +109,7 @@ export const initDefaultBlocks = (world: World) => {
         .addBlockType('Oak leaves', 'OakLeaves')
         .withTexture(10)
         .withColours(0x274200ff, 0x183300ff)
-        .withItemDropHandler(() => {})
+        .withItemDropHandler(leafDropHandler)
         .withBlockHealth(100);
 
     world
@@ -126,7 +146,7 @@ export const initDefaultBlocks = (world: World) => {
         .addBlockType('Acacia leaves', 'AcaciaLeaves')
         .withTexture(15)
         .withColours(0x023000ff, 0x326f1cff)
-        .withItemDropHandler(() => {})
+        .withItemDropHandler(leafDropHandler)
         .withBlockHealth(100);
 
     world
@@ -147,7 +167,7 @@ export const initDefaultBlocks = (world: World) => {
         .addBlockType('Sakura leaves', 'SakuraLeaves')
         .withTexture(19)
         .withColours(0xe87c99ff, 0xb5254dff)
-        .withItemDropHandler(() => {})
+        .withItemDropHandler(leafDropHandler)
         .withBlockHealth(100);
 
     world
@@ -161,14 +181,14 @@ export const initDefaultBlocks = (world: World) => {
         .addBlockType('Flower bush', 'FlowerBush')
         .withTexture(21)
         .withColours(0x274200ff, 0x183300ff)
-        .withItemDropHandler(() => {})
+        .withItemDropHandler(leafDropHandler)
         .withBlockHealth(100);
 
     world
         .addBlockType('Date bush', 'DateBush')
         .withTexture(23)
         .withColours(0x4f3300ff, 0x948312ff)
-        .withItemDropHandler(() => {})
+        .withItemDropHandler(leafDropHandler)
         .withBlockHealth(100);
 
     world

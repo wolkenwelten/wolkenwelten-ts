@@ -12,6 +12,8 @@ export { VoxelMesh } from './meshes/voxelMesh/voxelMesh';
 import { Texture } from './texture';
 
 import voxelBagFile from '../../assets/vox/bag.vox?url';
+import voxelBranchFile from '../../assets/vox/branch.vox?url';
+import voxelStickFile from '../../assets/vox/stick.vox?url';
 import voxelFistFile from '../../assets/vox/fist.vox?url';
 import voxelCrabMeatRawFile from '../../assets/vox/crabMeatRaw.vox?url';
 
@@ -30,9 +32,13 @@ export interface CrabMesh {
 
 export class MeshList {
     bag: VoxelMesh;
-    crab: CrabMesh;
+    branch: VoxelMesh;
     crabMeatRaw: VoxelMesh;
     fist: VoxelMesh;
+    stick: VoxelMesh;
+
+    crab: CrabMesh;
+
     blockType: TriangleMesh[] = [];
     gl: WebGL2RenderingContext;
     game: Game;
@@ -63,7 +69,9 @@ export class MeshList {
         VoxelMesh.init(gl);
 
         this.bag = VoxelMesh.fromVoxFile(voxelBagFile);
+        this.branch = VoxelMesh.fromVoxFile(voxelBranchFile);
         this.fist = VoxelMesh.fromVoxFile(voxelFistFile);
+        this.stick = VoxelMesh.fromVoxFile(voxelStickFile);
         this.crabMeatRaw = VoxelMesh.fromVoxFile(voxelCrabMeatRawFile);
         this.crab = {
             idle: [

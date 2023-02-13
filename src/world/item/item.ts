@@ -5,15 +5,18 @@ import { World } from '../world';
 import { Inventory } from './inventory';
 
 import itemIcon from '../../../assets/gfx/items/rawCrabMeat.png';
+let idCounter = 0;
 
 export type MaybeItem = Item | undefined;
 
 export class Item {
+    id: number;
     name: string;
     world: World;
     destroyed = false;
 
     constructor(world: World, name: string) {
+        this.id = ++idCounter;
         this.name = name;
         this.world = world;
     }

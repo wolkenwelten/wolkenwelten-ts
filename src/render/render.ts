@@ -123,7 +123,11 @@ export class RenderManager {
                 this.game.player.hitAnimation = -1;
             } else {
                 rt = t * Math.PI;
-                r = Math.PI * (0.1 - Math.sin(t * Math.PI) * 0.125);
+                const rMax =
+                    this.game.player.inventory.active() === undefined
+                        ? 0.125
+                        : 0.4;
+                r = Math.PI * (0.1 - Math.sin(t * Math.PI) * rMax);
             }
         }
         const player = this.game.player;
