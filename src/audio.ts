@@ -9,6 +9,7 @@ import stompUrl from '../assets/sfx/stomp.ogg?url';
 import unghUrl from '../assets/sfx/ungh.ogg?url';
 import punchUrl from '../assets/sfx/punch.ogg?url';
 import punchMissUrl from '../assets/sfx/punchMiss.ogg?url';
+import levelUpUrl from '../assets/sfx/levelUp.ogg?url';
 
 export class AudioManager {
     game: Game;
@@ -23,6 +24,7 @@ export class AudioManager {
         this.add('stomp', stompUrl);
         this.add('punch', punchUrl);
         this.add('punchMiss', punchMissUrl);
+        this.add('levelUp', levelUpUrl);
     }
 
     constructor(game: Game) {
@@ -32,6 +34,7 @@ export class AudioManager {
 
     add(name: string, url: string) {
         this.assets.set(name, url);
+        this.play(name, 0);
     }
 
     play(name: string, volume = 1) {

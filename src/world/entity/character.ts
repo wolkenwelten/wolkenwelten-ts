@@ -43,12 +43,17 @@ export class Character extends Entity {
     maxHealth = 12;
     isDead = false;
 
+    level = 0;
+    xp = 0;
+
     inventory: Inventory;
 
     init() {
         this.x = this.spawnX;
         this.y = this.spawnY;
         this.z = this.spawnZ;
+        this.xp = this.level = 0;
+        this.xp = 0;
         this.yaw = this.spawnYaw;
         this.pitch = this.spawnPitch;
         this.noClip = false;
@@ -336,6 +341,9 @@ export class Character extends Entity {
                 e.vz += ndz * 0.2;
                 e.damage(1);
                 e.onAttack(this);
+                if (e.isDead) {
+                    this.xpGain(1);
+                }
             }
         }
 
@@ -429,5 +437,46 @@ export class Character extends Entity {
         } else {
             return heldItem.mesh(this.world);
         }
+    }
+
+    xpForLevel(level: number): number {
+        return level * 10;
+    }
+
+    xpPercentageTillNextLevel(): number {
+        const base = this.xpForLevel(this.level);
+        const goal = this.xpForLevel(this.level + 1);
+        const relGoal = goal - base;
+        const relBase = this.xp - base;
+        const p = relBase / relGoal;
+        return p;
+    }
+
+    xpCheckLevelUp() {
+        if (this.xpPercentageTillNextLevel() >= 1) {
+            this.level++;
+            this.maxHealth += 4;
+            this.health = this.maxHealth;
+            this.world.game.ui.rootElement.dispatchEvent(
+                new CustomEvent('playerLevelUp')
+            );
+            const event = new CustomEvent('playerDamage', {
+                detail: {
+                    rawAmount: 0,
+                    health: this.health,
+                    maxHealth: this.maxHealth,
+                },
+            });
+            this.world.game.ui.rootElement.dispatchEvent(event);
+            this.world.game.audio.play('levelUp');
+        }
+    }
+
+    xpGain(amount = 1) {
+        this.xp += amount;
+        this.xpCheckLevelUp();
+        this.world.game.ui.rootElement.dispatchEvent(
+            new CustomEvent('playerXp')
+        );
     }
 }

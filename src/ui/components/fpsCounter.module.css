@@ -3,4 +3,5 @@
     right: 8px;
     top: 8px;
     font-family: 'Courier New', Courier, monospace;
+    text-shadow: -1px 0px 0px#000,1px 0px 0px#000,0px -1px 0px#000,0px 1px 0px#000;
 }

@@ -3,6 +3,7 @@ import { HealthBar } from './components/health/healthBar';
 import { FpsCounter } from './components/fpsCounter';
 import { Crosshair } from './components/crosshair';
 import { InventoryBar } from './components/item/inventoryBar';
+import { XpView } from './components/xpView';
 import { IconManager } from './icon';
 
 export class UIManager {
@@ -23,5 +24,6 @@ export class UIManager {
         new HealthBar(this.uiWrapper, game);
         new Crosshair(this.uiWrapper);
         new InventoryBar(this.uiWrapper, game.player.inventory);
+        new XpView(this.uiWrapper, game);
     }
 }
