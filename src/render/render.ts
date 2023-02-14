@@ -13,7 +13,7 @@ export class RenderManager {
     canvas: HTMLCanvasElement;
     canvasWrapper: HTMLElement;
     gl: WebGL2RenderingContext;
-    fov = 60;
+    fov = 90;
     renderDistance = 160.0;
     width = 640;
     height = 480;
@@ -77,7 +77,7 @@ export class RenderManager {
     }
 
     updateFOV() {
-        const shouldFOV = 60;
+        const shouldFOV = 90;
         this.fov = this.fov * 0.95 + shouldFOV * 0.05;
     }
 
@@ -139,7 +139,7 @@ export class RenderManager {
         mat4.translate(modelViewMatrix, modelViewMatrix, [
             1 - rl * 0.2 + viewBobH + player.inertiaX * 0.5,
             -0.5 + rl * 0.2 + viewBob + jumpOff,
-            -1 - rl * 0.25 + player.inertiaZ * 0.5,
+            -0.6 - rl * 0.25 + player.inertiaZ * 0.5,
         ]);
         mat4.scale(
             modelViewMatrix,
