@@ -14,7 +14,7 @@ export class Mob extends Entity {
         if (this.destroyed) {
             return;
         }
-        this.world.game.render.decals.addShadow(this.x, this.y, this.z, 1);
+
         const modelViewMatrix = mat4.create();
         mat4.translate(modelViewMatrix, modelViewMatrix, [
             this.x,
@@ -30,7 +30,15 @@ export class Mob extends Entity {
         mat4.rotateY(modelViewMatrix, modelViewMatrix, this.yaw);
         mat4.mul(modelViewMatrix, viewMatrix, modelViewMatrix);
         mat4.mul(modelViewMatrix, projectionMatrix, modelViewMatrix);
-        this.mesh().draw(modelViewMatrix, 1.0);
+        const dx = this.x - cam.x;
+        const dy = this.y - cam.y;
+        const dz = this.z - cam.z;
+        const d = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        const alpha = Math.min(1, Math.max(0, 160.0 - d) / 8);
+        this.mesh().draw(modelViewMatrix, alpha);
+        if (d < 160) {
+            this.world.game.render.decals.addShadow(this.x, this.y, this.z, 1);
+        }
     }
 
     update() {

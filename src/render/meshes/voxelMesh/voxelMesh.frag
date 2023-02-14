@@ -4,10 +4,7 @@ precision lowp sampler2D;
 
 uniform sampler2D cur_tex;
 uniform float alpha;
-const float fade_distance = 160.0;
-const float fade_start = fade_distance - 8.0;
 
-in vec3 view_position;
 flat in uint tex_coord;
 in float light_value;
 
@@ -22,6 +19,5 @@ void main() {
  */
 	vec3 light_color = vec3(light_value, light_value, light_value);
 	vec4 rgba = texture(cur_tex, vec2(float(tex_coord) * (1.0/256.0),0)).rgba;
-	vec4 color = vec4(rgba.rgb * light_color, rgba.a);
-	frag_color = color * (alpha * (1.0 - smoothstep(fade_start, fade_distance, length(view_position))));
+	frag_color = vec4(rgba.rgb * light_color, rgba.a * alpha);
 }

@@ -38,6 +38,7 @@ export class RenderManager {
         this.canvas = document.createElement('canvas');
         this.canvas.classList.add('wolkenwelten-canvas');
         this.canvasWrapper = document.createElement('div');
+        this.canvasWrapper.classList.add('wolkenwelten-canvas-wrapper');
         game.ui.rootElement.append(this.canvasWrapper);
         this.canvasWrapper.append(this.canvas);
         const gl = this.canvas.getContext('webgl2');

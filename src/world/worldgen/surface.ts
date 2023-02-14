@@ -74,7 +74,7 @@ export const worldgenSurface = (chunk: Chunk) => {
                     }
 
                     if (gh > -3 && rng.bool(6400)) {
-                        new Crab(chunk.world, cx, gh + 3, cz);
+                        new Crab(chunk.world, cx, gh + 2, cz);
                     }
                 } else if (gh > 24) {
                     chunk.setBoxUnsafe(x, 0, z, 1, Math.min(endY, 32), 1, 3);

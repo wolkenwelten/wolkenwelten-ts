@@ -9,3 +9,8 @@ export const abgrToRgba = (c: number): number => {
         ((c & 0xff000000) >> 24)
     );
 };
+
+export const radianDifference = (α: number, β: number) => {
+    const diff = ((β - α + Math.PI) % Math.PI) * 2 - Math.PI;
+    return diff < -Math.PI ? diff + Math.PI : diff;
+};

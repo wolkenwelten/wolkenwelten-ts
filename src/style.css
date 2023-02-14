@@ -21,7 +21,7 @@ canvas.wolkenwelten-canvas {
     user-select: none;
 }
 
-#wolkenwelten-parent .fx-underwater::before {
+#wolkenwelten-parent .wolkenwelten-canvas-wrapper::before {
     content:'';
     display:block;
     position:absolute;
@@ -29,6 +29,25 @@ canvas.wolkenwelten-canvas {
     top:0;
     width:100%;
     height:100%;
-    background:rgba(0,0,255,0.5);
+    background: transparent;
+}
+
+#wolkenwelten-parent .fx-underwater::before {
     background: radial-gradient(rgba(0,0,255,0.4), rgba(0,0,48,0.9));
+}
+
+@keyframes fxDamage {
+    0% {
+        background-color: transparent;
+    }
+    1% {
+        background-color: rgba(255,0,0,0.5);
+    }
+    100% {
+        background-color: transparent;
+    }
+}
+
+#wolkenwelten-parent .fx-damage::before {
+    animation: fxDamage 300ms linear;
 }

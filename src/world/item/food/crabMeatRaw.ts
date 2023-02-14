@@ -31,7 +31,7 @@ export class CrabMeatRaw extends Item {
                 return false;
             }
             e.cooldown(100);
-            e.heal(2);
+            e.heal(4);
             this.world.game.audio.play('chomp', 0.5);
             this.destroy();
             return true;

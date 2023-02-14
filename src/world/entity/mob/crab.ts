@@ -2,8 +2,17 @@ import { VoxelMesh } from '../../../render/meshes';
 import { World } from '../../world';
 import { Mob } from './mob';
 import { CrabMeatRaw } from '../../item/food/crabMeatRaw';
+import { Entity } from '../entity';
+import { radianDifference } from '../../../util/math';
 
-export type CrabState = 'idle' | 'walk' | 'turnLeft' | 'turnRight' | 'walkBack';
+export type CrabState =
+    | 'idle'
+    | 'walk'
+    | 'turnLeft'
+    | 'turnRight'
+    | 'walkBack'
+    | 'chase'
+    | 'attack';
 
 export class Crab extends Mob {
     state: CrabState;
@@ -16,6 +25,8 @@ export class Crab extends Mob {
     health = 4;
     maxHealth = 4;
 
+    aggroTarget?: Entity;
+
     constructor(world: World, x: number, y: number, z: number) {
         super(world, x, y, z);
         this.state = 'idle';
@@ -25,12 +36,19 @@ export class Crab extends Mob {
 
     onDeath() {
         this.world.game.render.particle.fxDeath(this.x, this.y, this.z);
-        this.world.game.add.itemDrop(
-            this.x,
-            this.y,
-            this.z,
-            new CrabMeatRaw(this.world)
-        );
+        if ((this.id & 3) == 0) {
+            this.world.game.add.itemDrop(
+                this.x,
+                this.y,
+                this.z,
+                new CrabMeatRaw(this.world)
+            );
+        }
+    }
+
+    onAttack(perpetrator: Entity): void {
+        this.aggroTarget = perpetrator;
+        this.changeState('chase');
     }
 
     mesh(): VoxelMesh {
@@ -40,6 +58,16 @@ export class Crab extends Mob {
                     ((this.id * 120 + this.world.game.ticks) / 40) & 1;
                 return this.world.game.render.meshes.crab.idle[frame];
             }
+            case 'attack': {
+                const frame = this.ticksInState / 30;
+                return this.world.game.render.meshes.crab.attack[frame & 1];
+            }
+            case 'chase':
+                const frame = ((this.id * 32 + this.world.game.ticks) / 6) & 3;
+                if (frame & 1) {
+                    return this.world.game.render.meshes.crab.idle[0];
+                }
+                return this.world.game.render.meshes.crab.walk[frame >> 1];
             case 'turnLeft':
             case 'turnRight':
             case 'walkBack':
@@ -57,6 +85,26 @@ export class Crab extends Mob {
         this.state = newState;
         this.ticksInState = 0;
         this.stateTransitions++;
+    }
+
+    attack(entity: Entity, dmg = 1) {
+        const [vx, vz] = this.walkDirection();
+        const x = this.x - vx;
+        const y = this.y;
+        const z = this.z - vz;
+        const dx = x - entity.x;
+        const dy = y - entity.y;
+        const dz = z - entity.z;
+        const dd = dx * dx + dy * dy + dz * dz;
+        if (dd < 1.7 * 1.7) {
+            entity.damage(dmg);
+            entity.onAttack(this);
+            const edx = this.x - entity.x;
+            const edz = this.z - entity.z;
+            entity.vx += edx * -0.02;
+            entity.vy += 0.005;
+            entity.vz += edz * -0.02;
+        }
     }
 
     stateChange() {
@@ -78,7 +126,29 @@ export class Crab extends Mob {
                         }
                     }
                 }
+                break;
             }
+            case 'attack': {
+                const v = this.ticksInState;
+                if (v > 50) {
+                    if (this.aggroTarget) {
+                        this.attack(this.aggroTarget, 1);
+                        this.changeState('chase');
+                    } else {
+                        this.changeState('idle');
+                    }
+                } else if (v === 33) {
+                    this.world.game.audio.play('punchMiss', 0.5);
+                }
+                break;
+            }
+
+            case 'chase':
+                if (!this.aggroTarget || this.aggroTarget.isDead) {
+                    this.aggroTarget = undefined;
+                    this.changeState('idle');
+                }
+                break;
             case 'turnLeft':
             case 'turnRight':
             case 'walkBack':
@@ -87,6 +157,7 @@ export class Crab extends Mob {
                 if (v > 100) {
                     this.changeState('idle');
                 }
+                break;
             }
         }
     }
@@ -115,6 +186,34 @@ export class Crab extends Mob {
             case 'turnRight':
                 this.yaw -= 0.01;
                 break;
+            case 'chase':
+                if (this.aggroTarget) {
+                    const dx = this.x - this.aggroTarget.x;
+                    const dy = this.y - this.aggroTarget.y;
+                    const dz = this.z - this.aggroTarget.z;
+                    const dd = dx * dx + dy * dy + dz * dz;
+                    if (dd > 16 * 16) {
+                        this.aggroTarget = undefined;
+                        this.changeState('idle');
+                    } else {
+                        if (dd > 1.8 * 1.8) {
+                            const [vx, vz] = this.walkDirection();
+                            this.gvx = vx * -3.5;
+                            this.gvz = vz * -3.5;
+                        } else {
+                            this.changeState('attack');
+                        }
+
+                        const newYaw = -Math.atan2(dz, dx);
+                        const diff = radianDifference(this.yaw, newYaw);
+                        if (diff > 0) {
+                            this.yaw += Math.min(0.05, diff);
+                        } else {
+                            this.yaw += Math.max(-0.05, diff);
+                        }
+                    }
+                }
+                break;
         }
     }
 
@@ -122,7 +221,7 @@ export class Crab extends Mob {
         return (
             this.world.isSolid(x, y, z) ||
             this.world.isSolid(x, y - 2 / 32, z) ||
-            this.world.isSolid(x, y + 0.4, z)
+            this.world.isSolid(x, y + 12 / 32, z)
         );
     }
 

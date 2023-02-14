@@ -6,6 +6,8 @@ import { BlockItem } from '../item/blockItem';
 import { TriangleMesh, VoxelMesh } from '../../render/meshes';
 import { CrabMeatRaw } from '../item/food/crabMeatRaw';
 import { ItemDrop } from './itemDrop';
+import { initDefaultBlocks } from '../blockType/blockTypeDefaults';
+import { runInThisContext } from 'vm';
 
 const CHARACTER_ACCELERATION = 0.04;
 const CHARACTER_STOP_RATE = CHARACTER_ACCELERATION * 3.0;
@@ -14,6 +16,12 @@ const clamp = (x: number, min: number, max: number) =>
     Math.min(Math.max(x, min), max);
 
 export class Character extends Entity {
+    spawnX: number;
+    spawnY: number;
+    spawnZ: number;
+    spawnYaw: number;
+    spawnPitch: number;
+
     movementX = 0;
     movementY = 0;
     movementZ = 0;
@@ -37,6 +45,29 @@ export class Character extends Entity {
 
     inventory: Inventory;
 
+    init() {
+        this.x = this.spawnX;
+        this.y = this.spawnY;
+        this.z = this.spawnZ;
+        this.yaw = this.spawnYaw;
+        this.pitch = this.spawnPitch;
+        this.noClip = false;
+        this.isDead = false;
+        this.maxHealth = this.health = 12;
+        this.hitAnimation = -100;
+        this.lastAction = 0;
+        this.miningActive = false;
+        this.miningX = this.miningY = this.miningZ = 0;
+        this.vx = this.vy = this.vz = 0;
+        this.inventory.clear();
+        this.inventory.add(new CrabMeatRaw(this.world));
+        this.inventory.add(new BlockItem(this.world, 9, 10));
+        this.inventory.add(new BlockItem(this.world, 2, 90));
+        this.inventory.add(new BlockItem(this.world, 3, 90));
+        this.inventory.add(new BlockItem(this.world, 1, 10));
+        this.inventory.select(0);
+    }
+
     constructor(
         world: World,
         x: number,
@@ -47,28 +78,21 @@ export class Character extends Entity {
         noClip = false
     ) {
         super(world);
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.yaw = yaw;
-        this.pitch = pitch;
-        this.noClip = noClip;
+        this.spawnX = this.x = x;
+        this.spawnY = this.y = y;
+        this.spawnZ = this.z = z;
+        this.spawnYaw = yaw;
+        this.spawnPitch = pitch;
         this.inventory = new Inventory(10);
-        this.inventory.add(new CrabMeatRaw(world));
-        this.inventory.add(new BlockItem(world, 9, 10));
-        this.inventory.add(new BlockItem(world, 2, 90));
-        this.inventory.add(new BlockItem(world, 3, 90));
-        this.inventory.add(new BlockItem(world, 1, 10));
-        this.inventory.select(0);
+        this.init();
+        this.noClip = noClip;
     }
 
     damage(rawAmount: number) {
-        if (rawAmount < 0) {
-            throw new Error(
-                "Can't damage by a negative amount, use the heal method instead"
-            );
-        }
-        this.health = Math.max(0, this.health - rawAmount);
+        this.health = Math.min(
+            this.maxHealth,
+            Math.max(0, this.health - rawAmount)
+        );
         if (this.health <= 0) {
             if (!this.isDead) {
                 const event = new CustomEvent('playerDead', {
@@ -77,9 +101,10 @@ export class Character extends Entity {
                     },
                 });
                 this.world.game.ui.rootElement.dispatchEvent(event);
+                this.isDead = true;
+                this.onDeath();
                 // Dispatch death event
             }
-            this.isDead = true;
         } else {
             if (this === this.world.game.player) {
                 const event = new CustomEvent('playerDamage', {
@@ -95,22 +120,7 @@ export class Character extends Entity {
     }
 
     heal(rawAmount: number) {
-        if (rawAmount < 0) {
-            throw new Error(
-                "Can't heal by a negative amount, use the damage method instead"
-            );
-        }
-        this.health = Math.min(this.maxHealth, this.health + rawAmount);
-        if (this === this.world.game.player) {
-            const event = new CustomEvent('playerHeal', {
-                detail: {
-                    rawAmount,
-                    health: this.health,
-                    maxHealth: this.maxHealth,
-                },
-            });
-            this.world.game.ui.rootElement.dispatchEvent(event);
-        }
+        this.damage(-rawAmount);
     }
 
     /* Walk/Run according to the direction of the Entity, ignores pitch */
@@ -325,10 +335,30 @@ export class Character extends Entity {
                 e.vy += 0.06;
                 e.vz += ndz * 0.2;
                 e.damage(1);
+                e.onAttack(this);
             }
         }
 
         return hit;
+    }
+
+    onDeath() {
+        this.world.game.audio.play('ungh', 0.2);
+        this.init();
+        const event = new CustomEvent('playerDamage', {
+            detail: {
+                rawAmount: 0,
+                health: this.health,
+                maxHealth: this.maxHealth,
+            },
+        });
+        this.world.game.ui.rootElement.dispatchEvent(event);
+    }
+
+    onAttack(perpetrator: Entity): void {
+        this.world.game.render.canvasWrapper.classList.remove('fx-damage');
+        this.world.game.render.canvasWrapper.getBoundingClientRect();
+        this.world.game.render.canvasWrapper.classList.add('fx-damage');
     }
 
     strike() {

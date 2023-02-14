@@ -30,6 +30,12 @@ export class Inventory {
         return false;
     }
 
+    clear() {
+        for (let i = 0; i < this.items.length; i++) {
+            this.items[i] = undefined;
+        }
+    }
+
     select(newSelection: number) {
         this.selection = newSelection;
         this.onChange && this.onChange(-1);

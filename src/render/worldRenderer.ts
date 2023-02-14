@@ -88,15 +88,27 @@ export class WorldRenderer {
     }
 
     draw(projectionMatrix: mat4, viewMatrix: mat4, cam: Entity) {
-        for (const entity of this.renderer.game.world.entities) {
-            entity.draw(projectionMatrix, viewMatrix, cam);
-        }
-        BlockMesh.bindShaderAndTexture(projectionMatrix, viewMatrix);
         const cx = cam.x & ~31;
         const cy = cam.y & ~31;
         const cz = cam.z & ~31;
         const frustum = this.frustum;
         frustum.build(projectionMatrix, viewMatrix);
+        for (const entity of this.renderer.game.world.entities) {
+            if (
+                frustum.containsCube(
+                    vec4.fromValues(
+                        entity.x - 0.5,
+                        entity.y - 0.5,
+                        entity.z - 0.5,
+                        1
+                    )
+                )
+            ) {
+                entity.draw(projectionMatrix, viewMatrix, cam);
+            }
+        }
+        BlockMesh.bindShaderAndTexture(projectionMatrix, viewMatrix);
+
         let drawn = 0;
         let skipped = 0;
 

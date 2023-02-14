@@ -6,6 +6,7 @@ import pockUrl from '../assets/sfx/pock.ogg?url';
 import tockUrl from '../assets/sfx/tock.ogg?url';
 import stepUrl from '../assets/sfx/step.ogg?url';
 import stompUrl from '../assets/sfx/stomp.ogg?url';
+import unghUrl from '../assets/sfx/ungh.ogg?url';
 import punchUrl from '../assets/sfx/punch.ogg?url';
 import punchMissUrl from '../assets/sfx/punchMiss.ogg?url';
 
@@ -15,6 +16,7 @@ export class AudioManager {
 
     addDefaultAssets() {
         this.add('chomp', chompUrl);
+        this.add('ungh', unghUrl);
         this.add('pock', pockUrl);
         this.add('tock', tockUrl);
         this.add('step', stepUrl);
