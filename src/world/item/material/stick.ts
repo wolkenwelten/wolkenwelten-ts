@@ -14,6 +14,10 @@ export class Stick extends StackableItem {
         return itemIcon;
     }
 
+    attackDamage(e: Entity): number {
+        return 2;
+    }
+
     mesh(world: World): TriangleMesh | VoxelMesh {
         return world.game.render.meshes.stick;
     }

@@ -322,6 +322,7 @@ export class Character extends Entity {
         const z = this.z + vz;
         let hit = false;
         const rr = radius * radius;
+        const weapon = this.inventory.active();
         for (const e of this.world.entities) {
             if (e === this || e instanceof ItemDrop) {
                 continue;
@@ -339,7 +340,7 @@ export class Character extends Entity {
                 e.vx += ndx * 0.2;
                 e.vy += 0.06;
                 e.vz += ndz * 0.2;
-                e.damage(1);
+                e.damage(weapon?.attackDamage(e) || 1);
                 e.onAttack(this);
                 if (e.isDead) {
                     this.xpGain(1);

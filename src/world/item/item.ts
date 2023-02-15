@@ -37,6 +37,10 @@ export class Item {
         return false;
     }
 
+    attackDamage(e: Entity): number {
+        return 1;
+    }
+
     miningDamage(block: number): number {
         return 1;
     }
