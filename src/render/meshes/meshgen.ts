@@ -176,81 +176,68 @@ const blitChunkData = (
     }
 };
 
-const calcSides = (
-    x: number,
-    y: number,
-    z: number,
-    blockData: Uint8Array,
-    blockSeeThrough: number[]
-): number => {
-    const off = x * 34 * 34 + y * 34 + z;
-
-    const cb = blockData[off];
-    if (cb === 0) {
-        return 0;
-    }
-    if (blockSeeThrough[cb]) {
-        let ret = +(
-            blockData[off + 1] !== cb && blockSeeThrough[blockData[off + 1]]
-        );
-        ret |=
-            +(
-                blockData[off - 1] !== cb && blockSeeThrough[blockData[off - 1]]
-            ) << 1;
-        ret |=
-            +(
-                blockData[off + 34] !== cb &&
-                blockSeeThrough[blockData[off + 34]]
-            ) << 2;
-        ret |=
-            +(
-                blockData[off - 34] !== cb &&
-                blockSeeThrough[blockData[off - 34]]
-            ) << 3;
-        ret |=
-            +(
-                blockData[off + 34 * 34] !== cb &&
-                blockSeeThrough[blockData[off + 34 * 34]]
-            ) << 4;
-        ret |=
-            +(
-                blockData[off - 34 * 34] !== cb &&
-                blockSeeThrough[blockData[off - 34 * 34]]
-            ) << 5;
-        ret |= 1 << 6;
-        return ret;
-    } else {
-        return (
-            blockSeeThrough[blockData[off + 1]] |
-            (blockSeeThrough[blockData[off - 1]] << 1) |
-            (blockSeeThrough[blockData[off + 34]] << 2) |
-            (blockSeeThrough[blockData[off - 34]] << 3) |
-            (blockSeeThrough[blockData[off + 34 * 34]] << 4) |
-            (blockSeeThrough[blockData[off - 34 * 34]] << 5)
-        );
-    }
-};
-
 const calcSideCache = (
     sideCache: Uint8Array,
     blockData: Uint8Array,
     blocks: BlockType[]
 ) => {
-    let off = 0;
+    let sideOff = 0;
     const blockSeeThrough = [];
     for (let i = 0; i < blocks.length; i++) {
         blockSeeThrough[i] = blocks[i].seeThrough ? 1 : 0;
     }
+    sideCache.fill(0);
     for (let x = 0; x < 32; x++) {
         for (let y = 0; y < 32; y++) {
             for (let z = 0; z < 32; z++) {
-                sideCache[off++] = calcSides(
-                    x + 1,
-                    y + 1,
-                    z + 1,
-                    blockData,
-                    blockSeeThrough
-                );
+                const off = (x + 1) * 34 * 34 + (y + 1) * 34 + (z + 1);
+
+                const cb = blockData[off];
+                if (cb) {
+                    if (blockSeeThrough[cb]) {
+                        let ret = 1 << 6;
+                        ret |=
+                            blockData[off + 1] !== cb &&
+                            blockSeeThrough[blockData[off + 1]]
+                                ? 1
+                                : 0;
+                        ret |=
+                            blockData[off - 1] !== cb &&
+                            blockSeeThrough[blockData[off - 1]]
+                                ? 2
+                                : 0;
+                        ret |=
+                            blockData[off + 34] !== cb &&
+                            blockSeeThrough[blockData[off + 34]]
+                                ? 4
+                                : 0;
+                        ret |=
+                            blockData[off - 34] !== cb &&
+                            blockSeeThrough[blockData[off - 34]]
+                                ? 8
+                                : 0;
+                        ret |=
+                            blockData[off + 34 * 34] !== cb &&
+                            blockSeeThrough[blockData[off + 34 * 34]]
+                                ? 16
+                                : 0;
+                        ret |=
+                            blockData[off - 34 * 34] !== cb &&
+                            blockSeeThrough[blockData[off - 34 * 34]]
+                                ? 32
+                                : 0;
+                        sideCache[sideOff] = ret;
+                    } else {
+                        sideCache[sideOff] =
+                            blockSeeThrough[blockData[off + 1]] |
+                            (blockSeeThrough[blockData[off - 1]] << 1) |
+                            (blockSeeThrough[blockData[off + 34]] << 2) |
+                            (blockSeeThrough[blockData[off - 34]] << 3) |
+                            (blockSeeThrough[blockData[off + 34 * 34]] << 4) |
+                            (blockSeeThrough[blockData[off - 34 * 34]] << 5);
+                    }
+                }
+                sideOff++;
             }
         }
     }

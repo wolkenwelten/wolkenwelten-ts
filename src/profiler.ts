@@ -24,6 +24,10 @@ export class ProfilingManager {
         res.results.push(stop - start);
     }
 
+    addAmount(id: string, n: number) {
+        this.add(id, 0, n);
+    }
+
     showResults() {
         const tmp: any = {};
         for (const prof of this.profiles.values()) {

@@ -143,31 +143,55 @@ export class BlockMesh {
     }
 
     drawFast(mask: number, alpha: number, sideOffset = 0) {
+        if (this.elementCount === 0) {
+            return 0;
+        }
         BlockMesh.gl.bindVertexArray(this.vao);
         BlockMesh.shader.uniform3f('trans_pos', this.x, this.y, this.z);
         BlockMesh.shader.uniform1f('alpha', alpha);
+        let calls = 0;
+
+        let start = 0;
+        let end = 0;
         if (mask === 0) {
-            return;
+            return 0;
         } else {
             for (let i = 0; i < 6; i++) {
-                if (
-                    (mask & (1 << i)) === 0 ||
-                    this.sideSquareCount[i + sideOffset] === 0
-                ) {
+                if ((mask & (1 << i)) === 0) {
                     continue;
                 }
+                const curStart = this.sideStart[i + sideOffset];
+                const curEnd =
+                    curStart + this.sideSquareCount[i + sideOffset] * 4;
+                if (curStart !== end) {
+                    if (end !== start) {
+                        BlockMesh.gl.drawElements(
+                            BlockMesh.gl.TRIANGLES,
+                            (end - start) / 4,
+                            BlockMesh.gl.UNSIGNED_INT,
+                            start
+                        );
+                        calls++;
+                    }
+                    start = curStart;
+                }
+                end = curEnd;
+            }
+            if (end !== start) {
                 BlockMesh.gl.drawElements(
                     BlockMesh.gl.TRIANGLES,
-                    this.sideSquareCount[i + sideOffset],
+                    (end - start) / 4,
                     BlockMesh.gl.UNSIGNED_INT,
-                    this.sideStart[i + sideOffset]
+                    start
                 );
+                calls++;
             }
         }
+        return calls;
     }
 
     draw(projection: mat4, modelView: mat4, mask: number, alpha: number) {
         BlockMesh.bindShaderAndTexture(projection, modelView);
-        this.drawFast(mask, alpha);
+        return this.drawFast(mask, alpha);
     }
 }

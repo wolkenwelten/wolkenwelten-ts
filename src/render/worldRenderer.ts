@@ -152,17 +152,18 @@ export class WorldRenderer {
         if (this.generatorQueue.length) {
             this.generatorQueue.sort((a, b) => b.dd - a.dd);
         }
+        let drawCalls = 0;
 
         /* Here we sort all the chunks back to front, draw the solid blocks first and then
          * draw all the seeThrough blocks like water. This is necessary for alpha blending to work properly.
          */
         this.drawQueue.sort((a, b) => b.dd - a.dd);
         for (const { mesh, mask, alpha } of this.drawQueue) {
-            mesh.drawFast(mask, alpha, 0);
+            drawCalls += mesh.drawFast(mask, alpha, 0);
         }
-
         for (const { mesh, mask, alpha } of this.drawQueue) {
-            mesh.drawFast(mask, alpha, 6);
+            drawCalls += mesh.drawFast(mask, alpha, 6);
         }
+        this.renderer.game.profiler.addAmount('blockMeshDrawCalls', drawCalls);
     }
 }
