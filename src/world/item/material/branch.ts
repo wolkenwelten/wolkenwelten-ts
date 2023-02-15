@@ -1,13 +1,13 @@
 import { TriangleMesh, VoxelMesh } from '../../../render/meshes';
 import { Entity } from '../../entity/entity';
 import { World } from '../../world';
-import { Item } from '../item';
 
 import itemIcon from '../../../../assets/gfx/items/branch.png';
+import { StackableItem } from '../stackableItem';
 
-export class Branch extends Item {
-    constructor(world: World) {
-        super(world, 'Branch');
+export class Branch extends StackableItem {
+    constructor(world: World, amount = 1) {
+        super(world, 'Branch', amount);
     }
 
     icon(): string {

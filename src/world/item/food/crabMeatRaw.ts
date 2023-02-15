@@ -1,14 +1,14 @@
 import { TriangleMesh, VoxelMesh } from '../../../render/meshes';
 import { Entity } from '../../entity/entity';
 import { World } from '../../world';
-import { Item } from '../item';
 
 import itemIcon from '../../../../assets/gfx/items/rawCrabMeat.png';
 import { Character } from '../../entity/character';
+import { StackableItem } from '../stackableItem';
 
-export class CrabMeatRaw extends Item {
-    constructor(world: World) {
-        super(world, 'Crab meat');
+export class CrabMeatRaw extends StackableItem {
+    constructor(world: World, amount = 1) {
+        super(world, 'Crab meat', amount);
     }
 
     icon(): string {
@@ -33,7 +33,9 @@ export class CrabMeatRaw extends Item {
             e.cooldown(100);
             e.heal(4);
             this.world.game.audio.play('chomp', 0.5);
-            this.destroy();
+            if (--this.amount <= 0) {
+                this.destroy();
+            }
             return true;
         }
         return false;

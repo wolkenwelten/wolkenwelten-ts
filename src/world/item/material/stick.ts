@@ -1,18 +1,17 @@
 import { TriangleMesh, VoxelMesh } from '../../../render/meshes';
 import { Entity } from '../../entity/entity';
 import { World } from '../../world';
-import { Item } from '../item';
 
 import itemIcon from '../../../../assets/gfx/items/stick.png';
-import itemIcon2 from '../../../../assets/gfx/items/stick2.png';
+import { StackableItem } from '../stackableItem';
 
-export class Stick extends Item {
-    constructor(world: World) {
-        super(world, 'Stick');
+export class Stick extends StackableItem {
+    constructor(world: World, amount = 1) {
+        super(world, 'Stick', amount);
     }
 
     icon(): string {
-        return (this.id & 1) === 0 ? itemIcon : itemIcon2;
+        return itemIcon;
     }
 
     mesh(world: World): TriangleMesh | VoxelMesh {

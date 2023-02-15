@@ -14,8 +14,8 @@
     "author": "Benjamin Vincent Schulenburg <ben@wolkenwelten.net>",
     "license": "AGPL3",
     "devDependencies": {
-        "@types/howler": "^2.2.7",
-        "@types/node": "^18.11.18",
+        "@types/howler": "latest",
+        "@types/node": "latest",
         "prettier": "latest",
         "typescript": "latest",
         "vite": "latest"

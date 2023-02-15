@@ -1,24 +1,18 @@
 import { TriangleMesh, VoxelMesh } from '../../render/meshes';
-import { Character } from '../entity/character';
 import { Entity } from '../entity/entity';
-import { ItemDrop } from '../entity/itemDrop';
 import { World } from '../world';
-import { Inventory } from './inventory';
-import { Item } from './item';
+import { StackableItem } from './stackableItem';
 
-export class BlockItem extends Item {
+export class BlockItem extends StackableItem {
     blockType: number;
-    amount: number;
 
     constructor(world: World, blockType: number, amount: number) {
         const bt = world.blocks[blockType];
         if (!bt) {
             throw new Error(`Invalid blockType: ${blockType}`);
         }
-        super(world, bt.name);
-
+        super(world, bt.name, amount);
         this.blockType = blockType;
-        this.amount = amount;
     }
 
     clone(): BlockItem {
@@ -49,25 +43,11 @@ export class BlockItem extends Item {
         return this.world.blocks[this.blockType].icon;
     }
 
-    addToExistingStacks(inventory: Inventory) {
-        for (let i = 0; i < inventory.items.length; i++) {
-            const item = inventory.items[i];
-            if (!item || !(item instanceof BlockItem)) {
-                continue;
-            }
-            if (item.amount >= 99 || item.blockType !== this.blockType) {
-                continue;
-            }
-
-            const spaceLeft = 100 - item.amount;
-            if (spaceLeft > this.amount) {
-                item.amount += this.amount;
-                this.destroy();
-                return;
-            } else {
-                this.amount += spaceLeft;
-                item.amount -= spaceLeft;
-            }
+    mayStackWith(other: StackableItem): boolean {
+        if (other instanceof BlockItem) {
+            return other.blockType === this.blockType;
+        } else {
+            return false;
         }
     }
 
@@ -76,30 +56,5 @@ export class BlockItem extends Item {
             world.game.render.meshes.blockType[this.blockType] ||
             world.game.render.meshes.bag
         );
-    }
-
-    drop(e: Entity): boolean {
-        if (this.amount <= 1) {
-            return Item.prototype.drop.call(this, e);
-        }
-        this.amount--;
-        if (e instanceof Character) {
-            e.inventory.updateAll();
-            e.hitAnimation = e.world.game.render.frames;
-            e.cooldown(20);
-        }
-        const [vx, vz] = e.walkDirection();
-        const drop = new ItemDrop(
-            e.world,
-            e.x - vx,
-            e.y,
-            e.z - vz,
-            new BlockItem(this.world, this.blockType, 1)
-        );
-        drop.vy = 0.01;
-        drop.vx = vx * -0.1;
-        drop.vz = vz * -0.1;
-        drop.noCollect = true;
-        return false;
     }
 }

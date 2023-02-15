@@ -1,5 +1,6 @@
 import { BlockItem } from '../../../world/item/blockItem';
 import { Item, MaybeItem } from '../../../world/item/item';
+import { StackableItem } from '../../../world/item/stackableItem';
 import styles from './inventorySlot.module.css';
 
 export class InventorySlot {
@@ -41,7 +42,7 @@ export class InventorySlot {
         } else {
             this.div.classList.remove(styles.active);
         }
-        if (item instanceof BlockItem) {
+        if (item instanceof StackableItem) {
             if (item.amount > 0) {
                 this.amount.innerText = `${item.amount}`;
             } else {
