@@ -116,7 +116,7 @@ export class RenderManager {
         this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
 
         const modelViewMatrix = mat4.create();
-        let r = Math.PI * 0.1;
+        let r = Math.PI * -0.04;
         let rt = 0;
         if (this.game.player.hitAnimation >= 0) {
             const t = (this.frames - this.game.player.hitAnimation) / 20.0;
@@ -139,7 +139,7 @@ export class RenderManager {
         mat4.translate(modelViewMatrix, modelViewMatrix, [
             1 - rl * 0.2 + viewBobH + player.inertiaX * 0.5,
             -0.5 + rl * 0.2 + viewBob + jumpOff,
-            -0.6 - rl * 0.25 + player.inertiaZ * 0.5,
+            -0.65 - rl * 0.25 + player.inertiaZ * 0.5,
         ]);
         mat4.scale(
             modelViewMatrix,

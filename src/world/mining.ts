@@ -72,6 +72,7 @@ export class MiningManager {
             this.world.setBlock(x, y, z, 0);
             this.world.game.render.particle.fxBlockBreak(x, y, z, bt);
             this.world.dangerZone.add(x - 1, y - 1, z - 1, 3, 3, 3);
+            this.world.game.audio.play('tock');
             bt.spawnMiningDrops(this.world, x, y, z, tool);
         }
         return ret;
@@ -104,6 +105,12 @@ export class MiningManager {
                 const m = this.minings[i];
                 const bt = this.world.blocks[m.block];
                 this.world.game.render.particle.fxBlockMine(m.x, m.y, m.z, bt);
+            }
+        }
+        if ((++this.ticks & 63) == 0) {
+            for (let i = this.minings.length - 1; i >= 0; i--) {
+                const m = this.minings[i];
+                this.world.game.audio.play('tock', 0.5);
             }
         }
     }

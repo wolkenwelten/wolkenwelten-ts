@@ -103,12 +103,12 @@ export class ParticleMesh {
             const cx = x + Math.random();
             const cy = y + Math.random();
             const cz = z + Math.random();
-            const cs = 256;
+            const cs = 96 + Math.random() * 64;
             const cc = i < 32 ? bt.colorA : bt.colorB;
             const vx = (Math.random() - 0.5) * 0.04;
             const vy = Math.random() * 0.03;
             const vz = (Math.random() - 0.5) * 0.04;
-            const vs = -15;
+            const vs = -12;
             this.add(cx, cy, cz, cs, cc, vx, vy, vz, vs);
         }
     }
@@ -118,12 +118,12 @@ export class ParticleMesh {
             const cx = x + Math.random();
             const cy = y + Math.random();
             const cz = z + Math.random();
-            const cs = 256;
+            const cs = 128;
             const cc = i < 1 ? bt.colorA : bt.colorB;
             const vx = (Math.random() - 0.5) * 0.06;
             const vy = Math.random() * 0.05;
             const vz = (Math.random() - 0.5) * 0.06;
-            const vs = -15;
+            const vs = -12;
             this.add(cx, cy, cz, cs, cc, vx, vy, vz, vs);
         }
     }
