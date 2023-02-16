@@ -1,8 +1,9 @@
-import { TriangleMesh, VoxelMesh } from '../../../render/meshes';
+import { TriangleMesh, VoxelMesh } from '../../../render/asset';
 import { Entity } from '../../entity/entity';
 import { World } from '../../world';
 
-import itemIcon from '../../../../assets/gfx/items/rawCrabMeat.png';
+import itemIcon from '../../../../assets/gfx/items/crabMeatRaw.png';
+import meshUrl from '../../../../assets/vox/items/crabMeatRaw.vox?url';
 import { Character } from '../../entity/character';
 import { StackableItem } from '../stackableItem';
 
@@ -16,7 +17,7 @@ export class CrabMeatRaw extends StackableItem {
     }
 
     mesh(world: World): TriangleMesh | VoxelMesh {
-        return world.game.render.meshes.crabMeatRaw;
+        return world.game.render.assets.get(meshUrl);
     }
 
     use(e: Entity): boolean {

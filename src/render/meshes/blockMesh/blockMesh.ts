@@ -66,7 +66,7 @@ export class BlockMesh {
         this.texture = new Texture(
             this.gl,
             'blocks',
-            game.blockTextureUrl,
+            game.world.blockTextureUrl,
             '2DArray'
         );
         this.texture.nearest();

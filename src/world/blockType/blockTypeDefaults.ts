@@ -25,14 +25,14 @@ const leafDropHandler = (
 
 export const initDefaultBlocks = (world: World) => {
     world.blocks.length = 0;
-    world.game.blockTextureUrl = blockTextureUrl;
+    world.blockTextureUrl = blockTextureUrl;
     world.addBlockType('Air').withInvisible();
 
     world
         .addBlockType('Dirt')
         .withTexture(1)
         .withColours(0x311e00ff, 0x412800ff)
-        .withMiningCat('Shovel')
+        .withMiningCat('Pickaxe')
         .withBlockHealth(200);
 
     world
@@ -41,7 +41,7 @@ export const initDefaultBlocks = (world: World) => {
         .withTextureTop(0)
         .withTextureBottom(1)
         .withColours(0x003807ff, 0x412800ff)
-        .withMiningCat('Shovel')
+        .withMiningCat('Pickaxe')
         .withSimpleHandler(new BlockItem(world, 1, 1))
         .withBlockHealth(250);
 
@@ -80,7 +80,7 @@ export const initDefaultBlocks = (world: World) => {
         .withTextureTop(6)
         .withTextureBottom(1)
         .withColours(0x4b6411ff, 0x4f230aff)
-        .withMiningCat('Shovel')
+        .withMiningCat('Pickaxe')
         .withSimpleHandler(new BlockItem(world, 1, 1))
         .withBlockHealth(200);
 
@@ -88,7 +88,7 @@ export const initDefaultBlocks = (world: World) => {
         .addBlockType('Roots')
         .withTexture(7)
         .withColours(0x3e3214ff, 0x29200dff)
-        .withMiningCat('Shovel')
+        .withMiningCat('Pickaxe')
         .withSimpleHandler(new BlockItem(world, 1, 1))
         .withBlockHealth(5000);
 
@@ -201,7 +201,7 @@ export const initDefaultBlocks = (world: World) => {
         .addBlockType('Sand')
         .withTexture(24)
         .withColours(0xecd195ff, 0xd3a748ff)
-        .withMiningCat('Shovel')
+        .withMiningCat('Pickaxe')
         .withBlockHealth(140);
 
     world

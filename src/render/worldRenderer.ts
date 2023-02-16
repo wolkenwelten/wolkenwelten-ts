@@ -1,7 +1,7 @@
 import { mat4, vec4 } from 'gl-matrix';
 
 import { Frustum } from './frustum';
-import { BlockMesh } from './meshes';
+import { BlockMesh } from './asset';
 import { RenderManager } from '../render/render';
 import { Entity } from '../world/entity/entity';
 import { coordinateToWorldKey } from '../world/world';

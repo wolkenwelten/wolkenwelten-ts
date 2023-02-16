@@ -1,4 +1,4 @@
-import { TriangleMesh, VoxelMesh } from '../../render/meshes';
+import { TriangleMesh, VoxelMesh } from '../../render/asset';
 import { Entity } from '../entity/entity';
 import { World } from '../world';
 import { StackableItem } from './stackableItem';
@@ -53,8 +53,8 @@ export class BlockItem extends StackableItem {
 
     mesh(world: World): TriangleMesh | VoxelMesh {
         return (
-            world.game.render.meshes.blockType[this.blockType] ||
-            world.game.render.meshes.bag
+            world.game.render.assets.blockType[this.blockType] ||
+            world.game.render.assets.bag
         );
     }
 }

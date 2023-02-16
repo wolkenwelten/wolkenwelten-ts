@@ -18,23 +18,20 @@ export interface BlockTypeRegistry {
 
 export class Game {
     add: AdditionManager;
+    audio: AudioManager;
     blocks: BlockTypeRegistry = {};
     config: GameConfig;
-    persistence: PersistenceManager;
-    profiler: ProfilingManager;
-    world: World;
-
-    audio: AudioManager;
     input: InputManager;
+    persistence: PersistenceManager;
+    player: Character;
+    profiler: ProfilingManager;
     render: RenderManager;
     ui: UIManager;
-    player: Character;
+    world: World;
 
     ticks = 1;
     startTime = +Date.now();
     ready = false;
-
-    blockTextureUrl = '';
 
     constructor(config: GameConfig) {
         this.config = config;

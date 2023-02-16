@@ -4,7 +4,7 @@ import { World } from '../world';
 import { Item, MaybeItem } from '../item/item';
 import { abgrToRgba } from '../../util/math';
 
-export type MiningCat = 'Pickaxe' | 'Shovel' | 'Axe';
+export type MiningCat = 'Pickaxe' | 'Axe';
 export type BlockTypeItemDropHandler = (
     world: World,
     x: number,

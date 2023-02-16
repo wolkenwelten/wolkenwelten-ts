@@ -1,8 +1,9 @@
-import { TriangleMesh, VoxelMesh } from '../../../render/meshes';
+import { TriangleMesh, VoxelMesh } from '../../../render/asset';
 import { Entity } from '../../entity/entity';
 import { World } from '../../world';
 
 import itemIcon from '../../../../assets/gfx/items/branch.png';
+import meshUrl from '../../../../assets/vox/items/branch.vox?url';
 import { StackableItem } from '../stackableItem';
 
 export class Branch extends StackableItem {
@@ -19,6 +20,6 @@ export class Branch extends StackableItem {
     }
 
     mesh(world: World): TriangleMesh | VoxelMesh {
-        return world.game.render.meshes.branch;
+        return world.game.render.assets.get(meshUrl);
     }
 }

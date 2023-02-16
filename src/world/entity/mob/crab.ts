@@ -1,9 +1,16 @@
-import { VoxelMesh } from '../../../render/meshes';
+import { VoxelMesh } from '../../../render/asset';
 import { World } from '../../world';
 import { Mob } from './mob';
 import { CrabMeatRaw } from '../../item/food/crabMeatRaw';
 import { Entity } from '../entity';
 import { radianDifference } from '../../../util/math';
+
+import voxelCrabIdle0File from '../../../../assets/vox/crab/idle_0.vox?url';
+import voxelCrabIdle1File from '../../../../assets/vox/crab/idle_1.vox?url';
+import voxelCrabWalk0File from '../../../../assets/vox/crab/walk_0.vox?url';
+import voxelCrabWalk1File from '../../../../assets/vox/crab/walk_1.vox?url';
+import voxelCrabAttack0File from '../../../../assets/vox/crab/attack_0.vox?url';
+import voxelCrabAttack1File from '../../../../assets/vox/crab/attack_1.vox?url';
 
 export type CrabState =
     | 'idle'
@@ -32,6 +39,14 @@ export class Crab extends Mob {
         this.state = 'idle';
         this.ticksInState = this.id * 123;
         this.stateTransitions = this.id * 123;
+        this.world.game.render.assets.preload([
+            voxelCrabIdle0File,
+            voxelCrabIdle1File,
+            voxelCrabWalk0File,
+            voxelCrabWalk1File,
+            voxelCrabAttack0File,
+            voxelCrabAttack1File,
+        ]);
     }
 
     onDeath() {
@@ -56,27 +71,38 @@ export class Crab extends Mob {
             default: {
                 const frame =
                     ((this.id * 120 + this.world.game.ticks) / 40) & 1;
-                return this.world.game.render.meshes.crab.idle[frame];
+                const url = frame ? voxelCrabIdle0File : voxelCrabIdle1File;
+                return this.world.game.render.assets.get(url);
             }
             case 'attack': {
                 const frame = this.ticksInState / 30;
-                return this.world.game.render.meshes.crab.attack[frame & 1];
+                const url =
+                    frame & 1 ? voxelCrabAttack0File : voxelCrabAttack1File;
+                return this.world.game.render.assets.get(url);
             }
             case 'chase':
                 const frame = ((this.id * 32 + this.world.game.ticks) / 6) & 3;
                 if (frame & 1) {
-                    return this.world.game.render.meshes.crab.idle[0];
+                    return this.world.game.render.assets.get(
+                        voxelCrabIdle0File
+                    );
                 }
-                return this.world.game.render.meshes.crab.walk[frame >> 1];
+                const url =
+                    frame >> 1 ? voxelCrabWalk0File : voxelCrabWalk1File;
+                return this.world.game.render.assets.get(url);
             case 'turnLeft':
             case 'turnRight':
             case 'walkBack':
             case 'walk': {
                 const frame = ((this.id * 32 + this.world.game.ticks) / 8) & 3;
                 if (frame & 1) {
-                    return this.world.game.render.meshes.crab.idle[0];
+                    return this.world.game.render.assets.get(
+                        voxelCrabIdle0File
+                    );
                 }
-                return this.world.game.render.meshes.crab.walk[frame >> 1];
+                const url =
+                    frame >> 1 ? voxelCrabWalk0File : voxelCrabWalk1File;
+                return this.world.game.render.assets.get(url);
             }
         }
     }

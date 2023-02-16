@@ -1,5 +1,5 @@
 import { mat4, vec3 } from 'gl-matrix';
-import { TriangleMesh, VoxelMesh } from '../../render/meshes';
+import { TriangleMesh, VoxelMesh } from '../../render/asset';
 import { World } from '../world';
 
 let entityCounter = 0;
@@ -152,7 +152,7 @@ export class Entity {
     }
 
     mesh(): TriangleMesh | VoxelMesh {
-        return this.world.game.render.meshes.bag;
+        return this.world.game.render.assets.bag;
     }
 
     draw(projectionMatrix: mat4, viewMatrix: mat4, cam: Entity) {

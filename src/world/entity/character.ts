@@ -3,12 +3,11 @@ import { Inventory } from '../item/inventory';
 import { World } from '../world';
 import { mat4 } from 'gl-matrix';
 import { BlockItem } from '../item/blockItem';
-import { TriangleMesh, VoxelMesh } from '../../render/meshes';
+import { TriangleMesh, VoxelMesh } from '../../render/asset';
 import { CrabMeatRaw } from '../item/food/crabMeatRaw';
 import { ItemDrop } from './itemDrop';
-import { StoneShovel } from '../item/tools/stone/stoneShovel';
-import { StoneAxe } from '../item/tools/stone/stoneAxe';
-import { StonePickaxe } from '../item/tools/stone/stonePickaxe';
+import { StoneAxe } from '../item/tools/stoneAxe';
+import { StonePickaxe } from '../item/tools/stonePickaxe';
 import { Stick } from '../item/material/stick';
 
 const CHARACTER_ACCELERATION = 0.04;
@@ -69,7 +68,6 @@ export class Character extends Entity {
         this.inventory.clear();
         this.inventory.add(new StonePickaxe(this.world));
         this.inventory.add(new StoneAxe(this.world));
-        this.inventory.add(new StoneShovel(this.world));
         this.inventory.add(new CrabMeatRaw(this.world, 3));
         this.inventory.add(new Stick(this.world, 3));
         this.inventory.add(new BlockItem(this.world, 3, 90));
@@ -438,7 +436,7 @@ export class Character extends Entity {
     hudMesh(): VoxelMesh | TriangleMesh {
         const heldItem = this.inventory.active();
         if (!heldItem) {
-            return this.world.game.render.meshes.fist;
+            return this.world.game.render.assets.fist;
         } else {
             return heldItem.mesh(this.world);
         }

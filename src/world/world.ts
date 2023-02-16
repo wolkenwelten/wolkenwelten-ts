@@ -21,6 +21,7 @@ export class World {
     game: Game;
     assets: WorldgenAssetManager;
     blocks: BlockType[] = [];
+    blockTextureUrl = '';
 
     constructor(game: Game) {
         this.seed = 1234;

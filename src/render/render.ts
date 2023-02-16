@@ -1,6 +1,6 @@
 import { Game } from '../game';
 import { mat4, vec3 } from 'gl-matrix';
-import { DecalMesh, MeshList } from './meshes';
+import { DecalMesh, AssetList } from './asset';
 import { Entity } from '../world/entity/entity';
 import { WorldRenderer } from './worldRenderer';
 import { allTexturesLoaded, Texture } from './texture';
@@ -26,9 +26,9 @@ export class RenderManager {
     wasUnderwater = false;
     renderSizeMultiplier = 1;
 
+    assets: AssetList;
     decals: DecalMesh;
     particle: ParticleMesh;
-    meshes: MeshList;
     cam: Entity;
     world: WorldRenderer;
 
@@ -49,7 +49,7 @@ export class RenderManager {
         }
         this.gl = gl;
         this.initGLContext();
-        this.meshes = new MeshList(game, gl);
+        this.assets = new AssetList(game, gl);
 
         this.world = new WorldRenderer(this);
         this.decals = new DecalMesh(this);

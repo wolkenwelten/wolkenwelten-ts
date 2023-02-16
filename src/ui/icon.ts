@@ -58,6 +58,6 @@ export class IconManager {
             }
             that.ui.game.player.inventory.updateAll();
         };
-        img.src = this.ui.game.blockTextureUrl;
+        img.src = this.ui.game.world.blockTextureUrl;
     }
 }

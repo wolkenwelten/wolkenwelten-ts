@@ -1,10 +1,10 @@
-import { TriangleMesh, VoxelMesh } from '../../render/meshes';
+import { TriangleMesh, VoxelMesh } from '../../render/asset';
 import { Entity } from '../entity/entity';
 import { ItemDrop } from '../entity/itemDrop';
 import { World } from '../world';
 import { Inventory } from './inventory';
 
-import itemIcon from '../../../assets/gfx/items/rawCrabMeat.png';
+import itemIcon from '../../../assets/gfx/items/crabMeatRaw.png';
 let idCounter = 0;
 
 export type MaybeItem = Item | undefined;
@@ -56,7 +56,7 @@ export class Item {
     }
 
     mesh(world: World): TriangleMesh | VoxelMesh {
-        return world.game.render.meshes.bag;
+        return world.game.render.assets.bag;
     }
 
     addToExistingStacks(inventory: Inventory) {}

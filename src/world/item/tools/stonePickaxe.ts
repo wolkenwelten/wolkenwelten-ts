@@ -1,9 +1,10 @@
-import { TriangleMesh, VoxelMesh } from '../../../../render/meshes';
-import { Entity } from '../../../entity/entity';
-import { World } from '../../../world';
+import { TriangleMesh, VoxelMesh } from '../../../render/asset';
+import { Entity } from '../../entity/entity';
+import { World } from '../../world';
 
-import itemIcon from '../../../../../assets/gfx/items/tools/stonePickaxe.png';
-import { Item } from '../../item';
+import itemIcon from '../../../../assets/gfx/items/stonePickaxe.png';
+import meshUrl from '../../../../assets/vox/items/stonePickaxe.vox?url';
+import { Item } from '../item';
 
 export class StonePickaxe extends Item {
     constructor(world: World) {
@@ -23,6 +24,6 @@ export class StonePickaxe extends Item {
     }
 
     mesh(world: World): TriangleMesh | VoxelMesh {
-        return world.game.render.meshes.stonePickaxe;
+        return world.game.render.assets.get(meshUrl);
     }
 }
