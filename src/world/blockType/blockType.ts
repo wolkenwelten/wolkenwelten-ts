@@ -28,7 +28,7 @@ export class BlockType {
     colorA = 0xff8822ff;
     colorB = 0xff11aaff;
 
-    minigCat: MiningCat = 'Pickaxe';
+    miningCat: MiningCat = 'Pickaxe';
     health = 100;
     liquid = false;
     seeThrough = false;
@@ -91,7 +91,7 @@ export class BlockType {
     }
 
     withMiningCat(cat: MiningCat) {
-        this.minigCat = cat;
+        this.miningCat = cat;
         return this;
     }
 

@@ -14,7 +14,11 @@ export class StackableItem extends Item {
     }
 
     clone(): StackableItem {
-        return new StackableItem(this.world, this.name, this.amount);
+        return new (this.constructor as any)(
+            this.world,
+            this.name,
+            this.amount
+        );
     }
 
     mayStackWith(other: StackableItem): boolean {

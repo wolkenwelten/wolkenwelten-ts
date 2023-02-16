@@ -6,8 +6,10 @@ import { BlockItem } from '../item/blockItem';
 import { TriangleMesh, VoxelMesh } from '../../render/meshes';
 import { CrabMeatRaw } from '../item/food/crabMeatRaw';
 import { ItemDrop } from './itemDrop';
-import { initDefaultBlocks } from '../blockType/blockTypeDefaults';
-import { runInThisContext } from 'vm';
+import { StoneShovel } from '../item/tools/stone/stoneShovel';
+import { StoneAxe } from '../item/tools/stone/stoneAxe';
+import { StonePickaxe } from '../item/tools/stone/stonePickaxe';
+import { Stick } from '../item/material/stick';
 
 const CHARACTER_ACCELERATION = 0.04;
 const CHARACTER_STOP_RATE = CHARACTER_ACCELERATION * 3.0;
@@ -65,11 +67,13 @@ export class Character extends Entity {
         this.miningX = this.miningY = this.miningZ = 0;
         this.vx = this.vy = this.vz = 0;
         this.inventory.clear();
-        this.inventory.add(new CrabMeatRaw(this.world));
-        this.inventory.add(new BlockItem(this.world, 9, 10));
-        this.inventory.add(new BlockItem(this.world, 2, 90));
+        this.inventory.add(new StonePickaxe(this.world));
+        this.inventory.add(new StoneAxe(this.world));
+        this.inventory.add(new StoneShovel(this.world));
+        this.inventory.add(new CrabMeatRaw(this.world, 3));
+        this.inventory.add(new Stick(this.world, 3));
         this.inventory.add(new BlockItem(this.world, 3, 90));
-        this.inventory.add(new BlockItem(this.world, 1, 10));
+
         this.inventory.select(0);
     }
 

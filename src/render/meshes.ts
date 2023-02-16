@@ -14,6 +14,9 @@ import { Texture } from './texture';
 import voxelBagFile from '../../assets/vox/bag.vox?url';
 import voxelBranchFile from '../../assets/vox/branch.vox?url';
 import voxelStickFile from '../../assets/vox/stick.vox?url';
+import voxelStoneAxeFile from '../../assets/vox/stoneAxe.vox?url';
+import voxelStonePickaxeFile from '../../assets/vox/stonePickaxe.vox?url';
+import voxelStoneShovelFile from '../../assets/vox/stoneShovel.vox?url';
 import voxelFistFile from '../../assets/vox/fist.vox?url';
 import voxelCrabMeatRawFile from '../../assets/vox/crabMeatRaw.vox?url';
 
@@ -36,6 +39,9 @@ export class MeshList {
     crabMeatRaw: VoxelMesh;
     fist: VoxelMesh;
     stick: VoxelMesh;
+    stoneAxe: VoxelMesh;
+    stonePickaxe: VoxelMesh;
+    stoneShovel: VoxelMesh;
 
     crab: CrabMesh;
 
@@ -73,6 +79,9 @@ export class MeshList {
         this.fist = VoxelMesh.fromVoxFile(voxelFistFile);
         this.stick = VoxelMesh.fromVoxFile(voxelStickFile);
         this.crabMeatRaw = VoxelMesh.fromVoxFile(voxelCrabMeatRawFile);
+        this.stoneAxe = VoxelMesh.fromVoxFile(voxelStoneAxeFile);
+        this.stonePickaxe = VoxelMesh.fromVoxFile(voxelStonePickaxeFile);
+        this.stoneShovel = VoxelMesh.fromVoxFile(voxelStoneShovelFile);
         this.crab = {
             idle: [
                 VoxelMesh.fromVoxFile(voxelCrabIdle0File),
