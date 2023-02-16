@@ -1,71 +1,139 @@
-import { BlockItem } from '../../../world/item/blockItem';
-import { Item, MaybeItem } from '../../../world/item/item';
-import { StackableItem } from '../../../world/item/stackableItem';
+import { Inventory } from '../../../world/item/inventory';
+import { ItemWidget } from './item';
 import styles from './inventorySlot.module.css';
+import { Game } from '../../../game';
+import { ifError } from 'assert';
+import { StackableItem } from '../../../world/item/stackableItem';
 
 export class InventorySlot {
     div: HTMLElement;
-    name: HTMLElement;
-    amount: HTMLElement;
-    img: HTMLImageElement;
+    inventory: Inventory;
+    slotIndex: number;
+    game: Game;
+    widget: ItemWidget;
 
-    constructor(parent: HTMLElement, item: MaybeItem, active: boolean) {
+    constructor(
+        parent: HTMLElement,
+        inventory: Inventory,
+        slotIndex: number,
+        game: Game
+    ) {
         this.div = document.createElement('div');
         this.div.classList.add(styles.slot);
 
-        this.img = document.createElement('img');
-        this.img.classList.add(styles.img);
-        this.div.appendChild(this.img);
+        this.widget = new ItemWidget(this.div);
 
-        this.name = document.createElement('div');
-        this.name.classList.add(styles.name);
-        this.div.appendChild(this.name);
+        this.inventory = inventory;
+        this.slotIndex = slotIndex;
 
-        this.amount = document.createElement('div');
-        this.amount.classList.add(styles.amount);
-        this.div.appendChild(this.amount);
+        this.div.addEventListener('mousedown', (e) => e.stopPropagation());
+        this.div.addEventListener('click', this.click.bind(this));
+        this.div.addEventListener('contextmenu', this.rightClick.bind(this));
 
-        this.update(item, active);
+        this.game = game;
+
+        this.update();
         parent.appendChild(this.div);
     }
 
-    update(item: MaybeItem, active: boolean) {
-        const name = item?.name || '';
-        this.name.innerText = name;
-        if (name) {
-            this.div.setAttribute('title', name);
+    rightClick(e: MouseEvent) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (this.game.ui.heldItem === undefined) {
+            const item = this.inventory.items[this.slotIndex];
+            if (item instanceof StackableItem) {
+                if (item.amount < 2) {
+                    this.game.ui.heldItem =
+                        this.inventory.items[this.slotIndex];
+                    this.inventory.items[this.slotIndex] = undefined;
+                } else {
+                    const newStack = item.clone();
+                    newStack.amount = Math.ceil(newStack.amount / 2);
+                    item.amount -= newStack.amount;
+                    this.game.ui.heldItem = newStack;
+                }
+            } else {
+                this.game.ui.heldItem = this.inventory.items[this.slotIndex];
+                this.inventory.items[this.slotIndex] = undefined;
+            }
         } else {
-            this.div.removeAttribute('title');
+            const a = this.game.ui.heldItem;
+            const b = this.inventory.items[this.slotIndex];
+            if (a instanceof StackableItem) {
+                if (b instanceof StackableItem) {
+                    if (
+                        a.mayStackWith(b) &&
+                        b.mayStackWith(a) &&
+                        b.amount < 99
+                    ) {
+                        a.amount--;
+                        b.amount++;
+                        if (a.amount < 1) {
+                            a.destroy();
+                            this.game.ui.heldItem = undefined;
+                        }
+                    }
+                } else if (b === undefined) {
+                    const newStack = a.clone();
+                    newStack.amount = 1;
+                    a.amount--;
+                    this.inventory.items[this.slotIndex] = newStack;
+                }
+            } else {
+                this.inventory.items[this.slotIndex] = a;
+                this.game.ui.heldItem = b;
+            }
         }
+
+        this.game.ui.cursorItem.update(this.game.ui.heldItem);
+        this.game.ui.cursorItem.updatePos(e.pageX, e.pageY);
+        this.update();
+    }
+
+    click(e: MouseEvent) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (this.game.ui.heldItem === undefined) {
+            const tmp = this.inventory.items[this.slotIndex];
+            this.inventory.items[this.slotIndex] = this.game.ui.heldItem;
+            this.game.ui.heldItem = tmp;
+        } else {
+            const a = this.game.ui.heldItem;
+            const b = this.inventory.items[this.slotIndex];
+            if (
+                a instanceof StackableItem &&
+                b instanceof StackableItem &&
+                a.mayStackWith(b) &&
+                b.mayStackWith(a)
+            ) {
+                const transfer = Math.min(a.amount, 99 - b.amount);
+                a.amount -= transfer;
+                b.amount += transfer;
+                if (a.amount === 0) {
+                    a.destroy();
+                    this.game.ui.heldItem = undefined;
+                }
+            } else {
+                this.inventory.items[this.slotIndex] = a;
+                this.game.ui.heldItem = b;
+            }
+        }
+
+        this.game.ui.cursorItem.update(this.game.ui.heldItem);
+        this.game.ui.cursorItem.updatePos(e.pageX, e.pageY);
+        this.update();
+    }
+
+    update() {
+        const item = this.inventory.items[this.slotIndex];
+        const active = this.inventory.selection === this.slotIndex;
         if (active) {
             this.div.classList.add(styles.active);
         } else {
             this.div.classList.remove(styles.active);
         }
-        if (item instanceof StackableItem) {
-            if (item.amount > 0) {
-                this.amount.innerText = `${item.amount}`;
-            } else {
-                this.amount.innerText = '';
-            }
-            const icon = item.icon();
-            if (icon) {
-                this.img.setAttribute('src', icon);
-                this.img.style.display = 'block';
-            } else {
-                this.img.style.display = 'none';
-            }
-        } else if (item instanceof Item) {
-            const icon = item.icon();
-            if (icon) {
-                this.img.setAttribute('src', icon);
-                this.img.style.display = 'block';
-            } else {
-                this.img.style.display = 'none';
-            }
-        } else {
-            this.amount.innerText = '';
-            this.img.style.display = 'none';
-        }
+        this.widget.update(item, active);
     }
 }

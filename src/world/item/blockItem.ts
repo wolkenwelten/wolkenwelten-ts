@@ -11,7 +11,7 @@ export class BlockItem extends StackableItem {
         if (!bt) {
             throw new Error(`Invalid blockType: ${blockType}`);
         }
-        super(world, bt.name, amount);
+        super(world, amount, bt.longName || bt.name);
         this.blockType = blockType;
     }
 

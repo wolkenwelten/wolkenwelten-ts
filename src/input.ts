@@ -20,6 +20,9 @@ export class InputManager {
                 handler();
             }
         });
+        this.keyHandler.set('KeyE', () => {
+            that.toggleInventory();
+        });
         this.keyHandler.set('KeyN', () => {
             that.game.player.noClip = !that.game.player.noClip;
         });
@@ -38,6 +41,9 @@ export class InputManager {
         that.game.render.canvasWrapper.addEventListener(
             'mousedown',
             async (e) => {
+                if (this.game.ui.inventory.active) {
+                    this.toggleInventory();
+                }
                 if (!document.fullscreenElement) {
                     that.game.player.cooldown(15);
                     await that.game.ui.rootElement.requestFullscreen();
@@ -80,12 +86,35 @@ export class InputManager {
         );
     }
 
+    toggleInventory() {
+        this.game.ui.inventory.toggle();
+        if (this.game.ui.inventory.active) {
+            if (document.pointerLockElement) {
+                document.exitPointerLock();
+            }
+        } else {
+            if (!document.pointerLockElement) {
+                this.game.player.cooldown(15);
+                this.game.ui.rootElement.requestPointerLock();
+            }
+            if (this.game.ui.heldItem) {
+                this.game.player.dropItem(this.game.ui.heldItem);
+                this.game.ui.heldItem = undefined;
+                this.game.ui.cursorItem.update(this.game.ui.heldItem);
+            }
+        }
+    }
+
+    isInventoryActive() {
+        return this.game.ui.inventory.active;
+    }
+
     update() {
         const movement = { x: 0, y: 0, z: 0, sneak: false };
         const actions = { primary: false, secondary: false };
 
         if (this.keyStates.has('KeyQ')) {
-            this.game.player.dropItem();
+            this.game.player.dropActiveItem();
         }
         if (this.keyStates.has('KeyW')) {
             movement.z = -1;

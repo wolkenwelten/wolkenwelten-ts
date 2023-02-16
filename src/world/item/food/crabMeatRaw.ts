@@ -9,7 +9,7 @@ import { StackableItem } from '../stackableItem';
 
 export class CrabMeatRaw extends StackableItem {
     constructor(world: World, amount = 1) {
-        super(world, 'Crab meat', amount);
+        super(world, amount, 'Crab meat');
     }
 
     icon(): string {

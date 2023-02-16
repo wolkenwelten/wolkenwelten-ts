@@ -45,7 +45,7 @@ export class Item {
         return 1;
     }
 
-    drop(e: Entity): boolean {
+    dropAll(e: Entity): boolean {
         const drop = new ItemDrop(e.world, e.x, e.y, e.z, this);
         const [vx, vz] = e.walkDirection();
         drop.vy = 0.01;
@@ -53,6 +53,10 @@ export class Item {
         drop.vz = vz * -0.1;
         drop.noCollect = true;
         return true;
+    }
+
+    drop(e: Entity): boolean {
+        return this.dropAll(e);
     }
 
     mesh(world: World): TriangleMesh | VoxelMesh {

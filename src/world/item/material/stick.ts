@@ -8,7 +8,7 @@ import { StackableItem } from '../stackableItem';
 
 export class Stick extends StackableItem {
     constructor(world: World, amount = 1) {
-        super(world, 'Stick', amount);
+        super(world, amount, 'Stick');
     }
 
     icon(): string {

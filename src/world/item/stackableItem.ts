@@ -8,7 +8,7 @@ import { Item } from './item';
 export class StackableItem extends Item {
     amount: number;
 
-    constructor(world: World, name: string, amount: number) {
+    constructor(world: World, amount: number, name: string) {
         super(world, name);
         this.amount = amount;
     }
@@ -16,8 +16,8 @@ export class StackableItem extends Item {
     clone(): StackableItem {
         return new (this.constructor as any)(
             this.world,
-            this.name,
-            this.amount
+            this.amount,
+            this.name
         );
     }
 

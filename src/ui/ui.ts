@@ -2,15 +2,20 @@ import { Game } from '../game';
 import { HealthBar } from './components/health/healthBar';
 import { FpsCounter } from './components/fpsCounter';
 import { Crosshair } from './components/crosshair';
-import { InventoryBar } from './components/item/inventoryBar';
+import { InventoryWrap } from './components/item/inventoryWrap';
+import { CursorItem } from './components/item/cursorItem';
 import { XpView } from './components/xpView';
 import { IconManager } from './icon';
+import { MaybeItem } from '../world/item/item';
 
 export class UIManager {
     game: Game;
     rootElement: HTMLElement;
     uiWrapper: HTMLElement;
+    inventory: InventoryWrap;
+    cursorItem: CursorItem;
     icon: IconManager;
+    heldItem: MaybeItem;
 
     constructor(game: Game) {
         this.game = game;
@@ -23,7 +28,12 @@ export class UIManager {
         new FpsCounter(this.uiWrapper, game);
         new HealthBar(this.uiWrapper, game);
         new Crosshair(this.uiWrapper);
-        new InventoryBar(this.uiWrapper, game.player.inventory);
         new XpView(this.uiWrapper, game);
+        this.inventory = new InventoryWrap(
+            this.uiWrapper,
+            game.player.inventory,
+            game
+        );
+        this.cursorItem = new CursorItem(this.uiWrapper);
     }
 }

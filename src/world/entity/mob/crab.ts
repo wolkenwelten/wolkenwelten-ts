@@ -29,8 +29,8 @@ export class Crab extends Mob {
     gvx = 0;
     gvz = 0;
 
-    health = 4;
-    maxHealth = 4;
+    health = 8;
+    maxHealth = 8;
 
     aggroTarget?: Entity;
 

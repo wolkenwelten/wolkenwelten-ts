@@ -1,0 +1,16 @@
+.inventoryWrap {
+    display: table;
+    position:absolute;
+    right:0;
+    top:100%;
+    transform: translate(0, -80px);
+    text-align:left;
+    z-index:200;
+    transition: left 550ms, top 370ms, transform 190ms ease-in-out;
+}
+
+.inventoryWrap.active {
+    left:50%;
+    top:50%;
+    transform: translate(-50%, -50%);
+}

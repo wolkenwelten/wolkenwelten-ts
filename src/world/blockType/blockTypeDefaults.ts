@@ -90,7 +90,7 @@ export const initDefaultBlocks = (world: World) => {
         .withColours(0x3e3214ff, 0x29200dff)
         .withMiningCat('Pickaxe')
         .withSimpleHandler(new BlockItem(world, 1, 1))
-        .withBlockHealth(5000);
+        .withBlockHealth(500);
 
     world
         .addBlockType('Obsidian')
@@ -115,11 +115,11 @@ export const initDefaultBlocks = (world: World) => {
         .withBlockHealth(100);
 
     world
-        .addBlockType('Iron ore (hematite)', 'IronOre')
+        .addBlockType('Iron ore', 'IronOre')
         .withTexture(11)
         .withColours(0x725b5bff, 0x5e5e5eff)
         .withMiningCat('Pickaxe')
-        .withBlockHealth(10000);
+        .withBlockHealth(1000);
 
     world
         .addBlockType('Marble block', 'MarbleBlock')

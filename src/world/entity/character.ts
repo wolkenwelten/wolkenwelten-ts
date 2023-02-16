@@ -9,6 +9,7 @@ import { ItemDrop } from './itemDrop';
 import { StoneAxe } from '../item/tools/stoneAxe';
 import { StonePickaxe } from '../item/tools/stonePickaxe';
 import { Stick } from '../item/material/stick';
+import { MaybeItem } from '../item/item';
 
 const CHARACTER_ACCELERATION = 0.04;
 const CHARACTER_STOP_RATE = CHARACTER_ACCELERATION * 3.0;
@@ -90,7 +91,7 @@ export class Character extends Entity {
         this.spawnZ = this.z = z;
         this.spawnYaw = yaw;
         this.spawnPitch = pitch;
-        this.inventory = new Inventory(10);
+        this.inventory = new Inventory(40);
         this.init();
         this.noClip = noClip;
     }
@@ -414,7 +415,7 @@ export class Character extends Entity {
         }
     }
 
-    dropItem() {
+    dropActiveItem() {
         if (this.world.game.ticks < this.lastAction) {
             return;
         }
@@ -425,6 +426,16 @@ export class Character extends Entity {
         if (item.drop(this)) {
             this.hitAnimation = this.world.game.render.frames;
             this.inventory.items[this.inventory.selection] = undefined;
+            this.inventory.updateAll();
+        }
+    }
+
+    dropItem(item: MaybeItem) {
+        if (!item) {
+            return;
+        }
+        if (item.dropAll(this)) {
+            this.hitAnimation = this.world.game.render.frames;
             this.inventory.updateAll();
         }
     }
