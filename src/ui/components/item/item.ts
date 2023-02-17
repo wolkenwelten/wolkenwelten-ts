@@ -1,4 +1,6 @@
-import { BlockItem } from '../../../world/item/blockItem';
+/* Copyright 2023 - Benjamin Vincent Schulenburg
+ * Licensed under the AGPL3+, for the full text see /LICENSE
+ */
 import { Item, MaybeItem } from '../../../world/item/item';
 import { StackableItem } from '../../../world/item/stackableItem';
 import styles from './item.module.css';

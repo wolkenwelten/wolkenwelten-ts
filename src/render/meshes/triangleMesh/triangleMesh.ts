@@ -1,5 +1,6 @@
-// Wolkenwelten - Copyright (C) 2023 - Benjamin Vincent Schulenburg
-// Licensed under an MIT License, see /LICENSE for the details
+/* Copyright 2023 - Benjamin Vincent Schulenburg
+ * Licensed under the AGPL3+, for the full text see /LICENSE
+ */
 import { mat4 } from 'gl-matrix';
 
 import '../../../types';

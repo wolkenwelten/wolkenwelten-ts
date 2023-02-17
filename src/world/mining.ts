@@ -1,3 +1,6 @@
+/* Copyright 2023 - Benjamin Vincent Schulenburg
+ * Licensed under the AGPL3+, for the full text see /LICENSE
+ */
 import { RenderManager } from '../render/render';
 import { clamp } from '../util/math';
 import { MaybeItem } from './item/item';

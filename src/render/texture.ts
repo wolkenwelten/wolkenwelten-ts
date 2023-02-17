@@ -1,3 +1,6 @@
+/* Copyright 2023 - Benjamin Vincent Schulenburg
+ * Licensed under the AGPL3+, for the full text see /LICENSE
+ */
 const isPowerOf2 = (value: number) => (value & (value - 1)) === 0;
 
 type MaybeWebGLTexture = WebGLTexture | undefined;

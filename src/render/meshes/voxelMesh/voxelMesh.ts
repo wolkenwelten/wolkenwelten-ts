@@ -1,3 +1,6 @@
+/* Copyright 2023 - Benjamin Vincent Schulenburg
+ * Licensed under the AGPL3+, for the full text see /LICENSE
+ */
 import '../../../types';
 import { Shader } from '../../shader';
 import { Texture } from '../../texture';

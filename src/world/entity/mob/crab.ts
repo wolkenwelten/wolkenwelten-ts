@@ -1,3 +1,6 @@
+/* Copyright 2023 - Benjamin Vincent Schulenburg
+ * Licensed under the AGPL3+, for the full text see /LICENSE
+ */
 import { VoxelMesh } from '../../../render/asset';
 import { World } from '../../world';
 import { Mob } from './mob';

@@ -1,3 +1,6 @@
+/* Copyright 2023 - Benjamin Vincent Schulenburg
+ * Licensed under the AGPL3+, for the full text see /LICENSE
+ */
 import readVox from 'vox-reader';
 
 import voxBushA from '../../../assets/wg/bush_a.vox?url';

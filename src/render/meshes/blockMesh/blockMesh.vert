@@ -29,7 +29,6 @@ void main(){
 
     /* We divide the uv coordinates by 2 since we have 4 variations per
      | texture right now. If we ever add more we have to increase this value.
-     | Here we also mirror the textures, so that they are the right side up.
      */
 	tex_coord = vec3(uvec3(taxis[side >> 1], texture_index)) * vec3(0.5, 0.5, 1.0);
 

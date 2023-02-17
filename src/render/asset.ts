@@ -1,3 +1,6 @@
+/* Copyright 2023 - Benjamin Vincent Schulenburg
+ * Licensed under the AGPL3+, for the full text see /LICENSE
+ */
 import { Game } from '../game';
 import { BlockMesh } from './meshes/blockMesh/blockMesh';
 import { DecalMesh } from './meshes/decalMesh/decalMesh';

@@ -1,3 +1,6 @@
+/* Copyright 2023 - Benjamin Vincent Schulenburg
+ * Licensed under the AGPL3+, for the full text see /LICENSE
+ */
 import { mat4, vec3 } from 'gl-matrix';
 import { World } from '../../world';
 import { Entity } from '../entity';

@@ -1,8 +1,10 @@
+/* Copyright 2023 - Benjamin Vincent Schulenburg
+ * Licensed under the AGPL3+, for the full text see /LICENSE
+ */
 import { Inventory } from '../../../world/item/inventory';
 import { ItemWidget } from './item';
 import styles from './inventorySlot.module.css';
 import { Game } from '../../../game';
-import { ifError } from 'assert';
 import { StackableItem } from '../../../world/item/stackableItem';
 
 export class InventorySlot {

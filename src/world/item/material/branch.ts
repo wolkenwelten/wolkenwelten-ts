@@ -1,3 +1,6 @@
+/* Copyright 2023 - Benjamin Vincent Schulenburg
+ * Licensed under the AGPL3+, for the full text see /LICENSE
+ */
 import { TriangleMesh, VoxelMesh } from '../../../render/asset';
 import { Entity } from '../../entity/entity';
 import { World } from '../../world';

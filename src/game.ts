@@ -1,3 +1,7 @@
+/* Copyright 2023 - Benjamin Vincent Schulenburg
+ * Licensed under the AGPL3+, for the full text see /LICENSE
+ */
+
 import { Character } from './world/entity/character';
 import { AdditionManager } from './add';
 import { AudioManager } from './audio';

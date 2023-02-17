@@ -1,3 +1,6 @@
+/* Copyright 2023 - Benjamin Vincent Schulenburg
+ * Licensed under the AGPL3+, for the full text see /LICENSE
+ */
 import { ItemWidget } from './item';
 import styles from './cursorItem.module.css';
 import { MaybeItem } from '../../../world/item/item';
