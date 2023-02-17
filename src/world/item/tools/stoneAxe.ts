@@ -14,6 +14,10 @@ export class StoneAxe extends Item {
         super(world, 'Stone Axe');
     }
 
+    clone(): Item {
+        return new StoneAxe(this.world);
+    }
+
     icon(): string {
         return itemIcon;
     }

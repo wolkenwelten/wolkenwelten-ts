@@ -5,17 +5,19 @@ import { Game } from '../game';
 import { HealthBar } from './components/health/healthBar';
 import { FpsCounter } from './components/fpsCounter';
 import { Crosshair } from './components/crosshair';
-import { InventoryWrap } from './components/item/inventoryWrap';
+import { Hotbar } from './components/hotbar';
 import { CursorItem } from './components/item/cursorItem';
 import { XpView } from './components/xpView';
 import { IconManager } from './icon';
 import { MaybeItem } from '../world/item/item';
+import { PlayerModal } from './components/playerModal';
 
 export class UIManager {
     game: Game;
     rootElement: HTMLElement;
     uiWrapper: HTMLElement;
-    inventory: InventoryWrap;
+    inventory: PlayerModal;
+    hotbar: Hotbar;
     cursorItem: CursorItem;
     icon: IconManager;
     heldItem: MaybeItem;
@@ -32,11 +34,14 @@ export class UIManager {
         new HealthBar(this.uiWrapper, game);
         new Crosshair(this.uiWrapper);
         new XpView(this.uiWrapper, game);
-        this.inventory = new InventoryWrap(
-            this.uiWrapper,
-            game.player.inventory,
-            game
-        );
+        this.inventory = new PlayerModal(this.uiWrapper, game);
+        this.hotbar = new Hotbar(this.uiWrapper, game);
         this.cursorItem = new CursorItem(this.uiWrapper);
+        game.player.inventory.onChange = this.updateInventory.bind(this);
+    }
+
+    updateInventory(i: number) {
+        this.hotbar.update(i);
+        this.inventory.update(i);
     }
 }

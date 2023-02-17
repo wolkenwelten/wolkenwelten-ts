@@ -1,0 +1,79 @@
+.modal {
+    position: absolute;
+    left:50%;
+    top:50%;
+    transform: translate(-50%, -50%);
+
+    padding:8px;
+
+    background:#667;
+    border-radius:4px;
+    border-top: solid 1px #99A;
+    border-left: solid 1px #99A;
+    border-bottom:solid 1px #445;
+    border-right:solid 1px #445;
+    z-index:300;
+    display:none;
+}
+
+.active {
+    display:block;
+}
+
+.tabBar {
+    display: block;
+    position:relative;
+    top:1px;
+    z-index:1;
+}
+
+.tabContentWrap {
+    display: block;
+}
+
+.tabContent {
+    display:none;
+    position:relative;
+    top:-1px;
+    background:#556;
+    border-radius:0 4px 4px 4px;
+    border-bottom: solid 1px #99A;
+    border-right: solid 1px #99A;
+    border-top:solid 1px #445;
+    border-left:solid 1px #445;
+
+    min-width:800px;
+    min-height:300px;
+}
+
+.activeTab {
+    display:block;
+}
+
+.tabButton {
+    background:#445;
+    cursor: pointer;
+    display: inline-block;
+    border-radius:4px 4px 0 0;
+    border-top: solid 1px #99A;
+    border-left: solid 1px #99A;
+    border-right:solid 1px #445;
+    margin-right:6px;
+    color: #bbb;
+
+
+    padding:2px 6px;
+    font-size:1.3rem;
+    font-family: 'Courier New', Courier, monospace;
+    text-shadow: -1px 0px 0px#000,1px 0px 0px#000,0px -1px 0px#000,0px 1px 0px#000;
+}
+
+.activeTabButton {
+    background:#556;
+    border-right: solid 1px #99A;
+    border-top:solid 1px #445;
+    border-left:solid 1px #445;
+    color: #fff;
+
+    cursor:default;
+}

@@ -10,12 +10,15 @@ export class ItemWidget {
     amount: HTMLElement;
     img: HTMLImageElement;
 
-    constructor(parent: HTMLElement) {
+    constructor(parent: HTMLElement, showActive = true) {
         this.div = document.createElement('div');
         this.div.classList.add(styles.slot);
 
         this.img = document.createElement('img');
         this.img.classList.add(styles.img);
+        if (showActive) {
+            this.img.classList.add(styles.showActive);
+        }
         this.div.appendChild(this.img);
 
         this.amount = document.createElement('div');

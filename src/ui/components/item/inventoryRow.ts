@@ -16,7 +16,8 @@ export class InventoryRow {
         parent: HTMLElement,
         inventory: Inventory,
         offset = 0,
-        game: Game
+        game: Game,
+        showActive = true
     ) {
         this.div = document.createElement('div');
         this.div.classList.add(styles.row);
@@ -24,7 +25,13 @@ export class InventoryRow {
         this.offset = offset;
         for (let i = 0; i < 10; i++) {
             this.slots.push(
-                new InventorySlot(this.div, inventory, i + offset, game)
+                new InventorySlot(
+                    this.div,
+                    inventory,
+                    i + offset,
+                    game,
+                    showActive
+                )
             );
         }
         parent.appendChild(this.div);

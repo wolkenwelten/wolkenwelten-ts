@@ -8,6 +8,7 @@ import { Chunk } from './chunk/chunk';
 import { BlockType } from './blockType/blockType';
 import { MiningManager } from './mining';
 import { WorldgenAssetManager } from './worldgen/assets';
+import { CraftingSystem } from './crafting';
 import { initDefaultBlocks } from './blockType/blockTypeDefaults';
 
 export const coordinateToWorldKey = (x: number, y: number, z: number) =>
@@ -23,6 +24,7 @@ export class World {
     mining: MiningManager;
     game: Game;
     assets: WorldgenAssetManager;
+    crafting: CraftingSystem;
     blocks: BlockType[] = [];
     blockTextureUrl = '';
 
@@ -33,6 +35,7 @@ export class World {
         this.assets = new WorldgenAssetManager();
         this.dangerZone = new DangerZone(this);
         initDefaultBlocks(this);
+        this.crafting = new CraftingSystem(this);
     }
 
     addBlockType = (longName: string, name?: string): BlockType => {

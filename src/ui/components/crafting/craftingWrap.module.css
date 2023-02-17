@@ -1,0 +1,124 @@
+.craftingWrap {
+    display: table;
+    text-align:left;
+}
+
+.recipeList {
+    padding-top:1px;
+    display: block;
+    border-right: solid 1px #99a;
+    overflow-y: auto;
+    overflow-x: hidden;
+    width:256px;
+    height: 100%;
+    position: absolute;
+    left:0;
+    top:0;
+}
+
+.recipeDetails {
+    display: block;
+    padding-left:262px;
+}
+
+.recipe {
+    cursor: pointer;
+    display: block;
+    padding:0 4px;
+    position: relative;
+    border: solid 1px #556;
+}
+
+.recipe img {
+    float:left;
+}
+
+.craftingWrap::after,
+.recipe::after {
+    content:'';
+    display:block;
+    clear:both;
+}
+
+.recipeDetails h3 {
+    margin-top:2px;
+    font-size:1.3rem;
+    font-family: 'Courier New', Courier, monospace;
+    text-shadow: -1px 0px 0px#000,1px 0px 0px#000,0px -1px 0px#000,0px 1px 0px#000;
+}
+
+.recipe h3 {
+    margin-top:24px;
+    display: inline-block;
+    font-size:1rem;
+    font-family: 'Courier New', Courier, monospace;
+    text-shadow: -1px 0px 0px#000,1px 0px 0px#000,0px -1px 0px#000,0px 1px 0px#000;
+}
+
+.craftCount::before {
+    content:'x';
+}
+
+.craftCount {
+    position:absolute;
+    right:6px;
+    bottom:2px;
+    font-size:1rem;
+    font-family: 'Courier New', Courier, monospace;
+    text-shadow: -1px 0px 0px#000,1px 0px 0px#000,0px -1px 0px#000,0px 1px 0px#000;
+}
+
+.active h3 {
+    color: gold;
+}
+
+.active {
+    border: solid 1px gold !important;
+}
+
+.craftButton::before {
+    content:'Craft';
+}
+
+.craftButton {
+    background:linear-gradient(gold, goldenrod);
+    border: none;
+    cursor: pointer;
+    position: absolute;
+    right:6px;
+    bottom:4px;
+    border-radius: 2px;
+    color:#fff;
+    padding:2px 6px;
+    font-size:1.3rem;
+    font-family: 'Courier New', Courier, monospace;
+    text-shadow: -1px 0px 0px#000,1px 0px 0px#000,0px -1px 0px#000,0px 1px 0px#000;
+}
+
+.ingredientList {
+    display: block;
+}
+
+.ingredientList::before {
+    content: 'Ingredients';
+    display: block;
+    font-family: 'Courier New', Courier, monospace;
+    text-shadow: -1px 0px 0px#000,1px 0px 0px#000,0px -1px 0px#000,0px 1px 0px#000;
+}
+
+.ingredientWrap {
+    position: relative;
+    display: inline-block;
+    width:80px;
+    height:80px;
+    margin-right:8px;
+}
+
+.cantCraft {
+    background:#445;
+    color:#bbb;
+}
+
+button.cantCraft {
+    cursor:not-allowed;
+}

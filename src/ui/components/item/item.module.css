@@ -16,16 +16,23 @@
 
 .img {
     display:block;
-    width:32px;
-    height:32px;
+    width:64px;
+    height:64px;
     position:absolute;
-    left:22px;
-    top:22px;
-    transition: transform 200ms;
-    transform: scale(1.5);
+    left:4px;
+    top:4px;
     pointer-events: none;
 }
 
-.slot.active .img {
+.img.showActive {
+    width:32px;
+    height:32px;
+    left:22px;
+    top:22px;
+    transition: transform 150ms;
+    transform: scale(1.5);
+}
+
+.active .showActive {
     transform: scale(2);
 }

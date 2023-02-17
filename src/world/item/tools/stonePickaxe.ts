@@ -14,6 +14,10 @@ export class StonePickaxe extends Item {
         super(world, 'Stone Pickaxe');
     }
 
+    clone(): Item {
+        return new StonePickaxe(this.world);
+    }
+
     icon(): string {
         return itemIcon;
     }

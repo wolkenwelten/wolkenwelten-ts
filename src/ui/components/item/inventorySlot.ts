@@ -13,17 +13,20 @@ export class InventorySlot {
     slotIndex: number;
     game: Game;
     widget: ItemWidget;
+    showActive: boolean;
 
     constructor(
         parent: HTMLElement,
         inventory: Inventory,
         slotIndex: number,
-        game: Game
+        game: Game,
+        showActive = true
     ) {
         this.div = document.createElement('div');
         this.div.classList.add(styles.slot);
+        this.showActive = showActive;
 
-        this.widget = new ItemWidget(this.div);
+        this.widget = new ItemWidget(this.div, showActive);
 
         this.inventory = inventory;
         this.slotIndex = slotIndex;
@@ -90,6 +93,7 @@ export class InventorySlot {
 
         this.game.ui.cursorItem.update(this.game.ui.heldItem);
         this.game.ui.cursorItem.updatePos(e.pageX, e.pageY);
+        this.game.ui.updateInventory(this.slotIndex);
         this.update();
     }
 
@@ -125,12 +129,14 @@ export class InventorySlot {
 
         this.game.ui.cursorItem.update(this.game.ui.heldItem);
         this.game.ui.cursorItem.updatePos(e.pageX, e.pageY);
+        this.game.ui.updateInventory(this.slotIndex);
         this.update();
     }
 
     update() {
         const item = this.inventory.items[this.slotIndex];
-        const active = this.inventory.selection === this.slotIndex;
+        const active =
+            this.showActive && this.inventory.selection === this.slotIndex;
         if (active) {
             this.div.classList.add(styles.active);
         } else {
