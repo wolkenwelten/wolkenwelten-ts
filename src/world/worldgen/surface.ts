@@ -4,6 +4,9 @@
 import { Chunk } from '../chunk/chunk';
 import { Crab } from '../entity/mob/crab';
 import { LCG } from '../../util/prng';
+import { StaticShell } from '../staticObjects/shell';
+import { Grass } from '../staticObjects/grass';
+import { StaticStone } from '../staticObjects/stone';
 
 const grassHeight = (x: number, z: number): number => {
     const d = Math.sqrt(x * x + z * z);
@@ -76,8 +79,15 @@ export const worldgenSurface = (chunk: Chunk) => {
                         }
                     }
 
-                    if (gh > -3 && rng.bool(6400)) {
+                    if (gh > -3 && endY < 32 && rng.bool(640)) {
                         new Crab(chunk.world, cx, gh + 2, cz);
+                    } else if (
+                        gh > -3 &&
+                        gh < 0 &&
+                        endY < 32 &&
+                        rng.bool(640)
+                    ) {
+                        new StaticShell(chunk, cx, gh + 2, cz);
                     }
                 } else if (gh > 24) {
                     chunk.setBoxUnsafe(x, 0, z, 1, Math.min(endY, 32), 1, 3);
@@ -136,6 +146,8 @@ export const worldgenSurface = (chunk: Chunk) => {
                                 assets.spruceA.fits(chunk, x, gh - 3, z)
                             ) {
                                 assets.spruceA.blit(chunk, x, gh - 3, z);
+                            } else if (rng.bool(400)) {
+                                new StaticStone(chunk, cx, gh + 2, cz);
                             }
                         }
                     }

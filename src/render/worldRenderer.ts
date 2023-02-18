@@ -1,7 +1,7 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { mat4, vec4 } from 'gl-matrix';
+import { mat4, vec3, vec4 } from 'gl-matrix';
 
 import { Frustum } from './frustum';
 import { BlockMesh } from './asset';
@@ -168,5 +168,22 @@ export class WorldRenderer {
             drawCalls += mesh.drawFast(mask, alpha, 6);
         }
         this.renderer.game.profiler.addAmount('blockMeshDrawCalls', drawCalls);
+
+        const mvp = mat4.create();
+        for (const { mesh } of this.drawQueue) {
+            for (const s of mesh.chunk.static) {
+                mat4.identity(mvp);
+                const transOff = s.transOff();
+                mat4.translate(mvp, mvp, [
+                    s.x + transOff[0],
+                    s.y + transOff[1],
+                    s.z + transOff[2],
+                ]);
+                mat4.scale(mvp, mvp, [1 / 32, 1 / 32, 1 / 32]);
+                mat4.mul(mvp, viewMatrix, mvp);
+                mat4.mul(mvp, projectionMatrix, mvp);
+                s.mesh().draw(mvp, 1.0);
+            }
+        }
     }
 }

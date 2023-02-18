@@ -56,7 +56,7 @@ export class StackableItem extends Item {
 
     drop(e: Entity): boolean {
         if (this.amount <= 1) {
-            return Item.prototype.drop.call(this, e);
+            return super.drop(e);
         }
         this.amount--;
         if (e instanceof Character) {

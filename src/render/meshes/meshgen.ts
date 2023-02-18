@@ -723,6 +723,7 @@ const finishLight = (light: Uint8Array, block: Uint8Array) => {
 export const meshgenSimple = (blocks: Uint8Array): [Uint8Array, number] => {
     const start = performance.now();
     const vertices: number[] = [];
+    lightData.fill(15);
     lightGenSimple(tmpSimpleLight, blocks);
     blitChunkData(blockData, blocks, 1, 1, 1);
     blitChunkData(lightData, tmpSimpleLight, 1, 1, 1);

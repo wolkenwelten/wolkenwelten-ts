@@ -3,6 +3,7 @@
  */
 import { Entity } from '../entity/entity';
 import { lightGenSimple } from './lightGen';
+import { StaticObject } from '../staticObjects/staticObject';
 import { World } from '../world';
 import { worldgenSurface } from '../worldgen/surface';
 import { worldgenSky } from '../worldgen/sky';
@@ -22,6 +23,7 @@ export class Chunk {
     x: number;
     y: number;
     z: number;
+    static: Set<StaticObject> = new Set();
     world: World;
 
     constructor(world: World, x: number, y: number, z: number) {

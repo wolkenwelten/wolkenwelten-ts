@@ -70,11 +70,13 @@ export class Character extends Entity {
         this.miningX = this.miningY = this.miningZ = 0;
         this.vx = this.vy = this.vz = 0;
         this.inventory.clear();
+        /*
         this.inventory.add(new StonePickaxe(this.world));
         this.inventory.add(new StoneAxe(this.world));
         this.inventory.add(new CrabMeatRaw(this.world, 3));
         this.inventory.add(new Stick(this.world, 3));
         this.inventory.add(new BlockItem(this.world, 3, 90));
+        */
 
         this.inventory.select(0);
     }
@@ -350,6 +352,29 @@ export class Character extends Entity {
                 e.onAttack(this);
                 if (e.isDead) {
                     this.xpGain(1);
+                }
+            }
+        }
+
+        for (let cxo = -1; cxo < 2; cxo++) {
+            for (let cyo = -1; cyo < 2; cyo++) {
+                for (let czo = -1; czo < 2; czo++) {
+                    const cx = x + cxo * 32;
+                    const cy = y + cyo * 32;
+                    const cz = z + czo * 32;
+                    const c = this.world.getChunk(cx, cy, cz);
+                    if (!c) {
+                        continue;
+                    }
+                    for (const s of c.static) {
+                        const dx = x - s.x;
+                        const dy = y - s.y;
+                        const dz = z - s.z;
+                        const dd = dx * dx + dy * dy + dz * dz;
+                        if (dd < rr) {
+                            s.onAttacked(this);
+                        }
+                    }
                 }
             }
         }

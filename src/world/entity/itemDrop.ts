@@ -25,7 +25,7 @@ export class ItemDrop extends Entity {
     }
 
     update() {
-        Entity.prototype.update.call(this);
+        super.update();
         const player = this.world.game.player;
         const dx = player.x - this.x;
         const dy = player.y - this.y;
@@ -65,11 +65,7 @@ export class ItemDrop extends Entity {
             this.z,
         ]);
 
-        mat4.scale(
-            modelViewMatrix,
-            modelViewMatrix,
-            vec3.fromValues(1 / 32, 1 / 32, 1 / 32)
-        );
+        mat4.scale(modelViewMatrix, modelViewMatrix, [1 / 32, 1 / 32, 1 / 32]);
         mat4.rotateY(
             modelViewMatrix,
             modelViewMatrix,
