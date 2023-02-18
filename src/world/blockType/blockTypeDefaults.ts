@@ -10,6 +10,9 @@ import { World } from '../world';
 
 import { Branch } from '../item/material/branch';
 import { Stick } from '../item/material/stick';
+import { Stone } from '../item/material/stone';
+import { IronOre } from '../item/material/ironOre';
+import { Coal } from '../item/material/coal';
 
 const leafDropHandler = (
     world: World,
@@ -24,6 +27,38 @@ const leafDropHandler = (
     } else if (t < 3) {
         new ItemDrop(world, x + 0.5, y + 0.4, z + 0.5, new Stick(world));
     }
+};
+
+const stoneDropHandler = (
+    world: World,
+    x: number,
+    y: number,
+    z: number,
+    tool: MaybeItem
+) => {
+    new ItemDrop(world, x + 0.5, y + 0.4, z + 0.5, new Stone(world, 5));
+};
+
+const ironOreDropHandler = (
+    world: World,
+    x: number,
+    y: number,
+    z: number,
+    tool: MaybeItem
+) => {
+    new ItemDrop(world, x + 0.4, y + 0.4, z + 0.4, new Stone(world, 2));
+    new ItemDrop(world, x + 0.6, y + 0.4, z + 0.6, new IronOre(world, 3));
+};
+
+const coalDropHandler = (
+    world: World,
+    x: number,
+    y: number,
+    z: number,
+    tool: MaybeItem
+) => {
+    new ItemDrop(world, x + 0.4, y + 0.4, z + 0.4, new Stone(world, 2));
+    new ItemDrop(world, x + 0.6, y + 0.4, z + 0.6, new Coal(world, 3));
 };
 
 export const initDefaultBlocks = (world: World) => {
@@ -53,6 +88,7 @@ export const initDefaultBlocks = (world: World) => {
         .withTexture(2)
         .withColours(0x5e5e5eff, 0x484848ff)
         .withMiningCat('Pickaxe')
+        .withItemDropHandler(stoneDropHandler)
         .withBlockHealth(800);
 
     world
@@ -60,6 +96,7 @@ export const initDefaultBlocks = (world: World) => {
         .withTexture(3)
         .withColours(0x262626ff, 0x101010ff)
         .withMiningCat('Pickaxe')
+        .withItemDropHandler(coalDropHandler)
         .withBlockHealth(700);
 
     world
@@ -122,6 +159,7 @@ export const initDefaultBlocks = (world: World) => {
         .withTexture(11)
         .withColours(0x725b5bff, 0x5e5e5eff)
         .withMiningCat('Pickaxe')
+        .withItemDropHandler(ironOreDropHandler)
         .withBlockHealth(1000);
 
     world

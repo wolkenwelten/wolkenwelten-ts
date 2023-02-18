@@ -45,6 +45,12 @@ export class CraftingWrap {
         h.innerText = recipe.result.name;
         div.append(h);
 
+        if (recipe.description) {
+            const p = document.createElement('p');
+            p.innerText = recipe.description;
+            div.append(p);
+        }
+
         const ingredients = document.createElement('div');
         ingredients.classList.add(styles.ingredientList);
         div.append(ingredients);

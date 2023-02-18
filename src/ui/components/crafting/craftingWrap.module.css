@@ -21,6 +21,7 @@
     padding-left:262px;
 }
 
+
 .recipe {
     cursor: pointer;
     display: block;
@@ -43,6 +44,12 @@
 .recipeDetails h3 {
     margin-top:2px;
     font-size:1.3rem;
+    font-family: 'Courier New', Courier, monospace;
+    text-shadow: -1px 0px 0px#000,1px 0px 0px#000,0px -1px 0px#000,0px 1px 0px#000;
+}
+
+.recipeDetails p {
+    font-size:1rem;
     font-family: 'Courier New', Courier, monospace;
     text-shadow: -1px 0px 0px#000,1px 0px 0px#000,0px -1px 0px#000,0px 1px 0px#000;
 }

@@ -70,6 +70,7 @@ export class Character extends Entity {
         this.miningX = this.miningY = this.miningZ = 0;
         this.vx = this.vy = this.vz = 0;
         this.inventory.clear();
+
         /*
         this.inventory.add(new StonePickaxe(this.world));
         this.inventory.add(new StoneAxe(this.world));

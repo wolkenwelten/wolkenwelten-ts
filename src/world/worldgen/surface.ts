@@ -7,6 +7,7 @@ import { LCG } from '../../util/prng';
 import { StaticShell } from '../staticObjects/shell';
 import { Grass } from '../staticObjects/grass';
 import { StaticStone } from '../staticObjects/stone';
+import { StaticStick } from '../staticObjects/stick';
 
 const grassHeight = (x: number, z: number): number => {
     const d = Math.sqrt(x * x + z * z);
@@ -148,6 +149,8 @@ export const worldgenSurface = (chunk: Chunk) => {
                                 assets.spruceA.blit(chunk, x, gh - 3, z);
                             } else if (rng.bool(400)) {
                                 new StaticStone(chunk, cx, gh + 2, cz);
+                            } else if (rng.bool(2400)) {
+                                new StaticStick(chunk, cx, gh + 2, cz);
                             }
                         }
                     }

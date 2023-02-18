@@ -9,10 +9,12 @@ import { World } from './world';
 export class CraftingRecipe {
     result: Item;
     ingredients: Item[];
+    description: string;
 
-    constructor(result: Item, ingredients: Item[]) {
+    constructor(result: Item, ingredients: Item[], description = '') {
         this.result = result;
         this.ingredients = ingredients;
+        this.description = description;
     }
 
     couldCraft(inventory: Inventory): number {
@@ -37,8 +39,11 @@ export class CraftingSystem {
     world: World;
     recipes: Map<string, CraftingRecipe> = new Map();
 
-    add(id: string, result: Item, ingredients: Item[]) {
-        this.recipes.set(id, new CraftingRecipe(result, ingredients));
+    add(id: string, result: Item, ingredients: Item[], description = '') {
+        this.recipes.set(
+            id,
+            new CraftingRecipe(result, ingredients, description)
+        );
     }
 
     constructor(world: World) {
