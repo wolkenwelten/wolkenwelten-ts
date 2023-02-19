@@ -55,7 +55,9 @@ export class Crab extends Mob {
     }
 
     onDeath() {
-        if(this.state === 'dead'){return;}
+        if (this.state === 'dead') {
+            return;
+        }
         this.world.game.render.particle.fxDeath(this.x, this.y, this.z);
         this.world.game.add.itemDrop(
             this.x,
@@ -68,7 +70,9 @@ export class Crab extends Mob {
     }
 
     onAttack(perpetrator: Entity): void {
-        if(this.isDead){return;}
+        if (this.isDead) {
+            return;
+        }
         this.aggroTarget = perpetrator;
         this.changeState('chase');
     }
@@ -290,8 +294,11 @@ export class Crab extends Mob {
         }
 
         if (this.isSolidPillar(this.x, this.y - 5 / 32, this.z)) {
-            if(!this.isDead && this.isSolidPillar(this.x, this.y - 4 / 32, this.z)){
-                this.y += 1/32;
+            if (
+                !this.isDead &&
+                this.isSolidPillar(this.x, this.y - 4 / 32, this.z)
+            ) {
+                this.y += 1 / 32;
             }
             this.vy = Math.max(0, this.vy);
             const accel = 0.5;

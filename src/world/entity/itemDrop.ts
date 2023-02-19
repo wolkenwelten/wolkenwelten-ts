@@ -65,7 +65,6 @@ export class ItemDrop extends Entity {
             this.z,
         ]);
 
-        mat4.scale(modelViewMatrix, modelViewMatrix, [1 / 32, 1 / 32, 1 / 32]);
         mat4.rotateY(
             modelViewMatrix,
             modelViewMatrix,

@@ -179,7 +179,6 @@ export class WorldRenderer {
                     s.y + transOff[1],
                     s.z + transOff[2],
                 ]);
-                mat4.scale(mvp, mvp, [1 / 32, 1 / 32, 1 / 32]);
                 mat4.mul(mvp, viewMatrix, mvp);
                 mat4.mul(mvp, projectionMatrix, mvp);
                 s.mesh().draw(mvp, 1.0);

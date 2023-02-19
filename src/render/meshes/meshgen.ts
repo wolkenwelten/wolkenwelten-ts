@@ -11,7 +11,7 @@ const createIdentityBlocks = () => {
     const ret = [];
     ret.push(new BlockType(0, 'Void').withInvisible());
     for (let i = 1; i < 256; i++) {
-        ret.push(new BlockType(i, '').withTexture(i));
+        ret.push(new BlockType(i, '').withTexture(i - 1));
     }
     return ret;
 };

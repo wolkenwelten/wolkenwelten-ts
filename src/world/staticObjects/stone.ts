@@ -22,15 +22,15 @@ export class StaticStone extends StaticObject {
         const item = new Stone(this.chunk.world, 1);
         new ItemDrop(
             this.chunk.world,
-            this.x - 0.5,
+            this.x + 0.5,
             this.y + 0.5,
-            this.z - 0.5,
+            this.z + 0.5,
             item
         );
         this.destroy();
     }
 
     transOff(): [number, number, number] {
-        return [-0.5 - 3 / 32, -1 + 1 / 32, -0.5 + 5 / 32];
+        return [0.5 - 3 / 32, 1 / 32, 0.5 + 5 / 32];
     }
 }

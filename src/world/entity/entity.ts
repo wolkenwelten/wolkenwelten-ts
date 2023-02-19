@@ -170,11 +170,6 @@ export class Entity {
             this.z,
         ]);
 
-        mat4.scale(
-            modelViewMatrix,
-            modelViewMatrix,
-            vec3.fromValues(1 / 32, 1 / 32, 1 / 32)
-        );
         mat4.rotateY(modelViewMatrix, modelViewMatrix, this.yaw);
         mat4.mul(modelViewMatrix, viewMatrix, modelViewMatrix);
         mat4.mul(modelViewMatrix, projectionMatrix, modelViewMatrix);

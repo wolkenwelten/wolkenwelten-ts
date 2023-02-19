@@ -352,7 +352,7 @@ export class Character extends Entity {
                 const wasDead = e.isDead;
                 e.damage(weapon?.attackDamage(e) || 1);
                 e.onAttack(this);
-                if(!wasDead){
+                if (!wasDead) {
                     if (e.isDead) {
                         this.xpGain(1);
                     }

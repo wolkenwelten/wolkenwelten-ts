@@ -6,7 +6,6 @@ import { World } from '../../world';
 import { Entity } from '../entity';
 
 export class Mob extends Entity {
-
     constructor(world: World, x: number, y: number, z: number) {
         super(world);
         this.x = x;
@@ -26,11 +25,6 @@ export class Mob extends Entity {
             this.z,
         ]);
 
-        mat4.scale(
-            modelViewMatrix,
-            modelViewMatrix,
-            vec3.fromValues(1 / 32, 1 / 32, 1 / 32)
-        );
         mat4.rotateY(modelViewMatrix, modelViewMatrix, this.yaw);
         mat4.mul(modelViewMatrix, viewMatrix, modelViewMatrix);
         mat4.mul(modelViewMatrix, projectionMatrix, modelViewMatrix);

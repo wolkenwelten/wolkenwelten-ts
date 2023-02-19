@@ -144,11 +144,6 @@ export class RenderManager {
             -0.5 + rl * 0.2 + viewBob + jumpOff,
             -0.65 - rl * 0.25 + player.inertiaZ * 0.5,
         ]);
-        mat4.scale(
-            modelViewMatrix,
-            modelViewMatrix,
-            vec3.fromValues(1 / 32, 1 / 32, 1 / 32)
-        );
         mat4.rotateX(modelViewMatrix, modelViewMatrix, r);
         mat4.multiply(modelViewMatrix, projectionMatrix, modelViewMatrix);
         const mesh = this.game.player.hudMesh();
