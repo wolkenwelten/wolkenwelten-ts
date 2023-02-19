@@ -10,10 +10,10 @@ Runs on a Raspberry Pi 4. Fits on a 1.44MB floppy.
 You can play the newest version here: https://wolkenwelten.github.io/wolkenwelten-ts/
 
 ## History
-While integrating V8 into my Rust Voxel engine, I started experimenting with turning things around, writing most of the engine in TypeScript and using WASM for the tricky bits. Turns out Chrome/Safari are plenty fast and run at ~60FPS on my ~10 year old workstation already without having to use WASM (Firefox sadly seems to be quite slow at anything WebGL related).
+While integrating V8 into my Rust Voxel engine, I started experimenting with turning things around, writing most of the engine in TypeScript and using WASM for the tricky bits. Turns out Chrome/Safari are plenty fast and run at ~60FPS on my 8 year old PC already without having to use WASM (Firefox sadly seems to be quite slow at anything WebGL related).
 
 ## Status
-Super early, pretty much nothing works whatsoever, so probably not that interesting (yet).
+Still quite early, however a lot of things already work (somewhat).
 
 - [X] Setup a WebGL2 context
 - [X] Port the BlockMesh/Mesh/TextMesh shaders
@@ -37,16 +37,16 @@ Super early, pretty much nothing works whatsoever, so probably not that interest
 - [X] Allow importing of .vox assets
 - [X] Use .vox assets for worldgen (trees/plants and so on)
 - [X] Simple Mining (drop items after mining)
-- [X] Player Inventory (drop/pickup/block place/active item)
+- [X] Player Inventory (drop/pickup/block place/activate item)
 - [X] Simple shadows
 - [X] Proper Mining
 - [X] Simple particle effect system
 - [X] Simple SFX
 - [X] GamePad controls
 - [X] Simple fluid physics
-
-- [ ] Compile the Rust meshgen kernel to WASM and measure the performance difference
-- [ ] Port the meshgen kernel to AssemblyScript and compare against the Rust/TS versions
+- [X] (Pick)Axe's
+- [X] Simple crafting system
+- [X] Voxel Objects/Blocks
 
 ## Hardware Support
 I try to make sure that it also runs on cheap/older hardware and regularly test on my Raspberry PI 4 which gets ~50-60FPS at 720p in Chromium (make sure to use the 64-bit version). Additionally I make sure that it runs on an old Sandybridge x220 Thinkpad (Linux is much more performant here, although it kinda runs on Win10).
