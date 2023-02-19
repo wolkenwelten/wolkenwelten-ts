@@ -14,6 +14,8 @@ import voxelCrabWalk0File from '../../../../assets/vox/crab/walk_0.vox?url';
 import voxelCrabWalk1File from '../../../../assets/vox/crab/walk_1.vox?url';
 import voxelCrabAttack0File from '../../../../assets/vox/crab/attack_0.vox?url';
 import voxelCrabAttack1File from '../../../../assets/vox/crab/attack_1.vox?url';
+import voxelCrabDead0File from '../../../../assets/vox/crab/dead_0.vox?url';
+import { timingSafeEqual } from 'crypto';
 
 export type CrabState =
     | 'idle'
@@ -22,7 +24,8 @@ export type CrabState =
     | 'turnRight'
     | 'walkBack'
     | 'chase'
-    | 'attack';
+    | 'attack'
+    | 'dead';
 
 export class Crab extends Mob {
     state: CrabState;
@@ -32,10 +35,9 @@ export class Crab extends Mob {
     gvx = 0;
     gvz = 0;
 
-    health = 8;
-    maxHealth = 8;
-
     aggroTarget?: Entity;
+    health = 16;
+    maxHealth = 16;
 
     constructor(world: World, x: number, y: number, z: number) {
         super(world, x, y, z);
@@ -53,18 +55,20 @@ export class Crab extends Mob {
     }
 
     onDeath() {
+        if(this.state === 'dead'){return;}
         this.world.game.render.particle.fxDeath(this.x, this.y, this.z);
-        if ((this.id & 3) == 0) {
-            this.world.game.add.itemDrop(
-                this.x,
-                this.y,
-                this.z,
-                new CrabMeatRaw(this.world)
-            );
-        }
+        this.world.game.add.itemDrop(
+            this.x,
+            this.y,
+            this.z,
+            new CrabMeatRaw(this.world)
+        );
+        this.changeState('dead');
+        this.isDead = true;
     }
 
     onAttack(perpetrator: Entity): void {
+        if(this.isDead){return;}
         this.aggroTarget = perpetrator;
         this.changeState('chase');
     }
@@ -77,8 +81,11 @@ export class Crab extends Mob {
                 const url = frame ? voxelCrabIdle0File : voxelCrabIdle1File;
                 return this.world.game.render.assets.get(url);
             }
+            case 'dead': {
+                return this.world.game.render.assets.get(voxelCrabDead0File);
+            }
             case 'attack': {
-                const frame = this.ticksInState / 30;
+                const frame = this.ticksInState / 20;
                 const url =
                     frame & 1 ? voxelCrabAttack0File : voxelCrabAttack1File;
                 return this.world.game.render.assets.get(url);
@@ -159,14 +166,14 @@ export class Crab extends Mob {
             }
             case 'attack': {
                 const v = this.ticksInState;
-                if (v > 50) {
+                if (v > 33) {
                     if (this.aggroTarget) {
                         this.attack(this.aggroTarget, 1);
                         this.changeState('chase');
                     } else {
                         this.changeState('idle');
                     }
-                } else if (v === 33) {
+                } else if (v === 20) {
                     this.world.game.audio.play('punchMiss', 0.5);
                 }
                 break;
@@ -188,6 +195,12 @@ export class Crab extends Mob {
                 }
                 break;
             }
+            case 'dead':
+                if (this.ticksInState > 600) {
+                    this.destroy();
+                }
+            default:
+                break;
         }
     }
 
@@ -196,6 +209,13 @@ export class Crab extends Mob {
             default:
                 this.gvx = 0;
                 this.gvz = 0;
+                break;
+            case 'dead':
+                this.gvx = 0;
+                this.gvz = 0;
+                if (this.ticksInState > 200) {
+                    this.y -= 0.001;
+                }
                 break;
             case 'walk': {
                 const [vx, vz] = this.walkDirection();
@@ -269,7 +289,10 @@ export class Crab extends Mob {
             this.vz = Math.min(0, this.vz);
         }
 
-        if (this.isSolidPillar(this.x, this.y - 8 / 32, this.z)) {
+        if (this.isSolidPillar(this.x, this.y - 5 / 32, this.z)) {
+            if(!this.isDead && this.isSolidPillar(this.x, this.y - 4 / 32, this.z)){
+                this.y += 1/32;
+            }
             this.vy = Math.max(0, this.vy);
             const accel = 0.5;
             this.vx = this.vx * (1.0 - accel) + this.gvx * 0.01 * accel;

@@ -6,6 +6,7 @@ import { World } from '../../world';
 import { Entity } from '../entity';
 
 export class Mob extends Entity {
+
     constructor(world: World, x: number, y: number, z: number) {
         super(world);
         this.x = x;
@@ -60,4 +61,7 @@ export class Mob extends Entity {
             this.vz = 0;
         }
     }
+
+    onDeath() {}
+    onAttack(perpetrator: Entity): void {}
 }

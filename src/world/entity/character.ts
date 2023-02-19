@@ -346,13 +346,16 @@ export class Character extends Entity {
                 const dm = Math.max(Math.abs(dx), Math.abs(dz));
                 const ndx = dx / dm;
                 const ndz = dz / dm;
-                e.vx += ndx * 0.2;
-                e.vy += 0.06;
-                e.vz += ndz * 0.2;
+                e.vx += ndx * 0.05;
+                e.vy += 0.03;
+                e.vz += ndz * 0.05;
+                const wasDead = e.isDead;
                 e.damage(weapon?.attackDamage(e) || 1);
                 e.onAttack(this);
-                if (e.isDead) {
-                    this.xpGain(1);
+                if(!wasDead){
+                    if (e.isDead) {
+                        this.xpGain(1);
+                    }
                 }
             }
         }

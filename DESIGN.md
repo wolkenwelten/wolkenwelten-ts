@@ -25,3 +25,11 @@ Only players who have reached level 5 and up can feed the Mask, with the level d
 
 ## Ascension
 During ascension the entire Island gets destroyed, the new God may now modify WorldGen parameters and even modify the World a bit in a sort of creative mode, during this phase players may only spectate. After 30 minutes a new game begins.
+
+## Open Questions
+
+- How should skills be activated/selected?
+
+- Should ranged weapons use ammo? And should be consumable?
+
+- Is it necessary to identify gems/enchantments?

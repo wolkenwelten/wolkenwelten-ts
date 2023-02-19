@@ -71,7 +71,7 @@ export const initDefaultBlocks = (world: World) => {
         .withTexture(1)
         .withColours(0x311e00ff, 0x412800ff)
         .withMiningCat('Pickaxe')
-        .withBlockHealth(200);
+        .withBlockHealth(350);
 
     world
         .addBlockType('Grass')
@@ -81,7 +81,7 @@ export const initDefaultBlocks = (world: World) => {
         .withColours(0x003807ff, 0x412800ff)
         .withMiningCat('Pickaxe')
         .withSimpleHandler(new BlockItem(world, 1, 1))
-        .withBlockHealth(250);
+        .withBlockHealth(450);
 
     world
         .addBlockType('Stone')
@@ -243,7 +243,7 @@ export const initDefaultBlocks = (world: World) => {
         .withTexture(24)
         .withColours(0xecd195ff, 0xd3a748ff)
         .withMiningCat('Pickaxe')
-        .withBlockHealth(140);
+        .withBlockHealth(240);
 
     world
         .addBlockType('Sea Water', 'SeaWater')
@@ -252,5 +252,5 @@ export const initDefaultBlocks = (world: World) => {
         .withLiquid()
         .withSeeThrough()
         .withItemDropHandler(() => {})
-        .withBlockHealth(140);
+        .withBlockHealth(340);
 };
