@@ -68,8 +68,8 @@ export class TriangleMesh {
     }
 
     addBlockType(bt: BlockType) {
-        const m = -8;
-        const p = 8;
+        const m = -0.25;
+        const p = 0.25;
         {
             const t = bt.texBack / 32;
             const z = t + 1 / 64;

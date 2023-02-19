@@ -15,7 +15,6 @@ import voxelCrabWalk1File from '../../../../assets/vox/crab/walk_1.vox?url';
 import voxelCrabAttack0File from '../../../../assets/vox/crab/attack_0.vox?url';
 import voxelCrabAttack1File from '../../../../assets/vox/crab/attack_1.vox?url';
 import voxelCrabDead0File from '../../../../assets/vox/crab/dead_0.vox?url';
-import { timingSafeEqual } from 'crypto';
 
 export type CrabState =
     | 'idle'
@@ -25,6 +24,7 @@ export type CrabState =
     | 'walkBack'
     | 'chase'
     | 'attack'
+    | 'justHit'
     | 'dead';
 
 export class Crab extends Mob {
@@ -74,7 +74,7 @@ export class Crab extends Mob {
             return;
         }
         this.aggroTarget = perpetrator;
-        this.changeState('chase');
+        this.changeState('justHit');
     }
 
     mesh(): VoxelMesh {
@@ -85,6 +85,7 @@ export class Crab extends Mob {
                 const url = frame ? voxelCrabIdle0File : voxelCrabIdle1File;
                 return this.world.game.render.assets.get(url);
             }
+            case 'justHit':
             case 'dead': {
                 return this.world.game.render.assets.get(voxelCrabDead0File);
             }
@@ -199,10 +200,16 @@ export class Crab extends Mob {
                 }
                 break;
             }
+            case 'justHit':
+                if (this.ticksInState > 16) {
+                    this.changeState('chase');
+                }
+                break;
             case 'dead':
                 if (this.ticksInState > 600) {
                     this.destroy();
                 }
+                break;
             default:
                 break;
         }
