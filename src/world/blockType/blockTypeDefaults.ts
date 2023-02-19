@@ -8,7 +8,6 @@ import { BlockItem } from '../item/blockItem';
 import { MaybeItem } from '../item/item';
 import { World } from '../world';
 
-import { Branch } from '../item/material/branch';
 import { Stick } from '../item/material/stick';
 import { Stone } from '../item/material/stone';
 import { IronOre } from '../item/material/ironOre';
@@ -22,9 +21,7 @@ const leafDropHandler = (
     tool: MaybeItem
 ) => {
     const t = world.game.ticks & 7;
-    if (t === 0) {
-        new ItemDrop(world, x + 0.5, y + 0.4, z + 0.5, new Branch(world));
-    } else if (t < 3) {
+    if (t < 3) {
         new ItemDrop(world, x + 0.5, y + 0.4, z + 0.5, new Stick(world));
     }
 };
