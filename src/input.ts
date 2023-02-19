@@ -50,7 +50,9 @@ export class InputManager {
                 }
                 if (!document.fullscreenElement) {
                     that.game.player.cooldown(15);
-                    await that.game.ui.rootElement.requestFullscreen();
+                    if (that.game.ui.rootElement.requestFullscreen) {
+                        await that.game.ui.rootElement.requestFullscreen();
+                    }
                 }
                 if (!document.pointerLockElement) {
                     that.game.player.cooldown(15);
