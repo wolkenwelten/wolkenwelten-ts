@@ -64,6 +64,9 @@ export class InputManager {
         that.game.ui.rootElement.addEventListener('mousedown', (e) =>
             that.mouseStates.add(e.button)
         );
+        that.game.ui.rootElement.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
         that.game.ui.rootElement.addEventListener('mouseup', (e) =>
             that.mouseStates.delete(e.button)
         );

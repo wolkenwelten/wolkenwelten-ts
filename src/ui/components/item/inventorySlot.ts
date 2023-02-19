@@ -74,10 +74,6 @@ export class InventorySlot {
                     ) {
                         a.amount--;
                         b.amount++;
-                        if (a.amount < 1) {
-                            a.destroy();
-                            this.game.ui.heldItem = undefined;
-                        }
                     }
                 } else if (b === undefined) {
                     const newStack = a.clone();
@@ -85,11 +81,17 @@ export class InventorySlot {
                     a.amount--;
                     this.inventory.items[this.slotIndex] = newStack;
                 }
+				if (a.amount < 1) {
+					a.destroy();
+					this.game.ui.heldItem = undefined;
+				}
             } else {
                 this.inventory.items[this.slotIndex] = a;
                 this.game.ui.heldItem = b;
             }
+			
         }
+		
 
         this.game.ui.cursorItem.update(this.game.ui.heldItem);
         this.game.ui.cursorItem.updatePos(e.pageX, e.pageY);
