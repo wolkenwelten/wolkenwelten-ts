@@ -17,6 +17,7 @@ export class BlockMesh {
     static indeces: WebGLBuffer;
     static shader: Shader;
     static texture: Texture;
+    static mvp = mat4.create();
 
     readonly x: number;
     readonly y: number;
@@ -137,7 +138,9 @@ export class BlockMesh {
 
     static bindShaderAndTexture(projection: mat4, modelView: mat4) {
         BlockMesh.shader.bind();
-        const modelViewProjection = mat4.create();
+
+        const modelViewProjection = BlockMesh.mvp;
+        mat4.identity(modelViewProjection);
         mat4.multiply(modelViewProjection, projection, modelView);
         BlockMesh.shader.uniform4fv('mat_mv', modelView);
         BlockMesh.shader.uniform4fv('mat_mvp', modelViewProjection);

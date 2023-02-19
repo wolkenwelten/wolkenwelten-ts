@@ -1,9 +1,12 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { mat4, vec3 } from 'gl-matrix';
+import { mat4 } from 'gl-matrix';
 import { World } from '../../world';
 import { Entity } from '../entity';
+
+const modelViewMatrix = mat4.create();
+const transPos = new Float32Array([0, 0, 0]);
 
 export class Mob extends Entity {
     constructor(world: World, x: number, y: number, z: number) {
@@ -18,12 +21,11 @@ export class Mob extends Entity {
             return;
         }
 
-        const modelViewMatrix = mat4.create();
-        mat4.translate(modelViewMatrix, modelViewMatrix, [
-            this.x,
-            this.y,
-            this.z,
-        ]);
+        mat4.identity(modelViewMatrix);
+        transPos[0] = this.x;
+        transPos[1] = this.y;
+        transPos[2] = this.z;
+        mat4.translate(modelViewMatrix, modelViewMatrix, transPos);
 
         mat4.rotateY(modelViewMatrix, modelViewMatrix, this.yaw);
         mat4.mul(modelViewMatrix, viewMatrix, modelViewMatrix);

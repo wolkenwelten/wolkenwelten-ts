@@ -1,11 +1,13 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { mat4, vec3 } from 'gl-matrix';
+import { mat4 } from 'gl-matrix';
 import { TriangleMesh, VoxelMesh } from '../../render/asset';
 import { World } from '../world';
 
 let entityCounter = 0;
+const modelViewMatrix = mat4.create();
+const transPos = new Float32Array([0, 0, 0]);
 
 export class Entity {
     id: number;
@@ -163,12 +165,10 @@ export class Entity {
             return;
         }
         this.world.game.render.decals.addShadow(this.x, this.y, this.z, 1);
-        const modelViewMatrix = mat4.create();
-        mat4.translate(modelViewMatrix, modelViewMatrix, [
-            this.x,
-            this.y - 1 / 64,
-            this.z,
-        ]);
+        transPos[0] = this.x;
+        transPos[1] = this.y - 1 / 64;
+        transPos[2] = this.z;
+        mat4.translate(modelViewMatrix, modelViewMatrix, transPos);
 
         mat4.rotateY(modelViewMatrix, modelViewMatrix, this.yaw);
         mat4.mul(modelViewMatrix, viewMatrix, modelViewMatrix);

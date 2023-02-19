@@ -4,8 +4,11 @@
 import { Entity } from './entity';
 import { World } from '../world';
 import { Item } from '../item/item';
-import { mat4, vec3 } from 'gl-matrix';
+import { mat4 } from 'gl-matrix';
 import { TriangleMesh, VoxelMesh } from '../../render/asset';
+
+const transPos = new Float32Array([0, 0, 0]);
+const modelViewMatrix = mat4.create();
 
 export class ItemDrop extends Entity {
     item: Item;
@@ -56,14 +59,14 @@ export class ItemDrop extends Entity {
             return;
         }
         this.world.game.render.decals.addShadow(this.x, this.y, this.z, 1);
-        const modelViewMatrix = mat4.create();
+
+        mat4.identity(modelViewMatrix);
         const yOff =
             Math.sin(this.id * 7 + this.world.game.ticks * 0.07) * 0.1 + 0.2;
-        mat4.translate(modelViewMatrix, modelViewMatrix, [
-            this.x,
-            this.y + yOff,
-            this.z,
-        ]);
+        transPos[0] = this.x;
+        transPos[1] = this.y + yOff;
+        transPos[2] = this.z;
+        mat4.translate(modelViewMatrix, modelViewMatrix, transPos);
 
         mat4.rotateY(
             modelViewMatrix,

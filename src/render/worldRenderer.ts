@@ -24,6 +24,8 @@ type DrawQueueEntry = {
 };
 
 const RENDER_STEPS = 5;
+const transPos = new Float32Array([0, 0, 0]);
+const tmpVec4 = new Float32Array([0, 0, 0, 1]);
 
 export class WorldRenderer {
     meshes: Map<number, BlockMesh> = new Map();
@@ -33,6 +35,8 @@ export class WorldRenderer {
     frustum = new Frustum();
     chunksDrawn = 0;
     chunksSkipped = 0;
+
+    mvp = mat4.create();
 
     constructor(renderer: RenderManager) {
         this.renderer = renderer;
@@ -97,16 +101,10 @@ export class WorldRenderer {
         const frustum = this.frustum;
         frustum.build(projectionMatrix, viewMatrix);
         for (const entity of this.renderer.game.world.entities) {
-            if (
-                frustum.containsCube(
-                    vec4.fromValues(
-                        entity.x - 0.5,
-                        entity.y - 0.5,
-                        entity.z - 0.5,
-                        1
-                    )
-                )
-            ) {
+            tmpVec4[0] = entity.x - 0.5;
+            tmpVec4[1] = entity.y - 0.5;
+            tmpVec4[2] = entity.z - 0.5;
+            if (frustum.containsCube(tmpVec4)) {
                 entity.draw(projectionMatrix, viewMatrix, cam);
             }
         }
@@ -116,6 +114,7 @@ export class WorldRenderer {
         let skipped = 0;
 
         this.generatorQueue.length = 0;
+        let drawQLen = 0;
         this.drawQueue.length = 0;
         const ticks = this.renderer.game.ticks;
         for (let x = -RENDER_STEPS; x <= RENDER_STEPS; x++) {
@@ -124,7 +123,10 @@ export class WorldRenderer {
                     const nx = cx + x * 32;
                     const ny = cy + y * 32;
                     const nz = cz + z * 32;
-                    if (!frustum.containsCube(vec4.fromValues(nx, ny, nz, 1))) {
+                    tmpVec4[0] = nx;
+                    tmpVec4[1] = ny;
+                    tmpVec4[2] = nz;
+                    if (!frustum.containsCube(tmpVec4)) {
                         skipped++;
                         continue;
                     }
@@ -140,7 +142,16 @@ export class WorldRenderer {
                             (ticks - mesh.createdAt) * (1.0 / 16.0)
                         );
                         const mask = this.calcMask(x, y, z);
-                        this.drawQueue.push({ dd, mesh, mask, alpha });
+                        if (drawQLen < this.drawQueue.length) {
+                            const o = this.drawQueue[drawQLen];
+                            o.dd = dd;
+                            o.mesh = mesh;
+                            o.mask = mask;
+                            o.alpha = alpha;
+                        } else {
+                            this.drawQueue.push({ dd, mesh, mask, alpha });
+                        }
+                        drawQLen++;
                         if (mesh.lastUpdated >= mesh.chunk.lastUpdated) {
                             continue;
                         }
@@ -160,6 +171,7 @@ export class WorldRenderer {
         /* Here we sort all the chunks back to front, draw the solid blocks first and then
          * draw all the seeThrough blocks like water. This is necessary for alpha blending to work properly.
          */
+        this.drawQueue.length = drawQLen;
         this.drawQueue.sort((a, b) => b.dd - a.dd);
         for (const { mesh, mask, alpha } of this.drawQueue) {
             drawCalls += mesh.drawFast(mask, alpha, 0);
@@ -169,16 +181,16 @@ export class WorldRenderer {
         }
         this.renderer.game.profiler.addAmount('blockMeshDrawCalls', drawCalls);
 
-        const mvp = mat4.create();
+        const mvp = this.mvp;
+        mat4.identity(mvp);
         for (const { mesh } of this.drawQueue) {
             for (const s of mesh.chunk.static) {
                 mat4.identity(mvp);
                 const transOff = s.transOff();
-                mat4.translate(mvp, mvp, [
-                    s.x + transOff[0],
-                    s.y + transOff[1],
-                    s.z + transOff[2],
-                ]);
+                transPos[0] = s.x + transOff[0];
+                transPos[1] = s.y + transOff[1];
+                transPos[2] = s.z + transOff[2];
+                mat4.translate(mvp, mvp, transPos);
                 mat4.mul(mvp, viewMatrix, mvp);
                 mat4.mul(mvp, projectionMatrix, mvp);
                 s.mesh().draw(mvp, 1.0);

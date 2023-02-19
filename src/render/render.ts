@@ -11,6 +11,11 @@ import { coordinateToWorldKey } from '../world/world';
 
 import { ParticleMesh } from './meshes/particleMesh/particleMesh';
 
+const transPos = new Float32Array([0, 0, 0]);
+const projectionMatrix = mat4.create();
+const viewMatrix = mat4.create();
+const modelViewMatrix = mat4.create();
+
 export class RenderManager {
     game: Game;
     canvas: HTMLCanvasElement;
@@ -86,7 +91,7 @@ export class RenderManager {
 
     drawScene() {
         this.updateFOV();
-        const projectionMatrix = mat4.create();
+        mat4.identity(projectionMatrix);
         mat4.perspective(
             projectionMatrix,
             (this.fov * Math.PI) / 180,
@@ -95,14 +100,13 @@ export class RenderManager {
             512.0
         );
 
-        const viewMatrix = mat4.create();
+        mat4.identity(viewMatrix);
         mat4.rotateX(viewMatrix, viewMatrix, -this.cam.pitch);
         mat4.rotateY(viewMatrix, viewMatrix, -this.cam.yaw);
-        mat4.translate(viewMatrix, viewMatrix, [
-            -this.cam.x,
-            -this.cam.y,
-            -this.cam.z,
-        ]);
+        transPos[0] = -this.cam.x;
+        transPos[1] = -this.cam.y;
+        transPos[2] = -this.cam.z;
+        mat4.translate(viewMatrix, viewMatrix, transPos);
         this.gl.enable(this.gl.BLEND);
 
         this.world.draw(projectionMatrix, viewMatrix, this.cam);
@@ -118,7 +122,7 @@ export class RenderManager {
     drawHud(projectionMatrix: mat4) {
         this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
 
-        const modelViewMatrix = mat4.create();
+        mat4.identity(modelViewMatrix);
         let r = Math.PI * -0.04;
         let rt = 0;
         if (this.game.player.hitAnimation >= 0) {
@@ -139,11 +143,10 @@ export class RenderManager {
         const viewBobH = Math.sin(player.walkCycleCounter * 0.5) * 0.06;
         const jumpOff = player.jumpAnimeFactor * -0.2;
         const rl = Math.sin(rt);
-        mat4.translate(modelViewMatrix, modelViewMatrix, [
-            1 - rl * 0.2 + viewBobH + player.inertiaX * 0.5,
-            -0.5 + rl * 0.2 + viewBob + jumpOff,
-            -0.65 - rl * 0.25 + player.inertiaZ * 0.5,
-        ]);
+        transPos[0] = 1 - rl * 0.2 + viewBobH + player.inertiaX * 0.5;
+        transPos[1] = -0.5 + rl * 0.2 + viewBob + jumpOff;
+        transPos[2] = -0.65 - rl * 0.25 + player.inertiaZ * 0.5;
+        mat4.translate(modelViewMatrix, modelViewMatrix, transPos);
         mat4.rotateX(modelViewMatrix, modelViewMatrix, r);
         mat4.multiply(modelViewMatrix, projectionMatrix, modelViewMatrix);
         const mesh = this.game.player.hudMesh();
