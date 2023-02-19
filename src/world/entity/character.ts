@@ -31,6 +31,7 @@ export class Character extends Entity {
     movementY = 0;
     movementZ = 0;
     lastAction = 0;
+    miningCooldownUntil = 0;
     hitAnimation = -100;
     walkCycleCounter = 0;
     nextStepSound = 0;
@@ -403,33 +404,31 @@ export class Character extends Entity {
         this.world.game.render.canvasWrapper.classList.remove('fx-damage');
         this.world.game.render.canvasWrapper.getBoundingClientRect();
         this.world.game.render.canvasWrapper.classList.add('fx-damage');
+        this.miningCooldownUntil = this.world.game.ticks + 10;
     }
 
     strike() {
         if (this.world.game.ticks < this.lastAction) {
-            this.dig();
+            if (this.miningCooldownUntil < this.world.game.ticks) {
+                this.dig();
+            }
             return;
         }
 
-        if (this.world.game.render.frames > this.hitAnimation + 60) {
-            this.hitAnimation = this.world.game.render.frames;
-            const hit = this.attack();
-            if (hit) {
-                this.world.game.audio.play('punch');
-            } else {
-                this.world.game.audio.play('punchMiss');
-            }
-            if (this.miningActive) {
-                const minedBlock =
-                    this.world.getBlock(
-                        this.miningX,
-                        this.miningY,
-                        this.miningZ
-                    ) || 0;
-                this.world.blocks[minedBlock].playMineSound(this.world);
-            }
+        this.cooldown(64);
+        this.hitAnimation = this.world.game.render.frames;
+        const hit = this.attack();
+        if (hit) {
+            this.world.game.audio.play('punch');
+            this.miningCooldownUntil = this.world.game.ticks + 10;
         } else {
-            this.dig();
+            this.world.game.audio.play('punchMiss');
+        }
+        if (this.miningActive) {
+            const minedBlock =
+                this.world.getBlock(this.miningX, this.miningY, this.miningZ) ||
+                0;
+            this.world.blocks[minedBlock].playMineSound(this.world);
         }
     }
 

@@ -139,7 +139,7 @@ export class WorldRenderer {
                     if (mesh) {
                         const alpha = Math.min(
                             1.0,
-                            (ticks - mesh.createdAt) * (1.0 / 16.0)
+                            (ticks - mesh.createdAt) * (1.0 / 24.0)
                         );
                         const mask = this.calcMask(x, y, z);
                         if (drawQLen < this.drawQueue.length) {

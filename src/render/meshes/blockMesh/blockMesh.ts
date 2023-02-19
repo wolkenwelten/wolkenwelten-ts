@@ -121,7 +121,7 @@ export class BlockMesh {
         this.x = chunk.x;
         this.y = chunk.y;
         this.z = chunk.z;
-        this.createdAt = chunk.lastUpdated;
+        this.createdAt = chunk.world.game.ticks;
         this.chunk = chunk;
         const vao = BlockMesh.gl.createVertexArray();
         if (!vao) {

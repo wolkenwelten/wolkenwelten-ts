@@ -96,7 +96,7 @@ export const worldgenSurface = (chunk: Chunk) => {
                     chunk.setBoxUnsafe(x, 0, z, 1, Math.min(endY, 32), 1, 1);
                     if (endY < 32) {
                         chunk.setBlockUnsafe(x, Math.floor(endY), z, 2);
-                        if (gh > 3 && gh < 23) {
+                        if (gh > 2 && gh < 23) {
                             if (
                                 rng.bool(1725) &&
                                 assets.bushA.fits(chunk, x, gh, z)
@@ -129,14 +129,14 @@ export const worldgenSurface = (chunk: Chunk) => {
                                 assets.rockC.blit(chunk, x, gh, z);
                             } else if (
                                 rng.bool(620) &&
-                                assets.treeA.fits(chunk, x, gh - 3, z)
+                                assets.treeA.fits(chunk, x, gh - 2, z)
                             ) {
-                                assets.treeA.blit(chunk, x, gh - 3, z);
+                                assets.treeA.blit(chunk, x, gh - 2, z);
                             } else if (
                                 rng.bool(730) &&
-                                assets.treeB.fits(chunk, x, gh - 3, z)
+                                assets.treeB.fits(chunk, x, gh - 2, z)
                             ) {
-                                assets.treeB.blit(chunk, x, gh - 3, z);
+                                assets.treeB.blit(chunk, x, gh - 2, z);
                             } else if (
                                 rng.bool(630) &&
                                 assets.treeC.fits(chunk, x, gh - 2, z)
@@ -144,9 +144,9 @@ export const worldgenSurface = (chunk: Chunk) => {
                                 assets.treeC.blit(chunk, x, gh - 2, z);
                             } else if (
                                 rng.bool(600) &&
-                                assets.spruceA.fits(chunk, x, gh - 3, z)
+                                assets.spruceA.fits(chunk, x, gh - 2, z)
                             ) {
-                                assets.spruceA.blit(chunk, x, gh - 3, z);
+                                assets.spruceA.blit(chunk, x, gh - 2, z);
                             } else if (rng.bool(400)) {
                                 new StaticStone(
                                     chunk,

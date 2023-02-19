@@ -258,8 +258,8 @@ export class Crab extends Mob {
                     } else {
                         if (dd > 1.8 * 1.8) {
                             const [vx, vz] = this.walkDirection();
-                            this.gvx = vx * -3.5;
-                            this.gvz = vz * -3.5;
+                            this.gvx = vx * -4;
+                            this.gvz = vz * -4;
                         } else {
                             this.changeState('attack');
                         }
