@@ -16,7 +16,7 @@ import { MaybeItem } from '../item/item';
 import { IronPickaxe } from '../item/tools/ironPickaxe';
 import { IronAxe } from '../item/tools/ironAxe';
 
-const CHARACTER_ACCELERATION = 0.04;
+const CHARACTER_ACCELERATION = 0.05;
 const CHARACTER_STOP_RATE = CHARACTER_ACCELERATION * 3.0;
 
 const clamp = (x: number, min: number, max: number) =>
@@ -239,8 +239,8 @@ export class Character extends Entity {
             accel *= 0.7; // Slow down player movement while underwater
         }
 
-        this.vx = this.vx * (1.0 - accel) + this.movementX * 0.75 * accel;
-        this.vz = this.vz * (1.0 - accel) + this.movementZ * 0.75 * accel;
+        this.vx = this.vx * (1.0 - accel) + this.movementX * 0.3 * accel;
+        this.vz = this.vz * (1.0 - accel) + this.movementZ * 0.3 * accel;
         this.vy -= underwater ? 0.001 : 0.005;
         const oldVx = this.vx;
         const oldVy = this.vy;
@@ -253,7 +253,7 @@ export class Character extends Entity {
             this.vx *= 0.99;
             this.vz *= 0.99;
         } else if (this.movementY > 0 && this.mayJump()) {
-            this.vy = 0.12;
+            this.vy = 0.1;
             this.jumpAnimeFactor = 1;
         }
         if (this.movementY > 0 && this.maySwim() && Math.abs(this.vy) < 0.07) {
