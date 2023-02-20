@@ -69,6 +69,7 @@ export class Crab extends Mob {
         );
         this.changeState('dead');
         this.isDead = true;
+        this.world.game.audio.play("crabDeath", 0.5);
     }
 
     onAttack(perpetrator: Entity): void {
@@ -97,9 +98,11 @@ export class Crab extends Mob {
                 if (dd < 24 * 24) {
                     e.aggroTarget = perpetrator;
                     e.changeState('chase');
+                    this.world.game.audio.play("crabClick", 0.5);
                 }
             }
         }
+        this.world.game.audio.play("crabClick", 0.3);
     }
 
     mesh(): VoxelMesh {
