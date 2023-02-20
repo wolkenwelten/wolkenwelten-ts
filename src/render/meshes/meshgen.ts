@@ -45,10 +45,19 @@ const addFront = (
     const side = 0; // sides.front
     const zd = z + d;
 
-    out.push(x, y, zd, tex, side | ((light << 4) & 0xf0));
-    out.push(x + w, y, zd, tex, side | (light & 0xf0));
-    out.push(x + w, y + h, zd, tex, side | ((light >> 4) & 0xf0));
-    out.push(x, y + h, zd, tex, side | ((light >> 8) & 0xf0));
+    const aa = ((light << 4) & 0xf0) + ((light >> 4) & 0xf0);
+    const ab = (light & 0xf0) + ((light >> 8) & 0xf0);
+    if (aa > ab) {
+        out.push(x, y, zd, tex, side | ((light << 4) & 0xf0));
+        out.push(x + w, y, zd, tex, side | (light & 0xf0));
+        out.push(x + w, y + h, zd, tex, side | ((light >> 4) & 0xf0));
+        out.push(x, y + h, zd, tex, side | ((light >> 8) & 0xf0));
+    } else {
+        out.push(x, y + h, zd, tex, side | ((light >> 8) & 0xf0));
+        out.push(x, y, zd, tex, side | ((light << 4) & 0xf0));
+        out.push(x + w, y, zd, tex, side | (light & 0xf0));
+        out.push(x + w, y + h, zd, tex, side | ((light >> 4) & 0xf0));
+    }
 };
 
 const addBack = (
@@ -64,10 +73,19 @@ const addBack = (
 ) => {
     const side = 1; // sides.front
 
-    out.push(x, y + h, z, tex, side | ((light >> 8) & 0xf0));
-    out.push(x + w, y + h, z, tex, side | ((light >> 4) & 0xf0));
-    out.push(x + w, y, z, tex, side | (light & 0xf0));
-    out.push(x, y, z, tex, side | ((light << 4) & 0xf0));
+    const aa = ((light << 4) & 0xf0) + ((light >> 4) & 0xf0);
+    const ab = (light & 0xf0) + ((light >> 8) & 0xf0);
+    if (aa > ab) {
+        out.push(x, y + h, z, tex, side | ((light >> 8) & 0xf0));
+        out.push(x + w, y + h, z, tex, side | ((light >> 4) & 0xf0));
+        out.push(x + w, y, z, tex, side | (light & 0xf0));
+        out.push(x, y, z, tex, side | ((light << 4) & 0xf0));
+    } else {
+        out.push(x, y, z, tex, side | ((light << 4) & 0xf0));
+        out.push(x, y + h, z, tex, side | ((light >> 8) & 0xf0));
+        out.push(x + w, y + h, z, tex, side | ((light >> 4) & 0xf0));
+        out.push(x + w, y, z, tex, side | (light & 0xf0));
+    }
 };
 
 const addTop = (
@@ -84,10 +102,19 @@ const addTop = (
     const side = 2;
     const yh = y + h;
 
-    out.push(x, yh, z, tex, side | ((light << 4) & 0xf0));
-    out.push(x, yh, z + d, tex, side | (light & 0xf0));
-    out.push(x + w, yh, z + d, tex, side | ((light >> 4) & 0xf0));
-    out.push(x + w, yh, z, tex, side | ((light >> 8) & 0xf0));
+    const aa = ((light << 4) & 0xf0) + ((light >> 4) & 0xf0);
+    const ab = (light & 0xf0) + ((light >> 8) & 0xf0);
+    if (aa > ab) {
+        out.push(x, yh, z, tex, side | ((light << 4) & 0xf0));
+        out.push(x, yh, z + d, tex, side | (light & 0xf0));
+        out.push(x + w, yh, z + d, tex, side | ((light >> 4) & 0xf0));
+        out.push(x + w, yh, z, tex, side | ((light >> 8) & 0xf0));
+    } else {
+        out.push(x + w, yh, z, tex, side | ((light >> 8) & 0xf0));
+        out.push(x, yh, z, tex, side | ((light << 4) & 0xf0));
+        out.push(x, yh, z + d, tex, side | (light & 0xf0));
+        out.push(x + w, yh, z + d, tex, side | ((light >> 4) & 0xf0));
+    }
 };
 
 const addBottom = (
@@ -103,10 +130,19 @@ const addBottom = (
 ) => {
     const side = 3;
 
-    out.push(x, y, z, tex, side | ((light << 4) & 0xf0));
-    out.push(x + w, y, z, tex, side | (light & 0xf0));
-    out.push(x + w, y, z + d, tex, side | ((light >> 4) & 0xf0));
-    out.push(x, y, z + d, tex, side | ((light >> 8) & 0xf0));
+    const aa = ((light << 4) & 0xf0) + ((light >> 4) & 0xf0);
+    const ab = (light & 0xf0) + ((light >> 8) & 0xf0);
+    if (aa > ab) {
+        out.push(x, y, z, tex, side | ((light << 4) & 0xf0));
+        out.push(x + w, y, z, tex, side | (light & 0xf0));
+        out.push(x + w, y, z + d, tex, side | ((light >> 4) & 0xf0));
+        out.push(x, y, z + d, tex, side | ((light >> 8) & 0xf0));
+    } else {
+        out.push(x, y, z + d, tex, side | ((light >> 8) & 0xf0));
+        out.push(x, y, z, tex, side | ((light << 4) & 0xf0));
+        out.push(x + w, y, z, tex, side | (light & 0xf0));
+        out.push(x + w, y, z + d, tex, side | ((light >> 4) & 0xf0));
+    }
 };
 
 const addLeft = (
@@ -122,10 +158,19 @@ const addLeft = (
 ) => {
     const side = 4;
 
-    out.push(x, y, z, tex, side | ((light << 4) & 0xf0));
-    out.push(x, y, z + d, tex, side | (light & 0xf0));
-    out.push(x, y + h, z + d, tex, side | ((light >> 4) & 0xf0));
-    out.push(x, y + h, z, tex, side | ((light >> 8) & 0xf0));
+    const aa = ((light << 4) & 0xf0) + ((light >> 4) & 0xf0);
+    const ab = (light & 0xf0) + ((light >> 8) & 0xf0);
+    if (aa > ab) {
+        out.push(x, y, z, tex, side | ((light << 4) & 0xf0));
+        out.push(x, y, z + d, tex, side | (light & 0xf0));
+        out.push(x, y + h, z + d, tex, side | ((light >> 4) & 0xf0));
+        out.push(x, y + h, z, tex, side | ((light >> 8) & 0xf0));
+    } else {
+        out.push(x, y + h, z, tex, side | ((light >> 8) & 0xf0));
+        out.push(x, y, z, tex, side | ((light << 4) & 0xf0));
+        out.push(x, y, z + d, tex, side | (light & 0xf0));
+        out.push(x, y + h, z + d, tex, side | ((light >> 4) & 0xf0));
+    }
 };
 
 const addRight = (
@@ -142,10 +187,19 @@ const addRight = (
     const side = 5;
     const xw = x + w;
 
-    out.push(xw, y, z, tex, side | ((light << 4) & 0xf0));
-    out.push(xw, y + h, z, tex, side | (light & 0xf0));
-    out.push(xw, y + h, z + d, tex, side | ((light >> 4) & 0xf0));
-    out.push(xw, y, z + d, tex, side | ((light >> 8) & 0xf0));
+    const aa = ((light << 4) & 0xf0) + ((light >> 4) & 0xf0);
+    const ab = (light & 0xf0) + ((light >> 8) & 0xf0);
+    if (aa > ab) {
+        out.push(xw, y, z, tex, side | ((light << 4) & 0xf0));
+        out.push(xw, y + h, z, tex, side | (light & 0xf0));
+        out.push(xw, y + h, z + d, tex, side | ((light >> 4) & 0xf0));
+        out.push(xw, y, z + d, tex, side | ((light >> 8) & 0xf0));
+    } else {
+        out.push(xw, y, z + d, tex, side | ((light >> 8) & 0xf0));
+        out.push(xw, y, z, tex, side | ((light << 4) & 0xf0));
+        out.push(xw, y + h, z, tex, side | (light & 0xf0));
+        out.push(xw, y + h, z + d, tex, side | ((light >> 4) & 0xf0));
+    }
 };
 
 const blockBufferPosToOffset = (x: number, y: number, z: number): number =>
