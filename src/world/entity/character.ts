@@ -492,7 +492,7 @@ export class Character extends Entity {
     }
 
     xpForLevel(level: number): number {
-        return level * 8;
+        return level * 16;
     }
 
     xpPercentageTillNextLevel(): number {
