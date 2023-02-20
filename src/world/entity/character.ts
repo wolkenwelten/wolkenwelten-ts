@@ -411,6 +411,7 @@ export class Character extends Entity {
         this.world.game.render.canvasWrapper.getBoundingClientRect();
         this.world.game.render.canvasWrapper.classList.add('fx-damage');
         this.miningCooldownUntil = this.world.game.ticks + 10;
+        this.world.game.audio.play('ungh', 0.2);
     }
 
     strike() {
