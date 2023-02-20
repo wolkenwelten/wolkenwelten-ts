@@ -8,6 +8,7 @@ import { World } from '../world';
 import { Inventory } from './inventory';
 
 import itemIcon from '../../../assets/gfx/items/crabMeatRaw.png';
+import { Character } from '../entity/character';
 let idCounter = 0;
 
 export type MaybeItem = Item | undefined;
@@ -36,8 +37,10 @@ export class Item {
         return itemIcon;
     }
 
-    use(e: Entity): boolean {
-        return false;
+    use(e: Entity) {
+        if (e instanceof Character) {
+            e.strike();
+        }
     }
 
     attackDamage(e: Entity): number {

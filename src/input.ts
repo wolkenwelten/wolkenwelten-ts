@@ -290,10 +290,10 @@ export class InputManager {
         }
 
         if (actions.primary) {
-            this.game.player.strike();
+            this.game.player.primaryAction();
         }
         if (actions.secondary) {
-            this.game.player.useItem();
+            this.game.player.secondaryAction();
         }
     }
 }

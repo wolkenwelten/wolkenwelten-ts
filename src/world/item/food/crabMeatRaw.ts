@@ -23,16 +23,16 @@ export class CrabMeatRaw extends StackableItem {
         return world.game.render.assets.get(meshUrl);
     }
 
-    use(e: Entity): boolean {
+    use(e: Entity) {
         if (this.destroyed) {
-            return false;
+            return;
         }
         if (e instanceof Character) {
             if (this.world.game.ticks < e.lastAction) {
-                return false;
+                return;
             }
             if (e.health === e.maxHealth) {
-                return false;
+                return;
             }
             e.cooldown(100);
             e.heal(4);
@@ -40,8 +40,9 @@ export class CrabMeatRaw extends StackableItem {
             if (--this.amount <= 0) {
                 this.destroy();
             }
-            return true;
+            e.hitAnimation = this.world.game.render.frames;
+            e.inventory.updateAll();
         }
-        return false;
+        return;
     }
 }

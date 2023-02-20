@@ -2,6 +2,7 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import { TriangleMesh, VoxelMesh } from '../../render/asset';
+import { Character } from '../entity/character';
 import { Entity } from '../entity/entity';
 import { World } from '../world';
 import { StackableItem } from './stackableItem';
@@ -22,13 +23,17 @@ export class BlockItem extends StackableItem {
         return new BlockItem(this.world, this.blockType, this.amount);
     }
 
-    use(e: Entity): boolean {
-        if (this.destroyed) {
-            return false;
+    use(e: Entity) {
+        if (
+            this.destroyed ||
+            (e instanceof Character && this.world.game.ticks < e.lastAction)
+        ) {
+            return;
         }
+
         const ray = e.raycast(true);
         if (!ray) {
-            return false;
+            return;
         }
         const [x, y, z] = ray;
         this.world.blocks[this.blockType].playPlaceSound(e.world);
@@ -38,8 +43,12 @@ export class BlockItem extends StackableItem {
             this.destroy();
         }
 
-        e.cooldown(20);
-        return true;
+        e.cooldown(32);
+        if (e instanceof Character) {
+            e.hitAnimation = this.world.game.render.frames;
+            e.inventory.updateAll();
+        }
+        return;
     }
 
     icon(): string {

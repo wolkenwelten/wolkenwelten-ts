@@ -57,6 +57,16 @@ export class Character extends Entity {
 
     inventory: Inventory;
 
+    getGoodStuff() {
+        this.inventory.add(new IronAxe(this.world));
+        this.inventory.add(new IronPickaxe(this.world));
+        this.inventory.add(new StoneAxe(this.world));
+        this.inventory.add(new StonePickaxe(this.world));
+        this.inventory.add(new CrabMeatRaw(this.world, 3));
+        this.inventory.add(new Stick(this.world, 3));
+        this.inventory.add(new BlockItem(this.world, 3, 90));
+    }
+
     init() {
         this.x = this.spawnX;
         this.y = this.spawnY;
@@ -74,15 +84,6 @@ export class Character extends Entity {
         this.miningX = this.miningY = this.miningZ = 0;
         this.vx = this.vy = this.vz = 0;
         this.inventory.clear();
-
-        /*
-        this.inventory.add(new IronAxe(this.world));
-        this.inventory.add(new StonePickaxe(this.world));
-        this.inventory.add(new StoneAxe(this.world));
-        this.inventory.add(new CrabMeatRaw(this.world, 3));
-        this.inventory.add(new Stick(this.world, 3));
-        this.inventory.add(new BlockItem(this.world, 3, 90));
-        */
 
         this.inventory.select(0);
     }
@@ -370,6 +371,7 @@ export class Character extends Entity {
             }
         }
 
+        const srr = (radius + 0.4) * (radius + 0.4);
         for (let cxo = -1; cxo < 2; cxo++) {
             for (let cyo = -1; cyo < 2; cyo++) {
                 for (let czo = -1; czo < 2; czo++) {
@@ -385,7 +387,7 @@ export class Character extends Entity {
                         const dy = y - s.y;
                         const dz = z - s.z;
                         const dd = dx * dx + dy * dy + dz * dz;
-                        if (dd < rr) {
+                        if (dd < srr) {
                             s.onAttacked(this);
                         }
                     }
@@ -442,18 +444,17 @@ export class Character extends Entity {
         }
     }
 
-    useItem() {
-        if (this.world.game.ticks < this.lastAction) {
-            return;
-        }
+    primaryAction() {
         const item = this.inventory.active();
-        if (!item) {
-            return;
+        if (item) {
+            item.use(this);
+        } else {
+            this.strike();
         }
-        if (item.use(this)) {
-            this.hitAnimation = this.world.game.render.frames;
-            this.inventory.updateAll();
-        }
+    }
+
+    secondaryAction() {
+        this.primaryAction();
     }
 
     dropActiveItem() {
