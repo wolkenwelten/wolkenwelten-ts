@@ -80,7 +80,7 @@ export const worldgenSurface = (chunk: Chunk) => {
                         }
                     }
 
-                    if (gh > -3 && endY < 32 && rng.bool(1240)) {
+                    if (gh > -3 && endY < 32 && rng.bool(740)) {
                         new Crab(chunk.world, cx, gh + 2, cz);
                     } else if (
                         gh > -3 &&

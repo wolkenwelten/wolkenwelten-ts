@@ -30,6 +30,7 @@ export class Entity {
     maxHealth = 12;
     isDead = false;
     level = 0;
+    weight = 1;
 
     constructor(world: World) {
         this.id = ++entityCounter;
@@ -180,5 +181,27 @@ export class Entity {
         const d = Math.sqrt(dx * dx + dy * dy + dz * dz);
         const alpha = Math.min(1, Math.max(0, 160.0 - d) / 8);
         this.mesh().draw(modelViewMatrix, alpha);
+    }
+
+    beRepelledByEntities() {
+        for (const e of this.world.entities) {
+            if (e === this) {
+                continue;
+            }
+            const dx = e.x - this.x;
+            const dy = e.y - this.y;
+            const dz = e.z - this.z;
+            const dd = dx * dx + dy * dy * 0.5 + dz * dz;
+            if (dd < 1.8) {
+                const w = Math.max(
+                    0.98,
+                    Math.min(0.999, this.weight / e.weight)
+                );
+                this.vx =
+                    this.vx * w + (dx < 0 ? 1.35 : -1.35 - dx) * (1.0 - w);
+                this.vz =
+                    this.vz * w + (dz < 0 ? 1.35 : -1.35 - dz) * (1.0 - w);
+            }
+        }
     }
 }

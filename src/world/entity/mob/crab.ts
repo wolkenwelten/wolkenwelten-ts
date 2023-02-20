@@ -39,6 +39,7 @@ export class Crab extends Mob {
     health = 16;
     maxHealth = 16;
     level = 1;
+    weight = 10;
 
     constructor(world: World, x: number, y: number, z: number) {
         super(world, x, y, z);
@@ -328,6 +329,7 @@ export class Crab extends Mob {
         this.stateChange();
         this.doState();
         this.updatePhysics();
+        this.beRepelledByEntities();
 
         this.x += this.vx;
         this.y += this.vy;

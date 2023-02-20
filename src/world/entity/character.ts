@@ -53,6 +53,7 @@ export class Character extends Entity {
 
     level = 0;
     xp = 0;
+    weight = 70;
 
     inventory: Inventory;
 
@@ -302,6 +303,7 @@ export class Character extends Entity {
             this.vy *= v;
             this.vz *= v;
         }
+        this.beRepelledByEntities();
 
         this.x += this.vx;
         this.y += this.vy;
