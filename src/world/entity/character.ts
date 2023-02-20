@@ -324,10 +324,13 @@ export class Character extends Entity {
         if (minedBlock === 0) {
             return;
         }
-        this.miningActive = true;
-        this.miningX = x;
-        this.miningY = y;
-        this.miningZ = z;
+        const dmg = this.inventory.active()?.miningDamage(minedBlock) || 0;
+        if (dmg > 0) {
+            this.miningActive = true;
+            this.miningX = x;
+            this.miningY = y;
+            this.miningZ = z;
+        }
     }
 
     attack(radius = 1.6): boolean {

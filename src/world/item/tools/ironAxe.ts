@@ -27,7 +27,7 @@ export class IronAxe extends Item {
     }
 
     miningDamage(block: number): number {
-        return this.world.blocks[block].miningCat === 'Axe' ? 7 : 1;
+        return this.world.blocks[block].miningCat === 'Axe' ? 7 : 0;
     }
 
     mesh(world: World): TriangleMesh | VoxelMesh {

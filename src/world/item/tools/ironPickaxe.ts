@@ -27,7 +27,7 @@ export class IronPickaxe extends Item {
     }
 
     miningDamage(block: number): number {
-        return this.world.blocks[block].miningCat === 'Pickaxe' ? 7 : 1;
+        return this.world.blocks[block].miningCat === 'Pickaxe' ? 7 : 0;
     }
 
     mesh(world: World): TriangleMesh | VoxelMesh {

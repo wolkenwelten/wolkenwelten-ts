@@ -21,12 +21,12 @@ export const addDefaultCraftingRecipes = (
     crafting.add('StoneAxe', new StoneAxe(world), [
         new Stone(world, 2),
         new Stick(world, 3),
-    ]);
+    ], 'A simple stone axe, necessary to chop down trees and bushes.');
 
     crafting.add('StonePickaxe', new StonePickaxe(world), [
         new Stone(world, 3),
         new Stick(world, 3),
-    ]);
+    ], 'A simple stone pickaxe, necessary to mine through dirt and stone.');
 
     crafting.add(
         'IronBar',
@@ -39,11 +39,11 @@ export const addDefaultCraftingRecipes = (
         new Stick(world, 3),
         new IronBar(world, 2),
         new Coal(world, 2),
-    ]);
+    ], 'A much nicer axe, chops through trees pretty quickly and also does a lot of damage.');
 
     crafting.add('IronPickaxe', new IronPickaxe(world), [
         new Stick(world, 3),
         new IronBar(world, 3),
         new Coal(world, 2),
-    ]);
+    ], 'An improved pickaxe made from iron, digs much quicker and also does more damage.');
 };

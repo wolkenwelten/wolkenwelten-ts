@@ -45,7 +45,7 @@ export class Item {
     }
 
     miningDamage(block: number): number {
-        return 1;
+        return 0;
     }
 
     dropAll(e: Entity): boolean {
