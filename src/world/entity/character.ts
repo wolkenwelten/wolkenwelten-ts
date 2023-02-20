@@ -330,7 +330,7 @@ export class Character extends Entity {
         this.miningZ = z;
     }
 
-    attack(radius = 2): boolean {
+    attack(radius = 1.3): boolean {
         const [vx, vy, vz] = this.direction(0, 0, radius * -0.6);
         const x = this.x + vx;
         const y = this.y + vy;
@@ -352,9 +352,9 @@ export class Character extends Entity {
                 const dm = Math.max(Math.abs(dx), Math.abs(dz));
                 const ndx = dx / dm;
                 const ndz = dz / dm;
-                e.vx += ndx * 0.05;
-                e.vy += 0.03;
-                e.vz += ndz * 0.05;
+                e.vx += ndx * 0.03;
+                e.vy += 0.02;
+                e.vz += ndz * 0.03;
                 const wasDead = e.isDead;
                 e.damage(weapon?.attackDamage(e) || 1);
                 e.onAttack(this);

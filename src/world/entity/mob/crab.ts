@@ -77,6 +77,29 @@ export class Crab extends Mob {
         }
         this.aggroTarget = perpetrator;
         this.changeState('justHit');
+        for (const e of this.world.entities) {
+            if (e === this) {
+                continue;
+            }
+            if (e instanceof Crab) {
+                if (
+                    e.isDead ||
+                    e.state === 'justHit' ||
+                    e.state === 'chase' ||
+                    e.state === 'attack'
+                ) {
+                    continue;
+                }
+                const dx = e.x - this.x;
+                const dy = e.y - this.y;
+                const dz = e.z - this.z;
+                const dd = dx * dx + dy * dy + dz * dz;
+                if (dd < 24 * 24) {
+                    e.aggroTarget = perpetrator;
+                    e.changeState('chase');
+                }
+            }
+        }
     }
 
     mesh(): VoxelMesh {
@@ -254,14 +277,14 @@ export class Crab extends Mob {
                     const dy = this.y - this.aggroTarget.y;
                     const dz = this.z - this.aggroTarget.z;
                     const dd = dx * dx + dy * dy + dz * dz;
-                    if (dd > 16 * 16) {
+                    if (dd > 28 * 28) {
                         this.aggroTarget = undefined;
                         this.changeState('idle');
                     } else {
-                        if (dd > 1.8 * 1.8) {
+                        if (dd > 1.7 * 1.7) {
                             const [vx, vz] = this.walkDirection();
-                            this.gvx = vx * -4;
-                            this.gvz = vz * -4;
+                            this.gvx = vx * -5;
+                            this.gvz = vz * -5;
                         } else {
                             this.changeState('attack');
                         }
