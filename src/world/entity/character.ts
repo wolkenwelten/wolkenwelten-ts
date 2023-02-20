@@ -13,6 +13,8 @@ import { StoneAxe } from '../item/tools/stoneAxe';
 import { StonePickaxe } from '../item/tools/stonePickaxe';
 import { Stick } from '../item/material/stick';
 import { MaybeItem } from '../item/item';
+import { IronPickaxe } from '../item/tools/ironPickaxe';
+import { IronAxe } from '../item/tools/ironAxe';
 
 const CHARACTER_ACCELERATION = 0.04;
 const CHARACTER_STOP_RATE = CHARACTER_ACCELERATION * 3.0;
@@ -73,6 +75,7 @@ export class Character extends Entity {
         this.inventory.clear();
 
         /*
+        this.inventory.add(new IronAxe(this.world));
         this.inventory.add(new StonePickaxe(this.world));
         this.inventory.add(new StoneAxe(this.world));
         this.inventory.add(new CrabMeatRaw(this.world, 3));
@@ -355,7 +358,8 @@ export class Character extends Entity {
                 e.onAttack(this);
                 if (!wasDead) {
                     if (e.isDead) {
-                        this.xpGain(1);
+                        const xp = Math.max(0, e.level - this.level);
+                        this.xpGain(xp);
                     }
                 }
             }
@@ -420,7 +424,7 @@ export class Character extends Entity {
         const hit = this.attack();
         if (hit) {
             this.world.game.audio.play('punch');
-            this.miningCooldownUntil = this.world.game.ticks + 10;
+            this.miningCooldownUntil = this.world.game.ticks + 80;
         } else {
             this.world.game.audio.play('punchMiss');
         }
@@ -485,7 +489,7 @@ export class Character extends Entity {
     }
 
     xpForLevel(level: number): number {
-        return level * 10;
+        return level * 8;
     }
 
     xpPercentageTillNextLevel(): number {
@@ -517,7 +521,7 @@ export class Character extends Entity {
         }
     }
 
-    xpGain(amount = 1) {
+    xpGain(amount: number) {
         this.xp += amount;
         this.xpCheckLevelUp();
         this.world.game.ui.rootElement.dispatchEvent(

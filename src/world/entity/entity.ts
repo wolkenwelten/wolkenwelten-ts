@@ -29,6 +29,7 @@ export class Entity {
     health = 12;
     maxHealth = 12;
     isDead = false;
+    level = 0;
 
     constructor(world: World) {
         this.id = ++entityCounter;

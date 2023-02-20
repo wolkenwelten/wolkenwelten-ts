@@ -38,6 +38,7 @@ export class Crab extends Mob {
     aggroTarget?: Entity;
     health = 16;
     maxHealth = 16;
+    level = 1;
 
     constructor(world: World, x: number, y: number, z: number) {
         super(world, x, y, z);
@@ -60,9 +61,9 @@ export class Crab extends Mob {
         }
         this.world.game.render.particle.fxDeath(this.x, this.y, this.z);
         this.world.game.add.itemDrop(
-            this.x,
+            this.x + (Math.random() - 0.5) * 0.3,
             this.y,
-            this.z,
+            this.z + (Math.random() - 0.5) * 0.3,
             new CrabMeatRaw(this.world)
         );
         this.changeState('dead');

@@ -6,7 +6,7 @@ import { mat4, vec3 } from 'gl-matrix';
 import { DecalMesh, AssetList } from './asset';
 import { Entity } from '../world/entity/entity';
 import { WorldRenderer } from './worldRenderer';
-import { allTexturesLoaded, Texture } from './texture';
+import { allTexturesLoaded } from './texture';
 import { coordinateToWorldKey } from '../world/world';
 
 import { ParticleMesh } from './meshes/particleMesh/particleMesh';

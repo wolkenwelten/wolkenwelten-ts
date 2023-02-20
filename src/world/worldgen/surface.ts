@@ -89,6 +89,13 @@ export const worldgenSurface = (chunk: Chunk) => {
                         rng.bool(640)
                     ) {
                         new StaticShell(chunk, cx, gh + 1, cz);
+                    } else if (
+                        gh > -3 &&
+                        gh < 0 &&
+                        endY < 32 &&
+                        rng.bool(2440)
+                    ) {
+                        new StaticStick(chunk, cx, gh + 1, cz);
                     }
                 } else if (gh > 24) {
                     chunk.setBoxUnsafe(x, 0, z, 1, Math.min(endY, 32), 1, 3);
@@ -148,19 +155,9 @@ export const worldgenSurface = (chunk: Chunk) => {
                             ) {
                                 assets.spruceA.blit(chunk, x, gh - 2, z);
                             } else if (rng.bool(400)) {
-                                new StaticStone(
-                                    chunk,
-                                    cx,
-                                    Math.floor(gh) + 1,
-                                    cz
-                                );
+                                new StaticStone(chunk, cx, gh + 1, cz);
                             } else if (rng.bool(2400)) {
-                                new StaticStick(
-                                    chunk,
-                                    cx,
-                                    Math.floor(gh) + 1,
-                                    cz
-                                );
+                                new StaticStick(chunk, cx, gh + 1, cz);
                             }
                         }
                     }
