@@ -24,10 +24,7 @@ export class CrabMeatRaw extends StackableItem {
     }
 
     use(e: Entity) {
-        if (this.destroyed) {
-            return;
-        }
-        if (e instanceof Character) {
+        if (!this.destroyed && e instanceof Character) {
             if (this.world.game.ticks < e.lastAction) {
                 return;
             }
@@ -43,6 +40,5 @@ export class CrabMeatRaw extends StackableItem {
             e.hitAnimation = this.world.game.render.frames;
             e.inventory.updateAll();
         }
-        return;
     }
 }

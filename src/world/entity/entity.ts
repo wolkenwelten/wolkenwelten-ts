@@ -167,8 +167,10 @@ export class Entity {
             return;
         }
         this.world.game.render.decals.addShadow(this.x, this.y, this.z, 1);
+
+        mat4.identity(modelViewMatrix);
         transPos[0] = this.x;
-        transPos[1] = this.y - 1 / 64;
+        transPos[1] = this.y;
         transPos[2] = this.z;
         mat4.translate(modelViewMatrix, modelViewMatrix, transPos);
 

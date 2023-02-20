@@ -15,6 +15,7 @@ import { Stick } from '../item/material/stick';
 import { MaybeItem } from '../item/item';
 import { IronPickaxe } from '../item/tools/ironPickaxe';
 import { IronAxe } from '../item/tools/ironAxe';
+import { Stone } from '../item/material/stone';
 
 const CHARACTER_ACCELERATION = 0.05;
 const CHARACTER_STOP_RATE = CHARACTER_ACCELERATION * 3.0;
@@ -64,6 +65,7 @@ export class Character extends Entity {
         this.inventory.add(new StonePickaxe(this.world));
         this.inventory.add(new CrabMeatRaw(this.world, 3));
         this.inventory.add(new Stick(this.world, 3));
+        this.inventory.add(new Stone(this.world, 90));
         this.inventory.add(new BlockItem(this.world, 3, 90));
     }
 
@@ -334,6 +336,18 @@ export class Character extends Entity {
         }
     }
 
+    doDamage(target: Entity, damage: number) {
+        const wasDead = target.isDead;
+        target.damage(damage);
+        target.onAttack(this);
+        if (!wasDead) {
+            if (target.isDead) {
+                const xp = Math.max(0, target.level - this.level);
+                this.xpGain(xp);
+            }
+        }
+    }
+
     attack(radius = 1.6): boolean {
         const [vx, vy, vz] = this.direction(0, 0, radius * -0.6);
         const x = this.x + vx;
@@ -352,22 +366,14 @@ export class Character extends Entity {
             const dd = dx * dx + dy * dy + dz * dz;
             if (dd < rr) {
                 hit = true;
-                this.world.game.render.particle.fxStrike(e.x, e.y, e.z);
                 const dm = Math.max(Math.abs(dx), Math.abs(dz));
                 const ndx = dx / dm;
                 const ndz = dz / dm;
                 e.vx += ndx * 0.03;
                 e.vy += 0.02;
                 e.vz += ndz * 0.03;
-                const wasDead = e.isDead;
-                e.damage(weapon?.attackDamage(e) || 1);
-                e.onAttack(this);
-                if (!wasDead) {
-                    if (e.isDead) {
-                        const xp = Math.max(0, e.level - this.level);
-                        this.xpGain(xp);
-                    }
-                }
+                this.doDamage(e, weapon?.attackDamage(e) || 1);
+                this.world.game.render.particle.fxStrike(e.x, e.y, e.z);
             }
         }
 
