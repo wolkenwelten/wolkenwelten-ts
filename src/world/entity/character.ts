@@ -330,7 +330,7 @@ export class Character extends Entity {
         this.miningZ = z;
     }
 
-    attack(radius = 1.3): boolean {
+    attack(radius = 1.6): boolean {
         const [vx, vy, vz] = this.direction(0, 0, radius * -0.6);
         const x = this.x + vx;
         const y = this.y + vy;
