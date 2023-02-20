@@ -40,8 +40,39 @@ export class RenderManager {
     cam: Entity;
     world: WorldRenderer;
 
+    setPlatformDefaults() {
+        const isFirefox =
+            navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+        const isSafari = /^((?!chrome|android).)*safari/i.test(
+            navigator.userAgent
+        );
+        const isMobile =
+            navigator.userAgent.match(/Android/i) ||
+            navigator.userAgent.match(/iPhone/i) ||
+            navigator.userAgent.match(/iPad/i);
+
+        if (isFirefox || isSafari || isMobile) {
+            // Reduce default renderDistance due to performance issues
+            this.renderDistance = 96;
+            if (isMobile) {
+                this.game.ui.log.addEntry(
+                    `Reduced render distance, because it looks like this is a mobile device, you can override that decision in the settings menu.`
+                );
+            } else if (isSafari) {
+                this.game.ui.log.addEntry(
+                    `Reduced render distance, because it looks like this is Safari, you can override that decision in the settings menu.`
+                );
+            } else if (isFirefox) {
+                this.game.ui.log.addEntry(
+                    `Reduced render distance, because it looks like this is Firefox, you can override that decision in the settings menu.`
+                );
+            }
+        }
+    }
+
     constructor(game: Game, cam: Entity) {
         this.game = game;
+        this.setPlatformDefaults();
         this.cam = cam;
         this.canvas = document.createElement('canvas');
         this.canvas.classList.add('wolkenwelten-canvas');

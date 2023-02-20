@@ -6,6 +6,7 @@ import { HealthBar } from './components/health/healthBar';
 import { FpsCounter } from './components/fpsCounter';
 import { Crosshair } from './components/crosshair';
 import { Hotbar } from './components/hotbar';
+import { SystemLog } from './components/systemLog';
 import { CursorItem } from './components/item/cursorItem';
 import { XpView } from './components/xpView';
 import { IconManager } from './icon';
@@ -21,6 +22,7 @@ export class UIManager {
     cursorItem: CursorItem;
     icon: IconManager;
     heldItem: MaybeItem;
+    log: SystemLog;
 
     constructor(game: Game) {
         this.game = game;
@@ -34,6 +36,7 @@ export class UIManager {
         new HealthBar(this.uiWrapper, game);
         new Crosshair(this.uiWrapper);
         new XpView(this.uiWrapper, game);
+        this.log = new SystemLog(this.uiWrapper, game);
         this.inventory = new PlayerModal(this.uiWrapper, game);
         this.hotbar = new Hotbar(this.uiWrapper, game);
         this.cursorItem = new CursorItem(this.uiWrapper);

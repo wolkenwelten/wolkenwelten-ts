@@ -65,7 +65,14 @@ export class BlockMesh {
             'blockMesh',
             shaderVertSource,
             shaderFragSource,
-            ['cur_tex', 'mat_mv', 'mat_mvp', 'trans_pos', 'alpha']
+            [
+                'cur_tex',
+                'mat_mv',
+                'mat_mvp',
+                'trans_pos',
+                'alpha',
+                'fade_distance',
+            ]
         );
         this.texture = new Texture(
             this.gl,
@@ -136,7 +143,11 @@ export class BlockMesh {
         this.update(vertices, sideSquareCount);
     }
 
-    static bindShaderAndTexture(projection: mat4, modelView: mat4) {
+    static bindShaderAndTexture(
+        projection: mat4,
+        modelView: mat4,
+        renderDistance: number
+    ) {
         BlockMesh.shader.bind();
 
         const modelViewProjection = BlockMesh.mvp;
@@ -145,6 +156,7 @@ export class BlockMesh {
         BlockMesh.shader.uniform4fv('mat_mv', modelView);
         BlockMesh.shader.uniform4fv('mat_mvp', modelViewProjection);
         BlockMesh.shader.uniform1i('cur_tex', 1);
+        BlockMesh.shader.uniform1f('fade_distance', renderDistance);
         BlockMesh.texture.bind(1);
     }
 
@@ -194,10 +206,5 @@ export class BlockMesh {
             }
         }
         return calls;
-    }
-
-    draw(projection: mat4, modelView: mat4, mask: number, alpha: number) {
-        BlockMesh.bindShaderAndTexture(projection, modelView);
-        return this.drawFast(mask, alpha);
     }
 }

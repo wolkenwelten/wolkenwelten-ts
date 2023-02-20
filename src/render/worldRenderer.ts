@@ -23,7 +23,6 @@ type DrawQueueEntry = {
     alpha: number;
 };
 
-const RENDER_STEPS = 5;
 const transPos = new Float32Array([0, 0, 0]);
 const tmpVec4 = new Float32Array([0, 0, 0, 1]);
 
@@ -108,7 +107,11 @@ export class WorldRenderer {
                 entity.draw(projectionMatrix, viewMatrix, cam);
             }
         }
-        BlockMesh.bindShaderAndTexture(projectionMatrix, viewMatrix);
+        BlockMesh.bindShaderAndTexture(
+            projectionMatrix,
+            viewMatrix,
+            this.renderer.renderDistance
+        );
 
         let drawn = 0;
         let skipped = 0;
@@ -117,6 +120,7 @@ export class WorldRenderer {
         let drawQLen = 0;
         this.drawQueue.length = 0;
         const ticks = this.renderer.game.ticks;
+        const RENDER_STEPS = Math.ceil(this.renderer.renderDistance / 32);
         for (let x = -RENDER_STEPS; x <= RENDER_STEPS; x++) {
             for (let y = -RENDER_STEPS; y <= RENDER_STEPS; y++) {
                 for (let z = -RENDER_STEPS; z <= RENDER_STEPS; z++) {

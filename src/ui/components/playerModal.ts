@@ -5,6 +5,7 @@ import styles from './playerModal.module.css';
 import { Game } from '../../game';
 import { CraftingWrap } from './crafting/craftingWrap';
 import { InventoryWrap } from './item/inventoryWrap';
+import { SettingsWrap } from './settings/settingsWrap';
 
 export class PlayerModal {
     active = false;
@@ -15,6 +16,7 @@ export class PlayerModal {
 
     crafting: CraftingWrap;
     inventory: InventoryWrap;
+    settings: SettingsWrap;
 
     initInventoryTab(game: Game) {
         const tab = document.createElement('div');
@@ -74,6 +76,34 @@ export class PlayerModal {
         return crafting;
     }
 
+    initSettingsTab(game: Game) {
+        const tab = document.createElement('div');
+        tab.classList.add(styles.tabContent);
+
+        const settings = new SettingsWrap(tab, game);
+        this.tabContent.appendChild(tab);
+
+        const button = document.createElement('div');
+        button.innerText = 'Settings';
+        button.classList.add(styles.tabButton);
+        this.tabBar.appendChild(button);
+
+        const that = this;
+        button.onclick = () => {
+            for (const c of that.tabContent.children) {
+                c.classList.remove(styles.activeTab);
+            }
+            for (const c of that.tabBar.children) {
+                c.classList.remove(styles.activeTabButton);
+            }
+            tab.classList.add(styles.activeTab);
+            button.classList.add(styles.activeTabButton);
+            that.settings.update();
+        };
+
+        return settings;
+    }
+
     constructor(parent: HTMLElement, game: Game) {
         const div = document.createElement('div');
         this.div = div;
@@ -91,6 +121,7 @@ export class PlayerModal {
 
         this.inventory = this.initInventoryTab(game);
         this.crafting = this.initCraftingTab(game);
+        this.settings = this.initSettingsTab(game);
 
         div.addEventListener('mousedown', (e) => {
             e.preventDefault();

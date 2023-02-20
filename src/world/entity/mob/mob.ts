@@ -34,9 +34,10 @@ export class Mob extends Entity {
         const dy = this.y - cam.y;
         const dz = this.z - cam.z;
         const d = Math.sqrt(dx * dx + dy * dy + dz * dz);
-        const alpha = Math.min(1, Math.max(0, 160.0 - d) / 8);
+        const renderDistance = this.world.game.render.renderDistance;
+        const alpha = Math.min(1, Math.max(0, renderDistance - d) / 8);
         this.mesh().draw(modelViewMatrix, alpha);
-        if (d < 160) {
+        if (d < renderDistance) {
             this.world.game.render.decals.addShadow(this.x, this.y, this.z, 1);
         }
     }

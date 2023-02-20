@@ -27,6 +27,9 @@ export class InputManager {
         this.keyHandler.set('KeyE', () => {
             that.toggleInventory();
         });
+        this.keyHandler.set('Escape', () => {
+            that.closeInventory();
+        });
         this.keyHandler.set('KeyN', () => {
             that.game.player.noClip = !that.game.player.noClip;
         });
@@ -93,6 +96,12 @@ export class InputManager {
             },
             false
         );
+    }
+
+    closeInventory() {
+        if (this.isInventoryActive()) {
+            this.toggleInventory();
+        }
     }
 
     toggleInventory() {

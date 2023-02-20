@@ -16,7 +16,7 @@ export class XpView {
     constructor(parent: HTMLElement, game: Game) {
         const div = document.createElement('div');
         this.div = div;
-        div.classList.add(styles.wrap);
+        div.classList.add(styles.xpView);
 
         this.lvl = document.createElement('div');
         this.lvl.classList.add(styles.level);
