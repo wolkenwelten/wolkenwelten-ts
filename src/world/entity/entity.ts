@@ -187,6 +187,9 @@ export class Entity {
     }
 
     beRepelledByEntities() {
+        if((this.id & 0xF) !== (this.world.game.ticks & 0xF)){
+            return;
+        }
         for (const e of this.world.entities) {
             if (e === this) {
                 continue;

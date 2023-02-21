@@ -118,12 +118,24 @@ export class World {
         const maxDistance =
             this.game.render.renderDistance *
             this.game.render.renderDistance *
-            8;
+            4;
         for (const chunk of this.chunks.values()) {
             if (chunk.gc(maxDistance, this.game.player)) {
                 const key = coordinateToWorldKey(chunk.x, chunk.y, chunk.z);
                 this.chunks.delete(key);
                 this.game.render.dropBlockMesh(chunk.x, chunk.y, chunk.z);
+            }
+        }
+        const px = this.game.player.x;
+        const py = this.game.player.y;
+        const pz = this.game.player.z;
+        for(const e of this.entities){
+            const dx = px - e.x;
+            const dy = py - e.y;
+            const dz = pz - e.z;
+            const dd = dx*dx+dy*dy+dz*dz;
+            if(dd > maxDistance){
+                e.destroy();
             }
         }
     }

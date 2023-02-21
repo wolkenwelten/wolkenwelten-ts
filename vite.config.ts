@@ -5,5 +5,5 @@ export default defineConfig({
   build: {
     sourcemap: true,
     assetsInlineLimit: 32768
-  }
+  },
 });

@@ -6,11 +6,41 @@ A Voxel engine for the Web that respects your freedom.
 
 Runs on a Raspberry Pi 4. Fits on a 1.44MB floppy.
 
-## Try it!
-You can play the newest version here: https://wolkenwelten.github.io/wolkenwelten-ts/
+## Play it!
+You can play the newest build here: https://wolkenwelten.github.io/wolkenwelten-ts/
 
-## History
-While integrating V8 into my Rust Voxel engine, I started experimenting with turning things around, writing most of the engine in TypeScript and using WASM for the tricky bits. Turns out Chrome/Safari are plenty fast and run at ~60FPS on my 8 year old PC already without having to use WASM (Firefox sadly seems to be quite slow at anything WebGL related).
+## Develop it!
+You don't need to install a thing, everything can run in the Browser:
+
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/wolkenwelten/wolkenwelten-ts)
+
+## Hardware Support
+This game should run somewhat fine on a Raspbery PI 4 in 720p and actually most Android Phones/ChromeBooks, provided you have a GamePad, it runs at a pretty stable 60FPS on my old Pixel 2.
+
+## Development
+To set up a development environment you only need NodeJS(v16+) and NPM installed
+
+### Initial Setup
+Nothing special, just install everything with npm
+```bash
+npm install
+```
+
+### Development (Terminal)
+You can also start the development server by executing the following command within the repo:
+```bash
+npm run dev
+```
+You should now be able to see the game in your Browser on http://localhost:5137/
+
+
+### Development (VS Code)
+You can use the `Complete development` configuration to launch a Vite Dev Server and Chrome with the Debugger hooked up.
+
+Putting/removing breakpoints in the `.ts` files with VS Code in `/src` should then work as expected.
+If it does not, please open an issue.
+
+Edit the TypeScript files or assets and the browser should automatically refresh after saving.
 
 ## Status
 Still quite early, however a lot of things already work (somewhat).
@@ -47,31 +77,3 @@ Still quite early, however a lot of things already work (somewhat).
 - [X] (Pick)Axe's
 - [X] Simple crafting system
 - [X] Voxel Objects/Blocks
-
-## Hardware Support
-I try to make sure that it also runs on cheap/older hardware and regularly test on my Raspberry PI 4 which gets ~50-60FPS at 720p in Chromium (make sure to use the 64-bit version). Additionally I make sure that it runs on an old Sandybridge x220 Thinkpad (Linux is much more performant here, although it kinda runs on Win10).
-
-## Development
-To set up a development environment you only need NodeJS(v16+) and NPM installed
-
-### Initial Setup
-Nothing special, just install everything with npm
-```bash
-npm install
-```
-
-### Development (Terminal)
-You can also start the development server by executing the following command within the repo:
-```bash
-npm run dev
-```
-You should now be able to see the game in your Browser on http://localhost:5137/
-
-
-### Development (VS Code)
-You can use the `Complete development` configuration to launch a Vite Dev Server and Chrome with the Debugger hooked up.
-
-Putting/removing breakpoints in the `.ts` files with VS Code in `/src` should then work as expected.
-If it does not, please open an issue.
-
-Edit the TypeScript files or assets and the browser should automatically refresh after saving.
