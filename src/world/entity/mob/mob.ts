@@ -9,6 +9,8 @@ const modelViewMatrix = mat4.create();
 const transPos = new Float32Array([0, 0, 0]);
 
 export class Mob extends Entity {
+    yOff = 0;
+
     constructor(world: World, x: number, y: number, z: number) {
         super(world);
         this.x = x;
@@ -23,7 +25,7 @@ export class Mob extends Entity {
 
         mat4.identity(modelViewMatrix);
         transPos[0] = this.x;
-        transPos[1] = this.y;
+        transPos[1] = this.y - this.yOff;
         transPos[2] = this.z;
         mat4.translate(modelViewMatrix, modelViewMatrix, transPos);
 

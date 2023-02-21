@@ -4,19 +4,18 @@
 import { VoxelMesh } from '../../../render/asset';
 import { World } from '../../world';
 import { Mob } from './mob';
-import { CrabMeatRaw } from '../../item/food/crabMeatRaw';
 import { Entity } from '../entity';
 import { radianDifference } from '../../../util/math';
 
-import voxelCrabIdle0File from '../../../../assets/vox/crab/idle_0.vox?url';
-import voxelCrabIdle1File from '../../../../assets/vox/crab/idle_1.vox?url';
-import voxelCrabWalk0File from '../../../../assets/vox/crab/walk_0.vox?url';
-import voxelCrabWalk1File from '../../../../assets/vox/crab/walk_1.vox?url';
-import voxelCrabAttack0File from '../../../../assets/vox/crab/attack_0.vox?url';
-import voxelCrabAttack1File from '../../../../assets/vox/crab/attack_1.vox?url';
-import voxelCrabDead0File from '../../../../assets/vox/crab/dead_0.vox?url';
+import voxelIdle0File from '../../../../assets/vox/rat/idle0.vox?url';
+import voxelIdle1File from '../../../../assets/vox/rat/idle1.vox?url';
+import voxelWalk0File from '../../../../assets/vox/rat/walk0.vox?url';
+import voxelWalk1File from '../../../../assets/vox/rat/walk1.vox?url';
+import voxelAttack0File from '../../../../assets/vox/rat/attack0.vox?url';
+import voxelAttack1File from '../../../../assets/vox/rat/attack1.vox?url';
+import voxelDamage0File from '../../../../assets/vox/rat/damage0.vox?url';
 
-export type CrabState =
+export type RatState =
     | 'idle'
     | 'walk'
     | 'turnLeft'
@@ -27,13 +26,14 @@ export type CrabState =
     | 'justHit'
     | 'dead';
 
-export class Crab extends Mob {
-    state: CrabState;
+export class Rat extends Mob {
+    state: RatState;
     ticksInState = 0;
     stateTransitions = 0;
 
     gvx = 0;
     gvz = 0;
+    yOff = 2 / 32;
 
     aggroTarget?: Entity;
     health = 16;
@@ -44,16 +44,16 @@ export class Crab extends Mob {
     constructor(world: World, x: number, y: number, z: number) {
         super(world, x, y, z);
         this.state = 'idle';
-        this.ticksInState = this.id * 123;
-        this.stateTransitions = this.id * 123;
+        this.ticksInState = (Math.random() * 128) | 0;
+        this.stateTransitions = (Math.random() * 128) | 0;
         this.world.game.render.assets.preload([
-            voxelCrabIdle0File,
-            voxelCrabIdle1File,
-            voxelCrabWalk0File,
-            voxelCrabWalk1File,
-            voxelCrabAttack0File,
-            voxelCrabAttack1File,
-            voxelCrabDead0File,
+            voxelIdle0File,
+            voxelIdle1File,
+            voxelWalk0File,
+            voxelWalk1File,
+            voxelAttack0File,
+            voxelAttack1File,
+            voxelDamage0File,
         ]);
     }
 
@@ -62,15 +62,9 @@ export class Crab extends Mob {
             return;
         }
         this.world.game.render.particle.fxDeath(this.x, this.y, this.z);
-        this.world.game.add.itemDrop(
-            this.x + (Math.random() - 0.5) * 0.3,
-            this.y,
-            this.z + (Math.random() - 0.5) * 0.3,
-            new CrabMeatRaw(this.world)
-        );
         this.changeState('dead');
         this.isDead = true;
-        this.world.game.audio.play('crabDeath', 0.5);
+        this.world.game.audio.play('ratDeath', 0.5);
     }
 
     onAttack(perpetrator: Entity): void {
@@ -83,7 +77,7 @@ export class Crab extends Mob {
             if (e === this) {
                 continue;
             }
-            if (e instanceof Crab) {
+            if (e instanceof Rat) {
                 if (
                     e.isDead ||
                     e.state === 'justHit' ||
@@ -99,11 +93,11 @@ export class Crab extends Mob {
                 if (dd < 24 * 24) {
                     e.aggroTarget = perpetrator;
                     e.changeState('chase');
-                    this.world.game.audio.play('crabClick', 0.5);
+                    this.world.game.audio.play('ratAttack', 0.5);
                 }
             }
         }
-        this.world.game.audio.play('crabClick', 0.3);
+        this.world.game.audio.play('ratAttack', 0.3);
     }
 
     mesh(): VoxelMesh {
@@ -111,28 +105,24 @@ export class Crab extends Mob {
             default: {
                 const frame =
                     ((this.id * 120 + this.world.game.ticks) / 40) & 1;
-                const url = frame ? voxelCrabIdle0File : voxelCrabIdle1File;
+                const url = frame ? voxelIdle0File : voxelIdle1File;
                 return this.world.game.render.assets.get(url);
             }
             case 'justHit':
             case 'dead': {
-                return this.world.game.render.assets.get(voxelCrabDead0File);
+                return this.world.game.render.assets.get(voxelDamage0File);
             }
             case 'attack': {
                 const frame = this.ticksInState / 20;
-                const url =
-                    frame & 1 ? voxelCrabAttack0File : voxelCrabAttack1File;
+                const url = frame & 1 ? voxelAttack0File : voxelAttack1File;
                 return this.world.game.render.assets.get(url);
             }
             case 'chase':
                 const frame = ((this.id * 32 + this.world.game.ticks) / 6) & 3;
                 if (frame & 1) {
-                    return this.world.game.render.assets.get(
-                        voxelCrabIdle0File
-                    );
+                    return this.world.game.render.assets.get(voxelIdle0File);
                 }
-                const url =
-                    frame >> 1 ? voxelCrabWalk0File : voxelCrabWalk1File;
+                const url = frame >> 1 ? voxelWalk0File : voxelWalk1File;
                 return this.world.game.render.assets.get(url);
             case 'turnLeft':
             case 'turnRight':
@@ -140,18 +130,15 @@ export class Crab extends Mob {
             case 'walk': {
                 const frame = ((this.id * 32 + this.world.game.ticks) / 8) & 3;
                 if (frame & 1) {
-                    return this.world.game.render.assets.get(
-                        voxelCrabIdle0File
-                    );
+                    return this.world.game.render.assets.get(voxelIdle0File);
                 }
-                const url =
-                    frame >> 1 ? voxelCrabWalk0File : voxelCrabWalk1File;
+                const url = frame >> 1 ? voxelWalk0File : voxelWalk1File;
                 return this.world.game.render.assets.get(url);
             }
         }
     }
 
-    changeState(newState: CrabState) {
+    changeState(newState: RatState) {
         this.state = newState;
         this.ticksInState = 0;
         this.stateTransitions++;
@@ -174,6 +161,7 @@ export class Crab extends Mob {
             entity.vx += edx * -0.02;
             entity.vy += 0.005;
             entity.vz += edz * -0.02;
+            this.world.game.audio.play('ratAttack', 0.3);
         }
     }
 

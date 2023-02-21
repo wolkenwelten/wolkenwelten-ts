@@ -3,6 +3,7 @@
  */
 import { Chunk } from '../chunk/chunk';
 import { Crab } from '../entity/mob/crab';
+import { Rat } from '../entity/mob/rat';
 import { LCG } from '../../util/prng';
 import { StaticShell } from '../staticObjects/shell';
 // import { Grass } from '../staticObjects/grass';
@@ -154,6 +155,8 @@ export const worldgenSurface = (chunk: Chunk) => {
                                 assets.spruceA.fits(chunk, x, gh - 2, z)
                             ) {
                                 assets.spruceA.blit(chunk, x, gh - 2, z);
+                            } else if (rng.bool(400)) {
+                                new Rat(chunk.world, cx, gh + 2, cz);
                             } else if (rng.bool(400)) {
                                 new StaticStone(chunk, cx, gh + 1, cz);
                             } else if (rng.bool(2400)) {

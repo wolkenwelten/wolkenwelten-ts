@@ -17,6 +17,9 @@ import levelUpUrl from '../assets/sfx/levelUp.ogg?url';
 import crabClickUrl from '../assets/sfx/crabClick.mp3?url';
 import crabDeathUrl from '../assets/sfx/crabDeath.mp3?url';
 
+import ratAttackUrl from '../assets/sfx/ratAttack.mp3?url';
+import ratDeathUrl from '../assets/sfx/ratDeath.mp3?url';
+
 export class AudioManager {
     game: Game;
     assets: Map<string, string> = new Map();
@@ -33,6 +36,8 @@ export class AudioManager {
         this.add('levelUp', levelUpUrl);
         this.add('crabClick', crabClickUrl);
         this.add('crabDeath', crabDeathUrl);
+        this.add('ratAttack', ratAttackUrl);
+        this.add('ratDeath', ratDeathUrl);
     }
 
     constructor(game: Game) {
