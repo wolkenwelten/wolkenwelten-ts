@@ -153,8 +153,13 @@ export class Character extends Entity {
         if (ox === 0 && oz === 0) {
             this.movementX = this.movementZ = 0;
         } else {
-            this.movementX = ox * Math.cos(-this.yaw) + oz * Math.sin(this.yaw);
-            this.movementZ = ox * Math.sin(-this.yaw) + oz * Math.cos(this.yaw);
+            if (oz > 0) {
+                oz *= 0.33;
+            }
+            this.movementX =
+                ox * 0.66 * Math.cos(-this.yaw) + oz * Math.sin(this.yaw);
+            this.movementZ =
+                ox * 0.66 * Math.sin(-this.yaw) + oz * Math.cos(this.yaw);
         }
 
         if (oy > 0) {
@@ -230,20 +235,24 @@ export class Character extends Entity {
             this.nextStepSound = this.walkCycleCounter + 6;
             this.world.game.audio.play('step', 0.5);
         }
+        let speed = 0.3;
         let accel =
             movementLength > 0.01
                 ? CHARACTER_ACCELERATION
                 : CHARACTER_STOP_RATE;
 
         if (!this.mayJump()) {
-            accel *= 0.4; // Slow down player movement changes during jumps
+            speed *= 0.4; // Slow down player movement changes during jumps
         }
         if (underwater) {
-            accel *= 0.7; // Slow down player movement while underwater
+            speed *= 0.7; // Slow down player movement while underwater
+        }
+        if (this.lastAction > this.world.game.ticks) {
+            speed *= 0.3;
         }
 
-        this.vx = this.vx * (1.0 - accel) + this.movementX * 0.3 * accel;
-        this.vz = this.vz * (1.0 - accel) + this.movementZ * 0.3 * accel;
+        this.vx = this.vx * (1.0 - accel) + this.movementX * speed * accel;
+        this.vz = this.vz * (1.0 - accel) + this.movementZ * speed * accel;
         this.vy -= underwater ? 0.001 : 0.005;
         const oldVx = this.vx;
         const oldVy = this.vy;

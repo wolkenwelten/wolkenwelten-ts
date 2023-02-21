@@ -90,14 +90,14 @@ export class Rat extends Mob {
                 const dy = e.y - this.y;
                 const dz = e.z - this.z;
                 const dd = dx * dx + dy * dy + dz * dz;
-                if (dd < 24 * 24) {
+                if (dd < 16 * 16) {
                     e.aggroTarget = perpetrator;
                     e.changeState('chase');
                     this.world.game.audio.play('ratAttack', 0.5);
                 }
             }
         }
-        this.world.game.audio.play('ratAttack', 0.3);
+        this.world.game.audio.play('ratAttack', 0.5);
     }
 
     mesh(): VoxelMesh {
@@ -142,27 +142,6 @@ export class Rat extends Mob {
         this.state = newState;
         this.ticksInState = 0;
         this.stateTransitions++;
-    }
-
-    attack(entity: Entity, dmg = 1) {
-        const [vx, vz] = this.walkDirection();
-        const x = this.x - vx;
-        const y = this.y;
-        const z = this.z - vz;
-        const dx = x - entity.x;
-        const dy = y - entity.y;
-        const dz = z - entity.z;
-        const dd = dx * dx + dy * dy + dz * dz;
-        if (dd < 1.7 * 1.7) {
-            entity.damage(dmg);
-            entity.onAttack(this);
-            const edx = this.x - entity.x;
-            const edz = this.z - entity.z;
-            entity.vx += edx * -0.02;
-            entity.vy += 0.005;
-            entity.vz += edz * -0.02;
-            this.world.game.audio.play('ratAttack', 0.3);
-        }
     }
 
     stateChange() {

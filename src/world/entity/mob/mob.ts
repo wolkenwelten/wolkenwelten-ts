@@ -44,6 +44,26 @@ export class Mob extends Entity {
         }
     }
 
+    attack(entity: Entity, dmg = 1) {
+        const [vx, vz] = this.walkDirection();
+        const x = this.x - vx;
+        const y = this.y;
+        const z = this.z - vz;
+        const dx = x - entity.x;
+        const dy = y - entity.y;
+        const dz = z - entity.z;
+        const dd = dx * dx + dy * dy + dz * dz;
+        if (dd < 1.9 * 1.9) {
+            entity.damage(dmg);
+            entity.onAttack(this);
+            const edx = this.x - entity.x;
+            const edz = this.z - entity.z;
+            entity.vx += edx * -0.02;
+            entity.vy += 0.005;
+            entity.vz += edz * -0.02;
+        }
+    }
+
     update() {
         if (this.noClip) {
             this.vx = this.vy = this.vz = 0;

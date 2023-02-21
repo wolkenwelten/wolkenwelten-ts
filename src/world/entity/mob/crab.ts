@@ -36,8 +36,8 @@ export class Crab extends Mob {
     gvz = 0;
 
     aggroTarget?: Entity;
-    health = 16;
-    maxHealth = 16;
+    health = 12;
+    maxHealth = 12;
     level = 2;
     weight = 10;
 
@@ -155,26 +155,6 @@ export class Crab extends Mob {
         this.state = newState;
         this.ticksInState = 0;
         this.stateTransitions++;
-    }
-
-    attack(entity: Entity, dmg = 1) {
-        const [vx, vz] = this.walkDirection();
-        const x = this.x - vx;
-        const y = this.y;
-        const z = this.z - vz;
-        const dx = x - entity.x;
-        const dy = y - entity.y;
-        const dz = z - entity.z;
-        const dd = dx * dx + dy * dy + dz * dz;
-        if (dd < 1.7 * 1.7) {
-            entity.damage(dmg);
-            entity.onAttack(this);
-            const edx = this.x - entity.x;
-            const edz = this.z - entity.z;
-            entity.vx += edx * -0.02;
-            entity.vy += 0.005;
-            entity.vz += edz * -0.02;
-        }
     }
 
     stateChange() {
