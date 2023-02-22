@@ -23,6 +23,7 @@ import ratDeathUrl from '../assets/sfx/ratDeath.mp3?url';
 export class AudioManager {
     game: Game;
     assets: Map<string, string> = new Map();
+    volume = 1;
 
     addDefaultAssets() {
         this.add('chomp', chompUrl);
@@ -50,11 +51,12 @@ export class AudioManager {
         this.play(name, 0);
     }
 
-    play(name: string, volume = 1) {
+    play(name: string, localVolume = 1) {
         const url = this.assets.get(name);
         if (!url) {
             throw new Error(`Can't find audio called ${name}`);
         }
+        const volume = localVolume * this.volume;
         const howl = new Howl({ src: [url], volume });
         howl.play();
     }

@@ -32,11 +32,25 @@ export class SettingsWrap {
         }
     }
 
+    initVolume() {
+        const that = this;
+        const wrap = document.createElement('div');
+        wrap.classList.add(styles.volumeWrap);
+        wrap.innerHTML = `<h4>Volume</h4>
+        <input type="range" name="volume" value="100" min="0" max="100" step="any"/>`;
+        const input = wrap.querySelector('input');
+        input?.addEventListener('change', (e) => {
+            that.game.audio.volume = parseInt(input.value) / 100.0;
+        });
+        this.div.append(wrap);
+    }
+
     constructor(parent: HTMLElement, game: Game) {
         this.div = document.createElement('div');
         this.div.classList.add(styles.settingsWrap);
 
         this.initViewDistance();
+        this.initVolume();
 
         this.game = game;
         parent.appendChild(this.div);

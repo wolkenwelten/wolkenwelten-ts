@@ -77,3 +77,4 @@ Still quite early, however a lot of things already work (somewhat).
 - [X] (Pick)Axe's
 - [X] Simple crafting system
 - [X] Voxel Objects/Blocks
+- [ ] 3D Sound / Distance-based Volume attenuation

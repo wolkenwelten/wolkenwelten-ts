@@ -124,7 +124,6 @@ export class PlayerModal {
         this.settings = this.initSettingsTab(game);
 
         div.addEventListener('mousedown', (e) => {
-            e.preventDefault();
             e.stopPropagation();
         });
 

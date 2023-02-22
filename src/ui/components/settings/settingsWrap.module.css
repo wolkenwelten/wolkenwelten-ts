@@ -1,9 +1,10 @@
 .settingsWrap {
-    padding: 8px;
+    padding: 6px;
 }
 
 .radioButtonWrap {
     display:table;
+    margin-bottom:12px;
 }
 
 .settingsWrap h4 {
@@ -38,10 +39,10 @@
 }
 
 .radioButton:first-of-type > span {
-    border-radius: 8px 0 0 8px;
+    border-radius: 6px 0 0 6px;
 }
 .radioButton:last-of-type > span {
-    border-radius: 0 8px 8px 0;
+    border-radius: 0 6px 6px 0;
 }
 
 .radioButton > input:checked + span {
@@ -50,4 +51,9 @@
     border-left-color: #fe5;
     border-bottom-color: #ea1;
     border-right-color: #ea1;
+}
+
+.volumeWrap {
+    display: block;
+    position: relative;
 }
