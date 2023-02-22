@@ -126,6 +126,9 @@ export class PlayerModal {
         div.addEventListener('mousedown', (e) => {
             e.stopPropagation();
         });
+        div.addEventListener('mousewheel', (e) => {
+            e.stopPropagation();
+        });
 
         this.game = game;
 

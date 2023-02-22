@@ -76,12 +76,11 @@ export class InputManager {
         that.game.ui.rootElement.addEventListener('wheel', (e) => {
             const newSelection =
                 (that.game.player.inventory.selection +
-                    (e.deltaY > 0 ? 1 : -1)) %
-                that.game.player.inventory.items.length;
+                    (e.deltaY > 0 ? 1 : -1)) % 10;
             that.game.player.inventory.select(
                 newSelection >= 0
                     ? newSelection
-                    : that.game.player.inventory.items.length - newSelection - 2
+                    : 10 - newSelection - 2
             );
         });
         that.game.ui.rootElement.addEventListener(
