@@ -9,6 +9,7 @@ import { IronOre } from './item/material/ironOre';
 import { Coal } from './item/material/coal';
 import { StoneAxe } from './item/tools/stoneAxe';
 import { StonePickaxe } from './item/tools/stonePickaxe';
+import { Club } from './item/weapons/club';
 import { IronAxe } from './item/tools/ironAxe';
 import { IronPickaxe } from './item/tools/ironPickaxe';
 
@@ -18,6 +19,20 @@ export const addDefaultCraftingRecipes = (
     world: World,
     crafting: CraftingSystem
 ) => {
+    crafting.add(
+        'Club',
+        new Club(world),
+        [new Stick(world, 5)],
+        'A simple yet effective weapon.'
+    );
+
+    crafting.add(
+        'StoneAxe',
+        new StoneAxe(world),
+        [new Stone(world, 2), new Stick(world, 3)],
+        'A simple stone axe, necessary to chop down trees and bushes.'
+    );
+
     crafting.add(
         'StoneAxe',
         new StoneAxe(world),
