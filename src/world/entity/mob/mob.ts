@@ -9,8 +9,6 @@ const modelViewMatrix = mat4.create();
 const transPos = new Float32Array([0, 0, 0]);
 
 export class Mob extends Entity {
-    yOff = 0;
-
     constructor(world: World, x: number, y: number, z: number) {
         super(world);
         this.x = x;
@@ -23,9 +21,11 @@ export class Mob extends Entity {
             return;
         }
 
+        const mesh = this.mesh();
+        const yOff = (Math.floor(mesh.size.y / 2) * 1) / 32 - 6 / 32;
         mat4.identity(modelViewMatrix);
         transPos[0] = this.x;
-        transPos[1] = this.y - this.yOff;
+        transPos[1] = this.y + yOff;
         transPos[2] = this.z;
         mat4.translate(modelViewMatrix, modelViewMatrix, transPos);
 
@@ -38,7 +38,8 @@ export class Mob extends Entity {
         const d = Math.sqrt(dx * dx + dy * dy + dz * dz);
         const renderDistance = this.world.game.render.renderDistance;
         const alpha = Math.min(1, Math.max(0, renderDistance - d) / 8);
-        this.mesh().draw(modelViewMatrix, alpha);
+
+        mesh.draw(modelViewMatrix, alpha);
         if (d < renderDistance) {
             this.world.game.render.decals.addShadow(this.x, this.y, this.z, 1);
         }

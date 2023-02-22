@@ -33,7 +33,6 @@ export class Rat extends Mob {
 
     gvx = 0;
     gvz = 0;
-    yOff = 2 / 32;
 
     aggroTarget?: Entity;
     health = 16;
@@ -118,7 +117,7 @@ export class Rat extends Mob {
                 return this.world.game.render.assets.get(url);
             }
             case 'chase':
-                const frame = ((this.id * 32 + this.world.game.ticks) / 6) & 3;
+                const frame = ((this.id * 32 + this.world.game.ticks) / 4) & 3;
                 if (frame & 1) {
                     return this.world.game.render.assets.get(voxelIdle0File);
                 }
@@ -128,7 +127,7 @@ export class Rat extends Mob {
             case 'turnRight':
             case 'walkBack':
             case 'walk': {
-                const frame = ((this.id * 32 + this.world.game.ticks) / 8) & 3;
+                const frame = ((this.id * 32 + this.world.game.ticks) / 6) & 3;
                 if (frame & 1) {
                     return this.world.game.render.assets.get(voxelIdle0File);
                 }

@@ -21,6 +21,11 @@ export class TriangleMesh {
     texture: Texture;
     vao: WebGLVertexArrayObject;
     finished = false;
+    size = {
+        x: 0,
+        y: 0,
+        z: 0,
+    };
 
     static fromObjFile(objSource: string, tex: Texture): TriangleMesh {
         const mesh = new TriangleMesh(tex);

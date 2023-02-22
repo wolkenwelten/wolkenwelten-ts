@@ -23,6 +23,11 @@ export class VoxelMesh {
     elementCount = 0;
     readonly vao: WebGLVertexArrayObject;
     readonly vbo: WebGLBuffer;
+    size = {
+        x: 0,
+        y: 0,
+        z: 0,
+    };
 
     static init(glc: WebGL2RenderingContext) {
         this.gl = glc;
@@ -67,6 +72,9 @@ export class VoxelMesh {
             ) {
                 throw new Error(`Invalid .vox file: ${href}`);
             }
+            mesh.size.x = size.x;
+            mesh.size.y = size.z;
+            mesh.size.z = size.y;
             const ox = 32 / 2 - Math.floor(size.x / 2);
             const oy = 32 / 2 - Math.floor(size.y / 2);
             const oz = 32 / 2 - Math.floor(size.z / 2);

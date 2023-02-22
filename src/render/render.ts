@@ -174,13 +174,14 @@ export class RenderManager {
         const viewBobH = Math.sin(player.walkCycleCounter * 0.5) * 0.06;
         const jumpOff = player.jumpAnimeFactor * -0.2;
         const rl = Math.sin(rt);
+        const mesh = this.game.player.hudMesh();
         transPos[0] = 1 - rl * 0.2 + viewBobH + player.inertiaX * 0.5;
         transPos[1] = -0.5 + rl * 0.2 + viewBob + jumpOff;
         transPos[2] = -0.65 - rl * 0.25 + player.inertiaZ * 0.5;
         mat4.translate(modelViewMatrix, modelViewMatrix, transPos);
         mat4.rotateX(modelViewMatrix, modelViewMatrix, r);
         mat4.multiply(modelViewMatrix, projectionMatrix, modelViewMatrix);
-        const mesh = this.game.player.hudMesh();
+
         mesh.draw(modelViewMatrix, 1.0);
     }
 

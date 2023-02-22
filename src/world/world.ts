@@ -129,12 +129,12 @@ export class World {
         const px = this.game.player.x;
         const py = this.game.player.y;
         const pz = this.game.player.z;
-        for(const e of this.entities){
+        for (const e of this.entities) {
             const dx = px - e.x;
             const dy = py - e.y;
             const dz = pz - e.z;
-            const dd = dx*dx+dy*dy+dz*dz;
-            if(dd > maxDistance){
+            const dd = dx * dx + dy * dy + dz * dz;
+            if (dd > maxDistance) {
                 e.destroy();
             }
         }
