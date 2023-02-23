@@ -12,7 +12,7 @@ import stompUrl from '../assets/sfx/stomp.ogg?url';
 import unghUrl from '../assets/sfx/ungh.ogg?url';
 import punchUrl from '../assets/sfx/punch.ogg?url';
 import punchMissUrl from '../assets/sfx/punchMiss.ogg?url';
-import levelUpUrl from '../assets/sfx/levelUp.ogg?url';
+import levelUpUrl from '../assets/sfx/levelUp.mp3?url';
 
 import crabClickUrl from '../assets/sfx/crabClick.mp3?url';
 import crabDeathUrl from '../assets/sfx/crabDeath.mp3?url';

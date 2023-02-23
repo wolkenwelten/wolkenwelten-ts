@@ -35,10 +35,10 @@ export class Rat extends Mob {
     gvz = 0;
 
     aggroTarget?: Entity;
-    health = 16;
-    maxHealth = 16;
+    health = 8;
+    maxHealth = 8;
     level = 2;
-    weight = 10;
+    weight = 8;
 
     constructor(world: World, x: number, y: number, z: number) {
         super(world, x, y, z);
