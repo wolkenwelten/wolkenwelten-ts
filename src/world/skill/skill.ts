@@ -18,9 +18,10 @@ export class CharacterSkill {
             return;
         }
 
-        if (this.xp >= this.skill.xpPerLevel) {
-            this.xp -= this.skill.xpPerLevel;
+        if (this.xp >= this.skill.xpPerLevel * (this.level+1)) {
+            this.xp -= this.skill.xpPerLevel * (this.level+1);
             this.level++;
+            this.char.world.game.ui.log.addEntry(`Your skill in ${this.skill.name} has reached ${this.level}`);
             this.checkLevelUp();
         }
     }
@@ -51,7 +52,7 @@ export class Skill {
     readonly description: string;
 
     readonly xpPerLevel: number;
-    readonly maxLevel = 8;
+    readonly maxLevel = 4;
 
     constructor(
         id: string,
@@ -77,7 +78,7 @@ export class SkillSystem {
         name: string,
         icon: string,
         description: string,
-        xpPerLevel = 20
+        xpPerLevel = 10
     ) {
         this.skills.set(id, new Skill(id, name, icon, description, xpPerLevel));
     }

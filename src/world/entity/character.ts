@@ -56,7 +56,6 @@ export class Character extends Entity {
     level = 0;
     xp = 0;
     weight = 70;
-    lastUsedSkill: string[] = [];
 
     inventory: Inventory;
     skill: Map<string, CharacterSkill> = new Map();
@@ -449,14 +448,21 @@ export class Character extends Entity {
             }
             return;
         }
+        const item = this.inventory.active();
 
-        this.cooldown(64);
         this.hitAnimation = this.world.game.render.frames;
-        this.lastUsedSkill = this.attackSkillId();
         const hit = this.attack();
+        const cooldownDur = item ? item.attackCooldown(this) : 80 - this.skillLevel("pugilism") * 12;
+        this.cooldown(cooldownDur);
         if (hit) {
             this.world.game.audio.play('punch');
-            this.miningCooldownUntil = this.world.game.ticks + 80;
+            this.miningCooldownUntil = this.world.game.ticks + cooldownDur;
+
+            if(item){
+                item.onAttackWith(this);
+            } else {
+                this.skillXpGain("pugilism", 1);
+            }
         } else {
             this.world.game.audio.play('punchMiss');
         }
@@ -548,7 +554,8 @@ export class Character extends Entity {
                 },
             });
             this.world.game.ui.rootElement.dispatchEvent(event);
-            this.world.game.audio.play('levelUp');
+            this.world.game.audio.play('levelUp', 0.5);
+            this.world.game.ui.log.addEntry(`You've reached level ${this.level+1}! Maximum health increased.`);
         }
     }
 
@@ -558,9 +565,6 @@ export class Character extends Entity {
         this.world.game.ui.rootElement.dispatchEvent(
             new CustomEvent('playerXp')
         );
-        for (const id of this.lastUsedSkill) {
-            this.skillXpGain(id, amount);
-        }
     }
 
     skillXpGain(skillId: string, amount: number) {
@@ -581,8 +585,7 @@ export class Character extends Entity {
         }
     }
 
-    attackSkillId(): string[] {
-        const item = this.inventory.active();
-        return item ? item.attackSkill : ['pugilism'];
+    skillLevel(skillId: string): number {
+        return this.skill.get(skillId)?.level || 0;
     }
 }

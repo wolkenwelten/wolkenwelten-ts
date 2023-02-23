@@ -3,6 +3,7 @@
  */
 import { RenderManager } from '../render/render';
 import { clamp } from '../util/math';
+import { Character } from './entity/character';
 import { MaybeItem } from './item/item';
 import { World } from './world';
 
@@ -64,7 +65,7 @@ export class MiningManager {
         return ret;
     }
 
-    mine(x: number, y: number, z: number, tool: MaybeItem): boolean {
+    mine(player: Character, x: number, y: number, z: number, tool: MaybeItem): boolean {
         const block = this.world.getBlock(x, y, z);
         if (!block) {
             return false;
@@ -77,6 +78,7 @@ export class MiningManager {
             this.world.dangerZone.add(x - 1, y - 1, z - 1, 3, 3, 3);
             this.world.game.audio.play('tock');
             bt.spawnMiningDrops(this.world, x, y, z, tool);
+            tool?.onMineWith(player, block);
         }
         return ret;
     }
@@ -87,7 +89,7 @@ export class MiningManager {
             return;
         }
         const tool = player.inventory.active();
-        this.mine(player.miningX, player.miningY, player.miningZ, tool);
+        this.mine(player, player.miningX, player.miningY, player.miningZ, tool);
     }
 
     update() {

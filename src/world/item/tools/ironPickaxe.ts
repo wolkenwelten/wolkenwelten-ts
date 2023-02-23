@@ -8,8 +8,10 @@ import { World } from '../../world';
 import itemIcon from '../../../../assets/gfx/items/ironPickaxe.png';
 import meshUrl from '../../../../assets/vox/items/ironPickaxe.vox?url';
 import { Item } from '../item';
+import { Character } from '../../entity/character';
+import { StonePickaxe } from './stonePickaxe';
 
-export class IronPickaxe extends Item {
+export class IronPickaxe extends StonePickaxe {
     attackSkill = ['pickeneering', 'onehanded'];
 
     constructor(world: World) {

@@ -135,8 +135,9 @@ export class SkillWrap {
                     xpCount.innerText = `MAX POWER`;
                     xpBar.style.width = `100%`;
                 } else {
-                    xpCount.innerText = `${ps.xp} / ${ps.skill.xpPerLevel}`;
-                    const percent = ps.xp / ps.skill.xpPerLevel;
+                    const xpNeeded = ps.skill.xpPerLevel * (ps.level+1);
+                    xpCount.innerText = `${ps.xp} / ${xpNeeded}`;
+                    const percent = ps.xp / xpNeeded;
                     xpBar.style.width = `${percent * 100}%`;
                 }
                 div.classList.remove(styles.unlearned);

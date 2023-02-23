@@ -8,6 +8,7 @@ import { World } from '../../world';
 import itemIcon from '../../../../assets/gfx/items/stick.png';
 import meshUrl from '../../../../assets/vox/items/stick.vox?url';
 import { StackableItem } from '../stackableItem';
+import { Character } from '../../entity/character';
 
 export class Stick extends StackableItem {
     attackSkill = ['onehanded'];
@@ -22,6 +23,14 @@ export class Stick extends StackableItem {
 
     attackDamage(e: Entity): number {
         return 2;
+    }
+
+    attackCooldown(e: Entity): number {
+        let multiplier = 1;
+        if(e instanceof Character){
+            multiplier -= e.skillLevel("onehanded") * 0.03;
+        }
+        return 80 * multiplier;
     }
 
     mesh(world: World): TriangleMesh | VoxelMesh {

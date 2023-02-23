@@ -94,7 +94,7 @@ export const worldgenSurface = (chunk: Chunk) => {
                         gh > -3 &&
                         gh < 0 &&
                         endY < 32 &&
-                        rng.bool(2440)
+                        rng.bool(1240)
                     ) {
                         new StaticStick(chunk, cx, gh + 1, cz);
                     }
@@ -157,9 +157,9 @@ export const worldgenSurface = (chunk: Chunk) => {
                                 assets.spruceA.blit(chunk, x, gh - 2, z);
                             } else if (rng.bool(400)) {
                                 new Rat(chunk.world, cx, gh + 2, cz);
-                            } else if (rng.bool(400)) {
+                            } else if (rng.bool(500)) {
                                 new StaticStone(chunk, cx, gh + 1, cz);
-                            } else if (rng.bool(2400)) {
+                            } else if (rng.bool(600)) {
                                 new StaticStick(chunk, cx, gh + 1, cz);
                             }
                         }

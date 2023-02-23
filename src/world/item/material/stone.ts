@@ -26,15 +26,16 @@ export class Stone extends StackableItem {
             if (this.world.game.ticks < user.lastAction) {
                 return;
             }
-            user.cooldown(60);
+            const level = user.skillLevel("throwing");
+            user.cooldown(60 - level * 4);
             if (--this.amount <= 0) {
                 this.destroy();
             }
-            user.lastUsedSkill = ['throwing'];
+            user.skillXpGain("throwing", 1);
             user.hitAnimation = this.world.game.render.frames;
             user.inventory.updateAll();
 
-            const proj = new Projectile(user, 1);
+            const proj = new Projectile(user, 1 + level * 0.2);
             proj.projectileMesh = this.mesh(this.world) as VoxelMesh;
             proj.onHit = function (this: Projectile, e: Entity) {
                 user.doDamage(e, 1);

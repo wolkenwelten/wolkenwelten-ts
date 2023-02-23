@@ -8,12 +8,13 @@ import { World } from '../../world';
 import itemIcon from '../../../../assets/gfx/items/club.png';
 import meshUrl from '../../../../assets/vox/items/club.vox?url';
 import { Item } from '../item';
+import { Character } from '../../entity/character';
 
 export class Club extends Item {
     attackSkill = ['clubmanship', 'onehanded'];
 
-    constructor(world: World) {
-        super(world, 'Club');
+    constructor(world: World, name = "Club") {
+        super(world, name);
     }
 
     clone(): Item {
@@ -25,7 +26,16 @@ export class Club extends Item {
     }
 
     attackDamage(e: Entity): number {
-        return 4;
+        return 5;
+    }
+
+    attackCooldown(e: Entity): number {
+        let multiplier = 1;
+        if(e instanceof Character){
+            multiplier -= e.skillLevel("clubmanship") * 0.1;
+            multiplier -= e.skillLevel("onehanded") * 0.03;
+        }
+        return 70 * multiplier;
     }
 
     mesh(world: World): TriangleMesh | VoxelMesh {

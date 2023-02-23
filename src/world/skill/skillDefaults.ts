@@ -8,8 +8,8 @@ export const addDefaultSkills = (skills: SkillSystem) => {
         'throwing',
         'Throwing',
         '',
-        `The technique of hurling objects at far away targets with both precision and power.`,
-        30
+        `The technique of hurling objects at far away targets with both precision and power. Increases both range and rate of throwing.`,
+        10
     );
 
     skills.addPassive(
@@ -17,7 +17,7 @@ export const addDefaultSkills = (skills: SkillSystem) => {
         'Pugilism',
         '',
         `Now you can let your fists do the talking.`,
-        50
+        30
     );
 
     skills.addPassive(
@@ -25,7 +25,7 @@ export const addDefaultSkills = (skills: SkillSystem) => {
         'One-handed Weapons',
         '',
         `You have some more general understanding of how to fight with one handed weapons, like sticks, axes, swords, daggers and so on.`,
-        100
+        50
     );
 
     skills.addPassive(
