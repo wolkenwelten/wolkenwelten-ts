@@ -1,0 +1,128 @@
+.skillWrap {
+    display: table;
+    text-align:left;
+    padding-top:1px;
+}
+
+.skillList {
+    padding-top:1px;
+    display: block;
+    border-right: solid 1px #99a;
+    overflow-y: auto;
+    overflow-x: hidden;
+    width:256px;
+    height: 100%;
+    position: absolute;
+    left:0;
+    top:0;
+}
+
+.skillDetailsWrap {
+    display: block;
+    padding-left:262px;
+}
+
+.skill {
+    cursor: pointer;
+    display: block;
+    padding:0 4px;
+    position: relative;
+    border: solid 1px #556;
+    user-select: none;
+}
+
+.skill img {
+    float:left;
+}
+
+.skillWrap::after,
+.skill::after {
+    content:'';
+    display:block;
+    clear:both;
+}
+
+.skillDetails h3 {
+    margin-top:2px;
+    font-size:1.3rem;
+    font-family: 'Courier New', Courier, monospace;
+    text-shadow: -1px 0px 0px#000,1px 0px 0px#000,0px -1px 0px#000,0px 1px 0px#000;
+}
+
+.skillDetails p {
+    font-size:1rem;
+    font-family: 'Courier New', Courier, monospace;
+    text-shadow: -1px 0px 0px#000,1px 0px 0px#000,0px -1px 0px#000,0px 1px 0px#000;
+}
+
+.skill h3 {
+    margin:0;
+    padding-top:12px;
+    padding-bottom:24px;
+    padding-left:2px;
+    display: inline-block;
+    font-size:1rem;
+    font-family: 'Courier New', Courier, monospace;
+    text-shadow: -1px 0px 0px#000,1px 0px 0px#000,0px -1px 0px#000,0px 1px 0px#000;
+}
+
+
+.skill.unlearned {
+    background:#445;
+    color:#bbb;
+}
+
+.skill.active h3 {
+    color: gold;
+}
+
+.active {
+    border: solid 1px gold !important;
+}
+
+.skillLevel {
+    float:right;
+    font-size:1.6rem;
+    padding-top:6px;
+    font-family: 'Courier New', Courier, monospace;
+    text-shadow: -1px 0px 0px#000,1px 0px 0px#000,0px -1px 0px#000,0px 1px 0px#000;
+}
+
+.xpBarWrap {
+    display: block;
+    position:absolute;
+    left:1px;
+    bottom:1px;
+    width:calc(100% - 4px);
+    height:14px;
+    border:solid 1px #99a;
+    background:#445;
+    text-align:center;
+}
+
+.unlearned .xpBarWrap {
+    display: none;
+}
+
+.unlearned h3 {
+    padding-bottom:12px;
+}
+
+.xpBar {
+    display:block;
+    position:absolute;
+    left:0;
+    top:0;
+    height:100%;
+    background: linear-gradient(gold, goldenrod);
+}
+
+.xpCount {
+    font-size:0.8rem;
+    vertical-align: top;
+    position:relative;
+    z-index:1;
+    font-family: 'Courier New', Courier, monospace;
+    text-shadow: -1px 0px 0px#000,1px 0px 0px#000,0px -1px 0px#000,0px 1px 0px#000;
+}
+

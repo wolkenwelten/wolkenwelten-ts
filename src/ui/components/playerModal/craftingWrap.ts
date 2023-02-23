@@ -4,7 +4,7 @@
 import { Inventory } from '../../../world/item/inventory';
 import styles from './craftingWrap.module.css';
 import { Game } from '../../../game';
-import { CraftingRecipe } from '../../../world/crafting';
+import { CraftingRecipe } from '../../../world/crafting/crafting';
 import { ItemWidget } from '../item/item';
 
 export class CraftingWrap {
@@ -15,7 +15,9 @@ export class CraftingWrap {
     list: HTMLElement;
     details: HTMLElement;
 
-    constructor(parent: HTMLElement, inventory: Inventory, game: Game) {
+    constructor(parent: HTMLElement, game: Game) {
+        const inventory = game.player.inventory;
+
         this.div = document.createElement('div');
         this.div.classList.add(styles.craftingWrap);
 

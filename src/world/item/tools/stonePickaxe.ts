@@ -10,6 +10,8 @@ import meshUrl from '../../../../assets/vox/items/stonePickaxe.vox?url';
 import { Item } from '../item';
 
 export class StonePickaxe extends Item {
+    attackSkill = ['pickeneering', 'onehanded'];
+
     constructor(world: World) {
         super(world, 'Stone Pickaxe');
     }

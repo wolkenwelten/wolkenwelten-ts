@@ -10,6 +10,8 @@ import meshUrl from '../../../../assets/vox/items/stick.vox?url';
 import { StackableItem } from '../stackableItem';
 
 export class Stick extends StackableItem {
+    attackSkill = ['onehanded'];
+
     constructor(world: World, amount = 1) {
         super(world, amount, 'Stick');
     }

@@ -11,7 +11,7 @@ import { CursorItem } from './components/item/cursorItem';
 import { XpView } from './components/xpView';
 import { IconManager } from './icon';
 import { MaybeItem } from '../world/item/item';
-import { PlayerModal } from './components/playerModal';
+import { PlayerModal } from './components/playerModal/playerModal';
 
 export class UIManager {
     game: Game;

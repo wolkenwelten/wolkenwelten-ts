@@ -2,18 +2,18 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import { CraftingSystem } from './crafting';
-import { Stick } from './item/material/stick';
-import { Stone } from './item/material/stone';
-import { IronBar } from './item/material/ironBar';
-import { IronOre } from './item/material/ironOre';
-import { Coal } from './item/material/coal';
-import { StoneAxe } from './item/tools/stoneAxe';
-import { StonePickaxe } from './item/tools/stonePickaxe';
-import { Club } from './item/weapons/club';
-import { IronAxe } from './item/tools/ironAxe';
-import { IronPickaxe } from './item/tools/ironPickaxe';
+import { Stick } from '../item/material/stick';
+import { Stone } from '../item/material/stone';
+import { IronBar } from '../item/material/ironBar';
+import { IronOre } from '../item/material/ironOre';
+import { Coal } from '../item/material/coal';
+import { StoneAxe } from '../item/tools/stoneAxe';
+import { StonePickaxe } from '../item/tools/stonePickaxe';
+import { Club } from '../item/weapons/club';
+import { IronAxe } from '../item/tools/ironAxe';
+import { IronPickaxe } from '../item/tools/ironPickaxe';
 
-import { World } from './world';
+import { World } from '../world';
 
 export const addDefaultCraftingRecipes = (
     world: World,

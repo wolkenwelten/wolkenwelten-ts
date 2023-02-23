@@ -63,7 +63,7 @@ export class Rat extends Mob {
         this.world.game.render.particle.fxDeath(this.x, this.y, this.z);
         this.changeState('dead');
         this.isDead = true;
-        this.world.game.audio.play('ratDeath', 0.5);
+        this.world.game.audio.play('ratDeath', 0.3);
     }
 
     onAttack(perpetrator: Entity): void {
@@ -92,11 +92,11 @@ export class Rat extends Mob {
                 if (dd < 16 * 16) {
                     e.aggroTarget = perpetrator;
                     e.changeState('chase');
-                    this.world.game.audio.play('ratAttack', 0.5);
+                    this.world.game.audio.play('ratAttack', 0.2);
                 }
             }
         }
-        this.world.game.audio.play('ratAttack', 0.5);
+        this.world.game.audio.play('ratAttack', 0.2);
     }
 
     mesh(): VoxelMesh {

@@ -30,6 +30,7 @@ export class Stone extends StackableItem {
             if (--this.amount <= 0) {
                 this.destroy();
             }
+            user.lastUsedSkill = ['throwing'];
             user.hitAnimation = this.world.game.render.frames;
             user.inventory.updateAll();
 

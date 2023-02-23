@@ -60,7 +60,7 @@
     border-right:solid 1px #445;
     margin-right:6px;
     color: #bbb;
-
+    user-select: none;
 
     padding:2px 6px;
     font-size:1.3rem;

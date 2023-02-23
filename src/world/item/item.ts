@@ -18,6 +18,7 @@ export class Item {
     name: string;
     world: World;
     destroyed = false;
+    attackSkill: string[] = [];
 
     constructor(world: World, name: string) {
         this.id = ++idCounter;

@@ -21,13 +21,13 @@
     padding-left:262px;
 }
 
-
 .recipe {
     cursor: pointer;
     display: block;
     padding:0 4px;
     position: relative;
     border: solid 1px #556;
+    user-select: none;
 }
 
 .recipe img {
@@ -109,6 +109,7 @@
 .ingredientList::before {
     content: 'Ingredients';
     display: block;
+    padding-top:12px;
     font-family: 'Courier New', Courier, monospace;
     text-shadow: -1px 0px 0px#000,1px 0px 0px#000,0px -1px 0px#000,0px 1px 0px#000;
 }

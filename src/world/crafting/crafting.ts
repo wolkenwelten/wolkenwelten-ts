@@ -2,9 +2,9 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import { addDefaultCraftingRecipes } from './craftingRecipes';
-import { Inventory } from './item/inventory';
-import { Item } from './item/item';
-import { World } from './world';
+import { Inventory } from '../item/inventory';
+import { Item } from '../item/item';
+import { World } from '../world';
 
 export class CraftingRecipe {
     result: Item;

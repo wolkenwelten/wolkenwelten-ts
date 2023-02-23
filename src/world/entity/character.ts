@@ -16,6 +16,7 @@ import { MaybeItem } from '../item/item';
 import { IronPickaxe } from '../item/tools/ironPickaxe';
 import { IronAxe } from '../item/tools/ironAxe';
 import { Stone } from '../item/material/stone';
+import { CharacterSkill } from '../skill/skill';
 
 const CHARACTER_ACCELERATION = 0.05;
 const CHARACTER_STOP_RATE = CHARACTER_ACCELERATION * 3.0;
@@ -55,8 +56,10 @@ export class Character extends Entity {
     level = 0;
     xp = 0;
     weight = 70;
+    lastUsedSkill: string[] = [];
 
     inventory: Inventory;
+    skill: Map<string, CharacterSkill> = new Map();
 
     getGoodStuff() {
         this.inventory.add(new IronAxe(this.world));
@@ -67,6 +70,10 @@ export class Character extends Entity {
         this.inventory.add(new Stick(this.world, 3));
         this.inventory.add(new Stone(this.world, 90));
         this.inventory.add(new BlockItem(this.world, 3, 90));
+
+        this.skillXpGain('axefighting', 295);
+        this.skillXpGain('pugilism', 100);
+        this.skillXpGain('throwing', 100);
     }
 
     init() {
@@ -86,6 +93,7 @@ export class Character extends Entity {
         this.miningX = this.miningY = this.miningZ = 0;
         this.vx = this.vy = this.vz = 0;
         this.inventory.clear();
+        this.skill.clear();
 
         this.inventory.select(0);
     }
@@ -265,7 +273,7 @@ export class Character extends Entity {
             this.vx *= 0.99;
             this.vz *= 0.99;
         } else if (this.movementY > 0 && this.mayJump()) {
-            this.vy = 0.1;
+            this.vy = 0.12;
             this.jumpAnimeFactor = 1;
         }
         if (this.movementY > 0 && this.maySwim() && Math.abs(this.vy) < 0.07) {
@@ -444,6 +452,7 @@ export class Character extends Entity {
 
         this.cooldown(64);
         this.hitAnimation = this.world.game.render.frames;
+        this.lastUsedSkill = this.attackSkillId();
         const hit = this.attack();
         if (hit) {
             this.world.game.audio.play('punch');
@@ -549,5 +558,31 @@ export class Character extends Entity {
         this.world.game.ui.rootElement.dispatchEvent(
             new CustomEvent('playerXp')
         );
+        for (const id of this.lastUsedSkill) {
+            this.skillXpGain(id, amount);
+        }
+    }
+
+    skillXpGain(skillId: string, amount: number) {
+        if (skillId === '') {
+            return;
+        }
+        const ps = this.skill.get(skillId);
+        if (ps) {
+            ps.xpGain(amount);
+        } else {
+            const skill = this.world.skills.get(skillId);
+            if (!skill) {
+                throw new Error(`Unknown skill: ${skillId}`);
+            }
+            const nps = new CharacterSkill(this, skill);
+            this.skill.set(skillId, nps);
+            nps.xpGain(amount);
+        }
+    }
+
+    attackSkillId(): string[] {
+        const item = this.inventory.active();
+        return item ? item.attackSkill : ['pugilism'];
     }
 }

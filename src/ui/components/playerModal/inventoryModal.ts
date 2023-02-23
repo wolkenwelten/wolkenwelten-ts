@@ -2,8 +2,8 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import { Inventory } from '../../../world/item/inventory';
-import styles from './inventoryWrap.module.css';
-import { InventoryRow } from './inventoryRow';
+import styles from './inventoryModal.module.css';
+import { InventoryRow } from '../item/inventoryRow';
 import { Game } from '../../../game';
 
 export class InventoryWrap {
@@ -12,7 +12,9 @@ export class InventoryWrap {
     game: Game;
     rows: InventoryRow[] = [];
 
-    constructor(parent: HTMLElement, inventory: Inventory, game: Game) {
+    constructor(parent: HTMLElement, game: Game) {
+        const inventory = game.player.inventory;
+
         this.div = document.createElement('div');
         this.div.classList.add(styles.inventoryWrap);
         for (let i = 0; i < Math.ceil(inventory.items.length / 10); i++) {
@@ -29,7 +31,7 @@ export class InventoryWrap {
         parent.appendChild(this.div);
     }
 
-    update(i: number) {
+    update(i = -1) {
         for (let ni = 0; ni < this.rows.length; ni++) {
             this.rows[ni].update(i);
         }

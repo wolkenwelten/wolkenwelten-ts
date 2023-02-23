@@ -10,6 +10,8 @@ import meshUrl from '../../../../assets/vox/items/club.vox?url';
 import { Item } from '../item';
 
 export class Club extends Item {
+    attackSkill = ['clubmanship', 'onehanded'];
+
     constructor(world: World) {
         super(world, 'Club');
     }

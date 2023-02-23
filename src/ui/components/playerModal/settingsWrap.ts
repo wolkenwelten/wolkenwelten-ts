@@ -26,7 +26,6 @@ export class SettingsWrap {
         </label>`;
         this.div.append(wrap);
 
-        const that = this;
         for (const e of wrap.querySelectorAll('input')) {
             e.addEventListener('change', this.onChange.bind(this));
         }
