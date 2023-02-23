@@ -4,10 +4,10 @@
 import { VoxelMesh } from '../../render/asset';
 import { Chunk } from '../chunk/chunk';
 import { StaticObject } from './staticObject';
-import meshUrl from '../../../assets/vox/grass.vox?url';
+import meshUrl from '../../../assets/vox/flower.vox?url';
 import { Entity } from '../entity/entity';
 
-export class StaticGrass extends StaticObject {
+export class StaticFlower extends StaticObject {
     constructor(chunk: Chunk, x: number, y: number, z: number) {
         super(chunk, x, y, z);
     }
@@ -17,7 +17,7 @@ export class StaticGrass extends StaticObject {
     }
 
     transOff(): [number, number, number] {
-        return [-0.5, 6 / 32, -0.5];
+        return [0.5, 6 / 32, 0.5];
     }
 
     onAttacked(perpetrator: Entity) {

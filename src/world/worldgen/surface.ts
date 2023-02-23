@@ -6,7 +6,8 @@ import { Crab } from '../entity/mob/crab';
 import { Rat } from '../entity/mob/rat';
 import { LCG } from '../../util/prng';
 import { StaticShell } from '../staticObjects/shell';
-// import { Grass } from '../staticObjects/grass';
+import { StaticFlower } from '../staticObjects/flower';
+import { StaticGrass } from '../staticObjects/grass';
 import { StaticStone } from '../staticObjects/stone';
 import { StaticStick } from '../staticObjects/stick';
 
@@ -161,6 +162,8 @@ export const worldgenSurface = (chunk: Chunk) => {
                                 new StaticStone(chunk, cx, gh + 1, cz);
                             } else if (rng.bool(600)) {
                                 new StaticStick(chunk, cx, gh + 1, cz);
+                            } else if (rng.bool(300)){
+                                new StaticFlower(chunk, cx, gh + 1, cz);
                             }
                         }
                     }
