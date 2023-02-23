@@ -18,10 +18,12 @@ export class CharacterSkill {
             return;
         }
 
-        if (this.xp >= this.skill.xpPerLevel * (this.level+1)) {
-            this.xp -= this.skill.xpPerLevel * (this.level+1);
+        if (this.xp >= this.skill.xpPerLevel * (this.level + 1)) {
+            this.xp -= this.skill.xpPerLevel * (this.level + 1);
             this.level++;
-            this.char.world.game.ui.log.addEntry(`Your skill in ${this.skill.name} has reached ${this.level}`);
+            this.char.world.game.ui.log.addEntry(
+                `Your skill in ${this.skill.name} has reached ${this.level}`
+            );
             this.checkLevelUp();
         }
     }

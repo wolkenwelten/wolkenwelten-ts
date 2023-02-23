@@ -65,7 +65,13 @@ export class MiningManager {
         return ret;
     }
 
-    mine(player: Character, x: number, y: number, z: number, tool: MaybeItem): boolean {
+    mine(
+        player: Character,
+        x: number,
+        y: number,
+        z: number,
+        tool: MaybeItem
+    ): boolean {
         const block = this.world.getBlock(x, y, z);
         if (!block) {
             return false;

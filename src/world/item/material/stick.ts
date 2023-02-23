@@ -27,8 +27,8 @@ export class Stick extends StackableItem {
 
     attackCooldown(e: Entity): number {
         let multiplier = 1;
-        if(e instanceof Character){
-            multiplier -= e.skillLevel("onehanded") * 0.03;
+        if (e instanceof Character) {
+            multiplier -= e.skillLevel('onehanded') * 0.03;
         }
         return 80 * multiplier;
     }

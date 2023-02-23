@@ -52,13 +52,13 @@ export class Item {
         return 0;
     }
 
-    attackCooldown(e: Entity):number {
+    attackCooldown(e: Entity): number {
         return 80;
     }
 
     onAttackWith(e: Entity) {
-        if(e instanceof Character){
-            for(const id of this.attackSkill){
+        if (e instanceof Character) {
+            for (const id of this.attackSkill) {
                 e.skillXpGain(id, 1);
             }
         }

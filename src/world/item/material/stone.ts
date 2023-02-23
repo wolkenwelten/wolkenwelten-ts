@@ -26,12 +26,12 @@ export class Stone extends StackableItem {
             if (this.world.game.ticks < user.lastAction) {
                 return;
             }
-            const level = user.skillLevel("throwing");
+            const level = user.skillLevel('throwing');
             user.cooldown(60 - level * 4);
             if (--this.amount <= 0) {
                 this.destroy();
             }
-            user.skillXpGain("throwing", 1);
+            user.skillXpGain('throwing', 1);
             user.hitAnimation = this.world.game.render.frames;
             user.inventory.updateAll();
 

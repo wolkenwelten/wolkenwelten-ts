@@ -452,16 +452,18 @@ export class Character extends Entity {
 
         this.hitAnimation = this.world.game.render.frames;
         const hit = this.attack();
-        const cooldownDur = item ? item.attackCooldown(this) : 80 - this.skillLevel("pugilism") * 12;
+        const cooldownDur = item
+            ? item.attackCooldown(this)
+            : 80 - this.skillLevel('pugilism') * 12;
         this.cooldown(cooldownDur);
         if (hit) {
             this.world.game.audio.play('punch');
             this.miningCooldownUntil = this.world.game.ticks + cooldownDur;
 
-            if(item){
+            if (item) {
                 item.onAttackWith(this);
             } else {
-                this.skillXpGain("pugilism", 1);
+                this.skillXpGain('pugilism', 1);
             }
         } else {
             this.world.game.audio.play('punchMiss');
@@ -555,7 +557,11 @@ export class Character extends Entity {
             });
             this.world.game.ui.rootElement.dispatchEvent(event);
             this.world.game.audio.play('levelUp', 0.5);
-            this.world.game.ui.log.addEntry(`You've reached level ${this.level+1}! Maximum health increased.`);
+            this.world.game.ui.log.addEntry(
+                `You've reached level ${
+                    this.level + 1
+                }! Maximum health increased.`
+            );
         }
     }
 

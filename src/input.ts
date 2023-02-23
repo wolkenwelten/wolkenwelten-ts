@@ -15,7 +15,6 @@ export class InputManager {
     constructor(game: Game) {
         this.game = game;
         const that = this;
-        setInterval(this.update.bind(this), 1000 / 240);
         window.addEventListener('keydown', (e) => that.keyStates.add(e.code));
         window.addEventListener('keyup', (e) => {
             that.keyStates.delete(e.code);

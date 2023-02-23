@@ -2,7 +2,7 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import { Game } from '../game';
-import { mat4, vec3 } from 'gl-matrix';
+import { mat4 } from 'gl-matrix';
 import { DecalMesh, AssetList } from './asset';
 import { Entity } from '../world/entity/entity';
 import { WorldRenderer } from './worldRenderer';
@@ -50,21 +50,31 @@ export class RenderManager {
             navigator.userAgent.match(/Android/i) ||
             navigator.userAgent.match(/iPhone/i) ||
             navigator.userAgent.match(/iPad/i);
+        const isARM =
+            navigator.userAgent.match(/aarch64/i) ||
+            navigator.userAgent.match(/armhf/i);
 
-        if (isFirefox || isSafari || isMobile) {
+        if (isFirefox || isSafari || isMobile || isARM) {
             // Reduce default renderDistance due to performance issues
             this.renderDistance = 96;
+            this.game.ui.log.addEntry(
+                `You can manually change that in the Settings menu.`
+            );
             if (isMobile) {
                 this.game.ui.log.addEntry(
-                    `Reduced render distance, because it looks like this is a mobile device, you can override that decision in the settings menu.`
+                    `Reduced render distance, because it looks like this is a mobile device.`
                 );
             } else if (isSafari) {
                 this.game.ui.log.addEntry(
-                    `Reduced render distance, because it looks like this is Safari, you can override that decision in the settings menu.`
+                    `Reduced render distance, because it looks like this is Safari.`
                 );
             } else if (isFirefox) {
                 this.game.ui.log.addEntry(
-                    `Reduced render distance, because it looks like this is Firefox, you can override that decision in the settings menu.`
+                    `Reduced render distance, because it looks like this is Firefox.`
+                );
+            } else if (isARM) {
+                this.game.ui.log.addEntry(
+                    `Reduced render distance, because it looks like this is an ARM device like a RaspberryPI.`
                 );
             }
         }
@@ -138,15 +148,15 @@ export class RenderManager {
         transPos[1] = -this.cam.y;
         transPos[2] = -this.cam.z;
         mat4.translate(viewMatrix, viewMatrix, transPos);
-        this.gl.enable(this.gl.BLEND);
 
+        this.gl.enable(this.gl.BLEND);
         this.world.draw(projectionMatrix, viewMatrix, this.cam);
         mat4.multiply(viewMatrix, projectionMatrix, viewMatrix);
         this.world.renderer.game.world.mining.draw(this.world.renderer);
         this.decals.draw(viewMatrix);
         this.gl.disable(this.gl.BLEND);
-        this.particle.draw(viewMatrix);
 
+        this.particle.draw(viewMatrix);
         this.drawHud(projectionMatrix);
     }
 
@@ -190,6 +200,7 @@ export class RenderManager {
         this.height = (window.innerHeight | 0) * this.renderSizeMultiplier;
         this.canvas.width = this.width;
         this.canvas.height = this.height;
+        this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
     }
 
     generateMesh() {
@@ -208,14 +219,14 @@ export class RenderManager {
 
     drawFrame() {
         window.requestAnimationFrame(this.drawFrameClosure);
-        this.game.update(); // First we update the game world, so that we render the most up to version
+        this.game.input.update();
+        this.game.update();
         if (!this.game.ready || !allTexturesLoaded()) {
             return;
         }
         this.frames++;
         this.fpsCounter++;
 
-        this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
         this.drawScene();
         if (

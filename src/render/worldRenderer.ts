@@ -103,9 +103,7 @@ export class WorldRenderer {
             tmpVec4[0] = entity.x - 0.5;
             tmpVec4[1] = entity.y - 0.5;
             tmpVec4[2] = entity.z - 0.5;
-            if (frustum.containsCube(tmpVec4)) {
-                entity.draw(projectionMatrix, viewMatrix, cam);
-            }
+            entity.draw(projectionMatrix, viewMatrix, cam);
         }
         BlockMesh.bindShaderAndTexture(
             projectionMatrix,
@@ -187,18 +185,24 @@ export class WorldRenderer {
 
         const mvp = this.mvp;
         mat4.identity(mvp);
+        let staticCalls = 0;
         for (const { mesh } of this.drawQueue) {
             for (const s of mesh.chunk.static) {
-                mat4.identity(mvp);
                 const transOff = s.transOff();
                 transPos[0] = s.x + transOff[0];
                 transPos[1] = s.y + transOff[1];
                 transPos[2] = s.z + transOff[2];
+                mat4.identity(mvp);
                 mat4.translate(mvp, mvp, transPos);
                 mat4.mul(mvp, viewMatrix, mvp);
                 mat4.mul(mvp, projectionMatrix, mvp);
                 s.mesh().draw(mvp, 1.0);
+                staticCalls++;
             }
         }
+        this.renderer.game.profiler.addAmount(
+            'staticMeshesDrawCalls',
+            staticCalls
+        );
     }
 }

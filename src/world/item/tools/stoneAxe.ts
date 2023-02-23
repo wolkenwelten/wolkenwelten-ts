@@ -31,9 +31,9 @@ export class StoneAxe extends Item {
 
     attackCooldown(e: Entity): number {
         let multiplier = 1;
-        if(e instanceof Character){
-            multiplier -= e.skillLevel("axefighting") * 0.1;
-            multiplier -= e.skillLevel("onehanded") * 0.03;
+        if (e instanceof Character) {
+            multiplier -= e.skillLevel('axefighting') * 0.1;
+            multiplier -= e.skillLevel('onehanded') * 0.03;
         }
         return 80 * multiplier;
     }
@@ -43,8 +43,8 @@ export class StoneAxe extends Item {
     }
 
     onMineWith(e: Entity, block: number): void {
-        if(e instanceof Character){
-            e.skillXpGain("axefighting", 1);
+        if (e instanceof Character) {
+            e.skillXpGain('axefighting', 1);
         }
     }
 

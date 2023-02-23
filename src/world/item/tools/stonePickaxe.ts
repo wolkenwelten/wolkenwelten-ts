@@ -13,7 +13,7 @@ import { Character } from '../../entity/character';
 export class StonePickaxe extends Item {
     attackSkill = ['pickeneering', 'onehanded'];
 
-    constructor(world: World, name = "Stone Pickaxe") {
+    constructor(world: World, name = 'Stone Pickaxe') {
         super(world, name);
     }
 
@@ -31,9 +31,9 @@ export class StonePickaxe extends Item {
 
     attackCooldown(e: Entity): number {
         let multiplier = 1;
-        if(e instanceof Character){
-            multiplier -= e.skillLevel("axefighting") * 0.1;
-            multiplier -= e.skillLevel("onehanded") * 0.03;
+        if (e instanceof Character) {
+            multiplier -= e.skillLevel('axefighting') * 0.1;
+            multiplier -= e.skillLevel('onehanded') * 0.03;
         }
         return 80 * multiplier;
     }
@@ -43,8 +43,8 @@ export class StonePickaxe extends Item {
     }
 
     onMineWith(e: Entity, block: number): void {
-        if(e instanceof Character){
-            e.skillXpGain("pickeneering", 1);
+        if (e instanceof Character) {
+            e.skillXpGain('pickeneering', 1);
         }
     }
 

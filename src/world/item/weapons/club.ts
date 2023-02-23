@@ -13,7 +13,7 @@ import { Character } from '../../entity/character';
 export class Club extends Item {
     attackSkill = ['clubmanship', 'onehanded'];
 
-    constructor(world: World, name = "Club") {
+    constructor(world: World, name = 'Club') {
         super(world, name);
     }
 
@@ -31,9 +31,9 @@ export class Club extends Item {
 
     attackCooldown(e: Entity): number {
         let multiplier = 1;
-        if(e instanceof Character){
-            multiplier -= e.skillLevel("clubmanship") * 0.1;
-            multiplier -= e.skillLevel("onehanded") * 0.03;
+        if (e instanceof Character) {
+            multiplier -= e.skillLevel('clubmanship') * 0.1;
+            multiplier -= e.skillLevel('onehanded') * 0.03;
         }
         return 70 * multiplier;
     }

@@ -161,7 +161,7 @@ export class BlockMesh {
     }
 
     drawFast(mask: number, alpha: number, sideOffset = 0) {
-        if (this.elementCount === 0) {
+        if (this.elementCount === 0 || mask === 0) {
             return 0;
         }
         BlockMesh.gl.bindVertexArray(this.vao);
@@ -171,39 +171,34 @@ export class BlockMesh {
 
         let start = 0;
         let end = 0;
-        if (mask === 0) {
-            return 0;
-        } else {
-            for (let i = 0; i < 6; i++) {
-                if ((mask & (1 << i)) === 0) {
-                    continue;
-                }
-                const curStart = this.sideStart[i + sideOffset];
-                const curEnd =
-                    curStart + this.sideSquareCount[i + sideOffset] * 4;
-                if (curStart !== end) {
-                    if (end !== start) {
-                        BlockMesh.gl.drawElements(
-                            BlockMesh.gl.TRIANGLES,
-                            (end - start) / 4,
-                            BlockMesh.gl.UNSIGNED_INT,
-                            start
-                        );
-                        calls++;
-                    }
-                    start = curStart;
-                }
-                end = curEnd;
+        for (let i = 0; i < 6; i++) {
+            if ((mask & (1 << i)) === 0) {
+                continue;
             }
-            if (end !== start) {
-                BlockMesh.gl.drawElements(
-                    BlockMesh.gl.TRIANGLES,
-                    (end - start) / 4,
-                    BlockMesh.gl.UNSIGNED_INT,
-                    start
-                );
-                calls++;
+            const curStart = this.sideStart[i + sideOffset];
+            const curEnd = curStart + this.sideSquareCount[i + sideOffset] * 4;
+            if (curStart !== end) {
+                if (end !== start) {
+                    BlockMesh.gl.drawElements(
+                        BlockMesh.gl.TRIANGLES,
+                        (end - start) / 4,
+                        BlockMesh.gl.UNSIGNED_INT,
+                        start
+                    );
+                    calls++;
+                }
+                start = curStart;
             }
+            end = curEnd;
+        }
+        if (end !== start) {
+            BlockMesh.gl.drawElements(
+                BlockMesh.gl.TRIANGLES,
+                (end - start) / 4,
+                BlockMesh.gl.UNSIGNED_INT,
+                start
+            );
+            calls++;
         }
         return calls;
     }

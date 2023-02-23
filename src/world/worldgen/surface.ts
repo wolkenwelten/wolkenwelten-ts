@@ -162,7 +162,7 @@ export const worldgenSurface = (chunk: Chunk) => {
                                 new StaticStone(chunk, cx, gh + 1, cz);
                             } else if (rng.bool(600)) {
                                 new StaticStick(chunk, cx, gh + 1, cz);
-                            } else if (rng.bool(300)){
+                            } else if (rng.bool(300)) {
                                 new StaticFlower(chunk, cx, gh + 1, cz);
                             }
                         }

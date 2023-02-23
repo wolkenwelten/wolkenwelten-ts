@@ -7,6 +7,7 @@ export class Frustum {
     clip: mat4;
     planes: vec4[];
     rows: vec4[];
+    cp: vec4;
 
     constructor() {
         this.clip = mat4.create();
@@ -24,6 +25,7 @@ export class Frustum {
             vec4.create(),
             vec4.create(),
         ];
+        this.cp = vec4.create();
     }
 
     build(projection: mat4, view: mat4) {
@@ -68,7 +70,8 @@ export class Frustum {
     }
 
     containsCube(p: vec4) {
-        const cp = vec4.create();
+        const cp = this.cp;
+        cp[3] = 1;
         planeLoop: for (const plane of this.planes) {
             for (let x = 0; x < 2; x++) {
                 for (let y = 0; y < 2; y++) {
@@ -76,7 +79,6 @@ export class Frustum {
                         cp[0] = p[0] + 32 * x;
                         cp[1] = p[1] + 32 * y;
                         cp[2] = p[2] + 32 * z;
-                        cp[3] = 1;
                         if (vec4.dot(plane, cp) > 0) {
                             continue planeLoop;
                         }
