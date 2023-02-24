@@ -10,17 +10,12 @@ export class XpView {
     lvl: HTMLElement;
     bar: HTMLElement;
 
-    lastLevel = -1;
     lastXpPercentage = -1;
 
     constructor(parent: HTMLElement, game: Game) {
         const div = document.createElement('div');
         this.div = div;
         div.classList.add(styles.xpView);
-
-        this.lvl = document.createElement('div');
-        this.lvl.classList.add(styles.level);
-        div.append(this.lvl);
 
         this.bar = document.createElement('div');
         this.bar.classList.add(styles.bar);
@@ -37,13 +32,9 @@ export class XpView {
     }
 
     update(char: Character) {
-        if (char.level !== this.lastLevel) {
-            this.lvl.innerText = String(char.level + 1);
-            this.lastLevel = char.level;
-        }
-        const xpPercentage = (char.xpPercentageTillNextLevel() * 100) | 0;
+        const xpPercentage = char.xpPercentageTillNextLevel() * 100;
         if (this.lastXpPercentage !== xpPercentage) {
-            this.bar.style.height = `${xpPercentage}%`;
+            this.bar.style.width = `${xpPercentage}%`;
             this.lastXpPercentage = xpPercentage;
         }
     }

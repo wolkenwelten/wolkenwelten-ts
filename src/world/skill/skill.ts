@@ -22,7 +22,7 @@ export class CharacterSkill {
             this.xp -= this.skill.xpPerLevel * (this.level + 1);
             this.level++;
             this.char.world.game.ui.log.addEntry(
-                `Your skill in ${this.skill.name} has reached ${this.level}`
+                `Your skill in ${this.skill.name} has reached level ${this.level}`
             );
             this.checkLevelUp();
         }
