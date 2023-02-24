@@ -1,0 +1,35 @@
+.healthWrap {}
+
+.healthOrbWrap {
+    display: block;
+    position: absolute;
+    left:2px;
+    bottom:7px;
+    width:128px;
+    height:128px;
+    background:#556;
+    border-radius:50%;
+    overflow:hidden;
+    border:solid 1px #667;
+}
+
+.healthOrb {
+    display:block;
+    width:100%;
+    height:100%;
+    border-radius:50%;
+    background:#FA1107;
+    background: radial-gradient( circle, #FF1507, #480502);
+}
+
+.healthOrbOverlay {
+    display:block;
+    width:100%;
+    height:0%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background:#556;
+    background: radial-gradient( circle at 64px 64px, #667, #112);
+    transition: height 35ms;
+}

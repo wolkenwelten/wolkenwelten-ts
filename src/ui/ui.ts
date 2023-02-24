@@ -2,10 +2,10 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import { Game } from '../game';
-import { HealthBar } from './components/health/healthBar';
 import { FpsCounter } from './components/fpsCounter';
 import { Crosshair } from './components/crosshair';
 import { Hotbar } from './components/hotbar';
+import { HealthOrb } from './components/healthOrb';
 import { SystemLog } from './components/systemLog';
 import { CursorItem } from './components/item/cursorItem';
 import { XpView } from './components/xpView';
@@ -23,6 +23,7 @@ export class UIManager {
     icon: IconManager;
     heldItem: MaybeItem;
     log: SystemLog;
+    healthOrb: HealthOrb;
 
     constructor(game: Game) {
         this.game = game;
@@ -33,18 +34,22 @@ export class UIManager {
         this.rootElement.append(this.uiWrapper);
         this.icon = new IconManager(this);
         new FpsCounter(this.uiWrapper, game);
-        new HealthBar(this.uiWrapper, game);
         new Crosshair(this.uiWrapper);
         new XpView(this.uiWrapper, game);
         this.log = new SystemLog(this.uiWrapper, game);
         this.inventory = new PlayerModal(this.uiWrapper, game);
         this.hotbar = new Hotbar(this.uiWrapper, game);
         this.cursorItem = new CursorItem(this.uiWrapper);
+        this.healthOrb = new HealthOrb(this.uiWrapper, game);
         game.player.inventory.onChange = this.updateInventory.bind(this);
     }
 
     updateInventory(i: number) {
         this.hotbar.update(i);
         this.inventory.update(i);
+    }
+
+    update() {
+        this.healthOrb.update();
     }
 }

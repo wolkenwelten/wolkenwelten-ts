@@ -16,12 +16,16 @@ export class SystemLog {
         div.classList.add(styles.systemLog);
 
         parent.appendChild(div);
+        this.addEntry(
+            'Welcome to WolkenWelten, you can use WASD+Mouse or a GamePad to move around'
+        );
+        this.addEntry('You can use E to open the Inventory/Menu');
     }
 
     addEntry(msg: string) {
         const entry = document.createElement('div');
         entry.innerText = msg;
-        this.div.prepend(entry);
+        this.div.append(entry);
         entry.getBoundingClientRect();
         entry.classList.add(styles.visible);
 

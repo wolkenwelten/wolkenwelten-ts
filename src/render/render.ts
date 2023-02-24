@@ -220,6 +220,7 @@ export class RenderManager {
     drawFrame() {
         window.requestAnimationFrame(this.drawFrameClosure);
         this.game.input.update();
+        this.game.ui.update();
         this.game.update();
         if (!this.game.ready || !allTexturesLoaded()) {
             return;

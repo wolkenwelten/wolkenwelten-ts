@@ -124,26 +124,8 @@ export class Character extends Entity {
         );
         if (this.health <= 0) {
             if (!this.isDead) {
-                const event = new CustomEvent('playerDead', {
-                    detail: {
-                        rawAmount,
-                    },
-                });
-                this.world.game.ui.rootElement.dispatchEvent(event);
                 this.isDead = true;
                 this.onDeath();
-                // Dispatch death event
-            }
-        } else {
-            if (this === this.world.game.player) {
-                const event = new CustomEvent('playerDamage', {
-                    detail: {
-                        rawAmount,
-                        health: this.health,
-                        maxHealth: this.maxHealth,
-                    },
-                });
-                this.world.game.ui.rootElement.dispatchEvent(event);
             }
         }
     }
@@ -548,14 +530,6 @@ export class Character extends Entity {
             this.world.game.ui.rootElement.dispatchEvent(
                 new CustomEvent('playerLevelUp')
             );
-            const event = new CustomEvent('playerDamage', {
-                detail: {
-                    rawAmount: 0,
-                    health: this.health,
-                    maxHealth: this.maxHealth,
-                },
-            });
-            this.world.game.ui.rootElement.dispatchEvent(event);
             this.world.game.audio.play('levelUp', 0.5);
             this.world.game.ui.log.addEntry(
                 `You've reached level ${

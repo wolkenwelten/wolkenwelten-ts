@@ -1,7 +1,7 @@
 .systemLog {
     position: absolute;
     left: 8px;
-    bottom: 8px;
+    top: 8px;
     width:480px;
     max-height:240px;
 }
