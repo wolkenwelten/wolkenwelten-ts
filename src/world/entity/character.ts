@@ -161,12 +161,12 @@ export class Character extends Entity {
             this.movementX = this.movementZ = 0;
         } else {
             if (oz > 0) {
-                oz *= 0.33;
+                oz *= 0.5;
             }
             this.movementX =
-                ox * 0.66 * Math.cos(-this.yaw) + oz * Math.sin(this.yaw);
+                ox * 0.75 * Math.cos(-this.yaw) + oz * Math.sin(this.yaw);
             this.movementZ =
-                ox * 0.66 * Math.sin(-this.yaw) + oz * Math.cos(this.yaw);
+                ox * 0.75 * Math.sin(-this.yaw) + oz * Math.cos(this.yaw);
         }
 
         if (oy > 0) {
@@ -249,13 +249,13 @@ export class Character extends Entity {
                 : CHARACTER_STOP_RATE;
 
         if (!this.mayJump()) {
-            speed *= 0.4; // Slow down player movement changes during jumps
+            speed *= 0.5; // Slow down player movement changes during jumps
         }
         if (underwater) {
-            speed *= 0.7; // Slow down player movement while underwater
+            speed *= 0.5; // Slow down player movement while underwater
         }
         if (this.lastAction > this.world.game.ticks) {
-            speed *= 0.3;
+            speed *= 0.5;
         }
 
         this.vx = this.vx * (1.0 - accel) + this.movementX * speed * accel;
