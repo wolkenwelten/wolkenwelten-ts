@@ -20,11 +20,6 @@ jobs:
         run: npm run typecheck
       - name: Build
         run: npm run build
-      - name: Build Zip for LD
-        uses: actions/upload-artifact@v3
-        with:
-          name: LD-compatible-zip
-          path: dist/
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v1
         with:
@@ -44,6 +39,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v1
-
-
-
