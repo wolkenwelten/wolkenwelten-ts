@@ -6,13 +6,15 @@ import { Game } from '../../game';
 import { Character } from '../../world/entity/character';
 
 export class XpView {
+    game: Game;
     div: HTMLElement;
-    lvl: HTMLElement;
     bar: HTMLElement;
 
     lastXpPercentage = -1;
 
     constructor(parent: HTMLElement, game: Game) {
+        this.game = game;
+
         const div = document.createElement('div');
         this.div = div;
         div.classList.add(styles.xpView);
@@ -21,18 +23,14 @@ export class XpView {
         this.bar.classList.add(styles.bar);
         div.append(this.bar);
 
-        const that = this;
-        const player = game.player;
-        const updateThis = (e: any) => {
-            that.update(player);
-        };
-        parent.parentElement?.addEventListener('playerXp', updateThis);
         parent.appendChild(div);
-        this.update(player);
+        this.update();
     }
 
-    update(char: Character) {
-        const xpPercentage = char.xpPercentageTillNextLevel() * 100;
+    update() {
+        const char = this.game.player;
+        const xpPercentage =
+            Math.floor(char.xpPercentageTillNextLevel() * 1000) / 10;
         if (this.lastXpPercentage !== xpPercentage) {
             this.bar.style.width = `${xpPercentage}%`;
             this.lastXpPercentage = xpPercentage;

@@ -6,11 +6,18 @@ import { Game } from '../../game';
 
 export class HealthOrb {
     div: HTMLElement;
+
     health: HTMLElement;
     healthOverlay: HTMLElement;
     healthWrap: HTMLElement;
+
+    mana: HTMLElement;
+    manaOverlay: HTMLElement;
+    manaWrap: HTMLElement;
+
     game: Game;
     lastHealth = -9;
+    lastMana = -9;
 
     constructor(parent: HTMLElement, game: Game) {
         this.game = game;
@@ -30,17 +37,37 @@ export class HealthOrb {
         this.health.classList.add(styles.healthOrb);
         this.healthWrap.append(this.health);
 
+        this.manaWrap = document.createElement('div');
+        this.manaWrap.classList.add(styles.manaOrbWrap);
+        this.div.append(this.manaWrap);
+
+        this.manaOverlay = document.createElement('div');
+        this.manaOverlay.classList.add(styles.manaOrbOverlay);
+        this.manaWrap.append(this.manaOverlay);
+
+        this.mana = document.createElement('div');
+        this.mana.classList.add(styles.manaOrb);
+        this.manaWrap.append(this.mana);
+
         parent.appendChild(this.div);
         this.update();
     }
 
     update() {
-        const percentage = Math.floor(
+        const healthPercentage = Math.floor(
             (this.game.player.health / this.game.player.maxHealth) * 100
         );
-        if (this.lastHealth !== percentage) {
-            this.healthOverlay.style.height = `${100 - percentage}%`;
-            this.lastHealth = percentage;
+        if (this.lastHealth !== healthPercentage) {
+            this.healthOverlay.style.height = `${100 - healthPercentage}%`;
+            this.lastHealth = healthPercentage;
+        }
+
+        const manaPercentage = Math.floor(
+            (this.game.player.mana / this.game.player.maxMana) * 100
+        );
+        if (this.lastMana !== manaPercentage) {
+            this.manaOverlay.style.height = `${100 - manaPercentage}%`;
+            this.lastMana = manaPercentage;
         }
     }
 }

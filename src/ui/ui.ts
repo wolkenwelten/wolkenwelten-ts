@@ -24,6 +24,7 @@ export class UIManager {
     heldItem: MaybeItem;
     log: SystemLog;
     healthOrb: HealthOrb;
+    xpView: XpView;
 
     constructor(game: Game) {
         this.game = game;
@@ -35,7 +36,7 @@ export class UIManager {
         this.icon = new IconManager(this);
         new FpsCounter(this.uiWrapper, game);
         new Crosshair(this.uiWrapper);
-        new XpView(this.uiWrapper, game);
+        this.xpView = new XpView(this.uiWrapper, game);
         this.log = new SystemLog(this.uiWrapper, game);
         this.inventory = new PlayerModal(this.uiWrapper, game);
         this.hotbar = new Hotbar(this.uiWrapper, game);
@@ -51,5 +52,6 @@ export class UIManager {
 
     update() {
         this.healthOrb.update();
+        this.xpView.update();
     }
 }

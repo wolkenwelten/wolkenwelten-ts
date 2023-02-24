@@ -53,6 +53,9 @@ export class Character extends Entity {
     maxHealth = 12;
     isDead = false;
 
+    mana = 12;
+    maxMana = 12;
+
     level = 0;
     xp = 0;
     weight = 70;
@@ -80,12 +83,12 @@ export class Character extends Entity {
         this.y = this.spawnY;
         this.z = this.spawnZ;
         this.xp = this.level = 0;
-        this.xp = 0;
         this.yaw = this.spawnYaw;
         this.pitch = this.spawnPitch;
         this.noClip = false;
         this.isDead = false;
         this.maxHealth = this.health = 12;
+        this.maxMana = this.mana = 12;
         this.hitAnimation = -100;
         this.lastAction = 0;
         this.miningActive = false;
@@ -405,14 +408,6 @@ export class Character extends Entity {
     onDeath() {
         this.world.game.audio.play('ungh', 0.2);
         this.init();
-        const event = new CustomEvent('playerDamage', {
-            detail: {
-                rawAmount: 0,
-                health: this.health,
-                maxHealth: this.maxHealth,
-            },
-        });
-        this.world.game.ui.rootElement.dispatchEvent(event);
     }
 
     onAttack(perpetrator: Entity): void {
@@ -527,9 +522,6 @@ export class Character extends Entity {
             this.level++;
             this.maxHealth += 4;
             this.health = this.maxHealth;
-            this.world.game.ui.rootElement.dispatchEvent(
-                new CustomEvent('playerLevelUp')
-            );
             this.world.game.audio.play('levelUp', 0.5);
             this.world.game.ui.log.addEntry(
                 `You've reached level ${
@@ -542,9 +534,6 @@ export class Character extends Entity {
     xpGain(amount: number) {
         this.xp += amount;
         this.xpCheckLevelUp();
-        this.world.game.ui.rootElement.dispatchEvent(
-            new CustomEvent('playerXp')
-        );
     }
 
     skillXpGain(skillId: string, amount: number) {

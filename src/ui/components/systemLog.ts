@@ -29,7 +29,6 @@ export class SystemLog {
         entry.getBoundingClientRect();
         entry.classList.add(styles.visible);
 
-        const that = this;
         setTimeout(() => {
             entry.classList.remove(styles.visible);
         }, 30000);

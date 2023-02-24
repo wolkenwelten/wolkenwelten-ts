@@ -1,5 +1,6 @@
 .healthWrap {}
 
+.manaOrbWrap,
 .healthOrbWrap {
     display: block;
     position: absolute;
@@ -13,6 +14,12 @@
     border:solid 1px #667;
 }
 
+.manaOrbWrap {
+    left:auto;
+    right:2px;
+}
+
+.manaOrb,
 .healthOrb {
     display:block;
     width:100%;
@@ -22,6 +29,12 @@
     background: radial-gradient( circle, #FF1507, #480502);
 }
 
+.manaOrb {
+    background:#0711FA;
+    background: radial-gradient( circle, #0715FF, #020448);
+}
+
+.manaOrbOverlay,
 .healthOrbOverlay {
     display:block;
     width:100%;

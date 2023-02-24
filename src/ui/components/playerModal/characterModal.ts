@@ -1,9 +1,7 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { Inventory } from '../../../world/item/inventory';
 import styles from './characterModal.module.css';
-import { InventoryRow } from '../item/inventoryRow';
 import { Game } from '../../../game';
 
 export class CharacterWrap {
@@ -26,6 +24,7 @@ export class CharacterWrap {
 <tr><th>Experience</th><td stat-key="xp"></td></tr>
 <tr><th>Next Level at</th><td stat-key="xpNextLevel"></td></tr>
 <tr><th>Health</th><td stat-key="health"></td></tr>
+<tr><th>Mana</th><td stat-key="mana"></td></tr>
 </tbody></table>`;
 
         this.div.append(this.table);
@@ -40,10 +39,11 @@ export class CharacterWrap {
             xp: String(player.xp),
             xpNextLevel: String(player.xpForLevel(this.game.player.level + 1)),
             health: `${player.health}/${player.maxHealth}`,
-        };
+            mana: `${player.mana}/${player.maxMana}`,
+        } as any;
         for (const td of this.table.querySelectorAll('td')) {
             const key = td.getAttribute('stat-key');
-            const d = data[key];
+            const d = data[key || ''];
             if (d) {
                 td.innerText = d;
             }
