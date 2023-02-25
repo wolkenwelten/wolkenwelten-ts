@@ -9,6 +9,7 @@
         "preview": "vite preview",
         "pretty": "prettier --write \"src/**/*.{css,ts}\"",
         "typecheck": "tsc -p ./tsconfig.json --noEmit",
+        "optimize": "node scripts/optimizeAssets.js",
         "zip": "npm run build && zip -r ld-itch-compatible.zip dist/"
     },
     "author": "Benjamin Vincent Schulenburg <ben@wolkenwelten.net>",
