@@ -2,6 +2,7 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import { Character } from '../entity/character';
+import { Entity } from '../entity/entity';
 import { World } from '../world';
 import { addDefaultSkills } from './skillDefaults';
 
@@ -21,7 +22,7 @@ export class CharacterSkill {
         if (this.xp >= this.skill.xpPerLevel * (this.level + 1)) {
             this.xp -= this.skill.xpPerLevel * (this.level + 1);
             this.level++;
-            this.char.world.game.ui.log.addEntry(
+            this.char.world.game.ui?.log.addEntry(
                 `Your skill in ${this.skill.name} has reached level ${this.level}`
             );
             this.checkLevelUp();
@@ -33,7 +34,12 @@ export class CharacterSkill {
         this.skill = skill;
     }
 
-    use() {}
+    use() {
+        const used = this.skill.use(this.char, this.level);
+        if (used) {
+            this.xpGain(1);
+        }
+    }
 
     xpGain(amount = 1) {
         this.xp += amount;
@@ -54,20 +60,47 @@ export class Skill {
     readonly description: string;
 
     readonly xpPerLevel: number;
-    readonly maxLevel = 4;
+    readonly maxLevel: number;
 
     constructor(
         id: string,
         name: string,
         icon: string,
         description: string,
-        xpPerLevel: number
+        xpPerLevel: number,
+        maxLevel = 4
     ) {
         this.id = id;
         this.name = name;
         this.icon = icon;
         this.description = description;
         this.xpPerLevel = xpPerLevel;
+        this.maxLevel = maxLevel;
+    }
+
+    use(e: Entity, skillLevel: number): boolean {
+        return false;
+    }
+}
+
+export class ActiveSkill extends Skill {
+    readonly maxLevel = 1;
+    readonly useCB: (e: Entity, skillLevel: number) => boolean;
+
+    constructor(
+        id: string,
+        name: string,
+        icon: string,
+        description: string,
+        xpPerLevel: number,
+        useCB: (e: Entity, skillLevel: number) => boolean
+    ) {
+        super(id, name, icon, description, xpPerLevel);
+        this.useCB = useCB;
+    }
+
+    use(e: Entity, skillLevel: number): boolean {
+        return this.useCB(e, skillLevel);
     }
 }
 
@@ -83,6 +116,20 @@ export class SkillSystem {
         xpPerLevel = 10
     ) {
         this.skills.set(id, new Skill(id, name, icon, description, xpPerLevel));
+    }
+
+    addActive(
+        id: string,
+        name: string,
+        icon: string,
+        description: string,
+        xpPerLevel: number,
+        useCB: (e: Entity, skillLevel: number) => boolean
+    ) {
+        this.skills.set(
+            id,
+            new ActiveSkill(id, name, icon, description, xpPerLevel, useCB)
+        );
     }
 
     get(id: string): Skill | undefined {

@@ -9,7 +9,7 @@
     border-right: solid 1px #99a;
     overflow-y: auto;
     overflow-x: hidden;
-    width:256px;
+    width:320px;
     height: 100%;
     position: absolute;
     left:0;
@@ -18,7 +18,7 @@
 
 .recipeDetails {
     display: block;
-    padding-left:262px;
+    padding-left:328px;
 }
 
 .recipe {

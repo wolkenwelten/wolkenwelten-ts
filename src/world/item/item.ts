@@ -45,7 +45,7 @@ export class Item {
     }
 
     attackDamage(e: Entity): number {
-        return 1;
+        return 0;
     }
 
     miningDamage(block: number): number {
@@ -53,7 +53,7 @@ export class Item {
     }
 
     attackCooldown(e: Entity): number {
-        return 80;
+        return 100;
     }
 
     onAttackWith(e: Entity) {

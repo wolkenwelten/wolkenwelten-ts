@@ -3,7 +3,7 @@
  */
 import styles from './skillWrap.module.css';
 import { Game } from '../../../game';
-import { Skill } from '../../../world/skill/skill';
+import { ActiveSkill, Skill } from '../../../world/skill/skill';
 
 interface ListElementEntry {
     div: HTMLElement;
@@ -52,6 +52,17 @@ export class SkillWrap {
         const p = document.createElement('p');
         p.innerText = skill.description || '';
         div.append(p);
+
+        if (skill instanceof ActiveSkill) {
+            const selectButton = document.createElement('button');
+            const that = this;
+            selectButton.innerText = 'Select';
+            selectButton.classList.add(styles.selectButton);
+            selectButton.onclick = () => {
+                that.game.player.selectSkill(skill);
+            };
+            div.append(selectButton);
+        }
 
         this.details.appendChild(div);
     }

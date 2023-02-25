@@ -11,6 +11,7 @@ import stepUrl from '../assets/sfx/step.ogg?url';
 import stompUrl from '../assets/sfx/stomp.ogg?url';
 import unghUrl from '../assets/sfx/ungh.ogg?url';
 import punchUrl from '../assets/sfx/punch.ogg?url';
+import heavyStrikeUrl from '../assets/sfx/heavyStrike.mp3?url';
 import punchMissUrl from '../assets/sfx/punchMiss.ogg?url';
 import levelUpUrl from '../assets/sfx/levelUp.mp3?url';
 
@@ -39,6 +40,7 @@ export class AudioManager {
         this.add('crabDeath', crabDeathUrl);
         this.add('ratAttack', ratAttackUrl);
         this.add('ratDeath', ratDeathUrl);
+        this.add('heavyStrike', heavyStrikeUrl);
     }
 
     constructor(game: Game) {

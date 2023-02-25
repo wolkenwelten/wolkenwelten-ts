@@ -46,3 +46,12 @@
     background: radial-gradient( circle at 64px 64px, #667, #112);
     transition: height 35ms;
 }
+
+.manaIcon {
+    display: block;
+    position:absolute;
+    left:32px;
+    top:32px;
+    width:64px;
+    height:64px;
+}

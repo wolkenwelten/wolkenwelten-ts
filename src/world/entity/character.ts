@@ -16,7 +16,7 @@ import { MaybeItem } from '../item/item';
 import { IronPickaxe } from '../item/tools/ironPickaxe';
 import { IronAxe } from '../item/tools/ironAxe';
 import { Stone } from '../item/material/stone';
-import { CharacterSkill } from '../skill/skill';
+import { CharacterSkill, Skill } from '../skill/skill';
 
 const CHARACTER_ACCELERATION = 0.05;
 const CHARACTER_STOP_RATE = CHARACTER_ACCELERATION * 3.0;
@@ -55,6 +55,7 @@ export class Character extends Entity {
 
     mana = 12;
     maxMana = 12;
+    nextManaRegen = 0;
 
     level = 0;
     xp = 0;
@@ -62,6 +63,7 @@ export class Character extends Entity {
 
     inventory: Inventory;
     skill: Map<string, CharacterSkill> = new Map();
+    selectedSkill?: CharacterSkill;
 
     getGoodStuff() {
         this.inventory.add(new IronAxe(this.world));
@@ -87,6 +89,7 @@ export class Character extends Entity {
         this.pitch = this.spawnPitch;
         this.noClip = false;
         this.isDead = false;
+        this.selectedSkill = undefined;
         this.maxHealth = this.health = 12;
         this.maxMana = this.mana = 12;
         this.hitAnimation = -100;
@@ -98,6 +101,8 @@ export class Character extends Entity {
         this.skill.clear();
 
         this.inventory.select(0);
+        this.skillXpGain('heavyStrike', 0);
+        this.selectedSkill = this.skill.get('heavyStrike');
     }
 
     constructor(
@@ -135,6 +140,15 @@ export class Character extends Entity {
 
     heal(rawAmount: number) {
         this.damage(-rawAmount);
+    }
+
+    useMana(amount: number): boolean {
+        if (this.mana > amount) {
+            this.mana -= amount;
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /* Walk/Run according to the direction of the Entity, ignores pitch */
@@ -201,10 +215,19 @@ export class Character extends Entity {
         );
     }
 
+    updateMana() {
+        if (this.world.game.ticks > this.nextManaRegen) {
+            this.nextManaRegen = this.world.game.ticks + 100;
+            this.mana++;
+        }
+        this.mana = Math.max(0, Math.min(this.maxMana, this.mana));
+    }
+
     update() {
         if (this.isDead) {
             return;
         }
+        this.updateMana();
 
         if (this.noClip) {
             this.vx = this.vy = this.vz = 0;
@@ -349,7 +372,7 @@ export class Character extends Entity {
         }
     }
 
-    attack(radius = 1.6): boolean {
+    attack(radius = 1.6, damageCB?: (e: Entity) => void): boolean {
         const [vx, vy, vz] = this.direction(0, 0, radius * -0.6);
         const x = this.x + vx;
         const y = this.y + vy;
@@ -367,14 +390,18 @@ export class Character extends Entity {
             const dd = dx * dx + dy * dy + dz * dz;
             if (dd < rr) {
                 hit = true;
-                const dm = Math.max(Math.abs(dx), Math.abs(dz));
-                const ndx = dx / dm;
-                const ndz = dz / dm;
-                e.vx += ndx * 0.03;
-                e.vy += 0.02;
-                e.vz += ndz * 0.03;
-                this.doDamage(e, weapon?.attackDamage(e) || 1);
-                this.world.game.render.particle.fxStrike(e.x, e.y, e.z);
+                if (damageCB) {
+                    damageCB(e);
+                } else {
+                    const dm = Math.max(Math.abs(dx), Math.abs(dz));
+                    const ndx = dx / dm;
+                    const ndz = dz / dm;
+                    e.vx += ndx * 0.03;
+                    e.vy += 0.02;
+                    e.vz += ndz * 0.03;
+                    this.doDamage(e, weapon?.attackDamage(e) || 1);
+                    this.world.game.render.particle.fxStrike(e.x, e.y, e.z);
+                }
             }
         }
 
@@ -416,6 +443,10 @@ export class Character extends Entity {
         this.world.game.render.canvasWrapper.classList.add('fx-damage');
         this.miningCooldownUntil = this.world.game.ticks + 10;
         this.world.game.audio.play('ungh', 0.2);
+    }
+
+    isOnCooldown(): boolean {
+        return this.world.game.ticks < this.lastAction;
     }
 
     strike() {
@@ -463,7 +494,7 @@ export class Character extends Entity {
     }
 
     secondaryAction() {
-        this.primaryAction();
+        this.selectedSkill?.use();
     }
 
     dropActiveItem() {
@@ -556,5 +587,17 @@ export class Character extends Entity {
 
     skillLevel(skillId: string): number {
         return this.skill.get(skillId)?.level || 0;
+    }
+
+    selectSkill(skill?: Skill) {
+        if (skill) {
+            for (const cs of this.skill.values()) {
+                if (cs.skill === skill) {
+                    this.selectedSkill = cs;
+                    return;
+                }
+            }
+        }
+        this.selectedSkill = undefined;
     }
 }

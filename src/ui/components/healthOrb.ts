@@ -3,9 +3,11 @@
  */
 import styles from './healthOrb.module.css';
 import { Game } from '../../game';
+import { Skill } from '../../world/skill/skill';
 
 export class HealthOrb {
     div: HTMLElement;
+    game: Game;
 
     health: HTMLElement;
     healthOverlay: HTMLElement;
@@ -14,10 +16,11 @@ export class HealthOrb {
     mana: HTMLElement;
     manaOverlay: HTMLElement;
     manaWrap: HTMLElement;
+    manaIcon: HTMLImageElement;
 
-    game: Game;
     lastHealth = -9;
     lastMana = -9;
+    lastSkillIcon = '';
 
     constructor(parent: HTMLElement, game: Game) {
         this.game = game;
@@ -49,6 +52,11 @@ export class HealthOrb {
         this.mana.classList.add(styles.manaOrb);
         this.manaWrap.append(this.mana);
 
+        this.manaIcon = document.createElement('img');
+        this.manaIcon.classList.add(styles.manaIcon);
+        this.manaIcon.style.display = 'none';
+        this.manaWrap.append(this.manaIcon);
+
         parent.appendChild(this.div);
         this.update();
     }
@@ -68,6 +76,17 @@ export class HealthOrb {
         if (this.lastMana !== manaPercentage) {
             this.manaOverlay.style.height = `${100 - manaPercentage}%`;
             this.lastMana = manaPercentage;
+        }
+
+        const curSkillIcon = this.game.player.selectedSkill?.skill.icon || '';
+        if (curSkillIcon !== this.lastSkillIcon) {
+            if (curSkillIcon) {
+                this.manaIcon.src = curSkillIcon;
+                this.manaIcon.style.display = 'block';
+            } else {
+                this.manaIcon.style.display = 'none';
+            }
+            this.lastSkillIcon = curSkillIcon;
         }
     }
 }
