@@ -1,34 +1,35 @@
 .slot {
     display: block;
-    width:76px;
-    height:76px;
+    width: 76px;
+    height: 76px;
     user-select: none;
 }
 
 .amount {
-    position:absolute;
-    right:2px;
-    bottom:2px;
-    font-size:1.3rem;
+    position: absolute;
+    right: 2px;
+    bottom: 2px;
+    font-size: 1.3rem;
     font-family: 'Courier New', Courier, monospace;
-    text-shadow: -1px 0px 0px#000,1px 0px 0px#000,0px -1px 0px#000,0px 1px 0px#000;
+    text-shadow: -1px 0px 0px#000, 1px 0px 0px#000, 0px -1px 0px#000,
+        0px 1px 0px#000;
 }
 
 .img {
-    display:block;
-    width:64px;
-    height:64px;
-    position:absolute;
-    left:4px;
-    top:4px;
+    display: block;
+    width: 64px;
+    height: 64px;
+    position: absolute;
+    left: 4px;
+    top: 4px;
     pointer-events: none;
 }
 
 .img.showActive {
-    width:32px;
-    height:32px;
-    left:22px;
-    top:22px;
+    width: 32px;
+    height: 32px;
+    left: 22px;
+    top: 22px;
     transition: transform 150ms;
     transform: scale(1.5);
 }

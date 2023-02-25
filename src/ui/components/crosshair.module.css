@@ -4,10 +4,10 @@
     left: 50%;
     pointer-events: none;
     z-index: 100;
-    width:32px;
-    height:32px;
-    margin-left:-16px;
-    margin-top:-16px;
+    width: 32px;
+    height: 32px;
+    margin-left: -16px;
+    margin-top: -16px;
     background: url('../../../assets/gfx/crosshair.png') no-repeat;
     background-size: contain;
 }

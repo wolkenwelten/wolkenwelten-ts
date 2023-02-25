@@ -1,78 +1,82 @@
 .craftingWrap {
     display: table;
-    text-align:left;
+    text-align: left;
 }
 
 .recipeList {
-    padding-top:1px;
+    padding-top: 1px;
     display: block;
     border-right: solid 1px #99a;
     overflow-y: auto;
     overflow-x: hidden;
-    width:320px;
+    width: 320px;
     height: 100%;
     position: absolute;
-    left:0;
-    top:0;
+    left: 0;
+    top: 0;
 }
 
 .recipeDetails {
     display: block;
-    padding-left:328px;
+    padding-left: 328px;
 }
 
 .recipe {
     cursor: pointer;
     display: block;
-    padding:0 4px;
+    padding: 0 4px;
     position: relative;
     border: solid 1px #556;
     user-select: none;
 }
 
 .recipe img {
-    float:left;
+    float: left;
 }
 
 .craftingWrap::after,
 .recipe::after {
-    content:'';
-    display:block;
-    clear:both;
+    content: '';
+    display: block;
+    clear: both;
 }
 
 .recipeDetails h3 {
-    margin-top:2px;
-    font-size:1.3rem;
+    margin-top: 2px;
+    font-size: 1.3rem;
     font-family: 'Courier New', Courier, monospace;
-    text-shadow: -1px 0px 0px#000,1px 0px 0px#000,0px -1px 0px#000,0px 1px 0px#000;
+    text-shadow: -1px 0px 0px#000, 1px 0px 0px#000, 0px -1px 0px#000,
+        0px 1px 0px#000;
 }
 
 .recipeDetails p {
-    font-size:1rem;
+    font-size: 1rem;
     font-family: 'Courier New', Courier, monospace;
-    text-shadow: -1px 0px 0px#000,1px 0px 0px#000,0px -1px 0px#000,0px 1px 0px#000;
+    text-shadow: -1px 0px 0px#000, 1px 0px 0px#000, 0px -1px 0px#000,
+        0px 1px 0px#000;
 }
 
 .recipe h3 {
-    margin-top:24px;
+    margin-top: 24px;
     display: inline-block;
-    font-size:1rem;
+    font-size: 1rem;
     font-family: 'Courier New', Courier, monospace;
-    text-shadow: -1px 0px 0px#000,1px 0px 0px#000,0px -1px 0px#000,0px 1px 0px#000;
+    text-shadow: -1px 0px 0px#000, 1px 0px 0px#000, 0px -1px 0px#000,
+        0px 1px 0px#000;
 }
 
 .craftCount::before {
-    content:'x';
+    content: 'x';
 }
 
 .craftCount {
-    position:absolute;
-    right:6px;
-    bottom:2px;
-    font-size:1rem;
+    position: absolute;
+    right: 6px;
+    bottom: 2px;
+    font-size: 1rem;
     font-family: 'Courier New', Courier, monospace;
-    text-shadow: -1px 0px 0px#000,1px 0px 0px#000,0px -1px 0px#000,0px 1px 0px#000;
+    text-shadow: -1px 0px 0px#000, 1px 0px 0px#000, 0px -1px 0px#000,
+        0px 1px 0px#000;
 }
 
 .active h3 {
@@ -84,22 +88,23 @@
 }
 
 .craftButton::before {
-    content:'Craft';
+    content: 'Craft';
 }
 
 .craftButton {
-    background:linear-gradient(gold, goldenrod);
+    background: linear-gradient(gold, goldenrod);
     border: none;
     cursor: pointer;
     position: absolute;
-    right:6px;
-    bottom:4px;
+    right: 6px;
+    bottom: 4px;
     border-radius: 2px;
-    color:#fff;
-    padding:2px 6px;
-    font-size:1.3rem;
+    color: #fff;
+    padding: 2px 6px;
+    font-size: 1.3rem;
     font-family: 'Courier New', Courier, monospace;
-    text-shadow: -1px 0px 0px#000,1px 0px 0px#000,0px -1px 0px#000,0px 1px 0px#000;
+    text-shadow: -1px 0px 0px#000, 1px 0px 0px#000, 0px -1px 0px#000,
+        0px 1px 0px#000;
 }
 
 .ingredientList {
@@ -109,24 +114,25 @@
 .ingredientList::before {
     content: 'Ingredients';
     display: block;
-    padding-top:12px;
+    padding-top: 12px;
     font-family: 'Courier New', Courier, monospace;
-    text-shadow: -1px 0px 0px#000,1px 0px 0px#000,0px -1px 0px#000,0px 1px 0px#000;
+    text-shadow: -1px 0px 0px#000, 1px 0px 0px#000, 0px -1px 0px#000,
+        0px 1px 0px#000;
 }
 
 .ingredientWrap {
     position: relative;
     display: inline-block;
-    width:80px;
-    height:80px;
-    margin-right:8px;
+    width: 80px;
+    height: 80px;
+    margin-right: 8px;
 }
 
 .cantCraft {
-    background:#445;
-    color:#bbb;
+    background: #445;
+    color: #bbb;
 }
 
 button.cantCraft {
-    cursor:not-allowed;
+    cursor: not-allowed;
 }

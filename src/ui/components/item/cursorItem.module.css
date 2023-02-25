@@ -1,15 +1,15 @@
 .slot {
-    display:block;
-    width:80px;
-    height:80px;
-    position:absolute;
-    margin-left:-40px;
-    margin-top:-40px;
-    left:0;
-    top:0;
-    transform:translate(0px,0px);
-    overflow:hidden;
-    z-index:1000;
+    display: block;
+    width: 80px;
+    height: 80px;
+    position: absolute;
+    margin-left: -40px;
+    margin-top: -40px;
+    left: 0;
+    top: 0;
+    transform: translate(0px, 0px);
+    overflow: hidden;
+    z-index: 1000;
     pointer-events: none;
     user-select: none;
 }
