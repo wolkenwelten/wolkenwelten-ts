@@ -207,7 +207,10 @@ export class WorldRenderer {
                     const z = (s.z - s.chunk.z + transOff[2]) * 32;
                     blits.push({ vertices, x, y, z });
                 }
-                staticMesh.updateFromMultiple(blits, mesh.chunk.staticLastUpdated);
+                staticMesh.updateFromMultiple(
+                    blits,
+                    mesh.chunk.staticLastUpdated
+                );
             }
             staticMesh.draw(
                 mvp,

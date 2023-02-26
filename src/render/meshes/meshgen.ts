@@ -51,12 +51,18 @@ const addFront = (
         out.push(x, y, zd, tex, side | ((light << 4) & 0xf0));
         out.push(x + w, y, zd, tex, side | (light & 0xf0));
         out.push(x + w, y + h, zd, tex, side | ((light >> 4) & 0xf0));
+
+        out.push(x + w, y + h, zd, tex, side | ((light >> 4) & 0xf0));
         out.push(x, y + h, zd, tex, side | ((light >> 8) & 0xf0));
+        out.push(x, y, zd, tex, side | ((light << 4) & 0xf0));
     } else {
         out.push(x, y + h, zd, tex, side | ((light >> 8) & 0xf0));
         out.push(x, y, zd, tex, side | ((light << 4) & 0xf0));
         out.push(x + w, y, zd, tex, side | (light & 0xf0));
+
+        out.push(x + w, y, zd, tex, side | (light & 0xf0));
         out.push(x + w, y + h, zd, tex, side | ((light >> 4) & 0xf0));
+        out.push(x, y + h, zd, tex, side | ((light >> 8) & 0xf0));
     }
 };
 
@@ -79,12 +85,18 @@ const addBack = (
         out.push(x, y + h, z, tex, side | ((light >> 8) & 0xf0));
         out.push(x + w, y + h, z, tex, side | ((light >> 4) & 0xf0));
         out.push(x + w, y, z, tex, side | (light & 0xf0));
+
+        out.push(x + w, y, z, tex, side | (light & 0xf0));
         out.push(x, y, z, tex, side | ((light << 4) & 0xf0));
+        out.push(x, y + h, z, tex, side | ((light >> 8) & 0xf0));
     } else {
         out.push(x, y, z, tex, side | ((light << 4) & 0xf0));
         out.push(x, y + h, z, tex, side | ((light >> 8) & 0xf0));
         out.push(x + w, y + h, z, tex, side | ((light >> 4) & 0xf0));
+
+        out.push(x + w, y + h, z, tex, side | ((light >> 4) & 0xf0));
         out.push(x + w, y, z, tex, side | (light & 0xf0));
+        out.push(x, y, z, tex, side | ((light << 4) & 0xf0));
     }
 };
 
@@ -108,12 +120,18 @@ const addTop = (
         out.push(x, yh, z, tex, side | ((light << 4) & 0xf0));
         out.push(x, yh, z + d, tex, side | (light & 0xf0));
         out.push(x + w, yh, z + d, tex, side | ((light >> 4) & 0xf0));
+
+        out.push(x + w, yh, z + d, tex, side | ((light >> 4) & 0xf0));
         out.push(x + w, yh, z, tex, side | ((light >> 8) & 0xf0));
+        out.push(x, yh, z, tex, side | ((light << 4) & 0xf0));
     } else {
         out.push(x + w, yh, z, tex, side | ((light >> 8) & 0xf0));
         out.push(x, yh, z, tex, side | ((light << 4) & 0xf0));
         out.push(x, yh, z + d, tex, side | (light & 0xf0));
+
+        out.push(x, yh, z + d, tex, side | (light & 0xf0));
         out.push(x + w, yh, z + d, tex, side | ((light >> 4) & 0xf0));
+        out.push(x + w, yh, z, tex, side | ((light >> 8) & 0xf0));
     }
 };
 
@@ -136,12 +154,18 @@ const addBottom = (
         out.push(x, y, z, tex, side | ((light << 4) & 0xf0));
         out.push(x + w, y, z, tex, side | (light & 0xf0));
         out.push(x + w, y, z + d, tex, side | ((light >> 4) & 0xf0));
+
+        out.push(x + w, y, z + d, tex, side | ((light >> 4) & 0xf0));
         out.push(x, y, z + d, tex, side | ((light >> 8) & 0xf0));
+        out.push(x, y, z, tex, side | ((light << 4) & 0xf0));
     } else {
         out.push(x, y, z + d, tex, side | ((light >> 8) & 0xf0));
         out.push(x, y, z, tex, side | ((light << 4) & 0xf0));
         out.push(x + w, y, z, tex, side | (light & 0xf0));
+
+        out.push(x + w, y, z, tex, side | (light & 0xf0));
         out.push(x + w, y, z + d, tex, side | ((light >> 4) & 0xf0));
+        out.push(x, y, z + d, tex, side | ((light >> 8) & 0xf0));
     }
 };
 
@@ -164,12 +188,18 @@ const addLeft = (
         out.push(x, y, z, tex, side | ((light << 4) & 0xf0));
         out.push(x, y, z + d, tex, side | (light & 0xf0));
         out.push(x, y + h, z + d, tex, side | ((light >> 4) & 0xf0));
+
+        out.push(x, y + h, z + d, tex, side | ((light >> 4) & 0xf0));
         out.push(x, y + h, z, tex, side | ((light >> 8) & 0xf0));
+        out.push(x, y, z, tex, side | ((light << 4) & 0xf0));
     } else {
         out.push(x, y + h, z, tex, side | ((light >> 8) & 0xf0));
         out.push(x, y, z, tex, side | ((light << 4) & 0xf0));
         out.push(x, y, z + d, tex, side | (light & 0xf0));
+
+        out.push(x, y, z + d, tex, side | (light & 0xf0));
         out.push(x, y + h, z + d, tex, side | ((light >> 4) & 0xf0));
+        out.push(x, y + h, z, tex, side | ((light >> 8) & 0xf0));
     }
 };
 
@@ -193,12 +223,18 @@ const addRight = (
         out.push(xw, y, z, tex, side | ((light << 4) & 0xf0));
         out.push(xw, y + h, z, tex, side | (light & 0xf0));
         out.push(xw, y + h, z + d, tex, side | ((light >> 4) & 0xf0));
+
+        out.push(xw, y + h, z + d, tex, side | ((light >> 4) & 0xf0));
         out.push(xw, y, z + d, tex, side | ((light >> 8) & 0xf0));
+        out.push(xw, y, z, tex, side | ((light << 4) & 0xf0));
     } else {
         out.push(xw, y, z + d, tex, side | ((light >> 8) & 0xf0));
         out.push(xw, y, z, tex, side | ((light << 4) & 0xf0));
         out.push(xw, y + h, z, tex, side | (light & 0xf0));
+
+        out.push(xw, y + h, z, tex, side | (light & 0xf0));
         out.push(xw, y + h, z + d, tex, side | ((light >> 4) & 0xf0));
+        out.push(xw, y, z + d, tex, side | ((light >> 8) & 0xf0));
     }
 };
 
@@ -443,7 +479,7 @@ const genFront = (vertices: number[], args: GenArgs): number => {
             }
         }
     }
-    return (vertices.length - start) / 4 / 5;
+    return (vertices.length - start) / 5;
 };
 
 const genBack = (vertices: number[], args: GenArgs) => {
@@ -497,7 +533,7 @@ const genBack = (vertices: number[], args: GenArgs) => {
             }
         }
     }
-    return (vertices.length - start) / 4 / 5;
+    return (vertices.length - start) / 5;
 };
 
 const genTop = (vertices: number[], args: GenArgs) => {
@@ -551,7 +587,7 @@ const genTop = (vertices: number[], args: GenArgs) => {
             }
         }
     }
-    return (vertices.length - start) / 4 / 5;
+    return (vertices.length - start) / 5;
 };
 
 const genBottom = (vertices: number[], args: GenArgs) => {
@@ -605,7 +641,7 @@ const genBottom = (vertices: number[], args: GenArgs) => {
             }
         }
     }
-    return (vertices.length - start) / 4 / 5;
+    return (vertices.length - start) / 5;
 };
 
 const genRight = (vertices: number[], args: GenArgs) => {
@@ -659,7 +695,7 @@ const genRight = (vertices: number[], args: GenArgs) => {
             }
         }
     }
-    return (vertices.length - start) / 4 / 5;
+    return (vertices.length - start) / 5;
 };
 
 const genLeft = (vertices: number[], args: GenArgs) => {
@@ -713,7 +749,7 @@ const genLeft = (vertices: number[], args: GenArgs) => {
             }
         }
     }
-    return (vertices.length - start) / 4 / 5;
+    return (vertices.length - start) / 5;
 };
 
 /* This has 3 separate functions bluring XYZ separately combined,

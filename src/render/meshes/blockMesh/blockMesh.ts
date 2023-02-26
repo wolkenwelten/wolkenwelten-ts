@@ -14,7 +14,6 @@ import { Game } from '../../../game';
 
 export class BlockMesh {
     static gl: WebGL2RenderingContext;
-    static indeces: WebGLBuffer;
     static shader: Shader;
     static texture: Texture;
     static mvp = mat4.create();
@@ -28,35 +27,8 @@ export class BlockMesh {
     readonly chunk: Chunk;
     lastUpdated = 0;
     elementCount = 0;
-    sideSquareCount: number[] = [];
+    sideElementCount: number[] = [];
     sideStart: number[] = [];
-
-    static generateIndexBuffer(squareCount: number) {
-        const bufferSize = squareCount * 6;
-        const buf = new Uint32Array(bufferSize);
-        for (let i = 0; i < squareCount; i++) {
-            const off = i * 6;
-            const vOff = i * 4;
-            buf[off] = vOff;
-            buf[off + 1] = vOff + 1;
-            buf[off + 2] = vOff + 2;
-
-            buf[off + 3] = vOff + 2;
-            buf[off + 4] = vOff + 3;
-            buf[off + 5] = vOff;
-        }
-        const vbo = this.gl.createBuffer();
-        if (!vbo) {
-            throw new Error("Can't create new textMesh vertex buffer!");
-        }
-        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, vbo);
-        this.gl.bufferData(
-            this.gl.ELEMENT_ARRAY_BUFFER,
-            buf,
-            this.gl.STATIC_DRAW
-        );
-        return vbo;
-    }
 
     static init(game: Game, glc: WebGL2RenderingContext) {
         this.gl = glc;
@@ -81,47 +53,38 @@ export class BlockMesh {
             '2DArray'
         );
         this.texture.nearest();
-        this.indeces = this.generateIndexBuffer(32 * 32 * 32 * 6);
     }
 
     static fromChunk(chunk: Chunk): BlockMesh {
-        const [vertices, sideSquareCount] = meshgenComplex(chunk);
-        return new BlockMesh(vertices, sideSquareCount, chunk);
+        const [vertices, sideElementCount] = meshgenComplex(chunk);
+        return new BlockMesh(vertices, sideElementCount, chunk);
     }
 
     updateFromChunk(chunk: Chunk) {
-        const [vertices, sideSquareCount] = meshgenComplex(chunk);
-        this.update(vertices, sideSquareCount);
+        const [vertices, sideElementCount] = meshgenComplex(chunk);
+        this.update(vertices, sideElementCount);
     }
 
-    update(vertices: Uint8Array, sideSquareCount: number[]) {
+    update(vertices: Uint8Array, sideElementCount: number[]) {
         const gl = BlockMesh.gl;
 
         this.lastUpdated = this.chunk.lastUpdated;
-        this.sideSquareCount = sideSquareCount;
+        this.sideElementCount = sideElementCount;
         this.sideStart = [0, 0, 0, 0, 0, 0];
         for (let i = 1; i < 12; i++) {
             this.sideStart[i] =
-                this.sideStart[i - 1] + this.sideSquareCount[i - 1];
+                this.sideStart[i - 1] + this.sideElementCount[i - 1];
         }
-        for (let i = 0; i < 12; i++) {
-            this.sideStart[i] *= 6 * 4;
-            this.sideSquareCount[i] *= 6;
-        }
-        this.elementCount = this.sideStart[6] / 4;
+        this.elementCount = this.sideStart[6];
         gl.bindVertexArray(this.vao);
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, BlockMesh.indeces);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
         gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
-
-        gl.vertexAttribIPointer(0, 3, gl.UNSIGNED_BYTE, 5, 0);
         gl.enableVertexAttribArray(0);
-
-        gl.vertexAttribIPointer(1, 1, gl.UNSIGNED_BYTE, 5, 3);
         gl.enableVertexAttribArray(1);
-
-        gl.vertexAttribIPointer(2, 1, gl.UNSIGNED_BYTE, 5, 4);
         gl.enableVertexAttribArray(2);
+        gl.vertexAttribIPointer(0, 3, gl.UNSIGNED_BYTE, 5, 0);
+        gl.vertexAttribIPointer(1, 1, gl.UNSIGNED_BYTE, 5, 3);
+        gl.vertexAttribIPointer(2, 1, gl.UNSIGNED_BYTE, 5, 4);
     }
 
     constructor(vertices: Uint8Array, sideSquareCount: number[], chunk: Chunk) {
@@ -176,14 +139,13 @@ export class BlockMesh {
                 continue;
             }
             const curStart = this.sideStart[i + sideOffset];
-            const curEnd = curStart + this.sideSquareCount[i + sideOffset] * 4;
+            const curEnd = curStart + this.sideElementCount[i + sideOffset];
             if (curStart !== end) {
                 if (end !== start) {
-                    BlockMesh.gl.drawElements(
+                    BlockMesh.gl.drawArrays(
                         BlockMesh.gl.TRIANGLES,
-                        (end - start) / 4,
-                        BlockMesh.gl.UNSIGNED_INT,
-                        start
+                        start,
+                        end - start
                     );
                     calls++;
                 }
@@ -192,12 +154,7 @@ export class BlockMesh {
             end = curEnd;
         }
         if (end !== start) {
-            BlockMesh.gl.drawElements(
-                BlockMesh.gl.TRIANGLES,
-                (end - start) / 4,
-                BlockMesh.gl.UNSIGNED_INT,
-                start
-            );
+            BlockMesh.gl.drawArrays(BlockMesh.gl.TRIANGLES, start, end - start);
             calls++;
         }
         return calls;

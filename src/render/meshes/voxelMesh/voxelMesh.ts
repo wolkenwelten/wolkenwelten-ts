@@ -96,7 +96,7 @@ export class VoxelMesh {
             }
 
             const [vertices, elementCount] = meshgenSimple(tmpBlocks);
-            mesh.update(vertices, elementCount * 6);
+            mesh.update(vertices, elementCount);
         }, 0);
         return mesh;
     }
@@ -106,7 +106,6 @@ export class VoxelMesh {
         this.elementCount = elementCount;
         this.vertices = vertices;
         gl.bindVertexArray(this.vao);
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, BlockMesh.indeces);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
         gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
         gl.enableVertexAttribArray(0);
@@ -131,7 +130,7 @@ export class VoxelMesh {
             if (!(blit.vertices instanceof Uint8Array)) {
                 throw new Error('Expected Uint8 vertex buffer');
             }
-            if(blit.vertices.length === 0){
+            if (blit.vertices.length === 0) {
                 // This means a mesh isn't loaded yet, so we just abort the overall blitting since it'll most likely
                 // be loaded in a couple of frames
                 return;
@@ -185,6 +184,6 @@ export class VoxelMesh {
         VoxelMesh.texture.bind(2);
 
         gl.bindVertexArray(this.vao);
-        gl.drawElements(gl.TRIANGLES, this.elementCount, gl.UNSIGNED_INT, 0);
+        gl.drawArrays(gl.TRIANGLES, 0, this.elementCount);
     }
 }

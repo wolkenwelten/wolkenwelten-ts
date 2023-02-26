@@ -69,7 +69,7 @@ export class Frustum {
         return true;
     }
 
-    containsCube(px:number, py:number, pz:number) {
+    containsCube(px: number, py: number, pz: number) {
         const cp = this.cp;
         cp[3] = 1;
         planeLoop: for (const plane of this.planes) {
