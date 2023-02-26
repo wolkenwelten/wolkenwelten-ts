@@ -1,14 +1,13 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { mat4, vec3, vec4 } from 'gl-matrix';
+import { mat4 } from 'gl-matrix';
 
 import { Frustum } from './frustum';
 import { BlockMesh, VoxelMesh } from './asset';
 import { RenderManager } from '../render/render';
 import { Entity } from '../world/entity/entity';
 import { coordinateToWorldKey } from '../world/world';
-import { Chunk } from '../world/chunk/chunk';
 import { VoxelMeshBlit } from './meshes/voxelMesh/voxelMesh';
 
 type GeneratorQueueEntry = {
@@ -24,9 +23,6 @@ type DrawQueueEntry = {
     mask: number;
     alpha: number;
 };
-
-const transPos = new Float32Array([0, 0, 0]);
-const tmpVec4 = new Float32Array([0, 0, 0, 1]);
 
 export class WorldRenderer {
     meshes: Map<number, BlockMesh> = new Map();
@@ -103,9 +99,6 @@ export class WorldRenderer {
         const frustum = this.frustum;
         frustum.build(projectionMatrix, viewMatrix);
         for (const entity of this.renderer.game.world.entities) {
-            tmpVec4[0] = entity.x - 0.5;
-            tmpVec4[1] = entity.y - 0.5;
-            tmpVec4[2] = entity.z - 0.5;
             entity.draw(projectionMatrix, viewMatrix, cam);
         }
         BlockMesh.bindShaderAndTexture(
@@ -128,10 +121,7 @@ export class WorldRenderer {
                     const nx = cx + x * 32;
                     const ny = cy + y * 32;
                     const nz = cz + z * 32;
-                    tmpVec4[0] = nx;
-                    tmpVec4[1] = ny;
-                    tmpVec4[2] = nz;
-                    if (!frustum.containsCube(tmpVec4)) {
+                    if (!frustum.containsCube(nx, ny, nz)) {
                         skipped++;
                         continue;
                     }

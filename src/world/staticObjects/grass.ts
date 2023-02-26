@@ -17,7 +17,7 @@ export class StaticGrass extends StaticObject {
     }
 
     transOff(): [number, number, number] {
-        return [-0.5, 6 / 32, -0.5];
+        return [0.5, 6 / 32, 0.5];
     }
 
     onAttacked(perpetrator: Entity) {

@@ -158,12 +158,14 @@ export const worldgenSurface = (chunk: Chunk) => {
                                 assets.spruceA.blit(chunk, x, gh - 2, z);
                             } else if (rng.bool(400)) {
                                 new Rat(chunk.world, cx, gh + 2, cz);
-                            } else if (rng.bool(500)) {
+                            } else if (rng.bool(300)) {
                                 new StaticStone(chunk, cx, gh + 1, cz);
-                            } else if (rng.bool(400)) {
+                            } else if (rng.bool(300)) {
                                 new StaticStick(chunk, cx, gh + 1, cz);
                             } else if (rng.bool(300)) {
                                 new StaticFlower(chunk, cx, gh + 1, cz);
+                            } else if (rng.bool(300)) {
+                                new StaticGrass(chunk, cx, gh + 1, cz);
                             }
                         }
                     }
