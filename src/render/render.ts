@@ -57,26 +57,6 @@ export class RenderManager {
         if (isFirefox || isSafari || isMobile || isARM) {
             // Reduce default renderDistance due to performance issues
             this.renderDistance = 96;
-            this.game.ui.log.addEntry(
-                `You can manually change that in the Settings menu.`
-            );
-            if (isMobile) {
-                this.game.ui.log.addEntry(
-                    `Reduced render distance, because it looks like this is a mobile device.`
-                );
-            } else if (isSafari) {
-                this.game.ui.log.addEntry(
-                    `Reduced render distance, because it looks like this is Safari.`
-                );
-            } else if (isFirefox) {
-                this.game.ui.log.addEntry(
-                    `Reduced render distance, because it looks like this is Firefox.`
-                );
-            } else if (isARM) {
-                this.game.ui.log.addEntry(
-                    `Reduced render distance, because it looks like this is an ARM device like a RaspberryPI.`
-                );
-            }
         }
     }
 

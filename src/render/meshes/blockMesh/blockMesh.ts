@@ -26,10 +26,12 @@ export class BlockMesh {
     readonly vbo: WebGLBuffer;
     readonly chunk: Chunk;
     lastUpdated = 0;
-    elementCount = 0;
     sideElementCount: number[] = [];
     sideStart: number[] = [];
 
+    /* Initialize all the static members necessary so that we can render blockMeshes. For example we load
+     * textures and compile/link shaders here.
+     */
     static init(game: Game, glc: WebGL2RenderingContext) {
         this.gl = glc;
         this.shader = new Shader(
@@ -55,27 +57,35 @@ export class BlockMesh {
         this.texture.nearest();
     }
 
+    /* Create a new blockMesh with data from chunk. Can be quite slow. */
     static fromChunk(chunk: Chunk): BlockMesh {
         const [vertices, sideElementCount] = meshgenComplex(chunk);
         return new BlockMesh(vertices, sideElementCount, chunk);
     }
 
+    /* Recreate a blockMesh with data from chunk. Doesn't check whether an update is
+     * necessary, so be careful about callingthis too often since it can be quite slow.
+     * Doesn't set this.lastUpdated, so that is something the caller needs to do so that
+     * we don't end up generating the same mesh over and over again.
+     */
     updateFromChunk(chunk: Chunk) {
         const [vertices, sideElementCount] = meshgenComplex(chunk);
         this.update(vertices, sideElementCount);
     }
 
-    update(vertices: Uint8Array, sideElementCount: number[]) {
+    /* Update the buffers of an existing blockMesh, you probably don't want to call this directly,
+     * instead prefer the updateFromChunk method.
+     */
+    private update(vertices: Uint8Array, sideElementCount: number[]) {
         const gl = BlockMesh.gl;
 
         this.lastUpdated = this.chunk.lastUpdated;
         this.sideElementCount = sideElementCount;
-        this.sideStart = [0, 0, 0, 0, 0, 0];
+        this.sideStart = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         for (let i = 1; i < 12; i++) {
             this.sideStart[i] =
                 this.sideStart[i - 1] + this.sideElementCount[i - 1];
         }
-        this.elementCount = this.sideStart[6];
         gl.bindVertexArray(this.vao);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
         gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
@@ -87,7 +97,15 @@ export class BlockMesh {
         gl.vertexAttribIPointer(2, 1, gl.UNSIGNED_BYTE, 5, 4);
     }
 
-    constructor(vertices: Uint8Array, sideSquareCount: number[], chunk: Chunk) {
+    /* Create a new blockMesh from the vertex data contained in vertices, you most likely
+     * don't want to call this directly, instead calling the static method fromChunk to create a new
+     * blockMesh for a specific chunk.
+     */
+    private constructor(
+        vertices: Uint8Array,
+        sideElementCount: number[],
+        chunk: Chunk
+    ) {
         this.x = chunk.x;
         this.y = chunk.y;
         this.z = chunk.z;
@@ -103,9 +121,12 @@ export class BlockMesh {
             throw new Error("Can't create new textMesh vertex buffer!");
         }
         this.vbo = vertex_buffer;
-        this.update(vertices, sideSquareCount);
+        this.update(vertices, sideElementCount);
     }
 
+    /* This function sets all the uniforms that don't change from one chunk to another, like
+     * the texture and such. This needs to be called before drawFast
+     */
     static bindShaderAndTexture(
         projection: mat4,
         modelView: mat4,
@@ -123,15 +144,23 @@ export class BlockMesh {
         BlockMesh.texture.bind(1);
     }
 
-    drawFast(mask: number, alpha: number, sideOffset = 0) {
-        if (this.elementCount === 0 || mask === 0) {
+    /* Draw certain sides of a chunk, which sides are drawn depend on the bits within mask.
+     * We're using drawArrays instead of drawElements because this way we use less memory,
+     * don't have to worry about having enough indeces and at least on the RPI4 drawArrays
+     * is slightly faster than drawArrays.
+     */
+    drawFast(mask: number, alpha: number, sideOffset = 0): number {
+        const elementCount =
+            this.sideStart[sideOffset + 5] +
+            this.sideElementCount[sideOffset + 5];
+        if (elementCount === 0 || mask === 0) {
             return 0;
         }
         BlockMesh.gl.bindVertexArray(this.vao);
         BlockMesh.shader.uniform3f('trans_pos', this.x, this.y, this.z);
         BlockMesh.shader.uniform1f('alpha', alpha);
-        let calls = 0;
 
+        let calls = 0;
         let start = 0;
         let end = 0;
         for (let i = 0; i < 6; i++) {
