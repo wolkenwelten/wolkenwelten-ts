@@ -4,6 +4,7 @@ precision lowp sampler2D;
 
 uniform sampler2D cur_tex;
 uniform mat4 mat_mvp;
+uniform vec3 trans_pos;
 
 layout (location=0) in uvec3 pos;
 layout (location=1) in uint texture_index;
@@ -24,5 +25,6 @@ void main(){
      | a chunk can fit in 5-bits, without this step we would need 16-bit
      | values, per axis...
      */
-	gl_Position = mat_mvp * ((vec4(pos, 1.0) * vec4(1.0/32.0, 1.0/32.0, 1.0/32.0, 1.0)) - vec4(0.5,0.5,0.5,0.0));
+    vec3 npos = vec3(pos) + trans_pos;
+	gl_Position = mat_mvp * ((vec4(npos, 1.0) * vec4(1.0/32.0, 1.0/32.0, 1.0/32.0, 1.0)) - vec4(0.5,0.5,0.5,0.0));
 }

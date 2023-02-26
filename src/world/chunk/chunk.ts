@@ -18,6 +18,7 @@ const coordinateToOffset = (x: number, y: number, z: number) =>
 export class Chunk {
     blocks: Uint8Array;
     lastUpdated: number;
+    staticLastUpdated: number;
     simpleLight: Uint8Array;
     simpleLightLastUpdated = 0;
     x: number;
@@ -33,7 +34,7 @@ export class Chunk {
         this.y = y;
         this.z = z;
         this.world = world;
-        this.lastUpdated = world.game.ticks;
+        this.staticLastUpdated = this.lastUpdated = world.game.ticks;
         this.worldgen();
     }
 
@@ -176,5 +177,15 @@ export class Chunk {
 
     invalidate() {
         this.lastUpdated = this.world.game.ticks;
+    }
+
+    staticAdd(obj: StaticObject) {
+        this.staticLastUpdated = this.world.game.ticks;
+        this.static.add(obj);
+    }
+
+    staticDelete(obj: StaticObject) {
+        this.staticLastUpdated = this.world.game.ticks;
+        this.static.delete(obj);
     }
 }

@@ -23,12 +23,12 @@ export class StaticObject {
         this.y = Math.floor(y);
         this.z = Math.floor(z);
 
-        chunk.static.add(this);
+        chunk.staticAdd(this);
     }
 
     destroy() {
         this.destroyed = true;
-        this.chunk.static.delete(this);
+        this.chunk.staticDelete(this);
     }
 
     onAttacked(perpetrator: Entity) {}

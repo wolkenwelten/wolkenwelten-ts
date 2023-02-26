@@ -160,7 +160,7 @@ export const worldgenSurface = (chunk: Chunk) => {
                                 new Rat(chunk.world, cx, gh + 2, cz);
                             } else if (rng.bool(500)) {
                                 new StaticStone(chunk, cx, gh + 1, cz);
-                            } else if (rng.bool(600)) {
+                            } else if (rng.bool(400)) {
                                 new StaticStick(chunk, cx, gh + 1, cz);
                             } else if (rng.bool(300)) {
                                 new StaticFlower(chunk, cx, gh + 1, cz);

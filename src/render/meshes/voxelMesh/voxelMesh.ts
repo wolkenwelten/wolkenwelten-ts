@@ -14,13 +14,22 @@ import readVox from 'vox-reader';
 
 const tmpBlocks = new Uint8Array(32 * 32 * 32);
 
+export interface VoxelMeshBlit {
+    vertices: Uint8Array | Uint16Array;
+    x: number;
+    y: number;
+    z: number;
+}
+
 export class VoxelMesh {
     static gl: WebGL2RenderingContext;
     static shader: Shader;
     static texture: Texture;
     static colorPalette: Map<number, number> = new Map();
 
+    lastUpdated = 0;
     elementCount = 0;
+    vertices: Uint8Array | Uint16Array;
     readonly vao: WebGLVertexArrayObject;
     readonly vbo: WebGLBuffer;
     size = {
@@ -36,7 +45,7 @@ export class VoxelMesh {
             'voxelMesh',
             shaderVertSource,
             shaderFragSource,
-            ['cur_tex', 'mat_mvp', 'alpha']
+            ['cur_tex', 'mat_mvp', 'alpha', 'trans_pos']
         );
         this.texture = new Texture(this.gl, 'voxelLUT', '', 'LUT');
         this.texture.nearest();
@@ -87,14 +96,15 @@ export class VoxelMesh {
             }
 
             const [vertices, elementCount] = meshgenSimple(tmpBlocks);
-            mesh.update(vertices, elementCount);
+            mesh.update(vertices, elementCount * 6);
         }, 0);
         return mesh;
     }
 
-    update(vertices: Uint8Array, elementCount: number) {
+    update(vertices: Uint8Array | Uint16Array, elementCount: number) {
         const gl = VoxelMesh.gl;
-        this.elementCount = elementCount * 6;
+        this.elementCount = elementCount;
+        this.vertices = vertices;
         gl.bindVertexArray(this.vao);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, BlockMesh.indeces);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
@@ -102,9 +112,48 @@ export class VoxelMesh {
         gl.enableVertexAttribArray(0);
         gl.enableVertexAttribArray(1);
         gl.enableVertexAttribArray(2);
-        gl.vertexAttribIPointer(0, 3, gl.UNSIGNED_BYTE, 5, 0);
-        gl.vertexAttribIPointer(1, 1, gl.UNSIGNED_BYTE, 5, 3);
-        gl.vertexAttribIPointer(2, 1, gl.UNSIGNED_BYTE, 5, 4);
+        if (vertices instanceof Uint16Array) {
+            gl.vertexAttribIPointer(0, 3, gl.UNSIGNED_SHORT, 8, 0);
+            gl.vertexAttribIPointer(1, 1, gl.UNSIGNED_BYTE, 8, 6);
+            gl.vertexAttribIPointer(2, 1, gl.UNSIGNED_BYTE, 8, 7);
+        } else {
+            gl.vertexAttribIPointer(0, 3, gl.UNSIGNED_BYTE, 5, 0);
+            gl.vertexAttribIPointer(1, 1, gl.UNSIGNED_BYTE, 5, 3);
+            gl.vertexAttribIPointer(2, 1, gl.UNSIGNED_BYTE, 5, 4);
+        }
+    }
+
+    updateFromMultiple(blits: VoxelMeshBlit[], ticks: number) {
+        let overallLength = 0;
+        for (const blit of blits) {
+            // We need to increase the size of the position attribute because we need 32*32 distinct values
+            overallLength += (blit.vertices.length / 5) * 8;
+            if (!(blit.vertices instanceof Uint8Array)) {
+                throw new Error('Expected Uint8 vertex buffer');
+            }
+            if(blit.vertices.length === 0){
+                // This means a mesh isn't loaded yet, so we just abort the overall blitting since it'll most likely
+                // be loaded in a couple of frames
+                return;
+            }
+        }
+        const buffer = new Uint8Array(overallLength);
+        const shorts = new Uint16Array(buffer.buffer);
+        let i = 0;
+        for (const blit of blits) {
+            // Now we combine all the vertex buffer into a single one with all vertices translated
+            for (let ii = 0; ii < blit.vertices.length / 5; ii++) {
+                shorts[i * 4] = blit.vertices[ii * 5] + blit.x;
+                shorts[i * 4 + 1] = blit.vertices[ii * 5 + 1] + blit.y;
+                shorts[i * 4 + 2] = blit.vertices[ii * 5 + 2] + blit.z;
+                buffer[i * 8 + 6] = blit.vertices[ii * 5 + 3];
+                buffer[i * 8 + 7] = blit.vertices[ii * 5 + 4];
+                i++;
+            }
+        }
+        const elementCount = ((overallLength / 8) * 3) / 2;
+        this.lastUpdated = ticks;
+        this.update(shorts, elementCount);
     }
 
     constructor() {
@@ -119,9 +168,10 @@ export class VoxelMesh {
             throw new Error("Can't create new textMesh vertex buffer!");
         }
         this.vbo = vertex_buffer;
+        this.vertices = new Uint8Array(0);
     }
 
-    draw(modelViewProjection: mat4, alpha: number) {
+    draw(modelViewProjection: mat4, alpha: number, x = 0, y = 0, z = 0) {
         if (this.elementCount === 0) {
             return;
         }
@@ -129,6 +179,7 @@ export class VoxelMesh {
 
         VoxelMesh.shader.bind();
         VoxelMesh.shader.uniform4fv('mat_mvp', modelViewProjection);
+        VoxelMesh.shader.uniform3f('trans_pos', x, y, z);
         VoxelMesh.shader.uniform1i('cur_tex', 2);
         VoxelMesh.shader.uniform1f('alpha', alpha);
         VoxelMesh.texture.bind(2);

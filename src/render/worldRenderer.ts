@@ -4,10 +4,12 @@
 import { mat4, vec3, vec4 } from 'gl-matrix';
 
 import { Frustum } from './frustum';
-import { BlockMesh } from './asset';
+import { BlockMesh, VoxelMesh } from './asset';
 import { RenderManager } from '../render/render';
 import { Entity } from '../world/entity/entity';
 import { coordinateToWorldKey } from '../world/world';
+import { Chunk } from '../world/chunk/chunk';
+import { VoxelMeshBlit } from './meshes/voxelMesh/voxelMesh';
 
 type GeneratorQueueEntry = {
     dd: number;
@@ -28,6 +30,7 @@ const tmpVec4 = new Float32Array([0, 0, 0, 1]);
 
 export class WorldRenderer {
     meshes: Map<number, BlockMesh> = new Map();
+    staticMeshes: Map<number, VoxelMesh> = new Map();
     renderer: RenderManager;
     generatorQueue: GeneratorQueueEntry[] = [];
     drawQueue: DrawQueueEntry[] = [];
@@ -183,23 +186,49 @@ export class WorldRenderer {
         }
         this.renderer.game.profiler.addAmount('blockMeshDrawCalls', drawCalls);
 
+        let staticCalls = 0;
+
         const mvp = this.mvp;
         mat4.identity(mvp);
-        let staticCalls = 0;
+        mat4.mul(mvp, viewMatrix, mvp);
+        mat4.mul(mvp, projectionMatrix, mvp);
         for (const { mesh } of this.drawQueue) {
-            for (const s of mesh.chunk.static) {
-                const transOff = s.transOff();
-                transPos[0] = s.x + transOff[0];
-                transPos[1] = s.y + transOff[1];
-                transPos[2] = s.z + transOff[2];
-                mat4.identity(mvp);
-                mat4.translate(mvp, mvp, transPos);
-                mat4.mul(mvp, viewMatrix, mvp);
-                mat4.mul(mvp, projectionMatrix, mvp);
-                s.mesh().draw(mvp, 1.0);
-                staticCalls++;
+            if (mesh.chunk.static.size === 0) {
+                continue;
             }
+
+            const key = coordinateToWorldKey(
+                mesh.chunk.x,
+                mesh.chunk.y,
+                mesh.chunk.z
+            );
+            let staticMesh = this.staticMeshes.get(key);
+            if (!staticMesh) {
+                staticMesh = new VoxelMesh();
+                this.staticMeshes.set(key, staticMesh);
+            }
+            if (staticMesh.lastUpdated < mesh.chunk.staticLastUpdated) {
+                const blits: VoxelMeshBlit[] = [];
+                for (const s of mesh.chunk.static) {
+                    const transOff = s.transOff();
+                    const vertices = s.mesh().vertices;
+                    const x = (s.x - s.chunk.x + transOff[0]) * 32;
+                    const y = (s.y - s.chunk.y + transOff[1]) * 32;
+                    const z = (s.z - s.chunk.z + transOff[2]) * 32;
+                    blits.push({ vertices, x, y, z });
+                }
+                staticMesh.updateFromMultiple(blits, mesh.chunk.staticLastUpdated);
+            }
+            staticMesh.draw(
+                mvp,
+                1.0,
+                mesh.chunk.x * 32,
+                mesh.chunk.y * 32,
+                mesh.chunk.z * 32
+            );
+            staticCalls++;
         }
+
         this.renderer.game.profiler.addAmount(
             'staticMeshesDrawCalls',
             staticCalls
