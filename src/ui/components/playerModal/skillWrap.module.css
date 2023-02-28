@@ -151,3 +151,8 @@
     text-shadow: -1px 0px 0px#000, 1px 0px 0px#000, 0px -1px 0px#000,
         0px 1px 0px#000;
 }
+
+.disabledButton {
+    background: linear-gradient(#aaa, #888);
+    cursor: not-allowed;
+}

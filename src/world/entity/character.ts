@@ -16,7 +16,7 @@ import { MaybeItem } from '../item/item';
 import { IronPickaxe } from '../item/tools/ironPickaxe';
 import { IronAxe } from '../item/tools/ironAxe';
 import { Stone } from '../item/material/stone';
-import { CharacterSkill, Skill } from '../skill/skill';
+import { ActiveSkill, CharacterSkill, Skill } from '../skill/skill';
 
 const CHARACTER_ACCELERATION = 0.05;
 const CHARACTER_STOP_RATE = CHARACTER_ACCELERATION * 3.0;
@@ -59,12 +59,15 @@ export class Character extends Entity {
 
     level = 0;
     xp = 0;
+    skillPoints = 0;
+
     weight = 70;
 
     inventory: Inventory;
     skill: Map<string, CharacterSkill> = new Map();
     selectedSkill?: CharacterSkill;
 
+    /* Simple cheat, can be run from the browser console by typing `wolkenwelten.player.getGoodStuff();` */
     getGoodStuff() {
         this.inventory.add(new IronAxe(this.world));
         this.inventory.add(new IronPickaxe(this.world));
@@ -80,6 +83,7 @@ export class Character extends Entity {
         this.skillXpGain('throwing', 100);
     }
 
+    /* Initialize an already existing Character, that way we can easily reuse the same object, */
     init() {
         this.x = this.spawnX;
         this.y = this.spawnY;
@@ -97,12 +101,10 @@ export class Character extends Entity {
         this.miningActive = false;
         this.miningX = this.miningY = this.miningZ = 0;
         this.vx = this.vy = this.vz = 0;
-        this.inventory.clear();
-        this.skill.clear();
 
+        this.skill.clear();
+        this.inventory.clear();
         this.inventory.select(0);
-        this.skillXpGain('heavyStrike', 0);
-        this.selectedSkill = this.skill.get('heavyStrike');
     }
 
     constructor(
@@ -115,16 +117,17 @@ export class Character extends Entity {
         noClip = false
     ) {
         super(world);
+        this.inventory = new Inventory(40);
+        this.init();
         this.spawnX = this.x = x;
         this.spawnY = this.y = y;
         this.spawnZ = this.z = z;
-        this.spawnYaw = yaw;
-        this.spawnPitch = pitch;
-        this.inventory = new Inventory(40);
-        this.init();
+        this.spawnYaw = this.yaw = yaw;
+        this.spawnPitch = this.pitch = pitch;
         this.noClip = noClip;
     }
 
+    /* Damage a character by a certain value, will change in the future to take a Damage argument instead */
     damage(rawAmount: number) {
         this.health = Math.min(
             this.maxHealth,
@@ -138,10 +141,12 @@ export class Character extends Entity {
         }
     }
 
+    /* Heal a character by a certain amount of hit points */
     heal(rawAmount: number) {
         this.damage(-rawAmount);
     }
 
+    /* Try and use a certain amount of mana, returns true when the player had sufficient mana. */
     useMana(amount: number): boolean {
         if (this.mana > amount) {
             this.mana -= amount;
@@ -175,6 +180,7 @@ export class Character extends Entity {
         }
     }
 
+    /* Fly a player in a certain direction */
     fly(ox: number, oy: number, oz: number) {
         const [nox, noy, noz] = this.direction(ox, oy, oz);
         this.movementX = nox;
@@ -432,11 +438,13 @@ export class Character extends Entity {
         return hit;
     }
 
+    /* Callback function that gets called when this Character dies */
     onDeath() {
         this.world.game.audio.play('ungh', 0.2);
         this.init();
     }
 
+    /* Callback function that gets called whenever this character is attacked */
     onAttack(perpetrator: Entity): void {
         this.world.game.render.canvasWrapper.classList.remove('fx-damage');
         this.world.game.render.canvasWrapper.getBoundingClientRect();
@@ -445,10 +453,12 @@ export class Character extends Entity {
         this.world.game.audio.play('ungh', 0.2);
     }
 
+    /* Return true when the character shouldn't be able to do anything */
     isOnCooldown(): boolean {
         return this.world.game.ticks < this.lastAction;
     }
 
+    /* Do a melee attack using whatever item is currently selected */
     strike() {
         if (this.world.game.ticks < this.lastAction) {
             if (this.miningCooldownUntil < this.world.game.ticks) {
@@ -497,6 +507,7 @@ export class Character extends Entity {
         this.selectedSkill?.use();
     }
 
+    /* Drop 1 of the currelty active item */
     dropActiveItem() {
         if (this.world.game.ticks < this.lastAction) {
             return;
@@ -512,6 +523,7 @@ export class Character extends Entity {
         }
     }
 
+    /* Drop the item in the argument in front of the player */
     dropItem(item: MaybeItem) {
         if (!item) {
             return;
@@ -552,6 +564,7 @@ export class Character extends Entity {
         if (this.xpPercentageTillNextLevel() >= 1) {
             this.level++;
             this.maxHealth += 4;
+            this.skillPoints++;
             this.health = this.maxHealth;
             this.world.game.audio.play('levelUp', 0.5);
             this.world.game.ui.log.addEntry(
@@ -585,11 +598,33 @@ export class Character extends Entity {
         }
     }
 
+    skillLearn(skillId: string): boolean {
+        if (this.skillPoints <= 0) {
+            return false;
+        }
+        const skill = this.world.skills.get(skillId);
+        if (!skill) {
+            throw new Error(`Unknown skill: ${skillId}`);
+        }
+        if (!(skill instanceof ActiveSkill)) {
+            throw new Error(
+                `${skillId} is not an active skill that must be learned by spending skill points`
+            );
+        }
+        this.skillPoints--;
+        this.skillXpGain(skillId, 0);
+        return true;
+    }
+
+    skillLearned(skillId: string): boolean {
+        return this.skill.get(skillId) !== undefined;
+    }
+
     skillLevel(skillId: string): number {
         return this.skill.get(skillId)?.level || 0;
     }
 
-    selectSkill(skill?: Skill) {
+    skillSelect(skill?: Skill) {
         if (skill) {
             for (const cs of this.skill.values()) {
                 if (cs.skill === skill) {

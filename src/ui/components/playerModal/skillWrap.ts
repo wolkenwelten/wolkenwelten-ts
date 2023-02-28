@@ -19,6 +19,9 @@ export class SkillWrap {
     list: HTMLElement;
     details: HTMLElement;
 
+    shownSkill?: Skill;
+    selectButton?: HTMLElement;
+
     listElement: Map<string, ListElementEntry> = new Map();
 
     constructor(parent: HTMLElement, game: Game) {
@@ -41,6 +44,7 @@ export class SkillWrap {
 
     showSkill(skill: Skill) {
         this.details.innerHTML = '';
+        this.shownSkill = skill;
 
         const div = document.createElement('div');
         div.classList.add(styles.skillDetails);
@@ -54,14 +58,12 @@ export class SkillWrap {
         div.append(p);
 
         if (skill instanceof ActiveSkill) {
-            const selectButton = document.createElement('button');
-            const that = this;
-            selectButton.innerText = 'Select';
-            selectButton.classList.add(styles.selectButton);
-            selectButton.onclick = () => {
-                that.game.player.selectSkill(skill);
-            };
-            div.append(selectButton);
+            this.selectButton = document.createElement('button');
+            this.selectButton.classList.add(styles.selectButton);
+            this.update();
+            div.append(this.selectButton);
+        } else {
+            this.selectButton = undefined;
         }
 
         this.details.appendChild(div);
@@ -134,7 +136,45 @@ export class SkillWrap {
         this.showSkill(skills[0]);
     }
 
+    updateDetails() {
+        const that = this;
+        const selectButton = this.selectButton;
+        const skill = this.shownSkill;
+        if (!selectButton) {
+            return;
+        }
+        if (!skill) {
+            return;
+        }
+
+        if (that.game.player.skillLearned(skill.id)) {
+            selectButton.innerText = 'Select';
+            selectButton.removeAttribute('title');
+            selectButton.classList.remove(styles.disabledButton);
+            selectButton.onclick = () => {
+                that.game.player.skillSelect(skill);
+            };
+        } else {
+            selectButton.innerText = 'Learn';
+            selectButton.onclick = () => {
+                that.game.player.skillLearn(skill.id);
+                that.update();
+            };
+            if (that.game.player.skillPoints <= 0) {
+                selectButton.classList.add(styles.disabledButton);
+                selectButton.setAttribute(
+                    'title',
+                    `You don't have enough skill points to learn this skill right now, you should get one with your next level up after slaying enough enemeis.`
+                );
+            } else {
+                selectButton.classList.remove(styles.disabledButton);
+                selectButton.removeAttribute('title');
+            }
+        }
+    }
+
     update() {
+        this.updateDetails();
         for (const [
             id,
             { div, level, xpBar, xpCount },

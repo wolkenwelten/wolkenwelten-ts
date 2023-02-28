@@ -25,6 +25,7 @@ export class CharacterWrap {
 <tr><th>Next Level at</th><td stat-key="xpNextLevel"></td></tr>
 <tr><th>Health</th><td stat-key="health"></td></tr>
 <tr><th>Mana</th><td stat-key="mana"></td></tr>
+<tr><th>SkillPoints</th><td stat-key="skillPoints"></td></tr>
 </tbody></table>`;
 
         this.div.append(this.table);
@@ -40,6 +41,7 @@ export class CharacterWrap {
             xpNextLevel: String(player.xpForLevel(this.game.player.level + 1)),
             health: `${player.health}/${player.maxHealth}`,
             mana: `${player.mana}/${player.maxMana}`,
+            skillPoints: String(player.skillPoints),
         } as any;
         for (const td of this.table.querySelectorAll('td')) {
             const key = td.getAttribute('stat-key');
