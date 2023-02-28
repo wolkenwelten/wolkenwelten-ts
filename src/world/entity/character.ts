@@ -113,8 +113,7 @@ export class Character extends Entity {
         y: number,
         z: number,
         yaw: number,
-        pitch: number,
-        noClip = false
+        pitch: number
     ) {
         super(world);
         this.inventory = new Inventory(40);
@@ -124,7 +123,6 @@ export class Character extends Entity {
         this.spawnZ = this.z = z;
         this.spawnYaw = this.yaw = yaw;
         this.spawnPitch = this.pitch = pitch;
-        this.noClip = noClip;
     }
 
     /* Damage a character by a certain value, will change in the future to take a Damage argument instead */

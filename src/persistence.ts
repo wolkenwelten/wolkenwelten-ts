@@ -25,28 +25,7 @@ export class PersistenceManager {
         this.tryToLoad();
     }
 
-    persist() {
-        if (location.hostname !== 'localhost') {
-            return;
-        }
-        const player = this.game.player;
-        const { x, y, z, yaw, pitch } = player;
-
-        const state: PersistentState = {
-            version: 'stateV1',
-            player: {
-                x,
-                y,
-                z,
-                yaw,
-                pitch,
-            },
-        };
-        const stateJson = JSON.stringify(state);
-        window.localStorage.setItem(this.lsKey, stateJson);
-    }
-
-    tryToLoad() {
+    loadState() {
         const stateRaw = window.localStorage.getItem(this.lsKey);
         if (!stateRaw) {
             return;
@@ -65,5 +44,31 @@ export class PersistenceManager {
         } catch {
             window.localStorage.removeItem(this.lsKey);
         }
+    }
+
+    saveState() {
+        const player = this.game.player;
+        const { x, y, z, yaw, pitch } = player;
+
+        const state: PersistentState = {
+            version: 'stateV1',
+            player: {
+                x,
+                y,
+                z,
+                yaw,
+                pitch,
+            },
+        };
+        const stateJson = JSON.stringify(state);
+        window.localStorage.setItem(this.lsKey, stateJson);
+    }
+
+    persist() {
+        //this.saveState();
+    }
+
+    tryToLoad() {
+        //this.loadState();
     }
 }

@@ -18,18 +18,27 @@ export class InputManager {
         window.addEventListener('keydown', (e) => that.keyStates.add(e.code));
         window.addEventListener('keyup', (e) => {
             that.keyStates.delete(e.code);
+            if(!that.game.running || !that.game.ready){
+                return;
+            }
             const handler = that.keyHandler.get(e.code);
             if (handler) {
                 handler();
             }
         });
         this.keyHandler.set('KeyE', () => {
+            if(!that.game.running || !that.game.ready){
+                return;
+            }
             that.toggleInventory();
         });
         this.keyHandler.set('Escape', () => {
             that.closeInventory();
         });
         this.keyHandler.set('KeyN', () => {
+            if(!that.game.running || !that.game.ready){
+                return;
+            }
             that.game.player.noClip = !that.game.player.noClip;
         });
         this.keyHandler.set('Tab', () => {
@@ -40,6 +49,9 @@ export class InputManager {
 
         for (let i = 0; i < 10; i++) {
             this.keyHandler.set(`Digit${(i + 1) % 10}`, () => {
+                if(!that.game.running || !that.game.ready){
+                    return;
+                }
                 this.game.player.inventory.select(i);
             });
         }
@@ -47,19 +59,13 @@ export class InputManager {
         that.game.render.canvasWrapper.addEventListener(
             'mousedown',
             async (e) => {
-                if (this.game.ui.inventory.active) {
-                    this.toggleInventory();
+                if(!that.game.running || !that.game.ready){
+                    return;
                 }
-                if (!document.fullscreenElement) {
-                    that.game.player.cooldown(15);
-                    if (that.game.ui.rootElement.requestFullscreen) {
-                        await that.game.ui.rootElement.requestFullscreen();
-                    }
+                if (that.game.ui.inventory.active) {
+                    that.toggleInventory();
                 }
-                if (!document.pointerLockElement) {
-                    that.game.player.cooldown(15);
-                    await that.game.ui.rootElement.requestPointerLock();
-                }
+                await that.requestFullscreenAndPointerLock();
             },
             false
         );
@@ -67,12 +73,18 @@ export class InputManager {
             that.mouseStates.add(e.button)
         );
         that.game.ui.rootElement.addEventListener('contextmenu', (e) => {
+            if(!that.game.running || !that.game.ready){
+                return;
+            }
             e.preventDefault();
         });
         that.game.ui.rootElement.addEventListener('mouseup', (e) =>
             that.mouseStates.delete(e.button)
         );
         that.game.ui.rootElement.addEventListener('wheel', (e) => {
+            if(!that.game.running || !that.game.ready){
+                return;
+            }
             const newSelection =
                 (that.game.player.inventory.selection +
                     (e.deltaY > 0 ? 1 : -1)) %
@@ -93,6 +105,19 @@ export class InputManager {
             },
             false
         );
+    }
+
+    async requestFullscreenAndPointerLock() {
+        if (!document.fullscreenElement) {
+            this.game.player.cooldown(15);
+            if (this.game.ui.rootElement.requestFullscreen) {
+                await this.game.ui.rootElement.requestFullscreen();
+            }
+        }
+        if (!document.pointerLockElement) {
+            this.game.player.cooldown(15);
+            await this.game.ui.rootElement.requestPointerLock();
+        }
     }
 
     closeInventory() {

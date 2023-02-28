@@ -11,6 +11,7 @@ import { PersistenceManager } from './persistence';
 import { ProfilingManager } from './profiler';
 import { UIManager } from './ui/ui';
 import { World } from './world/world';
+import { Options } from './options';
 
 export interface GameConfig {
     parent: HTMLElement;
@@ -31,21 +32,24 @@ export class Game {
     profiler: ProfilingManager;
     render: RenderManager;
     ui: UIManager;
+    options: Options;
     world: World;
 
     ticks = 1;
     startTime = +Date.now();
     ready = false;
+    running = false;
 
     constructor(config: GameConfig) {
         this.config = config;
+        this.options = new Options();
         this.profiler = ProfilingManager.profiler();
         this.add = new AdditionManager(this);
         this.world = new World(this);
         this.player = new Character(
             this.world,
             2,
-            0,
+            -1,
             955,
             Math.PI * 0.25,
             -Math.PI / 18
@@ -69,7 +73,7 @@ export class Game {
 
     // Run the game for a single tick
     update() {
-        if (!this.ready) {
+        if (!this.ready || !this.running) {
             return;
         }
         let ticksRun = 0;

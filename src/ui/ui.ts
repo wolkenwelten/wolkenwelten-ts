@@ -12,6 +12,7 @@ import { XpView } from './components/xpView';
 import { IconManager } from './icon';
 import { MaybeItem } from '../world/item/item';
 import { PlayerModal } from './components/playerModal/playerModal';
+import { IntroWindow } from './components/introWindow';
 
 export class UIManager {
     game: Game;
@@ -25,15 +26,21 @@ export class UIManager {
     log: SystemLog;
     healthOrb: HealthOrb;
     xpView: XpView;
+    introWindow: IntroWindow;
+
+    rootHasPaused = false;
 
     constructor(game: Game) {
         this.game = game;
         this.rootElement = game.config.parent;
+        this.rootElement.setAttribute('paused', 'false');
+
+        this.icon = new IconManager(this);
 
         this.uiWrapper = document.createElement('div');
         this.uiWrapper.id = 'wolkenwelten-ui-root';
         this.rootElement.append(this.uiWrapper);
-        this.icon = new IconManager(this);
+
         new FpsCounter(this.uiWrapper, game);
         new Crosshair(this.uiWrapper);
         this.xpView = new XpView(this.uiWrapper, game);
@@ -42,6 +49,8 @@ export class UIManager {
         this.hotbar = new Hotbar(this.uiWrapper, game);
         this.cursorItem = new CursorItem(this.uiWrapper);
         this.healthOrb = new HealthOrb(this.uiWrapper, game);
+        this.introWindow = new IntroWindow(this.uiWrapper, game);
+
         game.player.inventory.onChange = this.updateInventory.bind(this);
     }
 
@@ -51,6 +60,18 @@ export class UIManager {
     }
 
     update() {
+        if(this.game.running){
+            if(this.rootHasPaused){
+                this.rootElement.setAttribute("paused", "false");
+                this.rootHasPaused = false;
+            }
+        } else {
+            if(!this.rootHasPaused){
+                this.rootElement.setAttribute("paused", "true");
+                this.rootHasPaused = true;
+            }
+        }
+
         this.healthOrb.update();
         this.xpView.update();
     }

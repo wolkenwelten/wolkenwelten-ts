@@ -1,3 +1,7 @@
+div[paused="true"] .crosshair {
+    display:none;
+}
+
 .crosshair {
     position: absolute;
     top: 50%;

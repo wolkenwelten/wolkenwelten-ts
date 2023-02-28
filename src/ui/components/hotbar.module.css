@@ -1,3 +1,7 @@
+div[paused="true"] .hotbar {
+    display:none;
+}
+
 .hotbar {
     position: absolute;
     left: 50%;

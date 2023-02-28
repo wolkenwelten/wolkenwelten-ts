@@ -199,14 +199,15 @@ export class RenderManager {
 
     drawFrame() {
         window.requestAnimationFrame(this.drawFrameClosure);
-        this.game.input.update();
         this.game.ui.update();
-        this.game.update();
-        if (!this.game.ready || !allTexturesLoaded()) {
-            return;
-        }
+
         this.frames++;
         this.fpsCounter++;
+        if (!this.game.ready || !this.game.running || !allTexturesLoaded()) {
+            return;
+        }
+        this.game.input.update();
+        this.game.update();
 
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
         this.drawScene();

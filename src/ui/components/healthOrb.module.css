@@ -1,4 +1,5 @@
-.healthWrap {
+div[paused="true"] .healthWrap {
+    display:none;
 }
 
 .manaOrbWrap,
