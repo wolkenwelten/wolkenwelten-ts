@@ -12,7 +12,7 @@ import { ItemDrop } from './item/itemDrop';
 import { StoneAxe } from './item/tools/stoneAxe';
 import { StonePickaxe } from './item/tools/stonePickaxe';
 import { Stick } from './item/material/stick';
-import { MaybeItem } from './item/item';
+import { Item, MaybeItem } from './item/item';
 import { IronPickaxe } from './item/tools/ironPickaxe';
 import { IronAxe } from './item/tools/ironAxe';
 import { Stone } from './item/material/stone';
@@ -107,6 +107,24 @@ export class Character extends Being {
         this.skill.clear();
         this.inventory.clear();
         this.equipment.clear();
+        this.equipment.mayPut = (index: number, item: Item): boolean => {
+            switch (index) {
+                case 0:
+                    return item.isWeapon;
+                case 1:
+                    return item.isShield;
+                case 2:
+                    return item.isHeadwear;
+                case 3:
+                    return item.isTorsowear;
+                case 4:
+                    return item.isLegwear;
+                case 5:
+                    return item.isFootwear;
+                default:
+                    return false;
+            }
+        };
         this.inventory.select(0);
     }
 
@@ -218,9 +236,9 @@ export class Character extends Being {
     }
 
     updateMana() {
-        if (this.world.game.ticks > this.nextManaRegen) {
-            this.nextManaRegen = this.world.game.ticks + 100;
-            this.mana++;
+        while (this.world.game.ticks > this.nextManaRegen) {
+            this.nextManaRegen += 5;
+            this.mana += 0.05;
         }
         this.mana = Math.max(0, Math.min(this.maxMana, this.mana));
     }

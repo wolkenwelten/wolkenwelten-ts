@@ -13,6 +13,7 @@ import { registerClass } from '../../../class';
 
 export class Club extends Item {
     attackSkill = ['clubmanship', 'onehanded'];
+    isWeapon = true;
 
     constructor(world: World, name = 'Club') {
         super(world, name);

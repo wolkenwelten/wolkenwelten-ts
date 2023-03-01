@@ -13,6 +13,7 @@ import { registerClass } from '../../../class';
 
 export class Stick extends StackableItem {
     attackSkill = ['onehanded'];
+    isWeapon = true;
 
     constructor(world: World, amount = 1) {
         super(world, amount, 'Stick');

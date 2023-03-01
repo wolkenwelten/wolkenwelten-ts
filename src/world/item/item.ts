@@ -21,6 +21,13 @@ export class Item {
     destroyed = false;
     attackSkill: string[] = [];
 
+    isWeapon = false;
+    isShield = false;
+    isHeadwear = false;
+    isTorsowear = false;
+    isLegwear = false;
+    isFootwear = false;
+
     constructor(world: World, name: string) {
         this.id = ++idCounter;
         this.name = name;

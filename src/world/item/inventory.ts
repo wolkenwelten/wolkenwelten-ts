@@ -20,6 +20,10 @@ export class Inventory {
         return this.items[this.selection];
     }
 
+    mayPut(index: number, item: Item): boolean {
+        return true;
+    }
+
     add(item: Item): boolean {
         item.addToExistingStacks(this);
         if (item.destroyed) {

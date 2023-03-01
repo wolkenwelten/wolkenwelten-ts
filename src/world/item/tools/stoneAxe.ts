@@ -12,6 +12,7 @@ import { Character } from '../../character';
 import { registerClass } from '../../../class';
 
 export class StoneAxe extends Item {
+    isWeapon = true;
     attackSkill = ['axefighting', 'onehanded'];
 
     constructor(world: World, name = 'Stone Axe') {

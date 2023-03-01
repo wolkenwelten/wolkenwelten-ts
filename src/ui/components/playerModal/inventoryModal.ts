@@ -133,8 +133,8 @@ export class InventoryWrap {
             level: String(player.level + 1),
             xp: String(player.xp),
             xpNextLevel: String(player.xpForLevel(this.game.player.level + 1)),
-            health: `${player.health}/${player.maxHealth}`,
-            mana: `${player.mana}/${player.maxMana}`,
+            health: `${Math.round(player.health)}/${player.maxHealth}`,
+            mana: `${Math.round(player.mana)}/${player.maxMana}`,
             skillPoints: String(player.skillPoints),
         } as any;
         for (const td of this.characterWrap.querySelectorAll('td')) {

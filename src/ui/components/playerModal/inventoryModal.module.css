@@ -1,6 +1,7 @@
 .inventoryWrap {
     display: table;
     text-align: left;
+    padding: 8px;
 }
 
 .equipmentWrap {

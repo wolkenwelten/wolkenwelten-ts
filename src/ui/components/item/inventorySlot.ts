@@ -81,18 +81,22 @@ export class InventorySlot {
                         b.amount++;
                     }
                 } else if (b === undefined) {
-                    const newStack = a.clone();
-                    newStack.amount = 1;
-                    a.amount--;
-                    this.inventory.items[this.slotIndex] = newStack;
+                    if (this.inventory.mayPut(this.slotIndex, a)) {
+                        const newStack = a.clone();
+                        newStack.amount = 1;
+                        a.amount--;
+                        this.inventory.items[this.slotIndex] = newStack;
+                    }
                 }
                 if (a.amount < 1) {
                     a.destroy();
                     this.game.ui.heldItem = undefined;
                 }
             } else if (a instanceof Item) {
-                this.inventory.items[this.slotIndex] = a;
-                this.game.ui.heldItem = b;
+                if (this.inventory.mayPut(this.slotIndex, a)) {
+                    this.inventory.items[this.slotIndex] = a;
+                    this.game.ui.heldItem = b;
+                }
             }
         }
 
@@ -127,8 +131,10 @@ export class InventorySlot {
                     this.game.ui.heldItem = undefined;
                 }
             } else if (a instanceof Item) {
-                this.inventory.items[this.slotIndex] = a;
-                this.game.ui.heldItem = b;
+                if (this.inventory.mayPut(this.slotIndex, a)) {
+                    this.inventory.items[this.slotIndex] = a;
+                    this.game.ui.heldItem = b;
+                }
             }
         }
 
