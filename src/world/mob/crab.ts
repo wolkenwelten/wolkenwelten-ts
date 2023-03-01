@@ -1,20 +1,23 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { VoxelMesh } from '../../../render/asset';
-import { World } from '../../world';
+import { VoxelMesh } from '../../render/asset';
+import { World } from '../world';
 import { Mob } from './mob';
-import { CrabMeatRaw } from '../../item/food/crabMeatRaw';
-import { Entity } from '../entity';
-import { radianDifference } from '../../../util/math';
+import { CrabMeatRaw } from '../item/food/crabMeatRaw';
+import { Entity } from '../entity/entity';
+import { radianDifference } from '../../util/math';
+import { registerClass } from '../../class';
 
-import voxelCrabIdle0File from '../../../../assets/vox/crab/idle_0.vox?url';
-import voxelCrabIdle1File from '../../../../assets/vox/crab/idle_1.vox?url';
-import voxelCrabWalk0File from '../../../../assets/vox/crab/walk_0.vox?url';
-import voxelCrabWalk1File from '../../../../assets/vox/crab/walk_1.vox?url';
-import voxelCrabAttack0File from '../../../../assets/vox/crab/attack_0.vox?url';
-import voxelCrabAttack1File from '../../../../assets/vox/crab/attack_1.vox?url';
-import voxelCrabDead0File from '../../../../assets/vox/crab/dead_0.vox?url';
+import voxelCrabIdle0File from '../../../assets/vox/crab/idle_0.vox?url';
+import voxelCrabIdle1File from '../../../assets/vox/crab/idle_1.vox?url';
+import voxelCrabWalk0File from '../../../assets/vox/crab/walk_0.vox?url';
+import voxelCrabWalk1File from '../../../assets/vox/crab/walk_1.vox?url';
+import voxelCrabAttack0File from '../../../assets/vox/crab/attack_0.vox?url';
+import voxelCrabAttack1File from '../../../assets/vox/crab/attack_1.vox?url';
+import voxelCrabDead0File from '../../../assets/vox/crab/dead_0.vox?url';
+import { Being } from '../entity/being';
+import { ItemDrop } from '../item/itemDrop';
 
 export type CrabState =
     | 'idle'
@@ -35,7 +38,7 @@ export class Crab extends Mob {
     gvx = 0;
     gvz = 0;
 
-    aggroTarget?: Entity;
+    aggroTarget?: Being;
     health = 12;
     maxHealth = 12;
     level = 2;
@@ -62,7 +65,8 @@ export class Crab extends Mob {
             return;
         }
         this.world.game.render.particle.fxDeath(this.x, this.y, this.z);
-        this.world.game.add.itemDrop(
+        new ItemDrop(
+            this.world,
             this.x + (Math.random() - 0.5) * 0.3,
             this.y,
             this.z + (Math.random() - 0.5) * 0.3,
@@ -74,7 +78,7 @@ export class Crab extends Mob {
     }
 
     onAttack(perpetrator: Entity): void {
-        if (this.isDead) {
+        if (this.isDead || !(perpetrator instanceof Being)) {
             return;
         }
         this.aggroTarget = perpetrator;
@@ -344,3 +348,4 @@ export class Crab extends Mob {
         this.vy -= 0.005;
     }
 }
+registerClass(Crab);

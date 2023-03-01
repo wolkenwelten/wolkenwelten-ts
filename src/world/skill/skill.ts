@@ -1,7 +1,8 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { Character } from '../entity/character';
+import { registerClass } from '../../class';
+import { Character } from '../character';
 import { Entity } from '../entity/entity';
 import { World } from '../world';
 import { addDefaultSkills } from './skillDefaults';
@@ -51,6 +52,7 @@ export class CharacterSkill {
         return this.level === this.skill.maxLevel;
     }
 }
+registerClass(CharacterSkill);
 
 export class Skill {
     readonly id: string;
@@ -82,6 +84,7 @@ export class Skill {
         return false;
     }
 }
+registerClass(Skill);
 
 export class ActiveSkill extends Skill {
     readonly maxLevel = 1;
@@ -103,6 +106,7 @@ export class ActiveSkill extends Skill {
         return this.useCB(e, skillLevel);
     }
 }
+registerClass(ActiveSkill);
 
 export class SkillSystem {
     world: World;
@@ -141,3 +145,4 @@ export class SkillSystem {
         addDefaultSkills(this);
     }
 }
+registerClass(SkillSystem);

@@ -147,7 +147,7 @@ export class SkillWrap {
             return;
         }
 
-        if (that.game.player.skillLearned(skill.id)) {
+        if (that.game.player.skillIsLearned(skill.id)) {
             selectButton.innerText = 'Select';
             selectButton.removeAttribute('title');
             selectButton.classList.remove(styles.disabledButton);

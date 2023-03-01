@@ -1,5 +1,5 @@
-div[paused="true"] .hotbar {
-    display:none;
+div[paused='true'] .hotbar {
+    display: none;
 }
 
 .hotbar {

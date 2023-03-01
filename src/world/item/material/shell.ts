@@ -7,6 +7,7 @@ import { World } from '../../world';
 import itemIcon from '../../../../assets/gfx/items/shell.png';
 import meshUrl from '../../../../assets/vox/items/shell.vox?url';
 import { StackableItem } from '../stackableItem';
+import { registerClass } from '../../../class';
 
 export class Shell extends StackableItem {
     constructor(world: World, amount = 1) {
@@ -21,3 +22,4 @@ export class Shell extends StackableItem {
         return world.game.render.assets.get(meshUrl);
     }
 }
+registerClass(Shell);

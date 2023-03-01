@@ -18,6 +18,7 @@ import voxTreeC from '../../../assets/wg/tree_c.vox?url';
 import voxSpruceA from '../../../assets/wg/spruce_a.vox?url';
 
 import { Chunk } from '../chunk/chunk';
+import { registerClass } from '../../class';
 
 export class WorldgenAsset {
     w: number;
@@ -66,6 +67,7 @@ export class WorldgenAsset {
         return x + this.w < 32 && y + this.h < 32 && z + this.d < 32;
     }
 }
+registerClass(WorldgenAsset);
 
 export interface WorldgenAssetList {
     bushA: WorldgenAsset;
@@ -152,3 +154,4 @@ export class WorldgenAssetManager {
         });
     }
 }
+registerClass(WorldgenAssetManager);

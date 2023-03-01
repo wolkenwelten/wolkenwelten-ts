@@ -2,14 +2,14 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import { Chunk } from '../chunk/chunk';
-import { Crab } from '../entity/mob/crab';
-import { Rat } from '../entity/mob/rat';
+import { Crab } from '../mob/crab';
+import { Rat } from '../mob/rat';
 import { LCG } from '../../util/prng';
-import { StaticShell } from '../staticObjects/shell';
-import { StaticFlower } from '../staticObjects/flower';
-import { StaticGrass } from '../staticObjects/grass';
-import { StaticStone } from '../staticObjects/stone';
-import { StaticStick } from '../staticObjects/stick';
+import { StaticShell } from '../staticObject/shell';
+import { StaticFlower } from '../staticObject/flower';
+import { StaticGrass } from '../staticObject/grass';
+import { StaticStone } from '../staticObject/stone';
+import { StaticStick } from '../staticObject/stick';
 
 const grassHeight = (x: number, z: number): number => {
     const d = Math.sqrt(x * x + z * z);

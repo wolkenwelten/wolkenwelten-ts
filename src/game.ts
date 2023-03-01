@@ -2,9 +2,9 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 
-import { Character } from './world/entity/character';
-import { AdditionManager } from './add';
+import { Character } from './world/character';
 import { AudioManager } from './audio';
+import { classes, ClassType } from './class';
 import { InputManager } from './input';
 import { RenderManager } from './render/render';
 import { PersistenceManager } from './persistence';
@@ -22,10 +22,10 @@ export interface BlockTypeRegistry {
 }
 
 export class Game {
-    add: AdditionManager;
     audio: AudioManager;
     blocks: BlockTypeRegistry = {};
     config: GameConfig;
+    class: Record<string, ClassType>;
     input: InputManager;
     persistence: PersistenceManager;
     player: Character;
@@ -44,7 +44,7 @@ export class Game {
         this.config = config;
         this.options = new Options();
         this.profiler = ProfilingManager.profiler();
-        this.add = new AdditionManager(this);
+        this.class = classes;
         this.world = new World(this);
         this.player = new Character(
             this.world,

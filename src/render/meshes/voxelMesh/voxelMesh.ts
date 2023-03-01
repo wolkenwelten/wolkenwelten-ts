@@ -9,7 +9,7 @@ import shaderVertSource from './voxelMesh.vert?raw';
 import shaderFragSource from './voxelMesh.frag?raw';
 import { mat4 } from 'gl-matrix';
 import { BlockMesh } from '../blockMesh/blockMesh';
-import { meshgenSimple } from '../meshgen';
+import { meshgenVoxelMesh } from '../meshgen';
 import readVox from 'vox-reader';
 
 const tmpBlocks = new Uint8Array(32 * 32 * 32);
@@ -95,7 +95,7 @@ export class VoxelMesh {
                 tmpBlocks[off] = VoxelMesh.colorLookup(rgb);
             }
 
-            const [vertices, elementCount] = meshgenSimple(tmpBlocks);
+            const [vertices, elementCount] = meshgenVoxelMesh(tmpBlocks);
             mesh.update(vertices, elementCount);
         }, 0);
         return mesh;

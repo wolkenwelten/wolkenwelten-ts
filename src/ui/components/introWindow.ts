@@ -28,11 +28,11 @@ export class IntroWindow {
         <tr><th>Sneak</th><td>Shift</td><td>Right shoulder button</td></tr>
 
         </table>
-        `
+        `;
 
         const startButton = document.createElement('div');
         startButton.classList.add(styles.startButton);
-        startButton.innerText = "Start";
+        startButton.innerText = 'Start';
         startButton.onclick = () => {
             game.running = true;
             game.input.requestFullscreenAndPointerLock();
@@ -40,7 +40,7 @@ export class IntroWindow {
         this.div.append(startButton);
         parent.append(this.div);
 
-        if(game.options.skipMenu){
+        if (game.options.skipMenu) {
             game.running = true;
         }
         startButton.focus();

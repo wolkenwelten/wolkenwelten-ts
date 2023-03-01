@@ -3,12 +3,13 @@
  */
 import { TriangleMesh, VoxelMesh } from '../../render/asset';
 import { Entity } from '../entity/entity';
-import { ItemDrop } from '../entity/itemDrop';
+import { ItemDrop } from './itemDrop';
 import { World } from '../world';
 import { Inventory } from './inventory';
 
 import itemIcon from '../../../assets/gfx/items/crabMeatRaw.png';
-import { Character } from '../entity/character';
+import { Character } from '../character';
+import { registerClass } from '../../class';
 let idCounter = 0;
 
 export type MaybeItem = Item | undefined;
@@ -64,8 +65,6 @@ export class Item {
         }
     }
 
-    onMineWith(e: Entity, block: number) {}
-
     dropAll(e: Entity): boolean {
         const drop = new ItemDrop(e.world, e.x, e.y, e.z, this);
         const [vx, vz] = e.walkDirection();
@@ -85,4 +84,6 @@ export class Item {
     }
 
     addToExistingStacks(inventory: Inventory) {}
+    onMineWith(e: Entity, block: number) {}
 }
+registerClass(Item);

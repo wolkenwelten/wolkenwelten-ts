@@ -8,7 +8,8 @@ import { World } from '../../world';
 import itemIcon from '../../../../assets/gfx/items/stonePickaxe.png';
 import meshUrl from '../../../../assets/vox/items/stonePickaxe.vox?url';
 import { Item } from '../item';
-import { Character } from '../../entity/character';
+import { Character } from '../../character';
+import { registerClass } from '../../../class';
 
 export class StonePickaxe extends Item {
     attackSkill = ['pickeneering', 'onehanded'];
@@ -52,3 +53,4 @@ export class StonePickaxe extends Item {
         return world.game.render.assets.get(meshUrl);
     }
 }
+registerClass(StonePickaxe);

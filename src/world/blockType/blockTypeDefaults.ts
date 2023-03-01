@@ -2,7 +2,7 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import blockTextureUrl from '../../../assets/gfx/blocks.png';
-import { ItemDrop } from '../entity/itemDrop';
+import { ItemDrop } from '../item/itemDrop';
 
 import { BlockItem } from '../item/blockItem';
 import { MaybeItem } from '../item/item';

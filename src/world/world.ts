@@ -2,7 +2,7 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import { Game } from '../game';
-import { DangerZone } from './dangerZone';
+import { DangerZone } from './chunk/dangerZone';
 import { Entity } from './entity/entity';
 import { Chunk } from './chunk/chunk';
 import { BlockType } from './blockType/blockType';
@@ -11,6 +11,7 @@ import { WorldgenAssetManager } from './worldgen/assets';
 import { CraftingSystem } from './crafting/crafting';
 import { SkillSystem } from './skill/skill';
 import { initDefaultBlocks } from './blockType/blockTypeDefaults';
+import { registerClass } from '../class';
 
 export const coordinateToWorldKey = (x: number, y: number, z: number) =>
     ((Math.floor(x) >> 5) & 0xffff) +
@@ -160,3 +161,4 @@ export class World {
         }
     }
 }
+registerClass(World);

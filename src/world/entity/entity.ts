@@ -2,6 +2,7 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import { mat4 } from 'gl-matrix';
+import { registerClass } from '../../class';
 import { TriangleMesh, VoxelMesh } from '../../render/asset';
 import { World } from '../world';
 
@@ -11,6 +12,7 @@ const transPos = new Float32Array([0, 0, 0]);
 
 export class Entity {
     id: number;
+
     x = 0;
     y = 0;
     z = 0;
@@ -20,17 +22,11 @@ export class Entity {
 
     yaw = 0;
     pitch = 0;
-    roll = 0;
 
-    destroyed = false;
     noClip = false;
+    destroyed = false;
     world: World;
-
-    health = 12;
-    maxHealth = 12;
-    isDead = false;
-    level = 0;
-    weight = 1;
+    weight = 1; // Necessary for physics calculations
 
     constructor(world: World) {
         this.id = ++entityCounter;
@@ -83,21 +79,8 @@ export class Entity {
 
     onDeath() {}
     onAttack(perpetrator: Entity) {}
-
-    damage(rawAmount: number) {
-        this.health = Math.min(
-            this.maxHealth,
-            Math.max(0, this.health - rawAmount)
-        );
-        if (this.health <= 0) {
-            this.isDead = true;
-            this.onDeath();
-        }
-    }
-
-    heal(rawAmount: number) {
-        return this.damage(-rawAmount);
-    }
+    damage(rawAmount: number) {}
+    heal(rawAmount: number) {}
 
     update() {
         if (this.noClip) {
@@ -210,3 +193,4 @@ export class Entity {
         }
     }
 }
+registerClass(Entity);

@@ -3,7 +3,7 @@
  */
 import styles from './xpView.module.css';
 import { Game } from '../../game';
-import { Character } from '../../world/entity/character';
+import { Character } from '../../world/character';
 
 export class XpView {
     game: Game;

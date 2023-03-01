@@ -9,6 +9,7 @@ import itemIcon from '../../../../assets/gfx/items/ironPickaxe.png';
 import meshUrl from '../../../../assets/vox/items/ironPickaxe.vox?url';
 import { Item } from '../item';
 import { StonePickaxe } from './stonePickaxe';
+import { registerClass } from '../../../class';
 
 export class IronPickaxe extends StonePickaxe {
     attackSkill = ['pickeneering', 'onehanded'];
@@ -37,3 +38,4 @@ export class IronPickaxe extends StonePickaxe {
         return world.game.render.assets.get(meshUrl);
     }
 }
+registerClass(IronPickaxe);

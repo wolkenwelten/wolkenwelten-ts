@@ -1,23 +1,23 @@
-div[paused="true"] {
+div[paused='true'] {
     background: linear-gradient(#17e, #2af);
 }
 
-div[paused="false"] .introWindow {
-    display:none;
+div[paused='false'] .introWindow {
+    display: none;
 }
 
 .introWindow {
-    position:absolute;
+    position: absolute;
     height: 100%;
-    max-height:660px;
+    max-height: 660px;
     overflow-y: auto;
     display: block;
-    max-width:800px;
-    width:100%;
-    left:50%;
-    top:50%;
+    max-width: 800px;
+    width: 100%;
+    left: 50%;
+    top: 50%;
     transform: translate(-50%, -50%);
-    padding:12px 12px 48px;
+    padding: 12px 12px 48px;
     font-size: 1.3rem;
     background: #667;
     border-radius: 4px;
@@ -26,8 +26,8 @@ div[paused="false"] .introWindow {
     border-bottom: solid 1px #445;
     border-right: solid 1px #445;
     font-family: 'Courier New', Courier, monospace;
-    border-radius:4px;
-    z-index:1000;
+    border-radius: 4px;
+    z-index: 1000;
     box-sizing: border-box;
 }
 
@@ -35,14 +35,14 @@ div[paused="false"] .introWindow {
     background: linear-gradient(gold, goldenrod);
     border: none;
     cursor: pointer;
-    position:absolute;
-    left:50%;
-    bottom:0;
+    position: absolute;
+    left: 50%;
+    bottom: 0;
     transform: translateX(-50%);
-    margin:1em 0;
-    width:100px;
-    text-align:center;
-    display:block;
+    margin: 1em 0;
+    width: 100px;
+    text-align: center;
+    display: block;
     border-radius: 2px;
     color: #fff;
     padding: 2px 6px;

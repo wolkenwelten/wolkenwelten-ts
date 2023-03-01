@@ -1,19 +1,21 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { VoxelMesh } from '../../../render/asset';
-import { World } from '../../world';
+import { VoxelMesh } from '../../render/asset';
+import { World } from '../world';
 import { Mob } from './mob';
-import { Entity } from '../entity';
-import { radianDifference } from '../../../util/math';
+import { Entity } from '../entity/entity';
+import { radianDifference } from '../../util/math';
 
-import voxelIdle0File from '../../../../assets/vox/rat/idle0.vox?url';
-import voxelIdle1File from '../../../../assets/vox/rat/idle1.vox?url';
-import voxelWalk0File from '../../../../assets/vox/rat/walk0.vox?url';
-import voxelWalk1File from '../../../../assets/vox/rat/walk1.vox?url';
-import voxelAttack0File from '../../../../assets/vox/rat/attack0.vox?url';
-import voxelAttack1File from '../../../../assets/vox/rat/attack1.vox?url';
-import voxelDamage0File from '../../../../assets/vox/rat/damage0.vox?url';
+import voxelIdle0File from '../../../assets/vox/rat/idle0.vox?url';
+import voxelIdle1File from '../../../assets/vox/rat/idle1.vox?url';
+import voxelWalk0File from '../../../assets/vox/rat/walk0.vox?url';
+import voxelWalk1File from '../../../assets/vox/rat/walk1.vox?url';
+import voxelAttack0File from '../../../assets/vox/rat/attack0.vox?url';
+import voxelAttack1File from '../../../assets/vox/rat/attack1.vox?url';
+import voxelDamage0File from '../../../assets/vox/rat/damage0.vox?url';
+import { Being } from '../entity/being';
+import { registerClass } from '../../class';
 
 export type RatState =
     | 'idle'
@@ -34,7 +36,7 @@ export class Rat extends Mob {
     gvx = 0;
     gvz = 0;
 
-    aggroTarget?: Entity;
+    aggroTarget?: Being;
     health = 8;
     maxHealth = 8;
     level = 2;
@@ -67,7 +69,7 @@ export class Rat extends Mob {
     }
 
     onAttack(perpetrator: Entity): void {
-        if (this.isDead) {
+        if (this.isDead || !(perpetrator instanceof Being)) {
             return;
         }
         this.aggroTarget = perpetrator;
@@ -330,3 +332,4 @@ export class Rat extends Mob {
         this.vy -= 0.005;
     }
 }
+registerClass(Rat);

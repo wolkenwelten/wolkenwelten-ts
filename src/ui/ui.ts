@@ -60,14 +60,14 @@ export class UIManager {
     }
 
     update() {
-        if(this.game.running){
-            if(this.rootHasPaused){
-                this.rootElement.setAttribute("paused", "false");
+        if (this.game.running) {
+            if (this.rootHasPaused) {
+                this.rootElement.setAttribute('paused', 'false');
                 this.rootHasPaused = false;
             }
         } else {
-            if(!this.rootHasPaused){
-                this.rootElement.setAttribute("paused", "true");
+            if (!this.rootHasPaused) {
+                this.rootElement.setAttribute('paused', 'true');
                 this.rootHasPaused = true;
             }
         }

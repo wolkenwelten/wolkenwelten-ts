@@ -8,6 +8,7 @@ import { World } from '../../world';
 import itemIcon from '../../../../assets/gfx/items/coal.png';
 import meshUrl from '../../../../assets/vox/items/coal.vox?url';
 import { StackableItem } from '../stackableItem';
+import { registerClass } from '../../../class';
 
 export class Coal extends StackableItem {
     constructor(world: World, amount = 1) {
@@ -26,3 +27,4 @@ export class Coal extends StackableItem {
         return world.game.render.assets.get(meshUrl);
     }
 }
+registerClass(Coal);

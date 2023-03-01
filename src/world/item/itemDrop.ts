@@ -1,11 +1,12 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { Entity } from './entity';
+import { Entity } from '../entity/entity';
 import { World } from '../world';
-import { Item } from '../item/item';
+import { Item } from './item';
 import { mat4 } from 'gl-matrix';
 import { TriangleMesh, VoxelMesh } from '../../render/asset';
+import { registerClass } from '../../class';
 
 const transPos = new Float32Array([0, 0, 0]);
 const modelViewMatrix = mat4.create();
@@ -84,3 +85,4 @@ export class ItemDrop extends Entity {
         this.mesh().draw(modelViewMatrix, alpha);
     }
 }
+registerClass(ItemDrop);

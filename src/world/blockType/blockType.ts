@@ -2,10 +2,11 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import { BlockItem } from '../item/blockItem';
-import { ItemDrop } from '../entity/itemDrop';
+import { ItemDrop } from '../item/itemDrop';
 import { World } from '../world';
 import { Item, MaybeItem } from '../item/item';
 import { abgrToRgba } from '../../util/math';
+import { registerClass } from '../../class';
 
 export type MiningCat = 'Pickaxe' | 'Axe';
 export type BlockTypeItemDropHandler = (
@@ -176,3 +177,4 @@ export class BlockType {
         return this;
     }
 }
+registerClass(BlockType);

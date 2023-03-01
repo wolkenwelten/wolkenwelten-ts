@@ -8,7 +8,8 @@ import { World } from '../../world';
 import itemIcon from '../../../../assets/gfx/items/stick.png';
 import meshUrl from '../../../../assets/vox/items/stick.vox?url';
 import { StackableItem } from '../stackableItem';
-import { Character } from '../../entity/character';
+import { Character } from '../../character';
+import { registerClass } from '../../../class';
 
 export class Stick extends StackableItem {
     attackSkill = ['onehanded'];
@@ -37,3 +38,4 @@ export class Stick extends StackableItem {
         return world.game.render.assets.get(meshUrl);
     }
 }
+registerClass(Stick);

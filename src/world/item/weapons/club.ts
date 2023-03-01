@@ -8,7 +8,8 @@ import { World } from '../../world';
 import itemIcon from '../../../../assets/gfx/items/club.png';
 import meshUrl from '../../../../assets/vox/items/club.vox?url';
 import { Item } from '../item';
-import { Character } from '../../entity/character';
+import { Character } from '../../character';
+import { registerClass } from '../../../class';
 
 export class Club extends Item {
     attackSkill = ['clubmanship', 'onehanded'];
@@ -42,3 +43,4 @@ export class Club extends Item {
         return world.game.render.assets.get(meshUrl);
     }
 }
+registerClass(Club);

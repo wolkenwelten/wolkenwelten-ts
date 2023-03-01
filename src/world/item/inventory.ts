@@ -1,6 +1,7 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
+import { registerClass } from '../../class';
 import { BlockItem } from './blockItem';
 import { Item, MaybeItem } from './item';
 import { StackableItem } from './stackableItem';
@@ -139,3 +140,4 @@ export class Inventory {
         this.onChange && this.onChange(-1);
     }
 }
+registerClass(Inventory);

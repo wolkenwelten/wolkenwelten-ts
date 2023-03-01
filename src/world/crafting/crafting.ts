@@ -5,6 +5,7 @@ import { addDefaultCraftingRecipes } from './craftingRecipes';
 import { Inventory } from '../item/inventory';
 import { Item } from '../item/item';
 import { World } from '../world';
+import { registerClass } from '../../class';
 
 export class CraftingRecipe {
     result: Item;
@@ -34,6 +35,7 @@ export class CraftingRecipe {
         inventory.add(this.result.clone());
     }
 }
+registerClass(CraftingRecipe);
 
 export class CraftingSystem {
     world: World;
@@ -51,3 +53,4 @@ export class CraftingSystem {
         addDefaultCraftingRecipes(world, this);
     }
 }
+registerClass(CraftingSystem);

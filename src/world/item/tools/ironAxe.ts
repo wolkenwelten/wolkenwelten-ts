@@ -8,8 +8,8 @@ import { World } from '../../world';
 import itemIcon from '../../../../assets/gfx/items/ironAxe.png';
 import meshUrl from '../../../../assets/vox/items/ironAxe.vox?url';
 import { Item } from '../item';
-import { Character } from '../../entity/character';
 import { StoneAxe } from './stoneAxe';
+import { registerClass } from '../../../class';
 
 export class IronAxe extends StoneAxe {
     attackSkill = ['axefighting', 'onehanded'];
@@ -38,3 +38,4 @@ export class IronAxe extends StoneAxe {
         return world.game.render.assets.get(meshUrl);
     }
 }
+registerClass(IronAxe);

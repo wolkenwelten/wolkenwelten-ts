@@ -9,7 +9,7 @@ import { Chunk } from '../../../world/chunk/chunk';
 import shaderVertSource from './blockMesh.vert?raw';
 import shaderFragSource from './blockMesh.frag?raw';
 import { mat4 } from 'gl-matrix';
-import { meshgenComplex } from '../meshgen';
+import { meshgenChunk } from '../meshgen';
 import { Game } from '../../../game';
 
 export class BlockMesh {
@@ -59,7 +59,7 @@ export class BlockMesh {
 
     /* Create a new blockMesh with data from chunk. Can be quite slow. */
     static fromChunk(chunk: Chunk): BlockMesh {
-        const [vertices, sideElementCount] = meshgenComplex(chunk);
+        const [vertices, sideElementCount] = meshgenChunk(chunk);
         return new BlockMesh(vertices, sideElementCount, chunk);
     }
 
@@ -69,7 +69,7 @@ export class BlockMesh {
      * we don't end up generating the same mesh over and over again.
      */
     updateFromChunk(chunk: Chunk) {
-        const [vertices, sideElementCount] = meshgenComplex(chunk);
+        const [vertices, sideElementCount] = meshgenChunk(chunk);
         this.update(vertices, sideElementCount);
     }
 

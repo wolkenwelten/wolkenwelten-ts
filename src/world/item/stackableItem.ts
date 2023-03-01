@@ -1,12 +1,13 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { Character } from '../entity/character';
+import { Character } from '../character';
 import { Entity } from '../entity/entity';
-import { ItemDrop } from '../entity/itemDrop';
+import { ItemDrop } from './itemDrop';
 import { World } from '../world';
 import { Inventory } from './inventory';
 import { Item } from './item';
+import { registerClass } from '../../class';
 
 export class StackableItem extends Item {
     amount: number;
@@ -75,3 +76,4 @@ export class StackableItem extends Item {
         return false;
     }
 }
+registerClass(StackableItem);

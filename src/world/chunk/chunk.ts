@@ -3,12 +3,13 @@
  */
 import { Entity } from '../entity/entity';
 import { lightGenSimple } from './lightGen';
-import { StaticObject } from '../staticObjects/staticObject';
+import { StaticObject } from '../staticObject/staticObject';
 import { World } from '../world';
 import { worldgenSurface } from '../worldgen/surface';
 import { worldgenSky } from '../worldgen/sky';
 import { worldgenUnderground } from '../worldgen/underground';
 import profiler from '../../profiler';
+import { registerClass } from '../../class';
 
 const coordinateToOffset = (x: number, y: number, z: number) =>
     (Math.floor(x) & 0x1f) |
@@ -189,3 +190,4 @@ export class Chunk {
         this.static.delete(obj);
     }
 }
+registerClass(Chunk);

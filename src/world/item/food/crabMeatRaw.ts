@@ -7,8 +7,9 @@ import { World } from '../../world';
 
 import itemIcon from '../../../../assets/gfx/items/crabMeatRaw.png';
 import meshUrl from '../../../../assets/vox/items/crabMeatRaw.vox?url';
-import { Character } from '../../entity/character';
+import { Character } from '../../character';
 import { StackableItem } from '../stackableItem';
+import { registerClass } from '../../../class';
 
 export class CrabMeatRaw extends StackableItem {
     constructor(world: World, amount = 1) {
@@ -42,3 +43,4 @@ export class CrabMeatRaw extends StackableItem {
         }
     }
 }
+registerClass(CrabMeatRaw);

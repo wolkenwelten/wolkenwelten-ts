@@ -8,9 +8,11 @@ import { World } from '../../world';
 import itemIcon from '../../../../assets/gfx/items/stone.png';
 import meshUrl from '../../../../assets/vox/items/stone.vox?url';
 import { StackableItem } from '../stackableItem';
-import { Character } from '../../entity/character';
+import { Character } from '../../character';
 import { Projectile } from '../../entity/projectile';
-import { ItemDrop } from '../../entity/itemDrop';
+import { ItemDrop } from '../itemDrop';
+import { Being } from '../../entity/being';
+import { registerClass } from '../../../class';
 
 export class Stone extends StackableItem {
     constructor(world: World, amount = 1) {
@@ -38,7 +40,9 @@ export class Stone extends StackableItem {
             const proj = new Projectile(user, 1 + level * 0.2);
             proj.projectileMesh = this.mesh(this.world) as VoxelMesh;
             proj.onHit = function (this: Projectile, e: Entity) {
-                user.doDamage(e, 1);
+                if (e instanceof Being) {
+                    user.doDamage(e, 1);
+                }
                 this.world.game.render.particle.fxStrike(e.x, e.y, e.z);
                 new ItemDrop(
                     this.world,
@@ -64,3 +68,4 @@ export class Stone extends StackableItem {
         return world.game.render.assets.get(meshUrl);
     }
 }
+registerClass(Stone);

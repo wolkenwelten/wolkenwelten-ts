@@ -1,22 +1,24 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { Entity } from './entity';
-import { Inventory } from '../item/inventory';
-import { World } from '../world';
+import { Entity } from './entity/entity';
+import { Inventory } from './item/inventory';
+import { World } from './world';
 import { mat4 } from 'gl-matrix';
-import { BlockItem } from '../item/blockItem';
-import { TriangleMesh, VoxelMesh } from '../../render/asset';
-import { CrabMeatRaw } from '../item/food/crabMeatRaw';
-import { ItemDrop } from './itemDrop';
-import { StoneAxe } from '../item/tools/stoneAxe';
-import { StonePickaxe } from '../item/tools/stonePickaxe';
-import { Stick } from '../item/material/stick';
-import { MaybeItem } from '../item/item';
-import { IronPickaxe } from '../item/tools/ironPickaxe';
-import { IronAxe } from '../item/tools/ironAxe';
-import { Stone } from '../item/material/stone';
-import { ActiveSkill, CharacterSkill, Skill } from '../skill/skill';
+import { BlockItem } from './item/blockItem';
+import { TriangleMesh, VoxelMesh } from '../render/asset';
+import { CrabMeatRaw } from './item/food/crabMeatRaw';
+import { ItemDrop } from './item/itemDrop';
+import { StoneAxe } from './item/tools/stoneAxe';
+import { StonePickaxe } from './item/tools/stonePickaxe';
+import { Stick } from './item/material/stick';
+import { MaybeItem } from './item/item';
+import { IronPickaxe } from './item/tools/ironPickaxe';
+import { IronAxe } from './item/tools/ironAxe';
+import { Stone } from './item/material/stone';
+import { ActiveSkill, CharacterSkill, Skill } from './skill/skill';
+import { Being } from './entity/being';
+import { registerClass } from '../class';
 
 const CHARACTER_ACCELERATION = 0.05;
 const CHARACTER_STOP_RATE = CHARACTER_ACCELERATION * 3.0;
@@ -24,7 +26,7 @@ const CHARACTER_STOP_RATE = CHARACTER_ACCELERATION * 3.0;
 const clamp = (x: number, min: number, max: number) =>
     Math.min(Math.max(x, min), max);
 
-export class Character extends Entity {
+export class Character extends Being {
     spawnX: number;
     spawnY: number;
     spawnZ: number;
@@ -115,7 +117,7 @@ export class Character extends Entity {
         yaw: number,
         pitch: number
     ) {
-        super(world);
+        super(world, x, y, z);
         this.inventory = new Inventory(40);
         this.init();
         this.spawnX = this.x = x;
@@ -163,19 +165,13 @@ export class Character extends Entity {
             this.movementX = this.movementZ = 0;
         } else {
             if (oz > 0) {
-                oz *= 0.5;
+                oz *= 0.5; // Slow down backwards movement
             }
-            this.movementX =
-                ox * 0.75 * Math.cos(-this.yaw) + oz * Math.sin(this.yaw);
-            this.movementZ =
-                ox * 0.75 * Math.sin(-this.yaw) + oz * Math.cos(this.yaw);
+            ox *= 0.75; // Slow down strafing somewhat
+            this.movementX = ox * Math.cos(-this.yaw) + oz * Math.sin(this.yaw);
+            this.movementZ = ox * Math.sin(-this.yaw) + oz * Math.cos(this.yaw);
         }
-
-        if (oy > 0) {
-            this.movementY = 1;
-        } else {
-            this.movementY = 0;
-        }
+        this.movementY = oy > 0 ? 1 : 0;
     }
 
     /* Fly a player in a certain direction */
@@ -364,7 +360,7 @@ export class Character extends Entity {
         }
     }
 
-    doDamage(target: Entity, damage: number) {
+    doDamage(target: Being, damage: number) {
         const wasDead = target.isDead;
         target.damage(damage);
         target.onAttack(this);
@@ -403,7 +399,9 @@ export class Character extends Entity {
                     e.vx += ndx * 0.03;
                     e.vy += 0.02;
                     e.vz += ndz * 0.03;
-                    this.doDamage(e, weapon?.attackDamage(e) || 1);
+                    if (e instanceof Being) {
+                        this.doDamage(e, weapon?.attackDamage(e) || 1);
+                    }
                     this.world.game.render.particle.fxStrike(e.x, e.y, e.z);
                 }
             }
@@ -492,6 +490,7 @@ export class Character extends Entity {
         }
     }
 
+    /* Use the current item or punch if we don't have anything equipped */
     primaryAction() {
         const item = this.inventory.active();
         if (item) {
@@ -501,6 +500,7 @@ export class Character extends Entity {
         }
     }
 
+    /* Use whatever skill is currently selected */
     secondaryAction() {
         this.selectedSkill?.use();
     }
@@ -532,10 +532,12 @@ export class Character extends Entity {
         }
     }
 
+    /* Since right now WW is only singleplayer we can ignore this method */
     draw(projectionMatrix: mat4, viewMatrix: mat4, cam: Entity) {
         return;
     }
 
+    /* Return the mesh of whatever we are currently holding, or a hand */
     hudMesh(): VoxelMesh | TriangleMesh {
         const heldItem = this.inventory.active();
         if (!heldItem) {
@@ -545,10 +547,12 @@ export class Character extends Entity {
         }
     }
 
+    /* Return the absolute amount of XP needed to reach a certain level */
     xpForLevel(level: number): number {
         return level * 16;
     }
 
+    /* Return how close we are to reaching the next level in the range 0.0 - 1.0 */
     xpPercentageTillNextLevel(): number {
         const base = this.xpForLevel(this.level);
         const goal = this.xpForLevel(this.level + 1);
@@ -558,7 +562,8 @@ export class Character extends Entity {
         return p;
     }
 
-    xpCheckLevelUp() {
+    /* Level up if we have enough XP, increasing skillpoints/maxHealth and so on */
+    xpLevelUpIfAvailable() {
         if (this.xpPercentageTillNextLevel() >= 1) {
             this.level++;
             this.maxHealth += 4;
@@ -573,11 +578,13 @@ export class Character extends Entity {
         }
     }
 
+    /* Gain a certain amount of  XP and check whether a level up is possible */
     xpGain(amount: number) {
         this.xp += amount;
-        this.xpCheckLevelUp();
+        this.xpLevelUpIfAvailable();
     }
 
+    /* Gain some XP for a certain skill, learning it if necessary */
     skillXpGain(skillId: string, amount: number) {
         if (skillId === '') {
             return;
@@ -596,6 +603,7 @@ export class Character extends Entity {
         }
     }
 
+    /* Try to learn a certain skill if possible */
     skillLearn(skillId: string): boolean {
         if (this.skillPoints <= 0) {
             return false;
@@ -614,14 +622,17 @@ export class Character extends Entity {
         return true;
     }
 
-    skillLearned(skillId: string): boolean {
+    /* Return whether a given skill is already known to our character */
+    skillIsLearned(skillId: string): boolean {
         return this.skill.get(skillId) !== undefined;
     }
 
+    /* Return the level of the given skill, or -1 if unknown */
     skillLevel(skillId: string): number {
-        return this.skill.get(skillId)?.level || 0;
+        return this.skill.get(skillId)?.level || -1;
     }
 
+    /* Try to select a given skill */
     skillSelect(skill?: Skill) {
         if (skill) {
             for (const cs of this.skill.values()) {
@@ -634,3 +645,4 @@ export class Character extends Entity {
         this.selectedSkill = undefined;
     }
 }
+registerClass(Character);

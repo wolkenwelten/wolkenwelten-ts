@@ -20,6 +20,7 @@ import crabDeathUrl from '../assets/sfx/crabDeath.mp3?url';
 
 import ratAttackUrl from '../assets/sfx/ratAttack.mp3?url';
 import ratDeathUrl from '../assets/sfx/ratDeath.mp3?url';
+import { registerClass } from './class';
 
 export class AudioManager {
     game: Game;
@@ -63,3 +64,4 @@ export class AudioManager {
         howl.play();
     }
 }
+registerClass(AudioManager);

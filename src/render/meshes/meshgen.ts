@@ -1,5 +1,31 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
+ *
+ * This contains the core meshing functions used by calling meshgenChunk or meshgenVoxelMesh.
+ * To do that we need both block and lighting data, when meshing chunks also for all surrounding chunks.
+ *
+ * First we gather all the data into a single buffer to make subsequent steps simpler.
+ * After that we determine which faces are actually visible, so we iterate over all core(32*32*32) blocks
+ * and calculate a bitmap which faces need to be output in later stages. Now we can start emitting some triangles,
+ * for that we go over the data 6 times, once for each direction, we do this so that we get 6 distinct areas containing
+ * only faces pointing in a particular direction, this is important because we can then later only render parts of a buffer,
+ * since a lot of triangles can never be seen (for example triangles pointing upwards can never be seen in chunks above the player).
+ * While this increases the amount of drawCalls somewhat it seems to have a positive impact on performance constrained devices like a Raspberry PI.
+ *
+ * The actual meshing is done by slicing the chunk into 32 planes where we proceed to produce 1x1 rects for each blockface that could be seen.
+ * After generating these rects we then optimize the plane by trying to enlarge each rect as much as possible. The version used here is quite simple,
+ * this is mainly this version produces quite optimized meshes already while still being somewhat fast, it's been a long time since I measured this though,
+ * so there might be a lot of gains to be had here.
+ *
+ * After that we simply create triangles from rects in each plane and put them in the buffer. And when dealing with chunks we also repeat
+ * everything for seeThrough blocks, which right now means water. This needs to be separate because we need to draw them after drawing the rest
+ * of the world, since otherwise we would for example skip drawing the sand underneath the water since the water is updating the Z-Buffer (maybe this can be optimized
+ * away, works quite alright this way though so haven't put that much effort into optimizing this).
+ *
+ * If you're wondering how we do ambient occlusion, that's happening because for each vertex we use the light values of the 4 blocks
+ * facing the current BlockFace. And since we half the lightValue inside blocks instead of setting it to 0 we get a very similar effect.
+ * And again there are probably better ways, this is just the first version that I thought of and since it works reasonably well my motivation
+ * for optimization here is quite low.
  */
 import { Chunk } from '../../world/chunk/chunk';
 import profiler from '../../profiler';
@@ -810,7 +836,7 @@ const finishLight = (light: Uint8Array, block: Uint8Array) => {
     return light;
 };
 
-export const meshgenSimple = (blocks: Uint8Array): [Uint8Array, number] => {
+export const meshgenVoxelMesh = (blocks: Uint8Array): [Uint8Array, number] => {
     const start = performance.now();
     const vertices: number[] = [];
     lightData.fill(15);
@@ -836,12 +862,11 @@ export const meshgenSimple = (blocks: Uint8Array): [Uint8Array, number] => {
     elementCount += genRight(vertices, data);
 
     const vertArr = new Uint8Array(vertices);
-    const end = performance.now();
-    profiler.add('meshgenSimple', start, end);
+    profiler.add('meshgenSimple', start, performance.now());
     return [vertArr, elementCount];
 };
 
-export const meshgenComplex = (chunk: Chunk): [Uint8Array, number[]] => {
+export const meshgenChunk = (chunk: Chunk): [Uint8Array, number[]] => {
     const start = performance.now();
     const vertices: number[] = [];
     for (let x = -1; x <= 1; x++) {
@@ -897,7 +922,6 @@ export const meshgenComplex = (chunk: Chunk): [Uint8Array, number[]] => {
     sideSquareCount[11] = genRight(vertices, data);
 
     const vertArr = new Uint8Array(vertices);
-    const end = performance.now();
-    profiler.add('meshgenComplex', start, end);
+    profiler.add('meshgenComplex', start, performance.now());
     return [vertArr, sideSquareCount];
 };

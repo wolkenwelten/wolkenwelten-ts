@@ -9,7 +9,9 @@ import clubmanshipUrl from '../../../assets/gfx/skill/clubmanship.png';
 import axefightingUrl from '../../../assets/gfx/skill/axefighting.png';
 import pickeneeringUrl from '../../../assets/gfx/skill/pickeneering.png';
 import heavystrikeUrl from '../../../assets/gfx/skill/heavyStrike.png';
-import { Character } from '../entity/character';
+import { Character } from '../character';
+import { Being } from '../entity/being';
+import { Entity } from '../entity/entity';
 
 export const addDefaultSkills = (skills: SkillSystem) => {
     skills.addPassive(
@@ -73,7 +75,7 @@ export const addDefaultSkills = (skills: SkillSystem) => {
                 }
                 c.hitAnimation = c.world.game.render.frames;
                 c.cooldown(120);
-                const hit = c.attack(1.8, (e) => {
+                const hit = c.attack(1.8, (e: Entity) => {
                     const dx = e.x - c.x;
                     const dz = e.z - c.z;
                     const dm = Math.max(Math.abs(dx), Math.abs(dz));
@@ -82,7 +84,9 @@ export const addDefaultSkills = (skills: SkillSystem) => {
                     e.vx += ndx * 0.12;
                     e.vy += 0.06;
                     e.vz += ndz * 0.12;
-                    c.doDamage(e, dmg);
+                    if (e instanceof Being) {
+                        c.doDamage(e, dmg);
+                    }
                     c.world.game.render.particle.fxStrike(e.x, e.y, e.z);
                     c.world.game.render.particle.fxStrike(e.x, e.y, e.z);
                 });

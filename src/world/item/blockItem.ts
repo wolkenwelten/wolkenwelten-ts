@@ -1,8 +1,9 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
+import { registerClass } from '../../class';
 import { TriangleMesh, VoxelMesh } from '../../render/asset';
-import { Character } from '../entity/character';
+import { Character } from '../character';
 import { Entity } from '../entity/entity';
 import { World } from '../world';
 import { StackableItem } from './stackableItem';
@@ -70,3 +71,4 @@ export class BlockItem extends StackableItem {
         );
     }
 }
+registerClass(BlockItem);

@@ -1,9 +1,17 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
+ *
+ * This is the Mining subsystem, which gets called on every tick and checks which block every character
+ * is currently mining and advance the mining operation, while also determining which mining operations
+ * have stopped which we remove after a short while of inactivity.
+ *
+ * Is also responsible for calling the spawnMiningDrops method on the BlockType as the mining finishes as
+ * well as creating DangerZones to make sure that fluids are properly simulated if we dig close to one.
  */
+import { registerClass } from '../class';
 import { RenderManager } from '../render/render';
 import { clamp } from '../util/math';
-import { Character } from './entity/character';
+import { Character } from './character';
 import { MaybeItem } from './item/item';
 import { World } from './world';
 
@@ -14,7 +22,7 @@ export interface MiningAction {
     block: number;
     damageDealt: number;
     progress: number;
-    v: number;
+    decay: number;
 }
 
 export class MiningManager {
@@ -48,7 +56,7 @@ export class MiningManager {
                 m.damageDealt = 0;
                 m.block = block;
             }
-            m.v = 0;
+            m.decay = 0;
             m.damageDealt += damageDealt;
             const ret = m.damageDealt >= bt.health;
             if (ret) {
@@ -56,7 +64,7 @@ export class MiningManager {
             }
             return ret;
         }
-        const m = { x, y, z, block, damageDealt: 0, v: 0, progress: 0 };
+        const m = { x, y, z, block, damageDealt: 0, decay: 0, progress: 0 };
         this.minings.push(m);
         const ret = damageDealt >= bt.health;
         if (ret) {
@@ -102,10 +110,10 @@ export class MiningManager {
         this.playerMine();
         for (let i = this.minings.length - 1; i >= 0; i--) {
             const m = this.minings[i];
-            m.damageDealt -= m.v;
+            m.damageDealt -= m.decay;
             const bt = this.world.blocks[m.block];
             m.progress = clamp(m.damageDealt / bt.health, 0, 1);
-            m.v++;
+            m.decay++;
             if (m.damageDealt < 0) {
                 this.minings[i] = this.minings[this.minings.length - 1];
                 this.minings.length--;
@@ -138,3 +146,4 @@ export class MiningManager {
         }
     }
 }
+registerClass(MiningManager);

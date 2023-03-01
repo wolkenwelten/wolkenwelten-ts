@@ -3,8 +3,8 @@
  */
 import { Entity } from './entity';
 import { TriangleMesh, VoxelMesh } from '../../render/asset';
-import { Mob } from './mob/mob';
-import { mat4 } from 'gl-matrix';
+import { Mob } from '../mob/mob';
+import { registerClass } from '../../class';
 
 export class Projectile extends Entity {
     weight = 1;
@@ -70,3 +70,4 @@ export class Projectile extends Entity {
         }
     }
 }
+registerClass(Projectile);

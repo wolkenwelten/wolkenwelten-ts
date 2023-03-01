@@ -2,18 +2,14 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import { VoxelMesh } from '../../render/asset';
-import { Chunk } from '../chunk/chunk';
 import { StaticObject } from './staticObject';
 import meshUrl from '../../../assets/vox/staticStick.vox?url';
 import { Entity } from '../entity/entity';
-import { ItemDrop } from '../entity/itemDrop';
+import { ItemDrop } from '../item/itemDrop';
 import { Stick } from '../item/material/stick';
+import { registerClass } from '../../class';
 
 export class StaticStick extends StaticObject {
-    constructor(chunk: Chunk, x: number, y: number, z: number) {
-        super(chunk, x, y, z);
-    }
-
     mesh(): VoxelMesh {
         return this.chunk.world.game.render.assets.get(meshUrl);
     }
@@ -34,3 +30,4 @@ export class StaticStick extends StaticObject {
         return [0.5 - 3 / 32, 1 / 32, 0.5 + 5 / 32];
     }
 }
+registerClass(StaticStick);

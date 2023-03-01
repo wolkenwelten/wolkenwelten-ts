@@ -2,24 +2,20 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import { VoxelMesh } from '../../render/asset';
-import { Chunk } from '../chunk/chunk';
 import { StaticObject } from './staticObject';
-import meshUrl from '../../../assets/vox/staticShell.vox?url';
+import meshUrl from '../../../assets/vox/stone.vox?url';
 import { Entity } from '../entity/entity';
-import { ItemDrop } from '../entity/itemDrop';
-import { Shell } from '../item/material/shell';
+import { ItemDrop } from '../item/itemDrop';
+import { Stone } from '../item/material/stone';
+import { registerClass } from '../../class';
 
-export class StaticShell extends StaticObject {
-    constructor(chunk: Chunk, x: number, y: number, z: number) {
-        super(chunk, x, y, z);
-    }
-
+export class StaticStone extends StaticObject {
     mesh(): VoxelMesh {
         return this.chunk.world.game.render.assets.get(meshUrl);
     }
 
     onAttacked(perpetrator: Entity) {
-        const item = new Shell(this.chunk.world, 1);
+        const item = new Stone(this.chunk.world, 1);
         new ItemDrop(
             this.chunk.world,
             this.x + 0.5,
@@ -31,6 +27,7 @@ export class StaticShell extends StaticObject {
     }
 
     transOff(): [number, number, number] {
-        return [0.5 - 6 / 32, 1 / 32, 0.5 + 4 / 32];
+        return [0.5 - 3 / 32, 1 / 32, 0.5 + 5 / 32];
     }
 }
+registerClass(StaticStone);

@@ -2,18 +2,16 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import { mat4 } from 'gl-matrix';
-import { World } from '../../world';
-import { Entity } from '../entity';
+import { World } from '../world';
+import { Entity } from '../entity/entity';
+import { Being } from '../entity/being';
 
 const modelViewMatrix = mat4.create();
 const transPos = new Float32Array([0, 0, 0]);
 
-export class Mob extends Entity {
+export class Mob extends Being {
     constructor(world: World, x: number, y: number, z: number) {
-        super(world);
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        super(world, x, y, z);
     }
 
     draw(projectionMatrix: mat4, viewMatrix: mat4, cam: Entity) {

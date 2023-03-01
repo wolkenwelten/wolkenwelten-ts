@@ -2,6 +2,7 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 
+import { registerClass } from './class';
 import { Game } from './game';
 
 export class InputManager {
@@ -18,7 +19,7 @@ export class InputManager {
         window.addEventListener('keydown', (e) => that.keyStates.add(e.code));
         window.addEventListener('keyup', (e) => {
             that.keyStates.delete(e.code);
-            if(!that.game.running || !that.game.ready){
+            if (!that.game.running || !that.game.ready) {
                 return;
             }
             const handler = that.keyHandler.get(e.code);
@@ -27,7 +28,7 @@ export class InputManager {
             }
         });
         this.keyHandler.set('KeyE', () => {
-            if(!that.game.running || !that.game.ready){
+            if (!that.game.running || !that.game.ready) {
                 return;
             }
             that.toggleInventory();
@@ -36,7 +37,7 @@ export class InputManager {
             that.closeInventory();
         });
         this.keyHandler.set('KeyN', () => {
-            if(!that.game.running || !that.game.ready){
+            if (!that.game.running || !that.game.ready) {
                 return;
             }
             that.game.player.noClip = !that.game.player.noClip;
@@ -49,7 +50,7 @@ export class InputManager {
 
         for (let i = 0; i < 10; i++) {
             this.keyHandler.set(`Digit${(i + 1) % 10}`, () => {
-                if(!that.game.running || !that.game.ready){
+                if (!that.game.running || !that.game.ready) {
                     return;
                 }
                 this.game.player.inventory.select(i);
@@ -59,7 +60,7 @@ export class InputManager {
         that.game.render.canvasWrapper.addEventListener(
             'mousedown',
             async (e) => {
-                if(!that.game.running || !that.game.ready){
+                if (!that.game.running || !that.game.ready) {
                     return;
                 }
                 if (that.game.ui.inventory.active) {
@@ -73,7 +74,7 @@ export class InputManager {
             that.mouseStates.add(e.button)
         );
         that.game.ui.rootElement.addEventListener('contextmenu', (e) => {
-            if(!that.game.running || !that.game.ready){
+            if (!that.game.running || !that.game.ready) {
                 return;
             }
             e.preventDefault();
@@ -82,7 +83,7 @@ export class InputManager {
             that.mouseStates.delete(e.button)
         );
         that.game.ui.rootElement.addEventListener('wheel', (e) => {
-            if(!that.game.running || !that.game.ready){
+            if (!that.game.running || !that.game.ready) {
                 return;
             }
             const newSelection =
@@ -319,3 +320,4 @@ export class InputManager {
         }
     }
 }
+registerClass(InputManager);
