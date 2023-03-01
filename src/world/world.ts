@@ -12,6 +12,7 @@ import { CraftingSystem } from './crafting/crafting';
 import { SkillSystem } from './skill/skill';
 import { initDefaultBlocks } from './blockType/blockTypeDefaults';
 import { registerClass } from '../class';
+import { LCG } from '../util/prng';
 
 export const coordinateToWorldKey = (x: number, y: number, z: number) =>
     ((Math.floor(x) >> 5) & 0xffff) +
@@ -30,6 +31,7 @@ export class World {
     skills: SkillSystem;
     blocks: BlockType[] = [];
     blockTextureUrl = '';
+    lootRNG: LCG;
 
     constructor(game: Game) {
         this.seed = 1234;
@@ -40,6 +42,7 @@ export class World {
         initDefaultBlocks(this);
         this.crafting = new CraftingSystem(this);
         this.skills = new SkillSystem(this);
+        this.lootRNG = new LCG(new Date().toISOString());
     }
 
     addBlockType = (longName: string, name?: string): BlockType => {

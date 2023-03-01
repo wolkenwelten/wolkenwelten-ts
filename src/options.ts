@@ -5,6 +5,7 @@ import { registerClass } from './class';
  */
 export class Options {
     skipMenu = false;
+    startWithEquipment = false;
 
     private parseBoolean(def: boolean, paramValue: string | null): boolean {
         if (paramValue === null) {
@@ -36,6 +37,10 @@ export class Options {
         this.skipMenu = this.parseBoolean(
             this.skipMenu,
             params.get('skipMenu')
+        );
+        this.startWithEquipment = this.parseBoolean(
+            this.startWithEquipment,
+            params.get('startWithEquipment')
         );
     }
 }

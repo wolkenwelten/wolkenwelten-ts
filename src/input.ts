@@ -57,7 +57,7 @@ export class InputManager {
                     return;
                 }
                 if (that.game.ui.inventory.active) {
-                    that.toggleInventory();
+                    that.toggleInventory(true);
                 }
                 await that.requestFullscreenAndPointerLock();
             },
@@ -112,7 +112,7 @@ export class InputManager {
         }
     }
 
-    toggleInventory() {
+    toggleInventory(dropHelItem = false) {
         this.game.ui.inventory.toggle();
         if (this.game.ui.inventory.active) {
             if (document.pointerLockElement) {
@@ -126,6 +126,7 @@ export class InputManager {
             if (this.game.ui.heldItem) {
                 if (this.game.ui.heldItem instanceof Item) {
                     if (
+                        dropHelItem ||
                         !this.game.player.inventory.add(this.game.ui.heldItem)
                     ) {
                         this.game.player.dropItem(this.game.ui.heldItem);

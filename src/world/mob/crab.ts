@@ -18,6 +18,7 @@ import voxelCrabAttack1File from '../../../assets/vox/crab/attack_1.vox?url';
 import voxelCrabDead0File from '../../../assets/vox/crab/dead_0.vox?url';
 import { Being } from '../entity/being';
 import { ItemDrop } from '../item/itemDrop';
+import { CrabShield } from '../item/armor/crabShield';
 
 export type CrabState =
     | 'idle'
@@ -75,6 +76,15 @@ export class Crab extends Mob {
         this.changeState('dead');
         this.isDead = true;
         this.world.game.audio.play('crabDeath', 0.5);
+        if (this.world.lootRNG.bool(10)) {
+            new ItemDrop(
+                this.world,
+                this.x + (Math.random() - 0.5) * 0.3,
+                this.y,
+                this.z + (Math.random() - 0.5) * 0.3,
+                new CrabShield(this.world)
+            );
+        }
     }
 
     onAttack(perpetrator: Entity): void {

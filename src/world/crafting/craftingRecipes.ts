@@ -14,6 +14,8 @@ import { IronAxe } from '../item/tools/ironAxe';
 import { IronPickaxe } from '../item/tools/ironPickaxe';
 
 import { World } from '../world';
+import { CrabShield } from '../item/armor/crabShield';
+import { CrabMeatRaw } from '../item/food/crabMeatRaw';
 
 export const addDefaultCraftingRecipes = (
     world: World,
@@ -66,5 +68,12 @@ export const addDefaultCraftingRecipes = (
         new IronPickaxe(world),
         [new Stick(world, 3), new IronBar(world, 3), new Coal(world, 2)],
         'An improved pickaxe made from iron, digs much quicker and also does more damage.'
+    );
+
+    crafting.add(
+        'CrabShield',
+        new CrabShield(world),
+        [new CrabMeatRaw(world, 8)],
+        'A buckler made from the hard armored shell of the local crab populace.'
     );
 };

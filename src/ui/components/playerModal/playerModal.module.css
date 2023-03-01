@@ -14,6 +14,8 @@
     border-right: solid 1px #445;
     z-index: 300;
     display: none;
+
+    min-width: 818px;
 }
 
 .active {

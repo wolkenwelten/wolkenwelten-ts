@@ -16,9 +16,11 @@ import { Item, MaybeItem } from './item/item';
 import { IronPickaxe } from './item/tools/ironPickaxe';
 import { IronAxe } from './item/tools/ironAxe';
 import { Stone } from './item/material/stone';
-import { ActiveSkill, CharacterSkill, Skill } from './skill/skill';
+import { ActiveSkill, CharacterSkill } from './skill/skill';
 import { Being } from './entity/being';
 import { registerClass } from '../class';
+import { Club } from './item/weapons/club';
+import { CrabShield } from './item/armor/crabShield';
 
 const CHARACTER_ACCELERATION = 0.05;
 const CHARACTER_STOP_RATE = CHARACTER_ACCELERATION * 3.0;
@@ -80,6 +82,9 @@ export class Character extends Being {
         this.inventory.add(new Stone(this.world, 90));
         this.inventory.add(new BlockItem(this.world, 3, 90));
 
+        this.equipment.items[0] = new Club(this.world);
+        this.equipment.items[1] = new CrabShield(this.world);
+
         this.skillXpGain('axefighting', 295);
         this.skillXpGain('pugilism', 100);
         this.skillXpGain('throwing', 100);
@@ -107,6 +112,23 @@ export class Character extends Being {
         this.skill.clear();
         this.inventory.clear();
         this.equipment.clear();
+        this.inventory.select(0);
+        if (this.world.game.options.startWithEquipment) {
+            this.getGoodStuff();
+        }
+    }
+
+    constructor(
+        world: World,
+        x: number,
+        y: number,
+        z: number,
+        yaw: number,
+        pitch: number
+    ) {
+        super(world, x, y, z);
+        this.inventory = new Inventory(40);
+        this.equipment = new Inventory(10);
         this.equipment.mayPut = (index: number, item: Item): boolean => {
             switch (index) {
                 case 0:
@@ -125,20 +147,6 @@ export class Character extends Being {
                     return false;
             }
         };
-        this.inventory.select(0);
-    }
-
-    constructor(
-        world: World,
-        x: number,
-        y: number,
-        z: number,
-        yaw: number,
-        pitch: number
-    ) {
-        super(world, x, y, z);
-        this.inventory = new Inventory(40);
-        this.equipment = new Inventory(10);
         this.init();
         this.spawnX = this.x = x;
         this.spawnY = this.y = y;
