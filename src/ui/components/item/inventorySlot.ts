@@ -6,6 +6,7 @@ import { ItemWidget } from './item';
 import styles from './inventorySlot.module.css';
 import { Game } from '../../../game';
 import { StackableItem } from '../../../world/item/stackableItem';
+import { Item } from '../../../world/item/item';
 
 export class InventorySlot {
     div: HTMLElement;
@@ -20,10 +21,14 @@ export class InventorySlot {
         inventory: Inventory,
         slotIndex: number,
         game: Game,
-        showActive = true
+        showActive = true,
+        additionalClass?: string
     ) {
         this.div = document.createElement('div');
         this.div.classList.add(styles.slot);
+        if (additionalClass) {
+            this.div.classList.add(additionalClass);
+        }
         this.showActive = showActive;
 
         this.widget = new ItemWidget(this.div, showActive);
@@ -85,7 +90,7 @@ export class InventorySlot {
                     a.destroy();
                     this.game.ui.heldItem = undefined;
                 }
-            } else {
+            } else if (a instanceof Item) {
                 this.inventory.items[this.slotIndex] = a;
                 this.game.ui.heldItem = b;
             }
@@ -121,7 +126,7 @@ export class InventorySlot {
                     a.destroy();
                     this.game.ui.heldItem = undefined;
                 }
-            } else {
+            } else if (a instanceof Item) {
                 this.inventory.items[this.slotIndex] = a;
                 this.game.ui.heldItem = b;
             }

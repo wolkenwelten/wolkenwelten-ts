@@ -7,7 +7,6 @@ import { CraftingWrap } from './craftingWrap';
 import { InventoryWrap } from './inventoryModal';
 import { SettingsWrap } from './settingsWrap';
 import { SkillWrap } from './skillWrap';
-import { CharacterWrap } from './characterModal';
 
 interface TabClass {
     update: () => void;
@@ -26,7 +25,6 @@ export class PlayerModal {
 
     activeTab?: TabClass;
     crafting: CraftingWrap;
-    character: CharacterWrap;
     inventory: InventoryWrap;
     settings: SettingsWrap;
     skill: SkillWrap;
@@ -93,7 +91,6 @@ export class PlayerModal {
         this.tabContent = tabContent;
 
         this.inventory = this.initTab(game, 'Inventory', InventoryWrap, true);
-        this.character = this.initTab(game, 'Character', CharacterWrap);
         this.crafting = this.initTab(game, 'Crafting', CraftingWrap);
         this.skill = this.initTab(game, 'Skills', SkillWrap);
         this.settings = this.initTab(game, 'Settings', SettingsWrap);
@@ -108,6 +105,7 @@ export class PlayerModal {
         this.game.render.canvasWrapper.classList.add('fx-inventory');
         this.div.classList.add(styles.active);
         this.activeTab?.update();
+        this.inventory.update(-1);
         this.active = true;
     }
 

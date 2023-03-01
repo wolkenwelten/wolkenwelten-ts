@@ -153,7 +153,7 @@ export class RenderManager {
             } else {
                 rt = t * Math.PI;
                 const rMax =
-                    this.game.player.inventory.active() === undefined
+                    this.game.player.equipmentWeapon() === undefined
                         ? 0.125
                         : 0.4;
                 r = Math.PI * (0.1 - Math.sin(t * Math.PI) * rMax);

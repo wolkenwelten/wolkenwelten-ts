@@ -17,5 +17,23 @@ export class Being extends Entity {
         this.y = y;
         this.z = z;
     }
+
+    damage(rawAmount: number): void {
+        this.health = Math.max(
+            0,
+            Math.min(this.health - rawAmount, this.maxHealth)
+        );
+        if (this.health <= 0) {
+            this.isDead = true;
+            this.onDeath();
+        }
+    }
+
+    heal(rawAmount: number): void {
+        this.damage(-rawAmount);
+    }
+
+    onDeath() {}
+    onAttack(perpetrator: Entity): void {}
 }
 registerClass(Being);

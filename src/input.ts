@@ -4,6 +4,8 @@
 
 import { registerClass } from './class';
 import { Game } from './game';
+import { Item } from './world/item/item';
+import { ActiveSkill } from './world/skill/skill';
 
 export class InputManager {
     game: Game;
@@ -48,15 +50,6 @@ export class InputManager {
             }
         });
 
-        for (let i = 0; i < 10; i++) {
-            this.keyHandler.set(`Digit${(i + 1) % 10}`, () => {
-                if (!that.game.running || !that.game.ready) {
-                    return;
-                }
-                this.game.player.inventory.select(i);
-            });
-        }
-
         that.game.render.canvasWrapper.addEventListener(
             'mousedown',
             async (e) => {
@@ -78,22 +71,14 @@ export class InputManager {
                 return;
             }
             e.preventDefault();
+            if (that.game.ui.heldItem instanceof ActiveSkill) {
+                that.game.ui.heldItem = undefined;
+                that.game.ui.cursorItem.update(that.game.ui.heldItem);
+            }
         });
         that.game.ui.rootElement.addEventListener('mouseup', (e) =>
             that.mouseStates.delete(e.button)
         );
-        that.game.ui.rootElement.addEventListener('wheel', (e) => {
-            if (!that.game.running || !that.game.ready) {
-                return;
-            }
-            const newSelection =
-                (that.game.player.inventory.selection +
-                    (e.deltaY > 0 ? 1 : -1)) %
-                10;
-            that.game.player.inventory.select(
-                newSelection >= 0 ? newSelection : 10 - newSelection - 2
-            );
-        });
         that.game.ui.rootElement.addEventListener(
             'mousemove',
             (e) => {
@@ -139,7 +124,13 @@ export class InputManager {
                 this.game.ui.rootElement.requestPointerLock();
             }
             if (this.game.ui.heldItem) {
-                this.game.player.dropItem(this.game.ui.heldItem);
+                if (this.game.ui.heldItem instanceof Item) {
+                    if (
+                        !this.game.player.inventory.add(this.game.ui.heldItem)
+                    ) {
+                        this.game.player.dropItem(this.game.ui.heldItem);
+                    }
+                }
                 this.game.ui.heldItem = undefined;
                 this.game.ui.cursorItem.update(this.game.ui.heldItem);
             }
@@ -151,12 +142,9 @@ export class InputManager {
     }
 
     update() {
-        const movement = { x: 0, y: 0, z: 0, sneak: false };
+        const movement = { x: 0, y: 0, z: 0, sprint: false };
         const actions = { primary: false, secondary: false };
 
-        if (this.keyStates.has('KeyQ')) {
-            this.game.player.dropActiveItem();
-        }
         if (this.keyStates.has('KeyW')) {
             movement.z = -1;
         }
@@ -179,7 +167,7 @@ export class InputManager {
             movement.y = 1;
         }
         if (this.keyStates.has('ShiftLeft')) {
-            movement.sneak = true;
+            movement.sprint = true;
         }
 
         const player = this.game.player;
@@ -218,7 +206,7 @@ export class InputManager {
                     gamepad.buttons[4]?.pressed ||
                     gamepad.buttons[5]?.pressed
                 ) {
-                    movement.sneak = true;
+                    movement.sprint = true;
                 }
                 if (gamepad.buttons[14]?.pressed) {
                     const key = gamepad.index | (4 << 8);
@@ -288,19 +276,29 @@ export class InputManager {
         }
 
         if (player.noClip) {
-            const speed = movement.sneak ? 1.5 : 0.3;
+            const speed = movement.sprint ? 1.5 : 0.3;
             player.fly(
                 movement.x * speed,
                 movement.y * speed,
                 movement.z * speed
             );
         } else {
-            const speed = movement.sneak ? 0.05 : 0.2;
+            const speed = movement.sprint ? 0.3 : 0.2;
             player.move(
                 movement.x * speed,
                 movement.y * speed,
                 movement.z * speed
             );
+            if (movement.sprint) {
+                this.game.player.mana -= 0.1;
+            }
+        }
+
+        for (let i = 0; i < 10; i++) {
+            const key = `Digit${(i + 1) % 10}`;
+            if (this.keyStates.has(key)) {
+                this.game.ui.hotbar.use(i);
+            }
         }
 
         this.game.player.miningActive = false;

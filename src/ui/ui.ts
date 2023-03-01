@@ -4,7 +4,7 @@
 import { Game } from '../game';
 import { FpsCounter } from './components/fpsCounter';
 import { Crosshair } from './components/crosshair';
-import { Hotbar } from './components/hotbar';
+import { Hotbar, HotbarEntryValue } from './components/hotbar/hotbar';
 import { HealthOrb } from './components/healthOrb';
 import { SystemLog } from './components/systemLog';
 import { CursorItem } from './components/item/cursorItem';
@@ -22,7 +22,7 @@ export class UIManager {
     hotbar: Hotbar;
     cursorItem: CursorItem;
     icon: IconManager;
-    heldItem: MaybeItem;
+    heldItem: HotbarEntryValue;
     log: SystemLog;
     healthOrb: HealthOrb;
     xpView: XpView;
@@ -50,12 +50,9 @@ export class UIManager {
         this.cursorItem = new CursorItem(this.uiWrapper);
         this.healthOrb = new HealthOrb(this.uiWrapper, game);
         this.introWindow = new IntroWindow(this.uiWrapper, game);
-
-        game.player.inventory.onChange = this.updateInventory.bind(this);
     }
 
-    updateInventory(i: number) {
-        this.hotbar.update(i);
+    updateInventory(i = -1) {
         this.inventory.update(i);
     }
 
@@ -74,5 +71,6 @@ export class UIManager {
 
         this.healthOrb.update();
         this.xpView.update();
+        this.hotbar.update();
     }
 }

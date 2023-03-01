@@ -4,6 +4,7 @@
 import { ItemWidget } from './item';
 import styles from './cursorItem.module.css';
 import { MaybeItem } from '../../../world/item/item';
+import { HotbarEntryValue } from '../hotbar/hotbar';
 
 export class CursorItem {
     div: HTMLElement;
@@ -24,7 +25,7 @@ export class CursorItem {
         parent.appendChild(this.div);
     }
 
-    update(item: MaybeItem) {
+    update(item: HotbarEntryValue) {
         if (item) {
             this.active = true;
             this.div.style.display = 'block';

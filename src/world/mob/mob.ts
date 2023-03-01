@@ -79,7 +79,4 @@ export class Mob extends Being {
             this.vz = 0;
         }
     }
-
-    onDeath() {}
-    onAttack(perpetrator: Entity): void {}
 }

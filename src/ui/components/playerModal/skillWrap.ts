@@ -4,6 +4,7 @@
 import styles from './skillWrap.module.css';
 import { Game } from '../../../game';
 import { ActiveSkill, Skill } from '../../../world/skill/skill';
+import { Item } from '../../../world/item/item';
 
 interface ListElementEntry {
     div: HTMLElement;
@@ -148,11 +149,21 @@ export class SkillWrap {
         }
 
         if (that.game.player.skillIsLearned(skill.id)) {
-            selectButton.innerText = 'Select';
+            selectButton.innerText = 'Grab';
             selectButton.removeAttribute('title');
             selectButton.classList.remove(styles.disabledButton);
             selectButton.onclick = () => {
-                that.game.player.skillSelect(skill);
+                if (that.game.ui.heldItem instanceof Item) {
+                    if (
+                        !that.game.player.inventory.add(that.game.ui.heldItem)
+                    ) {
+                        that.game.player.dropItem(that.game.ui.heldItem);
+                    }
+                }
+                if (skill instanceof ActiveSkill) {
+                    that.game.ui.heldItem = skill;
+                    that.game.ui.cursorItem.update(that.game.ui.heldItem);
+                }
             };
         } else {
             selectButton.innerText = 'Learn';

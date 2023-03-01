@@ -67,7 +67,7 @@ export const addDefaultSkills = (skills: SkillSystem) => {
         20,
         (c, skillLevel) => {
             if (c instanceof Character) {
-                const weapon = c.inventory.active();
+                const weapon = c.equipmentWeapon();
                 const mul = 1 + skillLevel * 0.5;
                 const dmg = (weapon?.attackDamage(c) || 0) * mul;
                 if (c.isOnCooldown() || !dmg || !c.useMana(4)) {

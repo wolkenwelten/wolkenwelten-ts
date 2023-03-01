@@ -102,7 +102,7 @@ export class MiningManager {
         if (!player.miningActive) {
             return;
         }
-        const tool = player.inventory.active();
+        const tool = player.equipmentWeapon();
         this.mine(player, player.miningX, player.miningY, player.miningZ, tool);
     }
 

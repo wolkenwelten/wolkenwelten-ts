@@ -65,9 +65,9 @@ export class Character extends Being {
 
     weight = 70;
 
+    equipment: Inventory;
     inventory: Inventory;
     skill: Map<string, CharacterSkill> = new Map();
-    selectedSkill?: CharacterSkill;
 
     /* Simple cheat, can be run from the browser console by typing `wolkenwelten.player.getGoodStuff();` */
     getGoodStuff() {
@@ -83,6 +83,7 @@ export class Character extends Being {
         this.skillXpGain('axefighting', 295);
         this.skillXpGain('pugilism', 100);
         this.skillXpGain('throwing', 100);
+        this.skillXpGain('heavyStrike', 0);
     }
 
     /* Initialize an already existing Character, that way we can easily reuse the same object, */
@@ -95,7 +96,6 @@ export class Character extends Being {
         this.pitch = this.spawnPitch;
         this.noClip = false;
         this.isDead = false;
-        this.selectedSkill = undefined;
         this.maxHealth = this.health = 12;
         this.maxMana = this.mana = 12;
         this.hitAnimation = -100;
@@ -106,6 +106,7 @@ export class Character extends Being {
 
         this.skill.clear();
         this.inventory.clear();
+        this.equipment.clear();
         this.inventory.select(0);
     }
 
@@ -119,6 +120,7 @@ export class Character extends Being {
     ) {
         super(world, x, y, z);
         this.inventory = new Inventory(40);
+        this.equipment = new Inventory(10);
         this.init();
         this.spawnX = this.x = x;
         this.spawnY = this.y = y;
@@ -351,7 +353,7 @@ export class Character extends Being {
         if (minedBlock === 0) {
             return;
         }
-        const dmg = this.inventory.active()?.miningDamage(minedBlock) || 0;
+        const dmg = this.equipmentWeapon()?.miningDamage(minedBlock) || 0;
         if (dmg > 0) {
             this.miningActive = true;
             this.miningX = x;
@@ -379,7 +381,7 @@ export class Character extends Being {
         const z = this.z + vz;
         let hit = false;
         const rr = radius * radius;
-        const weapon = this.inventory.active();
+        const weapon = this.equipmentWeapon();
         for (const e of this.world.entities) {
             if (e === this || e instanceof ItemDrop) {
                 continue;
@@ -437,6 +439,7 @@ export class Character extends Being {
     /* Callback function that gets called when this Character dies */
     onDeath() {
         this.world.game.audio.play('ungh', 0.2);
+        this.world.game.ui.hotbar.clear();
         this.init();
     }
 
@@ -462,7 +465,7 @@ export class Character extends Being {
             }
             return;
         }
-        const item = this.inventory.active();
+        const item = this.equipmentWeapon();
 
         this.hitAnimation = this.world.game.render.frames;
         const hit = this.attack();
@@ -490,9 +493,33 @@ export class Character extends Being {
         }
     }
 
+    equipmentWeapon() {
+        return this.equipment.items[0];
+    }
+
+    equipmentShield() {
+        return this.equipment.items[1];
+    }
+
+    equipmentHead() {
+        return this.equipment.items[2];
+    }
+
+    equipmentTorso() {
+        return this.equipment.items[3];
+    }
+
+    equipmentLegs() {
+        return this.equipment.items[4];
+    }
+
+    equipmentFeet() {
+        return this.equipment.items[5];
+    }
+
     /* Use the current item or punch if we don't have anything equipped */
     primaryAction() {
-        const item = this.inventory.active();
+        const item = this.equipmentWeapon();
         if (item) {
             item.use(this);
         } else {
@@ -501,25 +528,7 @@ export class Character extends Being {
     }
 
     /* Use whatever skill is currently selected */
-    secondaryAction() {
-        this.selectedSkill?.use();
-    }
-
-    /* Drop 1 of the currelty active item */
-    dropActiveItem() {
-        if (this.world.game.ticks < this.lastAction) {
-            return;
-        }
-        const item = this.inventory.active();
-        if (!item) {
-            return;
-        }
-        if (item.drop(this)) {
-            this.hitAnimation = this.world.game.render.frames;
-            this.inventory.items[this.inventory.selection] = undefined;
-            this.inventory.updateAll();
-        }
-    }
+    secondaryAction() {}
 
     /* Drop the item in the argument in front of the player */
     dropItem(item: MaybeItem) {
@@ -539,7 +548,7 @@ export class Character extends Being {
 
     /* Return the mesh of whatever we are currently holding, or a hand */
     hudMesh(): VoxelMesh | TriangleMesh {
-        const heldItem = this.inventory.active();
+        const heldItem = this.equipmentWeapon();
         if (!heldItem) {
             return this.world.game.render.assets.fist;
         } else {
@@ -567,8 +576,10 @@ export class Character extends Being {
         if (this.xpPercentageTillNextLevel() >= 1) {
             this.level++;
             this.maxHealth += 4;
+            this.maxMana += 4;
             this.skillPoints++;
             this.health = this.maxHealth;
+            this.mana = this.maxMana;
             this.world.game.audio.play('levelUp', 0.5);
             this.world.game.ui.log.addEntry(
                 `You've reached level ${
@@ -632,17 +643,8 @@ export class Character extends Being {
         return this.skill.get(skillId)?.level || -1;
     }
 
-    /* Try to select a given skill */
-    skillSelect(skill?: Skill) {
-        if (skill) {
-            for (const cs of this.skill.values()) {
-                if (cs.skill === skill) {
-                    this.selectedSkill = cs;
-                    return;
-                }
-            }
-        }
-        this.selectedSkill = undefined;
+    skillUse(skillId: string) {
+        this.skill.get(skillId)?.use();
     }
 }
 registerClass(Character);

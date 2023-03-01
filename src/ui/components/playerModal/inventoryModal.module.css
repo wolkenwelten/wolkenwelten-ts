@@ -2,3 +2,105 @@
     display: table;
     text-align: left;
 }
+
+.equipmentWrap {
+    display: block;
+    position: relative;
+    width: 240px;
+    height: 336px;
+}
+
+.characterWrap {
+    float: right;
+    width: calc(100% - 256px);
+    padding: 2px 6px;
+    min-width: 240px;
+}
+
+.slotHead {
+    position: absolute;
+    left: 80px;
+    top: 0;
+}
+
+.slotTorso::before,
+.slotLegs::before,
+.slotFeet::before,
+.slotWeapon::before,
+.slotShield::before,
+.slotHead::before {
+    content: 'Head';
+    text-align: center;
+    width: 72px;
+    display: block;
+    color: #aaa;
+    line-height: 72px;
+}
+.slotShield::before {
+    content: 'Shield';
+}
+.slotWeapon::before {
+    content: 'Weapon';
+}
+.slotTorso::before {
+    content: 'Torso';
+}
+.slotLegs::before {
+    content: 'Legs';
+}
+.slotFeet::before {
+    content: 'Feet';
+}
+
+div.slotTorso {
+    position: absolute;
+    left: 80px;
+    top: 80px;
+}
+
+div.slotLegs {
+    position: absolute;
+    left: 80px;
+    top: 160px;
+}
+
+div.slotFeet {
+    position: absolute;
+    left: 80px;
+    top: 240px;
+}
+
+div.slotWeapon {
+    position: absolute;
+    left: 0px;
+    top: 80px;
+}
+
+div.slotShield {
+    position: absolute;
+    left: 160px;
+    top: 80px;
+}
+
+.characterWrap h4 {
+    font-size: 1.3rem;
+    color: #fff;
+    font-family: 'Courier New', Courier, monospace;
+    text-shadow: -1px 0px 0px#000, 1px 0px 0px#000, 0px -1px 0px#000,
+        0px 1px 0px#000;
+    margin: 0 0 0.25em;
+}
+
+.characterWrap td,
+.characterWrap th {
+    font-family: 'Courier New', Courier, monospace;
+    text-align: left;
+    padding: 2px 6px;
+}
+
+.characterWrap th {
+    padding-left: 0;
+}
+.characterWrap td {
+    text-align: right;
+}
