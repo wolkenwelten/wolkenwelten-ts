@@ -3,8 +3,9 @@
  */
 import styles from './inventoryModal.module.css';
 import { InventoryRow } from '../item/inventoryRow';
-import { InventorySlot } from '../item/inventorySlot';
+import { InventorySlotWidget } from '../item/inventorySlotWidget';
 import { Game } from '../../../game';
+import { Div } from '../../utils';
 
 export class InventoryWrap {
     div: HTMLElement;
@@ -14,37 +15,37 @@ export class InventoryWrap {
     equipmentWrap: HTMLElement;
     characterWrap: HTMLElement;
 
-    equipmentHead: InventorySlot;
-    equipmentTorso: InventorySlot;
-    equipmentLegs: InventorySlot;
-    equipmentFeet: InventorySlot;
+    equipmentHead: InventorySlotWidget;
+    equipmentTorso: InventorySlotWidget;
+    equipmentLegs: InventorySlotWidget;
+    equipmentFeet: InventorySlotWidget;
 
-    equipmentWeapon: InventorySlot;
-    equipmentShield: InventorySlot;
+    equipmentWeapon: InventorySlotWidget;
+    equipmentShield: InventorySlotWidget;
 
     constructor(parent: HTMLElement, game: Game) {
         const inventory = game.player.inventory;
 
-        this.div = document.createElement('div');
-        this.div.classList.add(styles.inventoryWrap);
+        this.div = Div({
+            class: styles.inventoryWrap,
+            children: [
+                (this.characterWrap = Div({
+                    class: styles.characterWrap,
+                    html: `<table>
+                    <tbody>
+                    <tr><th>Level</th><td stat-key="level"></td></tr>
+                    <tr><th>Experience</th><td stat-key="xp"></td></tr>
+                    <tr><th>Next Level at</th><td stat-key="xpNextLevel"></td></tr>
+                    <tr><th>Skill points</th><td stat-key="skillPoints"></td></tr>
+                    <tr><th>Health</th><td stat-key="health"></td></tr>
+                    <tr><th>Mana</th><td stat-key="mana"></td></tr>
+                    </tbody></table>`,
+                })),
+                (this.equipmentWrap = Div({ class: styles.equipmentWrap })),
+            ],
+        });
 
-        this.characterWrap = document.createElement('div');
-        this.characterWrap.classList.add(styles.characterWrap);
-        this.characterWrap.innerHTML = `<table>
-        <tbody>
-        <tr><th>Level</th><td stat-key="level"></td></tr>
-        <tr><th>Experience</th><td stat-key="xp"></td></tr>
-        <tr><th>Next Level at</th><td stat-key="xpNextLevel"></td></tr>
-        <tr><th>Skill points</th><td stat-key="skillPoints"></td></tr>
-        <tr><th>Health</th><td stat-key="health"></td></tr>
-        <tr><th>Mana</th><td stat-key="mana"></td></tr>
-        </tbody></table>`;
-        this.div.append(this.characterWrap);
-
-        this.equipmentWrap = document.createElement('div');
-        this.equipmentWrap.classList.add(styles.equipmentWrap);
-
-        this.equipmentWeapon = new InventorySlot(
+        this.equipmentWeapon = new InventorySlotWidget(
             this.equipmentWrap,
             game.player.equipment,
             0,
@@ -52,7 +53,7 @@ export class InventoryWrap {
             false,
             styles.slotWeapon
         );
-        this.equipmentShield = new InventorySlot(
+        this.equipmentShield = new InventorySlotWidget(
             this.equipmentWrap,
             game.player.equipment,
             1,
@@ -60,7 +61,7 @@ export class InventoryWrap {
             false,
             styles.slotShield
         );
-        this.equipmentHead = new InventorySlot(
+        this.equipmentHead = new InventorySlotWidget(
             this.equipmentWrap,
             game.player.equipment,
             2,
@@ -68,7 +69,7 @@ export class InventoryWrap {
             false,
             styles.slotHead
         );
-        this.equipmentTorso = new InventorySlot(
+        this.equipmentTorso = new InventorySlotWidget(
             this.equipmentWrap,
             game.player.equipment,
             3,
@@ -76,7 +77,7 @@ export class InventoryWrap {
             false,
             styles.slotTorso
         );
-        this.equipmentLegs = new InventorySlot(
+        this.equipmentLegs = new InventorySlotWidget(
             this.equipmentWrap,
             game.player.equipment,
             4,
@@ -84,7 +85,7 @@ export class InventoryWrap {
             false,
             styles.slotLegs
         );
-        this.equipmentFeet = new InventorySlot(
+        this.equipmentFeet = new InventorySlotWidget(
             this.equipmentWrap,
             game.player.equipment,
             5,
@@ -92,8 +93,6 @@ export class InventoryWrap {
             false,
             styles.slotFeet
         );
-
-        this.div.append(this.equipmentWrap);
 
         for (let i = 0; i < Math.ceil(inventory.items.length / 10); i++) {
             const row = new InventoryRow(

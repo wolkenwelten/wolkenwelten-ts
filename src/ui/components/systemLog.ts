@@ -3,6 +3,7 @@
  */
 import { Game } from '../../game';
 import styles from './systemLog.module.css';
+import { Div } from '../utils';
 
 export class SystemLog {
     div: HTMLElement;
@@ -10,17 +11,11 @@ export class SystemLog {
 
     constructor(parent: HTMLElement, game: Game) {
         this.game = game;
-
-        const div = document.createElement('div');
-        this.div = div;
-        div.classList.add(styles.systemLog);
-
-        parent.appendChild(div);
+        parent.appendChild((this.div = Div({ class: styles.systemLog })));
     }
 
-    addEntry(msg: string) {
-        const entry = document.createElement('div');
-        entry.innerText = msg;
+    addEntry(text: string) {
+        const entry = Div({ text });
         this.div.append(entry);
         entry.getBoundingClientRect();
         entry.classList.add(styles.visible);

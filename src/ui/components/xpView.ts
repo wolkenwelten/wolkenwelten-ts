@@ -4,6 +4,7 @@
 import styles from './xpView.module.css';
 import { Game } from '../../game';
 import { Character } from '../../world/character';
+import { Div } from '../utils';
 
 export class XpView {
     game: Game;
@@ -14,16 +15,12 @@ export class XpView {
 
     constructor(parent: HTMLElement, game: Game) {
         this.game = game;
-
-        const div = document.createElement('div');
-        this.div = div;
-        div.classList.add(styles.xpView);
-
-        this.bar = document.createElement('div');
-        this.bar.classList.add(styles.bar);
-        div.append(this.bar);
-
-        parent.appendChild(div);
+        parent.appendChild(
+            (this.div = Div({
+                class: styles.xpView,
+                children: [(this.bar = Div({ class: styles.bar }))],
+            }))
+        );
         this.update();
     }
 

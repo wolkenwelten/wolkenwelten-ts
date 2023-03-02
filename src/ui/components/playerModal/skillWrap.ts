@@ -5,6 +5,7 @@ import styles from './skillWrap.module.css';
 import { Game } from '../../../game';
 import { ActiveSkill, Skill } from '../../../world/skill/skill';
 import { Item } from '../../../world/item/item';
+import { Div, H3, Img, P, Span } from '../../utils';
 
 interface ListElementEntry {
     div: HTMLElement;
@@ -26,18 +27,14 @@ export class SkillWrap {
     listElement: Map<string, ListElementEntry> = new Map();
 
     constructor(parent: HTMLElement, game: Game) {
-        this.div = document.createElement('div');
-        this.div.classList.add(styles.skillWrap);
-
-        this.list = document.createElement('div');
-        this.list.classList.add(styles.skillList);
-        this.div.appendChild(this.list);
-
-        this.details = document.createElement('div');
-        this.details.classList.add(styles.skillDetailsWrap);
-        this.div.appendChild(this.details);
-
         this.game = game;
+        this.div = Div({
+            class: styles.skilWrap,
+            children: [
+                (this.list = Div({ class: styles.skillList })),
+                (this.details = Div({ class: styles.skillDetailsWrap })),
+            ],
+        });
         this.createList();
         this.update();
         parent.appendChild(this.div);
@@ -47,16 +44,13 @@ export class SkillWrap {
         this.details.innerHTML = '';
         this.shownSkill = skill;
 
-        const div = document.createElement('div');
-        div.classList.add(styles.skillDetails);
-
-        const h = document.createElement('h3');
-        h.innerText = skill.name;
-        div.append(h);
-
-        const p = document.createElement('p');
-        p.innerText = skill.description || '';
-        div.append(p);
+        const div = Div({
+            class: styles.skillDetails,
+            children: [
+                H3({ text: skill.name }),
+                P({ text: skill.description || '' }),
+            ],
+        });
 
         if (skill instanceof ActiveSkill) {
             this.selectButton = document.createElement('button');
@@ -72,32 +66,21 @@ export class SkillWrap {
 
     private createSkillListElement(skill: Skill, active = false): HTMLElement {
         const that = this;
+        const div = Div({
+            class: styles.skill,
+            children: [Img({ src: skill.icon }), H3({ text: skill.name })],
+        });
 
-        const div = document.createElement('div');
-        div.classList.add(styles.skill);
-
-        const img = document.createElement('img');
-        img.setAttribute('src', skill.icon);
-        div.append(img);
-
-        const h = document.createElement('h3');
-        h.innerText = skill.name;
-        div.append(h);
-
-        const level = document.createElement('span');
-        level.classList.add(styles.skillLevel);
+        const level = Span({ class: styles.skillLevel });
         div.append(level);
 
-        const xpBarWrap = document.createElement('div');
-        xpBarWrap.classList.add(styles.xpBarWrap);
+        const xpBarWrap = Div({ class: styles.xpBarWrap });
         div.append(xpBarWrap);
 
-        const xpBar = document.createElement('div');
-        xpBar.classList.add(styles.xpBar);
+        const xpBar = Div({ class: styles.xpBar });
         xpBarWrap.append(xpBar);
 
-        const xpCount = document.createElement('span');
-        xpCount.classList.add(styles.xpCount);
+        const xpCount = Span({ class: styles.xpCount });
         xpBarWrap.append(xpCount);
 
         div.onclick = () => {

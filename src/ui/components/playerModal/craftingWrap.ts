@@ -6,6 +6,7 @@ import styles from './craftingWrap.module.css';
 import { Game } from '../../../game';
 import { CraftingRecipe } from '../../../world/crafting/crafting';
 import { ItemWidget } from '../item/item';
+import { Button, Div, H3, Img, P, Span } from '../../utils';
 
 export class CraftingWrap {
     div: HTMLElement;
@@ -16,70 +17,57 @@ export class CraftingWrap {
     details: HTMLElement;
 
     constructor(parent: HTMLElement, game: Game) {
-        const inventory = game.player.inventory;
-
-        this.div = document.createElement('div');
-        this.div.classList.add(styles.craftingWrap);
-
-        this.list = document.createElement('div');
-        this.list.classList.add(styles.recipeList);
-        this.div.appendChild(this.list);
-
-        this.details = document.createElement('div');
-        this.details.classList.add(styles.recipeDetails);
-        this.div.appendChild(this.details);
-
+        parent.appendChild(
+            (this.div = Div({
+                class: styles.craftingWrap,
+                children: [
+                    (this.list = Div({
+                        class: styles.recipeList,
+                    })),
+                    (this.details = Div({
+                        class: styles.recipeDetails,
+                    })),
+                ],
+            }))
+        );
         this.game = game;
-        this.inventory = inventory;
+        this.inventory = game.player.inventory;
         this.update();
-        parent.appendChild(this.div);
     }
 
     showRecipe(recipe: CraftingRecipe) {
-        this.details.innerHTML = '';
         const couldCraft = recipe.couldCraft(this.inventory);
         const that = this;
 
-        const div = document.createElement('div');
-        div.classList.add(styles.detailedRecipe);
-
-        const h = document.createElement('h3');
-        h.innerText = recipe.result.name;
-        div.append(h);
-
-        if (recipe.description) {
-            const p = document.createElement('p');
-            p.innerText = recipe.description;
-            div.append(p);
-        }
-
-        const ingredients = document.createElement('div');
-        ingredients.classList.add(styles.ingredientList);
-        div.append(ingredients);
-
-        for (const ing of recipe.ingredients) {
-            const wrap = document.createElement('div');
-            wrap.classList.add(styles.ingredientWrap);
-            ingredients.append(wrap);
-
-            const item = new ItemWidget(wrap, false);
-            item.update(ing);
-        }
-
-        const craft = document.createElement('button');
-        craft.classList.add(styles.craftButton);
-        div.append(craft);
-
-        if (couldCraft === 0) {
-            craft.classList.add(styles.cantCraft);
-        }
-
-        craft.onclick = () => {
-            recipe.doCraft(that.inventory);
-            that.update(recipe);
-        };
-
-        this.details.appendChild(div);
+        this.details.innerHTML = '';
+        this.details.appendChild(
+            Div({
+                class: styles.detailedRecipe,
+                children: [
+                    H3({ text: recipe.result.name }),
+                    recipe.description && P({ text: recipe.description }),
+                    Div({
+                        class: styles.ingredientList,
+                        children: recipe.ingredients.map((ing) => {
+                            const wrap = Div({ class: styles.ingredientWrap });
+                            const item = new ItemWidget(wrap, false);
+                            item.update(ing);
+                            return wrap;
+                        }),
+                    }),
+                    Button({
+                        classes: [
+                            styles.craftButton,
+                            couldCraft === 0 && styles.cantCraft,
+                        ],
+                        onClick: () => {
+                            recipe.doCraft(that.inventory);
+                            that.update(recipe);
+                        },
+                    }),
+                ],
+            })
+        );
     }
 
     update(preselectedRecipe?: CraftingRecipe) {
@@ -88,33 +76,27 @@ export class CraftingWrap {
         let firstRecipe = preselectedRecipe;
         for (const recipe of this.game.world.crafting.recipes.values()) {
             const couldCraft = recipe.couldCraft(this.inventory);
-            const div = document.createElement('div');
-            div.classList.add(styles.recipe);
-
-            const img = document.createElement('img');
-            img.setAttribute('src', recipe.result.icon());
-            div.append(img);
-
-            const h = document.createElement('h3');
-            h.innerText = recipe.result.name;
-            div.append(h);
-
-            const count = document.createElement('span');
-            count.innerText = String(couldCraft);
-            count.classList.add(styles.craftCount);
-            div.append(count);
-
-            if (couldCraft === 0) {
-                div.classList.add(styles.cantCraft);
-            }
-
-            div.onclick = () => {
-                for (const d of this.list.children) {
-                    d.classList.remove(styles.active);
-                }
-                div.classList.add(styles.active);
-                that.showRecipe(recipe);
-            };
+            const div = Div({
+                classes: [styles.recipe, couldCraft === 0 && styles.cantCraft],
+                children: [
+                    Img({
+                        src: recipe.result.icon(),
+                    }),
+                    H3({ text: recipe.result.name }),
+                    Span({
+                        class: styles.craftCount,
+                        text: String(couldCraft),
+                    }),
+                ],
+                onClick: () => {
+                    for (const d of this.list.children) {
+                        d.classList.remove(styles.active);
+                    }
+                    div.classList.add(styles.active);
+                    that.showRecipe(recipe);
+                },
+            });
+            this.list.appendChild(div);
 
             if (!firstRecipe || firstRecipe == recipe) {
                 for (const d of this.list.children) {
@@ -123,8 +105,6 @@ export class CraftingWrap {
                 div.classList.add(styles.active);
                 firstRecipe = recipe;
             }
-
-            this.list.appendChild(div);
         }
         if (firstRecipe) {
             this.showRecipe(firstRecipe);

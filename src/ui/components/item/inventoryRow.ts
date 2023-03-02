@@ -3,14 +3,15 @@
  */
 import { Game } from '../../../game';
 import { Inventory } from '../../../world/item/inventory';
+import { Div } from '../../utils';
 import styles from './inventoryRow.module.css';
-import { InventorySlot } from './inventorySlot';
+import { InventorySlotWidget } from './inventorySlotWidget';
 
 export class InventoryRow {
     div: HTMLElement;
     inventory: Inventory;
     offset: number;
-    slots: InventorySlot[] = [];
+    slots: InventorySlotWidget[] = [];
 
     constructor(
         parent: HTMLElement,
@@ -19,13 +20,12 @@ export class InventoryRow {
         game: Game,
         showActive = true
     ) {
-        this.div = document.createElement('div');
-        this.div.classList.add(styles.row);
+        parent.appendChild((this.div = Div({ class: styles.row })));
         this.inventory = inventory;
         this.offset = offset;
         for (let i = 0; i < 10; i++) {
             this.slots.push(
-                new InventorySlot(
+                new InventorySlotWidget(
                     this.div,
                     inventory,
                     i + offset,
@@ -34,7 +34,6 @@ export class InventoryRow {
                 )
             );
         }
-        parent.appendChild(this.div);
     }
 
     update(i: number) {

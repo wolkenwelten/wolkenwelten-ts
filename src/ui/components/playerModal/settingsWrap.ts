@@ -3,15 +3,16 @@
  */
 import styles from './settingsWrap.module.css';
 import { Game } from '../../../game';
+import { Div } from '../../utils';
 
 export class SettingsWrap {
     div: HTMLElement;
     game: Game;
 
     initViewDistance() {
-        const wrap = document.createElement('div');
-        wrap.classList.add(styles.radioButtonWrap);
-        wrap.innerHTML = `<h4>View Distance</h4>
+        const wrap = Div({
+            class: styles.radioButtonWrap,
+            html: `<h4>View Distance</h4>
         <label class="${styles.radioButton}">
             <input type="radio" name="renderDistance" value="near"/>
             <span>Near</span>
@@ -23,7 +24,8 @@ export class SettingsWrap {
         <label class="${styles.radioButton}">
             <input type="radio" name="renderDistance" value="far"/>
             <span>Far</span>
-        </label>`;
+        </label>`,
+        });
         this.div.append(wrap);
 
         for (const e of wrap.querySelectorAll('input')) {
@@ -33,10 +35,11 @@ export class SettingsWrap {
 
     initVolume() {
         const that = this;
-        const wrap = document.createElement('div');
-        wrap.classList.add(styles.volumeWrap);
-        wrap.innerHTML = `<h4>Volume</h4>
-        <input type="range" name="volume" value="100" min="0" max="100" step="any"/>`;
+        const wrap = Div({
+            class: styles.volumeWrap,
+            html: `<h4>Volume</h4>
+        <input type="range" name="volume" value="100" min="0" max="100" step="any"/>`,
+        });
         const input = wrap.querySelector('input');
         input?.addEventListener('change', (e) => {
             that.game.audio.volume = parseInt(input.value) / 100.0;
@@ -45,8 +48,7 @@ export class SettingsWrap {
     }
 
     constructor(parent: HTMLElement, game: Game) {
-        this.div = document.createElement('div');
-        this.div.classList.add(styles.settingsWrap);
+        this.div = Div({ class: styles.settingsWrap });
 
         this.initViewDistance();
         this.initVolume();

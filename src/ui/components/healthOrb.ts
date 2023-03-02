@@ -3,19 +3,13 @@
  */
 import styles from './healthOrb.module.css';
 import { Game } from '../../game';
-import { Skill } from '../../world/skill/skill';
+import { Div } from '../utils';
 
 export class HealthOrb {
-    div: HTMLElement;
     game: Game;
-
-    health: HTMLElement;
+    div: HTMLElement;
     healthOverlay: HTMLElement;
-    healthWrap: HTMLElement;
-
-    mana: HTMLElement;
     manaOverlay: HTMLElement;
-    manaWrap: HTMLElement;
 
     lastHealth = -9;
     lastMana = -9;
@@ -23,33 +17,29 @@ export class HealthOrb {
 
     constructor(parent: HTMLElement, game: Game) {
         this.game = game;
-
-        this.div = document.createElement('div');
-        this.div.classList.add(styles.healthWrap);
-
-        this.healthWrap = document.createElement('div');
-        this.healthWrap.classList.add(styles.healthOrbWrap);
-        this.div.append(this.healthWrap);
-
-        this.healthOverlay = document.createElement('div');
-        this.healthOverlay.classList.add(styles.healthOrbOverlay);
-        this.healthWrap.append(this.healthOverlay);
-
-        this.health = document.createElement('div');
-        this.health.classList.add(styles.healthOrb);
-        this.healthWrap.append(this.health);
-
-        this.manaWrap = document.createElement('div');
-        this.manaWrap.classList.add(styles.manaOrbWrap);
-        this.div.append(this.manaWrap);
-
-        this.manaOverlay = document.createElement('div');
-        this.manaOverlay.classList.add(styles.manaOrbOverlay);
-        this.manaWrap.append(this.manaOverlay);
-
-        this.mana = document.createElement('div');
-        this.mana.classList.add(styles.manaOrb);
-        this.manaWrap.append(this.mana);
+        this.div = Div({
+            class: styles.healthWrap,
+            children: [
+                Div({
+                    class: styles.healthOrbWrap,
+                    children: [
+                        (this.healthOverlay = Div({
+                            class: styles.healthOrbOverlay,
+                        })),
+                        Div({ class: styles.healthOrb }),
+                    ],
+                }),
+                Div({
+                    class: styles.manaOrbWrap,
+                    children: [
+                        (this.manaOverlay = Div({
+                            class: styles.manaOrbOverlay,
+                        })),
+                        Div({ class: styles.manaOrb }),
+                    ],
+                }),
+            ],
+        });
 
         parent.appendChild(this.div);
         this.update();

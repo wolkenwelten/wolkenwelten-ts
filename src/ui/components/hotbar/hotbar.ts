@@ -6,6 +6,7 @@ import { Game } from '../../../game';
 import { ActiveSkill } from '../../../world/skill/skill';
 import { Item } from '../../../world/item/item';
 import { ItemWidget } from '../item/item';
+import { Div } from '../../utils';
 
 export type HotbarEntryValue = Item | ActiveSkill | undefined;
 
@@ -19,16 +20,18 @@ export class HotbarEntry {
     constructor(parent: HTMLElement, game: Game, i: number) {
         this.i = i;
         this.game = game;
-        this.slot = document.createElement('div');
-        this.slot.classList.add(styles.hotbarSlot);
-        this.slot.setAttribute('slot-index', String((i + 1) % 10));
+        parent.appendChild(
+            (this.slot = Div({
+                class: styles.hotbarSlot,
+                attributes: {
+                    'slot-index': String((i + 1) % 10),
+                },
+                onMousedown: (e) => e.stopPropagation(),
+                onClick: this.click.bind(this),
+                onContextmenu: this.rightClick.bind(this),
+            }))
+        );
         this.widget = new ItemWidget(this.slot, false);
-
-        this.slot.addEventListener('mousedown', (e) => e.stopPropagation());
-        this.slot.addEventListener('click', this.click.bind(this));
-        this.slot.addEventListener('contextmenu', this.rightClick.bind(this));
-
-        parent.append(this.slot);
     }
 
     click(e: Event) {
@@ -54,6 +57,9 @@ export class HotbarEntry {
     update() {
         if (this.value instanceof ActiveSkill) {
         } else {
+            if (this.value?.destroyed) {
+                this.value = undefined;
+            }
             this.widget.update(this.value);
         }
     }
@@ -72,13 +78,10 @@ export class Hotbar {
     entries: HotbarEntry[] = [];
 
     constructor(parent: HTMLElement, game: Game) {
-        this.div = document.createElement('div');
-        this.div.classList.add(styles.hotbar);
-
+        this.div = Div({ class: styles.hotbar });
         for (let i = 0; i < 10; i++) {
             this.entries[i] = new HotbarEntry(this.div, game, i);
         }
-
         parent.appendChild(this.div);
     }
 

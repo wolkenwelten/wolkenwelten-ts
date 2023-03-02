@@ -3,8 +3,8 @@
  */
 import { ItemWidget } from './item';
 import styles from './cursorItem.module.css';
-import { MaybeItem } from '../../../world/item/item';
 import { HotbarEntryValue } from '../hotbar/hotbar';
+import { Div } from '../../utils';
 
 export class CursorItem {
     div: HTMLElement;
@@ -12,17 +12,13 @@ export class CursorItem {
     active = false;
 
     constructor(parent: HTMLElement) {
-        this.div = document.createElement('div');
-        this.div.classList.add(styles.slot);
-
-        this.widget = new ItemWidget(this.div);
         const that = this;
+        parent.appendChild((this.div = Div({ class: styles.slot })));
         parent.parentElement?.addEventListener('mousemove', (e) => {
             that.updatePos(e.pageX, e.pageY);
         });
-
+        this.widget = new ItemWidget(this.div);
         this.update(undefined);
-        parent.appendChild(this.div);
     }
 
     update(item: HotbarEntryValue) {

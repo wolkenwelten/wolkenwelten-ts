@@ -3,6 +3,7 @@
  */
 import { Game } from '../../game';
 import styles from './introWindow.module.css';
+import { Div } from '../utils';
 
 export class IntroWindow {
     div: HTMLElement;
@@ -10,10 +11,9 @@ export class IntroWindow {
 
     constructor(parent: HTMLElement, game: Game) {
         this.game = game;
-        this.div = document.createElement('div');
-        this.div.classList.add(styles.introWindow);
-
-        this.div.innerHTML = `<h3>WolkenWelten</h3>
+        this.div = Div({
+            class: styles.introWindow,
+            html: `<h3>WolkenWelten</h3>
         <p>You have washed upon the cursed shores of the Island of Dreams.<br/><br/>
         If you can survive the ordeals that await, you may be granted an immense power.</p>
         <table>
@@ -26,20 +26,20 @@ export class IntroWindow {
         <tr><th>Use skill/spell</th><td>Right mouse button</td><td>Left trigger</td></tr>
         <tr><th>Drop item</th><td>Q</td><td>Y</td></tr>
         <tr><th>Sneak</th><td>Shift</td><td>Right shoulder button</td></tr>
+        </table>`,
+        });
 
-        </table>
-        `;
-
-        const startButton = document.createElement('div');
-        startButton.classList.add(styles.startButton);
-        startButton.innerText = 'Start';
-        startButton.onclick = () => {
-            game.running = true;
-            game.input.requestFullscreenAndPointerLock();
-        };
+        const startButton = Div({
+            class: styles.startButton,
+            text: 'Start',
+            onClick: () => {
+                game.running = true;
+                game.input.requestFullscreenAndPointerLock();
+            },
+        });
         this.div.append(startButton);
-        parent.append(this.div);
 
+        parent.append(this.div);
         if (game.options.skipMenu) {
             game.running = true;
         }

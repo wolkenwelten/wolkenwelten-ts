@@ -35,7 +35,7 @@ export class Stone extends StackableItem {
             }
             user.skillXpGain('throwing', 1);
             user.hitAnimation = this.world.game.render.frames;
-            user.equipment.updateAll();
+            user.inventory.updateAll();
 
             const proj = new Projectile(user, 1 + level * 0.2);
             proj.projectileMesh = this.mesh(this.world) as VoxelMesh;

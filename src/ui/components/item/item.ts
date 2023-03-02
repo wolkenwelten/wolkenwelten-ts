@@ -1,9 +1,10 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { Item, MaybeItem } from '../../../world/item/item';
+import { Item } from '../../../world/item/item';
 import { StackableItem } from '../../../world/item/stackableItem';
 import { Skill } from '../../../world/skill/skill';
+import { Div, Img } from '../../utils';
 import { HotbarEntryValue } from '../hotbar/hotbar';
 import styles from './item.module.css';
 
@@ -18,22 +19,19 @@ export class ItemWidget {
     lastIcon = '';
 
     constructor(parent: HTMLElement, showActive = true) {
-        this.div = document.createElement('div');
-        this.div.classList.add(styles.slot);
-
-        this.img = document.createElement('img');
-        this.img.classList.add(styles.img);
+        parent.appendChild(
+            (this.div = Div({
+                class: styles.slot,
+                children: [
+                    (this.img = Img({ class: styles.img })),
+                    (this.amount = Div({ class: styles.amount })),
+                ],
+            }))
+        );
         if (showActive) {
             this.img.classList.add(styles.showActive);
         }
-        this.div.appendChild(this.img);
-
-        this.amount = document.createElement('div');
-        this.amount.classList.add(styles.amount);
-        this.div.appendChild(this.amount);
-
         this.update(undefined);
-        parent.appendChild(this.div);
     }
 
     update(item: HotbarEntryValue, active = false) {

@@ -3,12 +3,13 @@
  */
 import { Inventory } from '../../../world/item/inventory';
 import { ItemWidget } from './item';
-import styles from './inventorySlot.module.css';
+import styles from './inventorySlotWidget.module.css';
 import { Game } from '../../../game';
 import { StackableItem } from '../../../world/item/stackableItem';
 import { Item } from '../../../world/item/item';
+import { Div } from '../../utils';
 
-export class InventorySlot {
+export class InventorySlotWidget {
     div: HTMLElement;
     inventory: Inventory;
     slotIndex: number;
@@ -24,26 +25,23 @@ export class InventorySlot {
         showActive = true,
         additionalClass?: string
     ) {
-        this.div = document.createElement('div');
-        this.div.classList.add(styles.slot);
+        this.game = game;
+        parent.appendChild(
+            (this.div = Div({
+                class: styles.slot,
+                onMousedown: (e) => e.stopPropagation(),
+                onClick: this.click.bind(this),
+                onContextmenu: this.rightClick.bind(this),
+            }))
+        );
         if (additionalClass) {
             this.div.classList.add(additionalClass);
         }
         this.showActive = showActive;
-
         this.widget = new ItemWidget(this.div, showActive);
-
         this.inventory = inventory;
         this.slotIndex = slotIndex;
-
-        this.div.addEventListener('mousedown', (e) => e.stopPropagation());
-        this.div.addEventListener('click', this.click.bind(this));
-        this.div.addEventListener('contextmenu', this.rightClick.bind(this));
-
-        this.game = game;
-
         this.update();
-        parent.appendChild(this.div);
     }
 
     rightClick(e: MouseEvent) {

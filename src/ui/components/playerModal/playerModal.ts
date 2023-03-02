@@ -7,6 +7,7 @@ import { CraftingWrap } from './craftingWrap';
 import { InventoryWrap } from './inventoryModal';
 import { SettingsWrap } from './settingsWrap';
 import { SkillWrap } from './skillWrap';
+import { Div } from '../../utils';
 
 interface TabClass {
     update: () => void;
@@ -35,67 +36,55 @@ export class PlayerModal {
         constructor: TabConstructor<T>,
         activeTab = false
     ): T {
-        const tab = document.createElement('div');
-        tab.classList.add(styles.tabContent);
-        if (activeTab) {
-            tab.classList.add(styles.activeTab);
-        }
+        const that = this;
+        const tab = Div({
+            classes: [styles.tabContent, activeTab && styles.activeTab],
+        });
 
         const o = new constructor(tab, game);
         this.tabContent.appendChild(tab);
 
-        const button = document.createElement('div');
-        button.innerText = title;
-        button.classList.add(styles.tabButton);
-        if (activeTab) {
-            button.classList.add(styles.activeTabButton);
-        }
+        const button = Div({
+            classes: [styles.tabButton, activeTab && styles.activeTabButton],
+            text: title,
+            onClick: () => {
+                for (const c of that.tabContent.children) {
+                    c.classList.remove(styles.activeTab);
+                }
+                for (const c of that.tabBar.children) {
+                    c.classList.remove(styles.activeTabButton);
+                }
+                tab.classList.add(styles.activeTab);
+                button.classList.add(styles.activeTabButton);
+                o.update();
+                that.activeTab = o;
+            },
+        });
         this.tabBar.appendChild(button);
-
-        const that = this;
-        button.onclick = () => {
-            for (const c of that.tabContent.children) {
-                c.classList.remove(styles.activeTab);
-            }
-            for (const c of that.tabBar.children) {
-                c.classList.remove(styles.activeTabButton);
-            }
-            tab.classList.add(styles.activeTab);
-            button.classList.add(styles.activeTabButton);
-            o.update();
-            that.activeTab = o;
-        };
-
         return o;
     }
 
     constructor(parent: HTMLElement, game: Game) {
         this.game = game;
-        const div = document.createElement('div');
-        this.div = div;
-        this.div.classList.add(styles.modal);
+        this.div = Div({
+            class: styles.modal,
+            children: [
+                (this.tabBar = Div({ class: styles.tabBar })),
+                (this.tabContent = Div({ class: styles.tabContentWrap })),
+            ],
+        });
         const λ = (e: Event) => {
             e.stopPropagation();
         };
-        div.addEventListener('mousedown', λ);
-        div.addEventListener('mousewheel', λ);
-
-        const tabBar = document.createElement('div');
-        tabBar.classList.add(styles.tabBar);
-        div.appendChild(tabBar);
-        this.tabBar = tabBar;
-
-        const tabContent = document.createElement('div');
-        tabContent.classList.add(styles.tabContentWrap);
-        div.appendChild(tabContent);
-        this.tabContent = tabContent;
+        this.div.addEventListener('mousedown', λ);
+        this.div.addEventListener('mousewheel', λ);
 
         this.inventory = this.initTab(game, 'Inventory', InventoryWrap, true);
         this.crafting = this.initTab(game, 'Crafting', CraftingWrap);
         this.skill = this.initTab(game, 'Skills', SkillWrap);
         this.settings = this.initTab(game, 'Settings', SettingsWrap);
 
-        parent.appendChild(div);
+        parent.appendChild(this.div);
     }
 
     activate() {
