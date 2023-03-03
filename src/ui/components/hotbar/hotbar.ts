@@ -56,6 +56,7 @@ export class HotbarEntry {
 
     update() {
         if (this.value instanceof ActiveSkill) {
+            this.widget.update(this.value);
         } else {
             if (this.value?.destroyed) {
                 this.value = undefined;
@@ -83,6 +84,17 @@ export class Hotbar {
             this.entries[i] = new HotbarEntry(this.div, game, i);
         }
         parent.appendChild(this.div);
+    }
+
+    add(v: HotbarEntryValue) {
+        for (let entry of this.entries) {
+            entry.update();
+            if (!entry.value) {
+                entry.value = v;
+                entry.update();
+                return;
+            }
+        }
     }
 
     update() {

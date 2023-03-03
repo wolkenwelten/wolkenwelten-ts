@@ -24,6 +24,7 @@ export class Options {
         return def;
     }
 
+    /*
     private parseNumber(def: number, paramValue: string | null) {
         if (paramValue === null) {
             return def;
@@ -31,6 +32,7 @@ export class Options {
         const v = parseInt(paramValue);
         return v !== undefined ? v : def;
     }
+    */
 
     constructor() {
         const params = new URLSearchParams(window.location.search);

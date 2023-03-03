@@ -10,7 +10,6 @@ import { SystemLog } from './components/systemLog';
 import { CursorItem } from './components/item/cursorItem';
 import { XpView } from './components/xpView';
 import { IconManager } from './icon';
-import { MaybeItem } from '../world/item/item';
 import { PlayerModal } from './components/playerModal/playerModal';
 import { IntroWindow } from './components/introWindow';
 

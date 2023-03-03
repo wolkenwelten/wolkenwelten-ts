@@ -20,6 +20,9 @@ export class Mob extends Being {
         }
 
         const mesh = this.mesh();
+        if (!mesh) {
+            return;
+        }
         const yOff = (Math.floor(mesh.size.y / 2) * 1) / 32 - 6 / 32;
         mat4.identity(modelViewMatrix);
         transPos[0] = this.x;

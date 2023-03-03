@@ -48,6 +48,7 @@ const sideCache = new Uint8Array(32 * 32 * 32);
 const tmpSimpleLight = new Uint8Array(32 * 32 * 32);
 const identityBlocks = createIdentityBlocks();
 
+/*
 const sides = {
     front: 0,
     back: 1,
@@ -56,6 +57,7 @@ const sides = {
     left: 4,
     right: 5,
 };
+*/
 
 const addFront = (
     out: number[],

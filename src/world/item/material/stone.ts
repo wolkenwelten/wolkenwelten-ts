@@ -25,7 +25,7 @@ export class Stone extends StackableItem {
 
     use(user: Entity) {
         if (!this.destroyed && user instanceof Character) {
-            if (this.world.game.ticks < user.lastAction) {
+            if (user.isOnCooldown()) {
                 return;
             }
             const level = user.skillLevel('throwing');

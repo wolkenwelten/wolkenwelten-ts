@@ -16,6 +16,7 @@ export class ParticleMesh {
     renderer: RenderManager;
     maxParticles: number;
 
+    gravity: Float32Array;
     velocity: Float32Array;
     floatBuffer: Float32Array;
     uintBuffer: Uint32Array;
@@ -35,12 +36,13 @@ export class ParticleMesh {
         );
     }
 
-    constructor(renderer: RenderManager, maxParticles = 4096) {
+    constructor(renderer: RenderManager, maxParticles = 8192) {
         const gl = ParticleMesh.gl;
 
         this.renderer = renderer;
         this.maxParticles = maxParticles;
 
+        this.gravity = new Float32Array(this.maxParticles * 4);
         this.velocity = new Float32Array(this.maxParticles * 4);
         this.floatBuffer = new Float32Array(this.maxParticles * 5);
         this.uintBuffer = new Uint32Array(this.floatBuffer.buffer);
@@ -84,21 +86,36 @@ export class ParticleMesh {
         vx: number,
         vy: number,
         vz: number,
-        vs: number
+        vs: number,
+        gx: number,
+        gy: number,
+        gz: number,
+        gs: number
     ) {
-        const endOfBuffer = this.particleCount * 5;
+        let i = this.particleCount;
+        if (this.particleCount >= this.maxParticles) {
+            i = Math.floor(Math.random() * (this.maxParticles - 1));
+        } else {
+            this.particleCount++;
+        }
+        const endOfBuffer = i * 5;
         this.floatBuffer[endOfBuffer] = x;
         this.floatBuffer[endOfBuffer + 1] = y;
         this.floatBuffer[endOfBuffer + 2] = z;
         this.floatBuffer[endOfBuffer + 3] = size;
         this.uintBuffer[endOfBuffer + 4] = color;
 
-        const endOfVelocity = this.particleCount * 4;
+        const endOfVelocity = i * 4;
         this.velocity[endOfVelocity] = vx;
         this.velocity[endOfVelocity + 1] = vy;
         this.velocity[endOfVelocity + 2] = vz;
         this.velocity[endOfVelocity + 3] = vs;
-        this.particleCount++;
+
+        const endOfGravity = endOfVelocity;
+        this.gravity[endOfGravity] = gx;
+        this.gravity[endOfGravity + 1] = gy;
+        this.gravity[endOfGravity + 2] = gz;
+        this.gravity[endOfGravity + 3] = gs;
     }
 
     fxBlockBreak(x: number, y: number, z: number, bt: BlockType) {
@@ -112,7 +129,7 @@ export class ParticleMesh {
             const vy = Math.random() * 0.03;
             const vz = (Math.random() - 0.5) * 0.04;
             const vs = -12;
-            this.add(cx, cy, cz, cs, cc, vx, vy, vz, vs);
+            this.add(cx, cy, cz, cs, cc, vx, vy, vz, vs, 0, -0.001, 0, 0);
         }
     }
 
@@ -127,7 +144,7 @@ export class ParticleMesh {
             const vy = Math.random() * 0.05;
             const vz = (Math.random() - 0.5) * 0.06;
             const vs = -12;
-            this.add(cx, cy, cz, cs, cc, vx, vy, vz, vs);
+            this.add(cx, cy, cz, cs, cc, vx, vy, vz, vs, 0, -0.001, 0, 0);
         }
     }
 
@@ -145,7 +162,7 @@ export class ParticleMesh {
             const vy = Math.random() * 0.05;
             const vz = (Math.random() - 0.5) * 0.06;
             const vs = -14;
-            this.add(cx, cy, cz, cs, cc, vx, vy, vz, vs);
+            this.add(cx, cy, cz, cs, cc, vx, vy, vz, vs, 0, -0.001, 0, 0);
         }
     }
 
@@ -163,7 +180,7 @@ export class ParticleMesh {
             const vy = Math.random() * 0.08;
             const vz = (Math.random() - 0.5) * 0.1;
             const vs = -11;
-            this.add(cx, cy, cz, cs, cc, vx, vy, vz, vs);
+            this.add(cx, cy, cz, cs, cc, vx, vy, vz, vs, 0, -0.001, 0, 0);
         }
     }
 
@@ -171,24 +188,35 @@ export class ParticleMesh {
         for (let i = this.particleCount - 1; i >= 0; i--) {
             const bufOff = i * 5;
             const velOff = i * 4;
+            const gOff = velOff;
             this.floatBuffer[bufOff] += this.velocity[velOff];
             this.floatBuffer[bufOff + 1] += this.velocity[velOff + 1];
             this.floatBuffer[bufOff + 2] += this.velocity[velOff + 2];
             this.floatBuffer[bufOff + 3] += this.velocity[velOff + 3];
-            this.velocity[velOff + 1] -= 0.001;
+            this.velocity[velOff] += this.gravity[gOff];
+            this.velocity[velOff + 1] += this.gravity[gOff + 1];
+            this.velocity[velOff + 2] += this.gravity[gOff + 2];
+            this.velocity[velOff + 3] += this.gravity[gOff + 3];
             if (this.floatBuffer[bufOff + 3] <= 0) {
                 const endBufOff = (this.particleCount - 1) * 5;
                 const endVelOff = (this.particleCount - 1) * 4;
+                const endGOff = endVelOff;
                 this.floatBuffer[bufOff] = this.floatBuffer[endBufOff];
                 this.floatBuffer[bufOff + 1] = this.floatBuffer[endBufOff + 1];
                 this.floatBuffer[bufOff + 2] = this.floatBuffer[endBufOff + 2];
                 this.floatBuffer[bufOff + 3] = this.floatBuffer[endBufOff + 3];
-                this.floatBuffer[bufOff + 4] = this.floatBuffer[endBufOff + 4];
+                this.uintBuffer[bufOff + 4] = this.uintBuffer[endBufOff + 4];
 
                 this.velocity[velOff] = this.velocity[endVelOff];
                 this.velocity[velOff + 1] = this.velocity[endVelOff + 1];
                 this.velocity[velOff + 2] = this.velocity[endVelOff + 2];
                 this.velocity[velOff + 3] = this.velocity[endVelOff + 3];
+
+                this.gravity[gOff] = this.gravity[endGOff];
+                this.gravity[gOff + 1] = this.gravity[endGOff + 1];
+                this.gravity[gOff + 2] = this.gravity[endGOff + 2];
+                this.gravity[gOff + 3] = this.gravity[endGOff + 3];
+
                 this.particleCount--;
             }
         }
@@ -201,7 +229,10 @@ export class ParticleMesh {
         const gl = ParticleMesh.gl;
         this.update();
         this.finish();
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.ONE, gl.ONE);
         ParticleMesh.shader.bind().uniform4fv('mat_mvp', mat_mvp);
         gl.drawArrays(gl.POINTS, 0, this.particleCount);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     }
 }

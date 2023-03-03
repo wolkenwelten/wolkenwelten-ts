@@ -8,7 +8,6 @@ import { Texture } from '../../texture';
 import shaderVertSource from './voxelMesh.vert?raw';
 import shaderFragSource from './voxelMesh.frag?raw';
 import { mat4 } from 'gl-matrix';
-import { BlockMesh } from '../blockMesh/blockMesh';
 import { meshgenVoxelMesh } from '../meshgen';
 import readVox from 'vox-reader';
 

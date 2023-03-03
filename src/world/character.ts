@@ -88,6 +88,7 @@ export class Character extends Being {
         this.skillXpGain('axefighting', 295);
         this.skillXpGain('pugilism', 100);
         this.skillXpGain('throwing', 100);
+        this.skillXpGain('magickMissile', 0);
         this.skillXpGain('heavyStrike', 0);
     }
 
@@ -637,6 +638,11 @@ export class Character extends Being {
             const nps = new CharacterSkill(this, skill);
             this.skill.set(skillId, nps);
             nps.xpGain(amount);
+            if (skill instanceof ActiveSkill) {
+                setTimeout(() => {
+                    this.world.game.ui.hotbar.add(skill);
+                }, 0);
+            }
         }
     }
 

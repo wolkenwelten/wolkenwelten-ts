@@ -10,6 +10,7 @@ import { Coal } from '../item/material/coal';
 import { StoneAxe } from '../item/tools/stoneAxe';
 import { StonePickaxe } from '../item/tools/stonePickaxe';
 import { Club } from '../item/weapons/club';
+import { WoodWand } from '../item/weapons/woodWand';
 import { IronAxe } from '../item/tools/ironAxe';
 import { IronPickaxe } from '../item/tools/ironPickaxe';
 
@@ -26,6 +27,13 @@ export const addDefaultCraftingRecipes = (
         new Club(world),
         [new Stick(world, 5)],
         'A simple yet effective weapon.'
+    );
+
+    crafting.add(
+        'Wood wand',
+        new WoodWand(world),
+        [new Stick(world, 3)],
+        'The weapon of choice for beginning magicians.'
     );
 
     crafting.add(

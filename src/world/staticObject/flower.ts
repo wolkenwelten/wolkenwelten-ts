@@ -17,6 +17,13 @@ export class StaticFlower extends StaticObject {
     }
 
     onAttacked(perpetrator: Entity) {
+        this.chunk.world.game.audio.play('tock', 0.5);
+        this.chunk.world.game.render.particle.fxBlockBreak(
+            this.x,
+            this.y,
+            this.z,
+            this.chunk.world.blocks[6]
+        );
         this.destroy();
     }
 }

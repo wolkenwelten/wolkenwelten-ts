@@ -141,12 +141,16 @@ export class Entity {
         return null;
     }
 
-    mesh(): TriangleMesh | VoxelMesh {
+    mesh(): TriangleMesh | VoxelMesh | null {
         return this.world.game.render.assets.bag;
     }
 
     draw(projectionMatrix: mat4, viewMatrix: mat4, cam: Entity) {
         if (this.destroyed) {
+            return;
+        }
+        const mesh = this.mesh();
+        if (!mesh) {
             return;
         }
         this.world.game.render.decals.addShadow(this.x, this.y, this.z, 1);
@@ -165,7 +169,7 @@ export class Entity {
         const d = Math.sqrt(dx * dx + dy * dy + dz * dz);
         const renderDistance = this.world.game.render.renderDistance;
         const alpha = Math.min(1, Math.max(0, renderDistance - d) / 8);
-        this.mesh().draw(modelViewMatrix, alpha);
+        mesh.draw(modelViewMatrix, alpha);
     }
 
     beRepelledByEntities() {

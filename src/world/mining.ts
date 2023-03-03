@@ -128,7 +128,6 @@ export class MiningManager {
         }
         if ((++this.ticks & 63) == 0) {
             for (let i = this.minings.length - 1; i >= 0; i--) {
-                const m = this.minings[i];
                 this.world.game.audio.play('tock', 0.5);
             }
         }

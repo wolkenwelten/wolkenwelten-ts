@@ -9,9 +9,12 @@ import clubmanshipUrl from '../../../assets/gfx/skill/clubmanship.png';
 import axefightingUrl from '../../../assets/gfx/skill/axefighting.png';
 import pickeneeringUrl from '../../../assets/gfx/skill/pickeneering.png';
 import heavystrikeUrl from '../../../assets/gfx/skill/heavyStrike.png';
+import wandwhippingUrl from '../../../assets/gfx/skill/wandWhipping.png';
+import magickMissileUrl from '../../../assets/gfx/skill/magickMissile.png';
 import { Character } from '../character';
 import { Being } from '../entity/being';
 import { Entity } from '../entity/entity';
+import { Projectile } from '../entity/projectile';
 
 export const addDefaultSkills = (skills: SkillSystem) => {
     skills.addPassive(
@@ -59,6 +62,13 @@ export const addDefaultSkills = (skills: SkillSystem) => {
         `With this skill you now deal more damage to both monsters and minerals using pickaxes.`
     );
 
+    skills.addPassive(
+        'wandWhipping',
+        'Wand whipping',
+        wandwhippingUrl,
+        `You are now an experienced wand user, which not only improves your physical prowess, but also unlocks some magical abilities.`
+    );
+
     skills.addActive(
         'heavyStrike',
         'Heavy Strike',
@@ -93,9 +103,110 @@ export const addDefaultSkills = (skills: SkillSystem) => {
                 c.world.game.audio.play('heavyStrike');
                 if (hit) {
                     c.world.game.audio.play('punch');
+                    c.skillXpGain('heavyStrike', 1);
                     return true;
                 } else {
                     c.world.game.audio.play('punchMiss');
+                }
+            }
+            return false;
+        }
+    );
+
+    skills.addActive(
+        'magickMissile',
+        'Magick missile',
+        magickMissileUrl,
+        `Throw small but deadly projectiles at whatever foe you are pointing at.`,
+        20,
+        (user, skillLevel) => {
+            let hit = false;
+            if (user instanceof Character) {
+                if (user.isOnCooldown() || !user.useMana(1)) {
+                    return false;
+                }
+                user.cooldown(35);
+                user.hitAnimation = user.world.game.render.frames;
+                user.world.game.audio.play('punchMiss');
+
+                const count = Math.floor(4 + skillLevel);
+                for (let i = 0; i < count; i++) {
+                    const proj = new Projectile(user, 1.2);
+                    const offDir = (i * 1) / count - 0.5;
+                    proj.x += Math.cos(user.yaw) * offDir + proj.vx;
+                    proj.z += Math.sin(user.yaw) * offDir + proj.vz;
+                    proj.y += proj.vy - 0.2;
+                    const vx = proj.vx;
+                    const vy = proj.vy;
+                    const vz = proj.vz;
+                    const off = Math.floor(Math.random() * 1000);
+
+                    proj.onHit = function (this: Projectile, e: Entity) {
+                        if (!hit) {
+                            hit = true;
+                            user.skillXpGain('magickMissile', 1);
+                        }
+                        if (e instanceof Being) {
+                            user.doDamage(e, 1);
+                        }
+                        this.world.game.render.particle.fxStrike(e.x, e.y, e.z);
+                    };
+                    proj.onMiss = function (this: Projectile) {
+                        this.world.game.render.particle.fxStrike(
+                            this.x,
+                            this.y,
+                            this.z
+                        );
+                        this.destroy();
+                    };
+                    proj.onUpdate = function (this: Projectile) {
+                        this.vx =
+                            vx +
+                            (Math.cos((this.ttl + 5 + off) * 0.1) - 0.5) * 0.02;
+                        this.vy =
+                            vy +
+                            (Math.cos((this.ttl + 10 + off) * 0.2) - 0.5) *
+                                0.02;
+                        this.vz =
+                            vz +
+                            (Math.cos((this.ttl + 15 + off) * 0.4) - 0.5) *
+                                0.02;
+                        this.world.game.render.particle.add(
+                            this.x,
+                            this.y,
+                            this.z,
+                            128,
+                            0xffa010df,
+                            0,
+                            0,
+                            0,
+                            -10,
+                            0,
+                            0,
+                            0,
+                            0
+                        );
+                        const vxs = (this.vx * 1) / 8;
+                        const vys = (this.vy * 1) / 8;
+                        const vzs = (this.vz * 1) / 8;
+                        for (let i = 0; i < 8; i++) {
+                            this.world.game.render.particle.add(
+                                this.x + vxs * i,
+                                this.y + vys * i,
+                                this.z + vzs * i,
+                                24,
+                                0xff8030af,
+                                0,
+                                0,
+                                0,
+                                -0.6,
+                                0,
+                                0,
+                                0,
+                                0
+                            );
+                        }
+                    };
                 }
             }
             return false;

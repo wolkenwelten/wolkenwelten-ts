@@ -8,7 +8,6 @@ import shadowTextureUrl from '../../../../assets/gfx/decals.png';
 
 import shaderVertSource from './decalMesh.vert?raw';
 import shaderFragSource from './decalMesh.frag?raw';
-import { Game } from '../../../game';
 import { mat4 } from 'gl-matrix';
 import { RenderManager } from '../../render';
 

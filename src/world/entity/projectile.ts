@@ -9,7 +9,8 @@ import { registerClass } from '../../class';
 export class Projectile extends Entity {
     weight = 1;
     source: Entity;
-    projectileMesh: VoxelMesh;
+    projectileMesh: VoxelMesh | null;
+    ttl = 128;
     onHit?: (e: Entity) => void;
     onMiss?: () => void;
     onUpdate?: () => void;
@@ -29,10 +30,10 @@ export class Projectile extends Entity {
         this.vy = vy;
         this.vz = vz;
 
-        this.projectileMesh = source.world.game.render.assets.fist;
+        this.projectileMesh = null;
     }
 
-    mesh(): TriangleMesh | VoxelMesh {
+    mesh(): TriangleMesh | VoxelMesh | null {
         return this.projectileMesh;
     }
 
@@ -60,11 +61,13 @@ export class Projectile extends Entity {
         if (this.destroyed) {
             return;
         }
+        if (--this.ttl < 0) {
+            this.destroy();
+        }
         super.update();
         this.checkForEntityCollisions();
         this.onUpdate && this.onUpdate();
-        const vv = this.vx * this.vx + this.vy * this.vy + this.vz * this.vz;
-        if (vv < 0.01) {
+        if (this.collides()) {
             this.onMiss && this.onMiss();
             this.destroy();
         }
