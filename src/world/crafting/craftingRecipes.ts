@@ -15,6 +15,7 @@ import { IronAxe } from '../item/tools/ironAxe';
 import { IronPickaxe } from '../item/tools/ironPickaxe';
 
 import { World } from '../world';
+import { WoodShield } from '../item/armor/woodShield';
 import { CrabShield } from '../item/armor/crabShield';
 import { CrabMeatRaw } from '../item/food/crabMeatRaw';
 
@@ -34,6 +35,13 @@ export const addDefaultCraftingRecipes = (
         new WoodWand(world),
         [new Stick(world, 3)],
         'The weapon of choice for beginning magicians.'
+    );
+
+    crafting.add(
+        'WoodShield',
+        new WoodShield(world),
+        [new Stick(world, 8)],
+        'A primitive shield.'
     );
 
     crafting.add(

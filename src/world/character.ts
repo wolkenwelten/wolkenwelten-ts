@@ -21,6 +21,7 @@ import { Being } from './entity/being';
 import { registerClass } from '../class';
 import { Club } from './item/weapons/club';
 import { CrabShield } from './item/armor/crabShield';
+import { WoodShield } from './item/armor/woodShield';
 
 const CHARACTER_ACCELERATION = 0.05;
 const CHARACTER_STOP_RATE = CHARACTER_ACCELERATION * 3.0;
@@ -83,7 +84,7 @@ export class Character extends Being {
         this.inventory.add(new BlockItem(this.world, 3, 90));
 
         this.equipment.items[0] = new Club(this.world);
-        this.equipment.items[1] = new CrabShield(this.world);
+        this.equipment.items[1] = new WoodShield(this.world);
 
         this.skillXpGain('axefighting', 295);
         this.skillXpGain('pugilism', 100);
