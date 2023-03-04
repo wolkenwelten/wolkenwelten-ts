@@ -1,12 +1,11 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import './style.css';
-import { Game } from './game';
+import { SlayersGame } from './slayers-mode/slayersGame';
 
 declare global {
     interface Window {
-        wolkenwelten: Game;
+        wolkenwelten: SlayersGame;
     }
 }
 
@@ -15,7 +14,7 @@ const main = () => {
     if (!parent) {
         throw new Error("Can't find WolkenWelten parent element");
     }
-    const game = new Game({
+    const game = new SlayersGame({
         parent: parent as HTMLElement,
     });
     window.wolkenwelten = game;

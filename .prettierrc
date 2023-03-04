@@ -1,4 +1,7 @@
 {
+    "importOrder": ["(([.]png)|([.]mp3)|([.]ogg)|([?]url)|([?]raw))$", "^[./]" ],
+    "importOrderSeparation": true,
+    "importOrderSortSpecifiers": true,
     "trailingComma": "es5",
     "tabWidth": 4,
     "semi": true,

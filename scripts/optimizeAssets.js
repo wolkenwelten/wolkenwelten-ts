@@ -29,3 +29,4 @@ const readdirRecSync = (path) => {
     }
 };
 readdirRecSync(process.cwd()+'/assets/');
+readdirRecSync(process.cwd()+'/src/');
