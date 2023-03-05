@@ -1,15 +1,16 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
+import { mat4 } from 'gl-matrix';
+
+import shadowTextureUrl from '../../../../assets/gfx/decals.png';
+import shaderFragSource from './decalMesh.frag?raw';
+import shaderVertSource from './decalMesh.vert?raw';
+
+import { clamp } from '../../../util/math';
+import { RenderManager } from '../../render';
 import { Shader } from '../../shader';
 import { Texture } from '../../texture';
-import { clamp } from '../../../util/math';
-import shadowTextureUrl from '../../../../assets/gfx/decals.png';
-
-import shaderVertSource from './decalMesh.vert?raw';
-import shaderFragSource from './decalMesh.frag?raw';
-import { mat4 } from 'gl-matrix';
-import { RenderManager } from '../../render';
 
 const uvs = 1 / 8;
 

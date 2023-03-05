@@ -1,12 +1,12 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import styles from './hotbar.module.css';
 import { Game } from '../../../game';
-import { ActiveSkill } from '../../../world/skill/skill';
 import { Item } from '../../../world/item/item';
-import { ItemWidget } from '../item/item';
+import { ActiveSkill } from '../../../world/skill';
 import { Div } from '../../utils';
+import { ItemWidget } from '../item/item';
+import styles from './hotbar.module.css';
 
 export type HotbarEntryValue = Item | ActiveSkill | undefined;
 

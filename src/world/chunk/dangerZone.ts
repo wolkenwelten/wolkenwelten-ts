@@ -1,7 +1,6 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { registerClass } from '../../class';
 import { World } from '../world';
 
 export interface DangerZoneEntry {
@@ -90,4 +89,3 @@ export class DangerZone {
         }
     }
 }
-registerClass(DangerZone);

@@ -1,15 +1,16 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
+import { mat4 } from 'gl-matrix';
+import readVox from 'vox-reader';
+
+import shaderFragSource from './voxelMesh.frag?raw';
+import shaderVertSource from './voxelMesh.vert?raw';
+
 import '../../../types';
 import { Shader } from '../../shader';
 import { Texture } from '../../texture';
-
-import shaderVertSource from './voxelMesh.vert?raw';
-import shaderFragSource from './voxelMesh.frag?raw';
-import { mat4 } from 'gl-matrix';
 import { meshgenVoxelMesh } from '../meshgen';
-import readVox from 'vox-reader';
 
 const tmpBlocks = new Uint8Array(32 * 32 * 32);
 

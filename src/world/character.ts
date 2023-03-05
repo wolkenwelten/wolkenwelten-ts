@@ -1,27 +1,17 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { Entity } from './entity/entity';
-import { Inventory } from './item/inventory';
-import { World } from './world';
 import { mat4 } from 'gl-matrix';
-import { BlockItem } from './item/blockItem';
-import { TriangleMesh, VoxelMesh } from '../render/asset';
-import { CrabMeatRaw } from './item/food/crabMeatRaw';
-import { ItemDrop } from './item/itemDrop';
-import { StoneAxe } from './item/tools/stoneAxe';
-import { StonePickaxe } from './item/tools/stonePickaxe';
-import { Stick } from './item/material/stick';
-import { Item, MaybeItem } from './item/item';
-import { IronPickaxe } from './item/tools/ironPickaxe';
-import { IronAxe } from './item/tools/ironAxe';
-import { Stone } from './item/material/stone';
-import { ActiveSkill, CharacterSkill } from './skill/skill';
+
+import { TriangleMesh } from '../render/meshes/triangleMesh/triangleMesh';
+import { VoxelMesh } from '../render/meshes/voxelMesh/voxelMesh';
 import { Being } from './entity/being';
-import { registerClass } from '../class';
-import { Club } from './item/weapons/club';
-import { CrabShield } from './item/armor/crabShield';
-import { WoodShield } from './item/armor/woodShield';
+import { Entity } from './entity/entity';
+import { ItemDrop } from './entity/itemDrop';
+import { Inventory } from './item/inventory';
+import { Item, MaybeItem } from './item/item';
+import { ActiveSkill, CharacterSkill, Skill } from './skill';
+import { World } from './world';
 
 const CHARACTER_ACCELERATION = 0.05;
 const CHARACTER_STOP_RATE = CHARACTER_ACCELERATION * 3.0;
@@ -74,17 +64,16 @@ export class Character extends Being {
 
     /* Simple cheat, can be run from the browser console by typing `wolkenwelten.player.getGoodStuff();` */
     getGoodStuff() {
-        this.inventory.add(new IronAxe(this.world));
-        this.inventory.add(new IronPickaxe(this.world));
-        this.inventory.add(new StoneAxe(this.world));
-        this.inventory.add(new StonePickaxe(this.world));
-        this.inventory.add(new CrabMeatRaw(this.world, 3));
-        this.inventory.add(new Stick(this.world, 3));
-        this.inventory.add(new Stone(this.world, 90));
-        this.inventory.add(new BlockItem(this.world, 3, 90));
+        this.inventory.add(Item.create('ironAxe', this.world));
+        this.inventory.add(Item.create('ironPickaxe', this.world));
+        this.inventory.add(Item.create('stoneAxe', this.world));
+        this.inventory.add(Item.create('stonePickaxe', this.world));
+        this.inventory.add(Item.create('crabMeatRaw', this.world, 3));
+        this.inventory.add(Item.create('stick', this.world, 3));
+        this.inventory.add(Item.create('stone', this.world, 90));
 
-        this.equipment.items[0] = new Club(this.world);
-        this.equipment.items[1] = new WoodShield(this.world);
+        this.equipment.items[0] = Item.create('club', this.world);
+        this.equipment.items[1] = Item.create('woodShield', this.world);
 
         this.skillXpGain('axefighting', 295);
         this.skillXpGain('pugilism', 100);
@@ -116,7 +105,9 @@ export class Character extends Being {
         this.equipment.clear();
         this.inventory.select(0);
         if (this.world.game.options.startWithEquipment) {
-            this.getGoodStuff();
+            setTimeout(() => {
+                this.getGoodStuff();
+            });
         }
     }
 
@@ -559,14 +550,14 @@ export class Character extends Being {
     secondaryAction() {}
 
     /* Drop the item in the argument in front of the player */
-    dropItem(item: MaybeItem) {
-        if (!item) {
-            return;
-        }
-        if (item.dropAll(this)) {
+    dropItem(item: MaybeItem): ItemDrop | null {
+        if (item) {
+            const drop = ItemDrop.fromItem(item, this);
             this.hitAnimation = this.world.game.render.frames;
             this.inventory.updateAll();
+            return drop;
         }
+        return null;
     }
 
     /* Since right now WW is only singleplayer we can ignore this method */
@@ -580,7 +571,7 @@ export class Character extends Being {
         if (!heldItem) {
             return this.world.game.render.assets.fist;
         } else {
-            return heldItem.mesh(this.world);
+            return heldItem.mesh();
         }
     }
 
@@ -632,7 +623,7 @@ export class Character extends Being {
         if (ps) {
             ps.xpGain(amount);
         } else {
-            const skill = this.world.skills.get(skillId);
+            const skill = Skill.get(skillId);
             if (!skill) {
                 throw new Error(`Unknown skill: ${skillId}`);
             }
@@ -652,7 +643,7 @@ export class Character extends Being {
         if (this.skillPoints <= 0) {
             return false;
         }
-        const skill = this.world.skills.get(skillId);
+        const skill = Skill.get(skillId);
         if (!skill) {
             throw new Error(`Unknown skill: ${skillId}`);
         }
@@ -680,4 +671,3 @@ export class Character extends Being {
         this.skill.get(skillId)?.use();
     }
 }
-registerClass(Character);

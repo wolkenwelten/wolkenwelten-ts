@@ -2,8 +2,7 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import { Item } from '../../../world/item/item';
-import { StackableItem } from '../../../world/item/stackableItem';
-import { Skill } from '../../../world/skill/skill';
+import { Skill } from '../../../world/skill';
 import { Div, Img } from '../../utils';
 import { HotbarEntryValue } from '../hotbar/hotbar';
 import styles from './item.module.css';
@@ -55,8 +54,8 @@ export class ItemWidget {
             this.div.removeAttribute('title');
             this.lastName = '';
         }
-        if (item instanceof StackableItem) {
-            if (item.amount > 0) {
+        if (item instanceof Item) {
+            if (item.stackSize > 1 && item.amount > 0) {
                 if (item.amount !== this.lastAmount) {
                     this.amount.innerText = `${item.amount}`;
                     this.lastAmount = item.amount;
@@ -65,7 +64,7 @@ export class ItemWidget {
                 this.amount.innerText = '';
                 this.lastAmount = 0;
             }
-            const icon = item.icon();
+            const icon = item.icon;
             if (icon) {
                 if (icon !== this.lastIcon) {
                     this.img.setAttribute('src', icon);
@@ -76,20 +75,6 @@ export class ItemWidget {
                 this.img.style.display = 'none';
                 this.lastIcon = '';
             }
-        } else if (item instanceof Item) {
-            const icon = item.icon();
-            if (icon) {
-                if (icon !== this.lastIcon) {
-                    this.img.setAttribute('src', icon);
-                    this.img.style.display = 'block';
-                    this.lastIcon = icon;
-                }
-            } else {
-                this.img.style.display = 'none';
-                this.lastIcon = '';
-            }
-            this.amount.innerText = '';
-            this.lastAmount = 0;
         } else if (item instanceof Skill) {
             const icon = item.icon;
             if (icon) {

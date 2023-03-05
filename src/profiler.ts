@@ -2,8 +2,6 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 
-import { registerClass } from './class';
-
 export interface ProfilingResults {
     id: string;
     results: number[];
@@ -53,7 +51,6 @@ export class ProfilingManager {
         console.table(tmp);
     }
 }
-registerClass(ProfilingManager);
 
 const profiler = new ProfilingManager();
 export default profiler;

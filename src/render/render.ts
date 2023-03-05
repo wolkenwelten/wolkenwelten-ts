@@ -1,15 +1,16 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { Game } from '../game';
 import { mat4 } from 'gl-matrix';
-import { DecalMesh, AssetList } from './asset';
-import { Entity } from '../world/entity/entity';
-import { WorldRenderer } from './worldRenderer';
-import { allTexturesLoaded } from './texture';
-import { coordinateToWorldKey } from '../world/world';
 
+import { Game } from '../game';
+import { Entity } from '../world/entity/entity';
+import { coordinateToWorldKey } from '../world/world';
+import { AssetList } from './asset';
+import { DecalMesh } from './meshes/decalMesh/decalMesh';
 import { ParticleMesh } from './meshes/particleMesh/particleMesh';
+import { allTexturesLoaded } from './texture';
+import { WorldRenderer } from './worldRenderer';
 
 const transPos = new Float32Array([0, 0, 0]);
 const projectionMatrix = mat4.create();
@@ -179,7 +180,7 @@ export class RenderManager {
         if (!item) {
             return;
         }
-        const mesh = item.mesh(this.game.world);
+        const mesh = item.mesh();
         mat4.identity(modelViewMatrix);
         let r = Math.PI * -0.04;
         const player = this.game.player;

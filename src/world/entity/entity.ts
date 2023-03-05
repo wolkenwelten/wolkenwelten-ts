@@ -2,8 +2,9 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import { mat4 } from 'gl-matrix';
-import { registerClass } from '../../class';
-import { TriangleMesh, VoxelMesh } from '../../render/asset';
+
+import { TriangleMesh } from '../../render/meshes/triangleMesh/triangleMesh';
+import { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
 import { World } from '../world';
 
 let entityCounter = 0;
@@ -197,4 +198,3 @@ export class Entity {
         }
     }
 }
-registerClass(Entity);

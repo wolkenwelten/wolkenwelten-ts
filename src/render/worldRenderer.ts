@@ -3,11 +3,12 @@
  */
 import { mat4 } from 'gl-matrix';
 
-import { Frustum } from './frustum';
-import { BlockMesh, VoxelMesh } from './asset';
 import { RenderManager } from '../render/render';
 import { Entity } from '../world/entity/entity';
 import { coordinateToWorldKey } from '../world/world';
+import { Frustum } from './frustum';
+import { BlockMesh } from './meshes/blockMesh/blockMesh';
+import { VoxelMesh } from './meshes/voxelMesh/voxelMesh';
 import { VoxelMeshBlit } from './meshes/voxelMesh/voxelMesh';
 
 type GeneratorQueueEntry = {

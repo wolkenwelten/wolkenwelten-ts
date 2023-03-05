@@ -1,25 +1,27 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { TriangleMesh, VoxelMesh } from '../../render/asset';
-import { Entity } from '../entity/entity';
-import { ItemDrop } from './itemDrop';
-import { World } from '../world';
-import { Inventory } from './inventory';
-
-import itemIcon from '../../../assets/gfx/items/crabMeatRaw.png';
+import { TriangleMesh } from '../../render/meshes/triangleMesh/triangleMesh';
+import { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
 import { Character } from '../character';
-import { registerClass } from '../../class';
+import { Entity } from '../entity/entity';
+import { World } from '../world';
+
 let idCounter = 0;
 
 export type MaybeItem = Item | undefined;
+type ItemConstructor = new (world: World, amount: number) => Item;
 
 export class Item {
     id: number;
-    name: string;
+    icon = '';
+    meshUrl = '';
+    name = '';
     world: World;
     destroyed = false;
     attackSkill: string[] = [];
+    amount = 1;
+    stackSize = 1;
 
     isWeapon = false;
     isShield = false;
@@ -28,22 +30,39 @@ export class Item {
     isLegwear = false;
     isFootwear = false;
 
-    constructor(world: World, name: string) {
+    static registry: Map<string, ItemConstructor> = new Map();
+    static register(name: string, con: ItemConstructor) {
+        this.registry.set(name, con);
+    }
+
+    static create(name: string, world: World, amount = 1) {
+        const con = this.registry.get(name);
+        if (con) {
+            return new con(world, amount);
+        } else {
+            throw new Error(`Unknown Item ${name}`);
+        }
+    }
+
+    constructor(world: World, amount = 1) {
         this.id = ++idCounter;
-        this.name = name;
+        this.amount = amount;
         this.world = world;
     }
 
     clone(): Item {
-        return new Item(this.world, this.name);
+        return new (this as any).__proto__.constructor(this.world, this.amount);
     }
 
     destroy() {
         this.destroyed = true;
     }
 
-    icon(): string {
-        return itemIcon;
+    mesh(): TriangleMesh | VoxelMesh {
+        return (
+            this.world.game.render.assets.get(this.meshUrl) ||
+            this.world.game.render.assets.bag
+        );
     }
 
     use(e: Entity) {
@@ -72,25 +91,9 @@ export class Item {
         }
     }
 
-    dropAll(e: Entity): boolean {
-        const drop = new ItemDrop(e.world, e.x, e.y, e.z, this);
-        const [vx, vz] = e.walkDirection();
-        drop.vy = 0.01;
-        drop.vx = vx * -0.1;
-        drop.vz = vz * -0.1;
-        drop.noCollect = true;
-        return true;
+    mayStackWith(other: Item): boolean {
+        return this.constructor === other.constructor;
     }
 
-    drop(e: Entity): boolean {
-        return this.dropAll(e);
-    }
-
-    mesh(world: World): TriangleMesh | VoxelMesh {
-        return world.game.render.assets.bag;
-    }
-
-    addToExistingStacks(inventory: Inventory) {}
     onMineWith(e: Entity, block: number) {}
 }
-registerClass(Item);

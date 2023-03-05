@@ -1,23 +1,33 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { registerClass } from '../../class';
-import { TriangleMesh, VoxelMesh } from '../../render/asset';
+import { TriangleMesh } from '../../render/meshes/triangleMesh/triangleMesh';
+import { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
 import { Character } from '../character';
 import { Entity } from '../entity/entity';
 import { World } from '../world';
-import { StackableItem } from './stackableItem';
+import { Item } from './item';
 
-export class BlockItem extends StackableItem {
+export class BlockItem extends Item {
     blockType: number;
+    stackSize = 99;
 
     constructor(world: World, blockType: number, amount: number) {
         const bt = world.blocks[blockType];
         if (!bt) {
             throw new Error(`Invalid blockType: ${blockType}`);
         }
-        super(world, amount, bt.longName || bt.name);
+        super(world, amount);
         this.blockType = blockType;
+        this.icon = this.world.blocks[this.blockType].icon;
+        this.name = bt.longName || bt.name;
+    }
+
+    mesh(): TriangleMesh | VoxelMesh {
+        return (
+            this.world.game.render.assets.blockType[this.blockType] ||
+            this.world.game.render.assets.bag
+        );
     }
 
     clone(): BlockItem {
@@ -52,23 +62,11 @@ export class BlockItem extends StackableItem {
         return;
     }
 
-    icon(): string {
-        return this.world.blocks[this.blockType].icon;
-    }
-
-    mayStackWith(other: StackableItem): boolean {
+    mayStackWith(other: Item): boolean {
         if (other instanceof BlockItem) {
             return other.blockType === this.blockType;
         } else {
             return false;
         }
     }
-
-    mesh(world: World): TriangleMesh | VoxelMesh {
-        return (
-            world.game.render.assets.blockType[this.blockType] ||
-            world.game.render.assets.bag
-        );
-    }
 }
-registerClass(BlockItem);

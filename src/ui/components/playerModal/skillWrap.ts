@@ -1,11 +1,11 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import styles from './skillWrap.module.css';
 import { Game } from '../../../game';
-import { ActiveSkill, Skill } from '../../../world/skill/skill';
 import { Item } from '../../../world/item/item';
+import { ActiveSkill, Skill } from '../../../world/skill';
 import { Div, H3, Img, P, Span } from '../../utils';
+import styles from './skillWrap.module.css';
 
 interface ListElementEntry {
     div: HTMLElement;
@@ -110,7 +110,7 @@ export class SkillWrap {
         this.list.innerHTML = '';
         this.listElement.clear();
 
-        const skills = Array.from(this.game.world.skills.skills.values()).sort(
+        const skills = Array.from(Skill.registry.values()).sort(
             (a: Skill, b: Skill) => (a.name > b.name ? 1 : -1)
         );
         for (const skill of skills) {

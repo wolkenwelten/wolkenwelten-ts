@@ -1,18 +1,15 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
+import { registerBlockTypes } from '../content/blockTypes';
 import { Game } from '../game';
+import profiler from '../profiler';
+import { LCG } from '../util/prng';
+import { BlockType } from './blockType';
+import { Chunk } from './chunk/chunk';
 import { DangerZone } from './chunk/dangerZone';
 import { Entity } from './entity/entity';
-import { Chunk } from './chunk/chunk';
-import { BlockType } from './blockType/blockType';
 import { MiningManager } from './mining';
-import { WorldgenAssetManager } from './worldgen/assets';
-import { CraftingSystem } from './crafting/crafting';
-import { SkillSystem } from './skill/skill';
-import { initDefaultBlocks } from './blockType/blockTypeDefaults';
-import { registerClass } from '../class';
-import { LCG } from '../util/prng';
 
 export const coordinateToWorldKey = (x: number, y: number, z: number) =>
     ((Math.floor(x) >> 5) & 0xffff) +
@@ -26,23 +23,28 @@ export class World {
     seed: number;
     mining: MiningManager;
     game: Game;
-    assets: WorldgenAssetManager;
-    crafting: CraftingSystem;
-    skills: SkillSystem;
     blocks: BlockType[] = [];
     blockTextureUrl = '';
     lootRNG: LCG;
+    worldgenHandler: (chunk: Chunk) => void;
 
     constructor(game: Game) {
         this.seed = 1234;
         this.game = game;
         this.mining = new MiningManager(this);
-        this.assets = new WorldgenAssetManager();
         this.dangerZone = new DangerZone(this);
-        initDefaultBlocks(this);
-        this.crafting = new CraftingSystem(this);
-        this.skills = new SkillSystem(this);
+        this.worldgenHandler = (chunk: Chunk) => {
+            chunk.setSphereUnsafe(16, 16, 16, 7, 3);
+        };
+        registerBlockTypes(this);
         this.lootRNG = new LCG(new Date().toISOString());
+    }
+
+    worldgen(chunk: Chunk): Chunk {
+        const start = performance.now();
+        this.worldgenHandler(chunk);
+        profiler.add('worldgen', start, performance.now());
+        return chunk;
     }
 
     addBlockType = (longName: string, name?: string): BlockType => {
@@ -93,7 +95,7 @@ export class World {
         if (chunk) {
             return chunk;
         }
-        const newChunk = new Chunk(this, x, y, z);
+        const newChunk = this.worldgen(new Chunk(this, x, y, z));
         this.chunks.set(key, newChunk);
         return newChunk;
     }
@@ -164,4 +166,3 @@ export class World {
         }
     }
 }
-registerClass(World);

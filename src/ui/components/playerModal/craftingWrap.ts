@@ -1,12 +1,12 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { Inventory } from '../../../world/item/inventory';
-import styles from './craftingWrap.module.css';
 import { Game } from '../../../game';
-import { CraftingRecipe } from '../../../world/crafting/crafting';
-import { ItemWidget } from '../item/item';
+import { CraftingRecipe } from '../../../world/crafting';
+import { Inventory } from '../../../world/item/inventory';
 import { Button, Div, H3, Img, P, Span } from '../../utils';
+import { ItemWidget } from '../item/item';
+import styles from './craftingWrap.module.css';
 
 export class CraftingWrap {
     div: HTMLElement;
@@ -74,13 +74,13 @@ export class CraftingWrap {
         const that = this;
         this.list.innerHTML = '';
         let firstRecipe = preselectedRecipe;
-        for (const recipe of this.game.world.crafting.recipes.values()) {
+        for (const recipe of CraftingRecipe.recipes.values()) {
             const couldCraft = recipe.couldCraft(this.inventory);
             const div = Div({
                 classes: [styles.recipe, couldCraft === 0 && styles.cantCraft],
                 children: [
                     Img({
-                        src: recipe.result.icon(),
+                        src: recipe.result.icon,
                     }),
                     H3({ text: recipe.result.name }),
                     Span({

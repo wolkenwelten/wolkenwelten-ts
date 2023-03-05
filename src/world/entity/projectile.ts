@@ -1,10 +1,10 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
+import { TriangleMesh } from '../../render/meshes/triangleMesh/triangleMesh';
+import { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
 import { Entity } from './entity';
-import { TriangleMesh, VoxelMesh } from '../../render/asset';
-import { Mob } from '../mob/mob';
-import { registerClass } from '../../class';
+import { Mob } from './mob';
 
 export class Projectile extends Entity {
     weight = 1;
@@ -73,4 +73,3 @@ export class Projectile extends Entity {
         }
     }
 }
-registerClass(Projectile);

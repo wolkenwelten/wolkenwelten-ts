@@ -8,7 +8,6 @@
  * Is also responsible for calling the spawnMiningDrops method on the BlockType as the mining finishes as
  * well as creating DangerZones to make sure that fluids are properly simulated if we dig close to one.
  */
-import { registerClass } from '../class';
 import { RenderManager } from '../render/render';
 import { clamp } from '../util/math';
 import { Character } from './character';
@@ -145,4 +144,3 @@ export class MiningManager {
         }
     }
 }
-registerClass(MiningManager);

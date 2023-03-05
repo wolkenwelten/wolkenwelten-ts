@@ -1,22 +1,17 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { Game } from '../game';
-import { BlockMesh } from './meshes/blockMesh/blockMesh';
-import { DecalMesh } from './meshes/decalMesh/decalMesh';
-import { TriangleMesh } from './meshes/triangleMesh/triangleMesh';
-import { ParticleMesh } from './meshes/particleMesh/particleMesh';
-import { VoxelMesh } from './meshes/voxelMesh/voxelMesh';
-
-export { BlockMesh } from './meshes/blockMesh/blockMesh';
-export { DecalMesh } from './meshes/decalMesh/decalMesh';
-export { TriangleMesh } from './meshes/triangleMesh/triangleMesh';
-export { VoxelMesh } from './meshes/voxelMesh/voxelMesh';
-import { Texture } from './texture';
-
 import voxelBagFile from '../../assets/vox/bag.vox?url';
 import voxelFistFile from '../../assets/vox/fist.vox?url';
 import voxelTestOutlineFile from '../../assets/vox/testOutline.vox?url';
+
+import { Game } from '../game';
+import { BlockMesh } from './meshes/blockMesh/blockMesh';
+import { DecalMesh } from './meshes/decalMesh/decalMesh';
+import { ParticleMesh } from './meshes/particleMesh/particleMesh';
+import { TriangleMesh } from './meshes/triangleMesh/triangleMesh';
+import { VoxelMesh } from './meshes/voxelMesh/voxelMesh';
+import { Texture } from './texture';
 
 export class AssetList {
     game: Game;

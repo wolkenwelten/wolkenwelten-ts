@@ -1,13 +1,14 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
+import { mat4 } from 'gl-matrix';
+
+import shaderFragSource from './particleMesh.frag?raw';
+import shaderVertSource from './particleMesh.vert?raw';
+
+import { BlockType } from '../../../world/blockType';
 import { RenderManager } from '../../render';
 import { Shader } from '../../shader';
-
-import shaderVertSource from './particleMesh.vert?raw';
-import shaderFragSource from './particleMesh.frag?raw';
-import { mat4 } from 'gl-matrix';
-import { BlockType } from '../../../world/blockType/blockType';
 
 export class ParticleMesh {
     static gl: WebGL2RenderingContext;

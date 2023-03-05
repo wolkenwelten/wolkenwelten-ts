@@ -1,9 +1,9 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import styles from './xpView.module.css';
 import { Game } from '../../game';
 import { Div } from '../utils';
+import styles from './xpView.module.css';
 
 export class XpView {
     game: Game;

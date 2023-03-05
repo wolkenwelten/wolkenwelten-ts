@@ -1,0 +1,31 @@
+/* Copyright 2023 - Benjamin Vincent Schulenburg
+ * Licensed under the AGPL3+, for the full text see /LICENSE
+ */
+import meshUrl from '../../../assets/vox/staticShell.vox?url';
+
+import { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
+import { StaticObject } from '../../world/chunk/staticObject';
+import { Entity } from '../../world/entity/entity';
+import { ItemDrop } from '../../world/entity/itemDrop';
+import { Item } from '../../world/item/item';
+
+export class StaticShell extends StaticObject {
+    mesh(): VoxelMesh {
+        return this.chunk.world.game.render.assets.get(meshUrl);
+    }
+
+    onAttacked(perpetrator: Entity) {
+        new ItemDrop(
+            this.chunk.world,
+            this.x + 0.5,
+            this.y + 0.5,
+            this.z + 0.5,
+            Item.create('shell', this.chunk.world)
+        );
+        this.destroy();
+    }
+
+    transOff(): [number, number, number] {
+        return [0.5 - 6 / 32, 1 / 32, 0.5 + 4 / 32];
+    }
+}

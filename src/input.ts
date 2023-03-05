@@ -1,11 +1,9 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-
-import { registerClass } from './class';
 import { Game } from './game';
 import { Item } from './world/item/item';
-import { ActiveSkill } from './world/skill/skill';
+import { ActiveSkill } from './world/skill';
 
 export class InputManager {
     game: Game;
@@ -319,4 +317,3 @@ export class InputManager {
         }
     }
 }
-registerClass(InputManager);

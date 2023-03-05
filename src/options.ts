@@ -1,5 +1,3 @@
-import { registerClass } from './class';
-
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
@@ -46,7 +44,6 @@ export class Options {
         );
     }
 }
-registerClass(Options);
 
 const options = new Options();
 export default options;

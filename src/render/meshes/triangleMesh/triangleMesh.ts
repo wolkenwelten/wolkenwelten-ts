@@ -3,14 +3,14 @@
  */
 import { mat4 } from 'gl-matrix';
 
+import shaderFragSource from './triangleMesh.frag?raw';
+import shaderVertSource from './triangleMesh.vert?raw';
+
 import '../../../types';
+import { BlockType } from '../../../world/blockType';
 import { Shader } from '../../shader';
 import { Texture } from '../../texture';
 import { WavefrontFile, WavefrontObject } from './objLoader';
-
-import shaderVertSource from './triangleMesh.vert?raw';
-import shaderFragSource from './triangleMesh.frag?raw';
-import { BlockType } from '../../../world/blockType/blockType';
 
 export class TriangleMesh {
     static gl: WebGL2RenderingContext;

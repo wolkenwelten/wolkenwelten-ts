@@ -2,14 +2,9 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import { Entity } from '../entity/entity';
-import { lightGenSimple } from './lightGen';
-import { StaticObject } from '../staticObject/staticObject';
 import { World } from '../world';
-import { worldgenSurface } from '../worldgen/surface';
-import { worldgenSky } from '../worldgen/sky';
-import { worldgenUnderground } from '../worldgen/underground';
-import profiler from '../../profiler';
-import { registerClass } from '../../class';
+import { lightGenSimple } from './lightGen';
+import { StaticObject } from './staticObject';
 
 const coordinateToOffset = (x: number, y: number, z: number) =>
     (Math.floor(x) & 0x1f) |
@@ -36,20 +31,6 @@ export class Chunk {
         this.z = z;
         this.world = world;
         this.staticLastUpdated = this.lastUpdated = world.game.ticks;
-        this.worldgen();
-    }
-
-    worldgen() {
-        const start = performance.now();
-        if (this.y < -512) {
-            worldgenUnderground(this);
-        } else if (this.y < 512) {
-            worldgenSurface(this);
-        } else {
-            worldgenSky(this);
-        }
-        const end = performance.now();
-        profiler.add('worldgen', start, end);
     }
 
     updateSimpleLight() {
@@ -190,4 +171,3 @@ export class Chunk {
         this.static.delete(obj);
     }
 }
-registerClass(Chunk);

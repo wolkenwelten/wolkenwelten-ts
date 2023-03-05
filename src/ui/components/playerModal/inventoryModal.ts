@@ -1,11 +1,11 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import styles from './inventoryModal.module.css';
-import { InventoryRow } from '../item/inventoryRow';
-import { InventorySlotWidget } from '../item/inventorySlotWidget';
 import { Game } from '../../../game';
 import { Div } from '../../utils';
+import { InventoryRow } from '../item/inventoryRow';
+import { InventorySlotWidget } from '../item/inventorySlotWidget';
+import styles from './inventoryModal.module.css';
 
 export class InventoryWrap {
     div: HTMLElement;

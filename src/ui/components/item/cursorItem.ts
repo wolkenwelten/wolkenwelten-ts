@@ -1,10 +1,10 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { ItemWidget } from './item';
-import styles from './cursorItem.module.css';
-import { HotbarEntryValue } from '../hotbar/hotbar';
 import { Div } from '../../utils';
+import { HotbarEntryValue } from '../hotbar/hotbar';
+import styles from './cursorItem.module.css';
+import { ItemWidget } from './item';
 
 export class CursorItem {
     div: HTMLElement;

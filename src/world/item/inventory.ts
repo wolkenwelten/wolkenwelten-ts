@@ -1,10 +1,7 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { registerClass } from '../../class';
-import { BlockItem } from './blockItem';
 import { Item, MaybeItem } from './item';
-import { StackableItem } from './stackableItem';
 
 export class Inventory {
     items: MaybeItem[];
@@ -25,7 +22,7 @@ export class Inventory {
     }
 
     add(item: Item): boolean {
-        item.addToExistingStacks(this);
+        this.addItemToExistingStacks(item);
         if (item.destroyed) {
             this.onChange && this.onChange(-1);
             return true;
@@ -41,56 +38,20 @@ export class Inventory {
     }
 
     remove(item: Item): boolean {
-        if (item instanceof BlockItem) {
-            let left = item.amount;
-            for (let i = 0; i < this.items.length; i++) {
-                const c = this.items[i];
-                if (c instanceof BlockItem && c.blockType === item.blockType) {
-                    c.amount -= left;
-                    if (c.amount < 0) {
-                        left = -c.amount;
-                        c.destroy();
-                        this.items[i] = undefined;
-                    } else {
-                        if (c.amount === 0) {
-                            c.destroy();
-                            this.items[i] = undefined;
-                        }
-                        return true;
-                    }
-                }
-            }
-            return false;
-        } else if (item instanceof StackableItem) {
-            let left = item.amount;
-            for (let i = 0; i < this.items.length; i++) {
-                const c = this.items[i];
-                if (
-                    c instanceof StackableItem &&
-                    c.mayStackWith(item) &&
-                    item.mayStackWith(c)
-                ) {
-                    c.amount -= left;
-                    if (c.amount < 0) {
-                        left = -c.amount;
-                        c.destroy();
-                        this.items[i] = undefined;
-                    } else {
-                        if (c.amount === 0) {
-                            c.destroy();
-                            this.items[i] = undefined;
-                        }
-                        return true;
-                    }
-                }
-            }
-            return false;
-        } else {
-            for (let i = 0; i < this.items.length; i++) {
-                const c = this.items[i];
-                if (c && c.constructor === item.constructor) {
+        let left = item.amount;
+        for (let i = 0; i < this.items.length; i++) {
+            const c = this.items[i];
+            if (c && c.mayStackWith(item) && item.mayStackWith(c)) {
+                c.amount -= left;
+                if (c.amount < 0) {
+                    left = -c.amount;
                     c.destroy();
                     this.items[i] = undefined;
+                } else {
+                    if (c.amount === 0) {
+                        c.destroy();
+                        this.items[i] = undefined;
+                    }
                     return true;
                 }
             }
@@ -108,26 +69,16 @@ export class Inventory {
         let acc = 0;
         for (let i = 0; i < this.items.length; i++) {
             const c = this.items[i];
-            if (c && c.constructor === item.constructor) {
-                if (c instanceof BlockItem) {
-                    if (
-                        item instanceof BlockItem &&
-                        c.blockType === item.blockType
-                    ) {
-                        acc += c.amount;
-                    }
-                } else if (c instanceof StackableItem) {
-                    acc += c.amount;
-                } else {
-                    acc++;
-                }
+            if (
+                c &&
+                c.constructor === item.constructor &&
+                c.mayStackWith(item) &&
+                item.mayStackWith(c)
+            ) {
+                acc += c.amount;
             }
         }
-        if (item instanceof StackableItem) {
-            return Math.floor(acc / item.amount);
-        } else {
-            return acc;
-        }
+        return Math.floor(acc / item.amount);
     }
 
     select(newSelection: number) {
@@ -143,5 +94,30 @@ export class Inventory {
         }
         this.onChange && this.onChange(-1);
     }
+
+    addItemToExistingStacks(source: Item) {
+        for (let i = 0; i < this.items.length; i++) {
+            const item = this.items[i];
+            if (!item) {
+                continue;
+            }
+            if (
+                item.amount >= item.stackSize ||
+                !source.mayStackWith(item) ||
+                !item.mayStackWith(source)
+            ) {
+                continue;
+            }
+
+            const spaceLeft = item.stackSize + 1 - item.amount;
+            if (spaceLeft > source.amount) {
+                item.amount += source.amount;
+                source.destroy();
+                return;
+            } else {
+                source.amount += spaceLeft;
+                item.amount -= spaceLeft;
+            }
+        }
+    }
 }
-registerClass(Inventory);

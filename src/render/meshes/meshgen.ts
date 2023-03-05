@@ -27,10 +27,10 @@
  * And again there are probably better ways, this is just the first version that I thought of and since it works reasonably well my motivation
  * for optimization here is quite low.
  */
-import { Chunk } from '../../world/chunk/chunk';
 import profiler from '../../profiler';
 import { clamp } from '../../util/math';
-import { BlockType } from '../../world/blockType/blockType';
+import { BlockType } from '../../world/blockType';
+import { Chunk } from '../../world/chunk/chunk';
 import { lightGenSimple } from '../../world/chunk/lightGen';
 
 const createIdentityBlocks = () => {
@@ -785,34 +785,59 @@ const genLeft = (vertices: number[], args: GenArgs) => {
  * readable, it does result in somewhat faster code (~12% speedup in my measurements on V8/Chrome)
  */
 const lightBlur = (out: Uint8Array) => {
+    for (let y = 0; y < 34; y++) {
+        for (let z = 0; z < 34; z++) {
+            let a = 0;
+            let b = 0;
+            for (let x = 0; x < 34; x++) {
+                const aOff = x * 34 * 34 + y * 34 + z;
+                a = Math.max(a, out[aOff]);
+                out[aOff] = a;
+                a = Math.max(0, a - 1);
+
+                const bx = 33 - x;
+                const bOff = bx * 34 * 34 + y * 34 + z;
+                b = Math.max(b, out[bOff]);
+                out[bOff] = b;
+                b = Math.max(0, b - 1);
+            }
+        }
+    }
+
     for (let x = 0; x < 34; x++) {
         for (let z = 0; z < 34; z++) {
             let a = 0;
             let b = 0;
-            let c = 0;
-            let d = 0;
-            let e = 0;
-            let f = 0;
             for (let y = 0; y < 34; y++) {
-                const back = 33 - y;
+                const aOff = x * 34 * 34 + y * 34 + z;
+                a = Math.max(a, out[aOff]);
+                out[aOff] = a;
+                a = Math.max(0, a - 1);
 
-                const aOff = y * 34 * 34 + x * 34 + z;
-                out[aOff] = a = Math.max(a - 1, out[aOff]);
+                const by = 33 - y;
+                const bOff = x * 34 * 34 + by * 34 + z;
+                b = Math.max(b, out[bOff]);
+                out[bOff] = b;
+                b = Math.max(0, b - 1);
+            }
+        }
+    }
 
-                const bOff = back * 34 * 34 + x * 34 + z;
-                out[bOff] = b = Math.max(b - 1, out[bOff]);
+    for (let x = 0; x < 34; x++) {
+        for (let y = 0; y < 34; y++) {
+            let a = 0;
+            let b = 0;
+            for (let z = 0; z < 34; z++) {
+                const aOff = x * 34 * 34 + y * 34 + z;
+                a = Math.max(a, out[aOff]);
+                out[aOff] = a;
+                a = Math.max(0, a - 1);
 
-                const cOff = x * 34 * 34 + y * 34 + z;
-                out[cOff] = c = Math.max(c - 1, out[cOff]);
-
-                const dOff = x * 34 * 34 + back * 34 + z;
-                out[dOff] = d = Math.max(d - 1, out[dOff]);
-
-                const eOff = x * 34 * 34 + z * 34 + y;
-                out[eOff] = e = Math.max(e - 1, out[eOff]);
-
-                const fOff = x * 34 * 34 + z * 34 + back;
-                out[fOff] = f = Math.max(f - 1, out[fOff]);
+                const bz = 33 - z;
+                const bOff = x * 34 * 34 + y * 34 + bz;
+                b = Math.max(b, out[bOff]);
+                out[bOff] = b;
+                b = Math.max(0, b - 1);
             }
         }
     }

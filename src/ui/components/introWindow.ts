@@ -2,8 +2,8 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import { Game } from '../../game';
-import styles from './introWindow.module.css';
 import { Div } from '../utils';
+import styles from './introWindow.module.css';
 
 export class IntroWindow {
     div: HTMLElement;

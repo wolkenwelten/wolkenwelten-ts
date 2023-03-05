@@ -2,16 +2,16 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import { Game } from '../game';
-import { FpsCounter } from './components/fpsCounter';
 import { Crosshair } from './components/crosshair';
-import { Hotbar, HotbarEntryValue } from './components/hotbar/hotbar';
+import { FpsCounter } from './components/fpsCounter';
 import { HealthOrb } from './components/healthOrb';
-import { SystemLog } from './components/systemLog';
+import { Hotbar, HotbarEntryValue } from './components/hotbar/hotbar';
+import { IntroWindow } from './components/introWindow';
 import { CursorItem } from './components/item/cursorItem';
+import { PlayerModal } from './components/playerModal/playerModal';
+import { SystemLog } from './components/systemLog';
 import { XpView } from './components/xpView';
 import { IconManager } from './icon';
-import { PlayerModal } from './components/playerModal/playerModal';
-import { IntroWindow } from './components/introWindow';
 
 export class UIManager {
     game: Game;

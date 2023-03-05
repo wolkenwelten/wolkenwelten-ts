@@ -1,13 +1,13 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import styles from './playerModal.module.css';
 import { Game } from '../../../game';
+import { Div } from '../../utils';
 import { CraftingWrap } from './craftingWrap';
 import { InventoryWrap } from './inventoryModal';
+import styles from './playerModal.module.css';
 import { SettingsWrap } from './settingsWrap';
 import { SkillWrap } from './skillWrap';
-import { Div } from '../../utils';
 
 interface TabClass {
     update: () => void;

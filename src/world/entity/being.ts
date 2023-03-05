@@ -1,9 +1,8 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { Entity } from './entity';
 import { World } from '../world';
-import { registerClass } from '../../class';
+import { Entity } from './entity';
 
 export class Being extends Entity {
     level = 0;
@@ -36,4 +35,3 @@ export class Being extends Entity {
     onDeath() {}
     onAttack(perpetrator: Entity): void {}
 }
-registerClass(Being);

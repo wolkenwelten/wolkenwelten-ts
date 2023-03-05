@@ -1,16 +1,17 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
+import { mat4 } from 'gl-matrix';
+
+import shaderFragSource from './blockMesh.frag?raw';
+import shaderVertSource from './blockMesh.vert?raw';
+
+import { Game } from '../../../game';
 import '../../../types';
+import { Chunk } from '../../../world/chunk/chunk';
 import { Shader } from '../../shader';
 import { Texture } from '../../texture';
-import { Chunk } from '../../../world/chunk/chunk';
-
-import shaderVertSource from './blockMesh.vert?raw';
-import shaderFragSource from './blockMesh.frag?raw';
-import { mat4 } from 'gl-matrix';
 import { meshgenChunk } from '../meshgen';
-import { Game } from '../../../game';
 
 export class BlockMesh {
     static gl: WebGL2RenderingContext;
