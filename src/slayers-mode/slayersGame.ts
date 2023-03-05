@@ -3,13 +3,13 @@
  */
 import { Game } from '../engine';
 import { GameConfig } from '../engine/game';
-import { addAudioContent } from './audioContent';
-import { addDefaultBlockTypes } from './blockTypeContent';
-import { addDefaultCraftingRecipes } from './craftingRecipes';
-import { addDefaultItems } from './itemContent';
-import { addDefaultMobs } from './mobContent';
-import { addDefaultSkills } from './skillContent';
-import { addDefaultStaticObjects } from './staticObjectDefaults';
+import { addAudioContent } from './audio';
+import { addDefaultBlockTypes } from './blockTypes';
+import { addDefaultCraftingRecipes } from './crafting';
+import { addDefaultItems } from './items';
+import { addDefaultMobs } from './mobs';
+import { addDefaultSkills } from './skills';
+import { addDefaultStaticObjects } from './staticObjects';
 import { SlayersWorldgen } from './worldgen/assets';
 
 export class SlayersGame extends Game {
