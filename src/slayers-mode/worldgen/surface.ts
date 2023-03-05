@@ -1,10 +1,8 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { LCG } from '../../util/prng';
-import { Chunk } from '../chunk/chunk';
-import { StaticObject } from '../chunk/staticObject';
-import { Mob } from '../entity/mob';
+import { Chunk, LCG, Mob, StaticObject } from '../../engine';
+import { WorldgenAssetList } from './assets';
 
 const grassHeight = (x: number, z: number): number => {
     const d = Math.sqrt(x * x + z * z);
@@ -48,11 +46,7 @@ const floodChunk = (chunk: Chunk, maxY: number) => {
     }
 };
 
-export const worldgenSurface = (chunk: Chunk) => {
-    const assets = chunk.world.assets.assets;
-    if (!assets) {
-        return;
-    }
+export const worldgenSurface = (assets: WorldgenAssetList, chunk: Chunk) => {
     const rng = new LCG([chunk.x, chunk.y, chunk.z, chunk.world.seed]);
     for (let x = 0; x < 32; x++) {
         for (let z = 0; z < 32; z++) {

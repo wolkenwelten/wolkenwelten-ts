@@ -38,4 +38,5 @@ export { Game } from './game';
 export { InputManager } from './input';
 export { Options } from './options';
 export { PersistenceManager } from './persistence';
+export { LCG } from './util/prng';
 export { abgrToRgba, clamp, radianDifference } from './util/math';

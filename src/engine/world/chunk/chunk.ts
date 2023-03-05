@@ -1,12 +1,8 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import profiler from '../../util/profiler';
 import { Entity } from '../entity/entity';
 import { World } from '../world';
-import { worldgenSky } from '../worldgen/sky';
-import { worldgenSurface } from '../worldgen/surface';
-import { worldgenUnderground } from '../worldgen/underground';
 import { lightGenSimple } from './lightGen';
 import { StaticObject } from './staticObject';
 
@@ -19,12 +15,12 @@ export class Chunk {
     blocks: Uint8Array;
     lastUpdated: number;
     staticLastUpdated: number;
+    static: Set<StaticObject> = new Set();
     simpleLight: Uint8Array;
     simpleLightLastUpdated = 0;
     x: number;
     y: number;
     z: number;
-    static: Set<StaticObject> = new Set();
     world: World;
 
     constructor(world: World, x: number, y: number, z: number) {
@@ -35,20 +31,6 @@ export class Chunk {
         this.z = z;
         this.world = world;
         this.staticLastUpdated = this.lastUpdated = world.game.ticks;
-        this.worldgen();
-    }
-
-    worldgen() {
-        const start = performance.now();
-        if (this.y < -512) {
-            worldgenUnderground(this);
-        } else if (this.y < 512) {
-            worldgenSurface(this);
-        } else {
-            worldgenSky(this);
-        }
-        const end = performance.now();
-        profiler.add('worldgen', start, end);
     }
 
     updateSimpleLight() {

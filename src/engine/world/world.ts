@@ -3,12 +3,12 @@
  */
 import { Game } from '../game';
 import { LCG } from '../util/prng';
+import profiler from '../util/profiler';
 import { BlockType } from './blockType';
 import { Chunk } from './chunk/chunk';
 import { DangerZone } from './chunk/dangerZone';
 import { Entity } from './entity/entity';
 import { MiningManager } from './mining';
-import { WorldgenAssetManager } from './worldgen/assets';
 
 export const coordinateToWorldKey = (x: number, y: number, z: number) =>
     ((Math.floor(x) >> 5) & 0xffff) +
@@ -16,24 +16,26 @@ export const coordinateToWorldKey = (x: number, y: number, z: number) =>
     ((Math.floor(z) >> 5) & 0xffff) * 0x100000000;
 
 export class World {
+    game: Game;
     chunks: Map<number, Chunk> = new Map();
     dangerZone: DangerZone;
     entities: Set<Entity> = new Set();
-    seed: number;
     mining: MiningManager;
-    game: Game;
-    assets: WorldgenAssetManager;
     blocks: BlockType[] = [];
     blockTextureUrl = '';
     lootRNG: LCG;
+    worldgenHandler: (chunk: Chunk) => void;
+
+    seed = 1234;
 
     constructor(game: Game) {
-        this.seed = 1234;
         this.game = game;
         this.mining = new MiningManager(this);
-        this.assets = new WorldgenAssetManager();
         this.dangerZone = new DangerZone(this);
         this.lootRNG = new LCG(new Date().toISOString());
+        this.worldgenHandler = (chunk: Chunk) => {
+            chunk.setSphereUnsafe(16, 16, 16, 8, 3);
+        };
     }
 
     addBlockType = (longName: string, name?: string): BlockType => {
@@ -84,9 +86,16 @@ export class World {
         if (chunk) {
             return chunk;
         }
-        const newChunk = new Chunk(this, x, y, z);
+        const newChunk = this.worldgen(new Chunk(this, x, y, z));
         this.chunks.set(key, newChunk);
         return newChunk;
+    }
+
+    worldgen(chunk: Chunk): Chunk {
+        const start = performance.now();
+        this.worldgenHandler(chunk);
+        profiler.add('worldgen', start, performance.now());
+        return chunk;
     }
 
     setChunk(x: number, y: number, z: number, chunk: Chunk) {

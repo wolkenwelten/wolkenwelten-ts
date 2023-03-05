@@ -3,18 +3,21 @@
  */
 import readVox from 'vox-reader';
 
-import voxBushA from '../../../../assets/wg/bush_a.vox?url';
-import voxBushB from '../../../../assets/wg/bush_b.vox?url';
-import voxBushC from '../../../../assets/wg/bush_c.vox?url';
-import voxRockA from '../../../../assets/wg/rock_a.vox?url';
-import voxRockB from '../../../../assets/wg/rock_b.vox?url';
-import voxRockC from '../../../../assets/wg/rock_c.vox?url';
-import voxSpruceA from '../../../../assets/wg/spruce_a.vox?url';
-import voxTreeA from '../../../../assets/wg/tree_a.vox?url';
-import voxTreeB from '../../../../assets/wg/tree_b.vox?url';
-import voxTreeC from '../../../../assets/wg/tree_c.vox?url';
+import voxBushA from '../assets/wg/bush_a.vox?url';
+import voxBushB from '../assets/wg/bush_b.vox?url';
+import voxBushC from '../assets/wg/bush_c.vox?url';
+import voxRockA from '../assets/wg/rock_a.vox?url';
+import voxRockB from '../assets/wg/rock_b.vox?url';
+import voxRockC from '../assets/wg/rock_c.vox?url';
+import voxSpruceA from '../assets/wg/spruce_a.vox?url';
+import voxTreeA from '../assets/wg/tree_a.vox?url';
+import voxTreeB from '../assets/wg/tree_b.vox?url';
+import voxTreeC from '../assets/wg/tree_c.vox?url';
 
-import { Chunk } from '../chunk/chunk';
+import { Chunk } from '../../engine';
+import { worldgenSky } from './sky';
+import { worldgenSurface } from './surface';
+import { worldgenUnderground } from './underground';
 
 export class WorldgenAsset {
     w: number;
@@ -80,31 +83,33 @@ export interface WorldgenAssetList {
     spruceA: WorldgenAsset;
 }
 
-export class WorldgenAssetManager {
-    assets?: WorldgenAssetList;
-
-    ready(): boolean {
-        return Boolean(this.assets);
-    }
-
-    async init() {
-        const that = this;
+export class SlayersWorldgen {
+    async init(): Promise<(chunk: Chunk) => void> {
         const assets = {
-            bushA: await that.load(voxBushA, [5, 6]),
-            bushB: await that.load(voxBushB, [6, 10]),
-            bushC: await that.load(voxBushC, [6, 5]),
+            bushA: await this.load(voxBushA, [5, 6]),
+            bushB: await this.load(voxBushB, [6, 10]),
+            bushC: await this.load(voxBushC, [6, 5]),
 
-            rockA: await that.load(voxRockA, [3]),
-            rockB: await that.load(voxRockB, [3, 4]),
-            rockC: await that.load(voxRockC, [3, 12]),
+            rockA: await this.load(voxRockA, [3]),
+            rockB: await this.load(voxRockB, [3, 4]),
+            rockC: await this.load(voxRockC, [3, 12]),
 
-            treeA: await that.load(voxTreeA, [5, 11]),
-            treeB: await that.load(voxTreeB, [5, 11]),
-            treeC: await that.load(voxTreeC, [5, 11]),
+            treeA: await this.load(voxTreeA, [5, 11]),
+            treeB: await this.load(voxTreeB, [5, 11]),
+            treeC: await this.load(voxTreeC, [5, 11]),
 
-            spruceA: await that.load(voxSpruceA, [5, 11]),
+            spruceA: await this.load(voxSpruceA, [5, 11]),
         };
-        that.assets = assets;
+        const worldgen = (chunk: Chunk) => {
+            if (chunk.y < -512) {
+                worldgenUnderground(chunk);
+            } else if (chunk.y > 512) {
+                worldgenSky(chunk);
+            } else {
+                worldgenSurface(assets, chunk);
+            }
+        };
+        return worldgen;
     }
 
     load(href: string, palette: number[]): Promise<WorldgenAsset> {

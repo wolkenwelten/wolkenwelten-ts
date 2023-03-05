@@ -78,7 +78,6 @@ export class Game {
     }
 
     async init() {
-        await this.world.assets.init();
         this.ready = true;
     }
 
