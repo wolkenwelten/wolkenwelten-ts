@@ -5,7 +5,7 @@ import voxelBagFile from '../../assets/vox/bag.vox?url';
 import voxelFistFile from '../../assets/vox/fist.vox?url';
 import voxelTestOutlineFile from '../../assets/vox/testOutline.vox?url';
 
-import { Game } from '../game';
+import type { Game } from '../game';
 import { BlockMesh } from './meshes/blockMesh/blockMesh';
 import { DecalMesh } from './meshes/decalMesh/decalMesh';
 import { ParticleMesh } from './meshes/particleMesh/particleMesh';

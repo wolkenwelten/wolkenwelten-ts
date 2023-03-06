@@ -14,12 +14,10 @@ import voxTreeA from '../../../assets/wg/tree_a.vox?url';
 import voxTreeB from '../../../assets/wg/tree_b.vox?url';
 import voxTreeC from '../../../assets/wg/tree_c.vox?url';
 
-import { Chunk } from '../../world/chunk/chunk';
-import { worldgenSky } from './sky';
-import { worldgenSurface } from './surface';
-import { worldgenUnderground } from './underground';
+import type { Chunk } from '../../world/chunk/chunk';
+import { worldgen } from './worldgen';
 
-export class WorldgenAsset {
+class WorldgenAsset {
     w: number;
     h: number;
     d: number;
@@ -135,15 +133,5 @@ export const initWorldgen = async () => {
 
         spruceA: await loadAsset(voxSpruceA, [5, 11]),
     };
-
-    const worldgenHandler = (chunk: Chunk) => {
-        if (chunk.y < -512) {
-            worldgenUnderground(chunk);
-        } else if (chunk.y < 512) {
-            worldgenSurface(assets, chunk);
-        } else {
-            worldgenSky(chunk);
-        }
-    };
-    return worldgenHandler;
+    return (chunk: Chunk) => worldgen(assets, chunk);
 };

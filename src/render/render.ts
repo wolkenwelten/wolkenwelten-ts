@@ -3,8 +3,8 @@
  */
 import { mat4 } from 'gl-matrix';
 
-import { Game } from '../game';
-import { Entity } from '../world/entity/entity';
+import type { Game } from '../game';
+import type { Entity } from '../world/entity/entity';
 import { coordinateToWorldKey } from '../world/world';
 import { AssetList } from './asset';
 import { DecalMesh } from './meshes/decalMesh/decalMesh';

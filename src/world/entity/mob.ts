@@ -3,9 +3,9 @@
  */
 import { mat4 } from 'gl-matrix';
 
-import { World } from '../world';
+import type { World } from '../world';
+import type { Entity } from './entity';
 import { Being } from './being';
-import { Entity } from './entity';
 
 const modelViewMatrix = mat4.create();
 const transPos = new Float32Array([0, 0, 0]);

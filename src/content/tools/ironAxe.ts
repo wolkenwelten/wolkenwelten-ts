@@ -4,7 +4,7 @@
 import itemIcon from '../../../assets/gfx/items/ironAxe.png';
 import meshUrl from '../../../assets/vox/items/ironAxe.vox?url';
 
-import { Entity } from '../../world/entity/entity';
+import type { Entity } from '../../world/entity/entity';
 import { StoneAxe } from './stoneAxe';
 
 export class IronAxe extends StoneAxe {

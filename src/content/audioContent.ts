@@ -16,7 +16,7 @@ import stompUrl from '../../assets/sfx/stomp.ogg?url';
 import tockUrl from '../../assets/sfx/tock.ogg?url';
 import unghUrl from '../../assets/sfx/ungh.ogg?url';
 
-import { AudioManager } from '../audio';
+import type { AudioManager } from '../audio';
 import '../types';
 
 export const registerAudioContent = (audio: AudioManager) => {

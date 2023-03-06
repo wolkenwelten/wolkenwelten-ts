@@ -7,9 +7,9 @@ import shaderFragSource from './triangleMesh.frag?raw';
 import shaderVertSource from './triangleMesh.vert?raw';
 
 import '../../../types';
-import { BlockType } from '../../../world/blockType';
+import type { BlockType } from '../../../world/blockType';
+import type { Texture } from '../../texture';
 import { Shader } from '../../shader';
-import { Texture } from '../../texture';
 import { WavefrontFile, WavefrontObject } from './objLoader';
 
 export class TriangleMesh {

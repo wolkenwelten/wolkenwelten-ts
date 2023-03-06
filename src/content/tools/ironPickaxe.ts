@@ -4,7 +4,7 @@
 import itemIcon from '../../../assets/gfx/items/ironPickaxe.png';
 import meshUrl from '../../../assets/vox/items/ironPickaxe.vox?url';
 
-import { Entity } from '../../world/entity/entity';
+import type { Entity } from '../../world/entity/entity';
 import { StonePickaxe } from './stonePickaxe';
 
 export class IronPickaxe extends StonePickaxe {

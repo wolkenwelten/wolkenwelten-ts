@@ -3,10 +3,10 @@
  */
 import { mat4 } from 'gl-matrix';
 
-import { TriangleMesh } from '../../render/meshes/triangleMesh/triangleMesh';
-import { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
-import { Item } from '../item/item';
-import { World } from '../world';
+import type { TriangleMesh } from '../../render/meshes/triangleMesh/triangleMesh';
+import type { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
+import type { Item } from '../item/item';
+import type { World } from '../world';
 import { Entity } from './entity';
 
 const transPos = new Float32Array([0, 0, 0]);

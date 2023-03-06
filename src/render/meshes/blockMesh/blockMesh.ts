@@ -6,9 +6,9 @@ import { mat4 } from 'gl-matrix';
 import shaderFragSource from './blockMesh.frag?raw';
 import shaderVertSource from './blockMesh.vert?raw';
 
-import { Game } from '../../../game';
 import '../../../types';
-import { Chunk } from '../../../world/chunk/chunk';
+import type { Game } from '../../../game';
+import type { Chunk } from '../../../world/chunk/chunk';
 import { Shader } from '../../shader';
 import { Texture } from '../../texture';
 import { meshgenChunk } from '../meshgen';

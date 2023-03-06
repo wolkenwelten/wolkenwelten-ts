@@ -9,12 +9,12 @@ import voxelIdle1File from '../../../assets/vox/rat/idle1.vox?url';
 import voxelWalk0File from '../../../assets/vox/rat/walk0.vox?url';
 import voxelWalk1File from '../../../assets/vox/rat/walk1.vox?url';
 
-import { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
+import type { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
+import type { Entity } from '../../world/entity/entity';
+import type { World } from '../../world/world';
 import { radianDifference } from '../../util/math';
 import { Being } from '../../world/entity/being';
-import { Entity } from '../../world/entity/entity';
 import { Mob } from '../../world/entity/mob';
-import { World } from '../../world/world';
 
 export type RatState =
     | 'idle'

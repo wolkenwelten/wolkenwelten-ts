@@ -1,7 +1,7 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { Game } from '../../../game';
+import type { Game } from '../../../game';
 import { Item } from '../../../world/item/item';
 import { ActiveSkill } from '../../../world/skill';
 import { Div } from '../../utils';

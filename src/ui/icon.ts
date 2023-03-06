@@ -1,8 +1,8 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { BlockType } from '../world/blockType';
-import { UIManager } from './ui';
+import type { BlockType } from '../world/blockType';
+import type { UIManager } from './ui';
 
 export class IconManager {
     ui: UIManager;

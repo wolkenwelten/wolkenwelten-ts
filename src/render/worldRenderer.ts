@@ -3,8 +3,8 @@
  */
 import { mat4 } from 'gl-matrix';
 
-import { RenderManager } from '../render/render';
-import { Entity } from '../world/entity/entity';
+import type { RenderManager } from '../render/render';
+import type { Entity } from '../world/entity/entity';
 import { coordinateToWorldKey } from '../world/world';
 import { Frustum } from './frustum';
 import { BlockMesh } from './meshes/blockMesh/blockMesh';

@@ -1,11 +1,11 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { TriangleMesh } from '../../render/meshes/triangleMesh/triangleMesh';
-import { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
-import { Character } from '../character';
-import { Entity } from '../entity/entity';
-import { World } from '../world';
+import type { TriangleMesh } from '../../render/meshes/triangleMesh/triangleMesh';
+import type { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
+import type { Entity } from '../entity/entity';
+import type { World } from '../world';
+import type { Character } from '../character';
 
 let idCounter = 0;
 
@@ -65,10 +65,8 @@ export class Item {
         );
     }
 
-    use(e: Entity) {
-        if (e instanceof Character) {
-            e.strike();
-        }
+    use(e: Character) {
+        e.strike();
     }
 
     attackDamage(e: Entity): number {
@@ -83,11 +81,9 @@ export class Item {
         return 100;
     }
 
-    onAttackWith(e: Entity) {
-        if (e instanceof Character) {
-            for (const id of this.attackSkill) {
-                e.skillXpGain(id, 1);
-            }
+    onAttackWith(e: Character) {
+        for (const id of this.attackSkill) {
+            e.skillXpGain(id, 1);
         }
     }
 

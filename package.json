@@ -6,8 +6,9 @@
     "license": "AGPL3",
     "type": "module",
     "scripts": {
-        "dev": "vite",
         "build": "vite build",
+        "check:circular": "madge --circular src/main.ts",
+        "dev": "vite",
         "preview": "vite preview",
         "pretty": "prettier --write \"src/**/*.{css,ts}\"",
         "typecheck": "tsc -p ./tsconfig.json --noEmit",
@@ -17,8 +18,9 @@
     "devDependencies": {
         "@types/howler": "latest",
         "@types/node": "latest",
-        "prettier": "latest",
         "typescript": "latest",
+        "prettier": "latest",
+        "madge": "latest",
         "vite": "latest"
     },
     "dependencies": {

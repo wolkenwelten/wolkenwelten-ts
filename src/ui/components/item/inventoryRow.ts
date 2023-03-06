@@ -1,8 +1,8 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { Game } from '../../../game';
-import { Inventory } from '../../../world/item/inventory';
+import type { Game } from '../../../game';
+import type { Inventory } from '../../../world/item/inventory';
 import { Div } from '../../utils';
 import styles from './inventoryRow.module.css';
 import { InventorySlotWidget } from './inventorySlotWidget';

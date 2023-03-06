@@ -15,9 +15,9 @@ import pugilismUrl from '../../assets/gfx/skill/pugilism.png';
 import throwingUrl from '../../assets/gfx/skill/throwing.png';
 import wandwhippingUrl from '../../assets/gfx/skill/wandWhipping.png';
 
+import type { Entity } from '../world/entity/entity';
 import { Character } from '../world/character';
 import { Being } from '../world/entity/being';
-import { Entity } from '../world/entity/entity';
 import { Projectile } from '../world/entity/projectile';
 import { Skill } from '../world/skill';
 

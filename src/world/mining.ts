@@ -8,11 +8,11 @@
  * Is also responsible for calling the spawnMiningDrops method on the BlockType as the mining finishes as
  * well as creating DangerZones to make sure that fluids are properly simulated if we dig close to one.
  */
-import { RenderManager } from '../render/render';
+import type { RenderManager } from '../render/render';
+import type { Character } from './character';
+import type { MaybeItem } from './item/item';
+import type { World } from './world';
 import { clamp } from '../util/math';
-import { Character } from './character';
-import { MaybeItem } from './item/item';
-import { World } from './world';
 
 export interface MiningAction {
     x: number;

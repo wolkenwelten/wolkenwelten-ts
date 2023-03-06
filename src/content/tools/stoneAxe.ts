@@ -4,8 +4,8 @@
 import itemIcon from '../../../assets/gfx/items/stoneAxe.png';
 import meshUrl from '../../../assets/vox/items/stoneAxe.vox?url';
 
+import type { Entity } from '../../world/entity/entity';
 import { Character } from '../../world/character';
-import { Entity } from '../../world/entity/entity';
 import { Item } from '../../world/item/item';
 
 export class StoneAxe extends Item {

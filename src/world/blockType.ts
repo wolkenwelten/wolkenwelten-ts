@@ -4,8 +4,8 @@
 import { abgrToRgba } from '../util/math';
 import { ItemDrop } from './entity/itemDrop';
 import { BlockItem } from './item/blockItem';
-import { Item, MaybeItem } from './item/item';
-import { World } from './world';
+import type { Item, MaybeItem } from './item/item';
+import type { World } from './world';
 
 export type MiningCat = 'Pickaxe' | 'Axe';
 export type BlockTypeItemDropHandler = (

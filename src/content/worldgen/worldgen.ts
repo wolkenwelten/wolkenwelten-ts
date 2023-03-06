@@ -2,10 +2,29 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import { LCG } from '../../util/prng';
-import { Chunk } from '../../world/chunk/chunk';
+import type { Chunk } from '../../world/chunk/chunk';
+import type { WorldgenAssetList } from './assets';
 import { StaticObject } from '../../world/chunk/staticObject';
 import { Mob } from '../../world/entity/mob';
-import { WorldgenAssetList } from './assets';
+
+export const worldgen = (assets: WorldgenAssetList, chunk:Chunk) => {
+    if (chunk.y < -512) {
+        chunk.setBox(0, 0, 0, 32, 32, 32, 3); // Just fill everything with stone for now
+    } else if (chunk.y < 512) {
+        worldgenSurface(assets, chunk);
+    } else {
+        worldgenSky(chunk);
+    }
+};
+
+const worldgenSky = (chunk: Chunk) => {
+    const rng = new LCG([chunk.x, chunk.y, chunk.z, chunk.world.seed]);
+    if (rng.bool(15)) {
+        chunk.setSphere(16, 16, 16, 8, 2);
+        chunk.setSphere(16, 15, 16, 8, 1);
+        chunk.setSphere(16, 12, 16, 7, 3);
+    }
+};
 
 const grassHeight = (x: number, z: number): number => {
     const d = Math.sqrt(x * x + z * z);
@@ -49,7 +68,7 @@ const floodChunk = (chunk: Chunk, maxY: number) => {
     }
 };
 
-export const worldgenSurface = (assets: WorldgenAssetList, chunk: Chunk) => {
+const worldgenSurface = (assets: WorldgenAssetList, chunk: Chunk) => {
     const rng = new LCG([chunk.x, chunk.y, chunk.z, chunk.world.seed]);
     for (let x = 0; x < 32; x++) {
         for (let z = 0; z < 32; z++) {

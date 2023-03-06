@@ -1,8 +1,8 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { Inventory } from './item/inventory';
-import { Item } from './item/item';
+import type { Inventory } from './item/inventory';
+import type { Item } from './item/item';
 
 export class CraftingRecipe {
     result: Item;

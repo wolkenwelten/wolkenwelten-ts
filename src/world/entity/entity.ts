@@ -3,9 +3,9 @@
  */
 import { mat4 } from 'gl-matrix';
 
-import { TriangleMesh } from '../../render/meshes/triangleMesh/triangleMesh';
-import { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
-import { World } from '../world';
+import type { TriangleMesh } from '../../render/meshes/triangleMesh/triangleMesh';
+import type { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
+import type { World } from '../world';
 
 let entityCounter = 0;
 const modelViewMatrix = mat4.create();

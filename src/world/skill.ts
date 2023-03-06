@@ -1,8 +1,8 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { Character } from './character';
-import { Entity } from './entity/entity';
+import type { Character } from './character';
+import type { Entity } from './entity/entity';
 
 export class CharacterSkill {
     char: Character;

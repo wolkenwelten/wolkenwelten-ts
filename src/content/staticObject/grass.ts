@@ -3,9 +3,9 @@
  */
 import meshUrl from '../../../assets/vox/grass.vox?url';
 
-import { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
+import type { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
+import type { Entity } from '../../world/entity/entity';
 import { StaticObject } from '../../world/chunk/staticObject';
-import { Entity } from '../../world/entity/entity';
 
 export class StaticGrass extends StaticObject {
     mesh(): VoxelMesh {

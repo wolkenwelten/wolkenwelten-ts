@@ -6,8 +6,8 @@ import { mat4 } from 'gl-matrix';
 import shaderFragSource from './particleMesh.frag?raw';
 import shaderVertSource from './particleMesh.vert?raw';
 
-import { BlockType } from '../../../world/blockType';
-import { RenderManager } from '../../render';
+import type { BlockType } from '../../../world/blockType';
+import type { RenderManager } from '../../render';
 import { Shader } from '../../shader';
 
 export class ParticleMesh {

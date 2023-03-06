@@ -1,10 +1,10 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { Entity } from '../entity/entity';
-import { World } from '../world';
+import type { Entity } from '../entity/entity';
+import type { World } from '../world';
+import type { StaticObject } from './staticObject';
 import { lightGenSimple } from './lightGen';
-import { StaticObject } from './staticObject';
 
 const coordinateToOffset = (x: number, y: number, z: number) =>
     (Math.floor(x) & 0x1f) |

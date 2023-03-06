@@ -7,8 +7,8 @@ import shadowTextureUrl from '../../../../assets/gfx/decals.png';
 import shaderFragSource from './decalMesh.frag?raw';
 import shaderVertSource from './decalMesh.vert?raw';
 
+import type { RenderManager } from '../../render';
 import { clamp } from '../../../util/math';
-import { RenderManager } from '../../render';
 import { Shader } from '../../shader';
 import { Texture } from '../../texture';
 

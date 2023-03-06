@@ -2,13 +2,13 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import { registerBlockTypes } from '../content/blockTypes';
-import { Game } from '../game';
+import type { Game } from '../game';
+import type { Entity } from './entity/entity';
 import profiler from '../profiler';
 import { LCG } from '../util/prng';
 import { BlockType } from './blockType';
 import { Chunk } from './chunk/chunk';
 import { DangerZone } from './chunk/dangerZone';
-import { Entity } from './entity/entity';
 import { MiningManager } from './mining';
 
 export const coordinateToWorldKey = (x: number, y: number, z: number) =>

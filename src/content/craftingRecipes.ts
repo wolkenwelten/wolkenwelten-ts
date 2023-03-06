@@ -1,9 +1,9 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
+import type { World } from '../world/world';
 import { CraftingRecipe } from '../world/crafting';
 import { Item } from '../world/item/item';
-import { World } from '../world/world';
 
 export const registerCraftingRecipes = (world: World) => {
     CraftingRecipe.register(

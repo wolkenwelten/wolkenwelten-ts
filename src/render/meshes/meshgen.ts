@@ -28,9 +28,9 @@
  * for optimization here is quite low.
  */
 import profiler from '../../profiler';
+import type { Chunk } from '../../world/chunk/chunk';
 import { clamp } from '../../util/math';
 import { BlockType } from '../../world/blockType';
-import { Chunk } from '../../world/chunk/chunk';
 import { lightGenSimple } from '../../world/chunk/lightGen';
 
 const createIdentityBlocks = () => {

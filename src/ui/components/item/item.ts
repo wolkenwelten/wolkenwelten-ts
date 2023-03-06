@@ -1,10 +1,10 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
+import type { HotbarEntryValue } from '../hotbar/hotbar';
 import { Item } from '../../../world/item/item';
 import { Skill } from '../../../world/skill';
 import { Div, Img } from '../../utils';
-import { HotbarEntryValue } from '../hotbar/hotbar';
 import styles from './item.module.css';
 
 export class ItemWidget {

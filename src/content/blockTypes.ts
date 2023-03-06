@@ -3,10 +3,10 @@
  */
 import blockTextureUrl from '../../assets/gfx/blocks.png';
 
+import type { World } from '../world/world';
 import { ItemDrop } from '../world/entity/itemDrop';
 import { BlockItem } from '../world/item/blockItem';
 import { Item, MaybeItem } from '../world/item/item';
-import { World } from '../world/world';
 
 const leafDropHandler = (
     world: World,

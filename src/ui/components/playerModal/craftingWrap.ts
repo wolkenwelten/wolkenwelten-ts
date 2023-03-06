@@ -1,9 +1,9 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { Game } from '../../../game';
+import type { Game } from '../../../game';
+import type { Inventory } from '../../../world/item/inventory';
 import { CraftingRecipe } from '../../../world/crafting';
-import { Inventory } from '../../../world/item/inventory';
 import { Button, Div, H3, Img, P, Span } from '../../utils';
 import { ItemWidget } from '../item/item';
 import styles from './craftingWrap.module.css';

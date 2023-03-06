@@ -9,14 +9,14 @@ import voxelCrabIdle1File from '../../../assets/vox/crab/idle_1.vox?url';
 import voxelCrabWalk0File from '../../../assets/vox/crab/walk_0.vox?url';
 import voxelCrabWalk1File from '../../../assets/vox/crab/walk_1.vox?url';
 
-import { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
+import type { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
+import type { Entity } from '../../world/entity/entity';
+import type { World } from '../../world/world';
 import { radianDifference } from '../../util/math';
 import { Being } from '../../world/entity/being';
-import { Entity } from '../../world/entity/entity';
 import { ItemDrop } from '../../world/entity/itemDrop';
 import { Mob } from '../../world/entity/mob';
 import { Item } from '../../world/item/item';
-import { World } from '../../world/world';
 
 export type CrabState =
     | 'idle'
