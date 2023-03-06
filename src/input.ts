@@ -289,7 +289,7 @@ export class InputManager {
                 movement.z * speed
             );
             if (movement.sprint) {
-                this.game.player.mana -= 0.1;
+                this.game.player.mana -= 0.02;
             }
         }
 

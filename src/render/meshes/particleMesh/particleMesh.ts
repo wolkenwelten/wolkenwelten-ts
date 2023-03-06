@@ -231,9 +231,11 @@ export class ParticleMesh {
         this.update();
         this.finish();
         gl.enable(gl.BLEND);
+        gl.depthMask(false);
         gl.blendFunc(gl.ONE, gl.ONE);
         ParticleMesh.shader.bind().uniform4fv('mat_mvp', mat_mvp);
         gl.drawArrays(gl.POINTS, 0, this.particleCount);
+        gl.depthMask(true);
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     }
 }

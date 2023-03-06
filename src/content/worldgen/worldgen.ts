@@ -7,7 +7,7 @@ import type { WorldgenAssetList } from './assets';
 import { StaticObject } from '../../world/chunk/staticObject';
 import { Mob } from '../../world/entity/mob';
 
-export const worldgen = (assets: WorldgenAssetList, chunk:Chunk) => {
+export const worldgen = (assets: WorldgenAssetList, chunk: Chunk) => {
     if (chunk.y < -512) {
         chunk.setBox(0, 0, 0, 32, 32, 32, 3); // Just fill everything with stone for now
     } else if (chunk.y < 512) {

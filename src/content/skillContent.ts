@@ -130,21 +130,21 @@ export const registerSkills = () => {
                 if (user.isOnCooldown() || !user.useMana(1)) {
                     return false;
                 }
-                user.cooldown(35);
+                user.cooldown(30);
                 user.hitAnimation = user.world.game.render.frames;
                 user.world.game.audio.play('punchMiss');
 
-                const count = Math.floor(4 + skillLevel);
+                const count = 1;
                 for (let i = 0; i < count; i++) {
                     setTimeout(() => {
                         const proj = new Projectile(user, 1.2);
-                        const offDir = (i * 1) / count - 0.5;
-                        proj.x += Math.cos(user.yaw) * offDir + proj.vx;
-                        proj.z += Math.sin(user.yaw) * offDir + proj.vz;
-                        proj.y += proj.vy - 0.2;
+                        proj.ttl = 48;
                         const vx = proj.vx;
                         const vy = proj.vy;
                         const vz = proj.vz;
+                        proj.x += vx;
+                        proj.y += vy;
+                        proj.z += vz;
                         const off = Math.floor(Math.random() * 1000);
 
                         proj.onHit = function (this: Projectile, e: Entity) {
@@ -172,22 +172,29 @@ export const registerSkills = () => {
                         proj.onUpdate = function (this: Projectile) {
                             this.vx =
                                 vx +
-                                (Math.cos((this.ttl + 5 + off) * 0.1) - 0.5) *
+                                (Math.cos((this.ttl + 5 + off + i * 23) * 0.5) -
+                                    0.5) *
                                     0.02;
                             this.vy =
                                 vy +
-                                (Math.cos((this.ttl + 10 + off) * 0.2) - 0.5) *
+                                (Math.cos(
+                                    (this.ttl + 10 + off + i * 42) * 0.7
+                                ) -
+                                    0.5) *
                                     0.02;
                             this.vz =
                                 vz +
-                                (Math.cos((this.ttl + 15 + off) * 0.4) - 0.5) *
+                                (Math.cos(
+                                    (this.ttl + 15 + off + i * 69) * 0.11
+                                ) -
+                                    0.5) *
                                     0.02;
                             this.world.game.render.particle.add(
                                 this.x,
                                 this.y,
                                 this.z,
-                                128,
-                                0xffa010df,
+                                192,
+                                0xafa010df,
                                 0,
                                 0,
                                 0,
@@ -197,20 +204,20 @@ export const registerSkills = () => {
                                 0,
                                 0
                             );
-                            const vxs = (this.vx * 1) / 8;
-                            const vys = (this.vy * 1) / 8;
-                            const vzs = (this.vz * 1) / 8;
-                            for (let i = 0; i < 8; i++) {
+                            const vxs = (this.vx * 1) / 9;
+                            const vys = (this.vy * 1) / 9;
+                            const vzs = (this.vz * 1) / 9;
+                            for (let i = 0; i < 9; i++) {
                                 this.world.game.render.particle.add(
                                     this.x + vxs * i,
                                     this.y + vys * i,
                                     this.z + vzs * i,
-                                    24,
-                                    0xff8030af,
+                                    56,
+                                    0x1F8030af,
                                     0,
                                     0,
                                     0,
-                                    -0.6,
+                                    -0.9,
                                     0,
                                     0,
                                     0,
@@ -218,7 +225,7 @@ export const registerSkills = () => {
                                 );
                             }
                         };
-                    }, (i + 1) * (i + 1) * 14);
+                    }, (i + 1) * (i + 1) * 24);
                 }
             }
             return false;

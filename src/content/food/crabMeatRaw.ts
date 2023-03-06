@@ -12,6 +12,7 @@ export class CrabMeatRaw extends Item {
     name = 'Crab meat';
     icon = itemIcon;
     meshUrl = meshUrl;
+    stackSize = 20;
 
     use(e: Entity) {
         if (!this.destroyed && e instanceof Character) {
