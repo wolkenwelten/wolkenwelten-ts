@@ -37,6 +37,10 @@ export class Entity {
 
     cooldown(ticks: number) {}
 
+    camOffY() {
+        return 0;
+    }
+
     destroy() {
         this.destroyed = true;
         this.world.removeEntity(this);

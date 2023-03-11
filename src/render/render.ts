@@ -127,7 +127,7 @@ export class RenderManager {
         mat4.rotateX(viewMatrix, viewMatrix, -this.cam.pitch);
         mat4.rotateY(viewMatrix, viewMatrix, -this.cam.yaw);
         transPos[0] = -this.cam.x;
-        transPos[1] = -this.cam.y;
+        transPos[1] = -(this.cam.y + this.cam.camOffY());
         transPos[2] = -this.cam.z;
         mat4.translate(viewMatrix, viewMatrix, transPos);
 

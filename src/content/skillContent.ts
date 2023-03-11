@@ -213,7 +213,7 @@ export const registerSkills = () => {
                                     this.y + vys * i,
                                     this.z + vzs * i,
                                     56,
-                                    0x1F8030af,
+                                    0x1f8030af,
                                     0,
                                     0,
                                     0,

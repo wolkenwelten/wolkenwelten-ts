@@ -244,6 +244,10 @@ export class Character extends Being {
         this.mana = Math.max(0, Math.min(this.maxMana, this.mana));
     }
 
+    camOffY() {
+        return Math.sin(this.walkCycleCounter) * 0.08;
+    }
+
     update() {
         if (this.isDead) {
             return;
