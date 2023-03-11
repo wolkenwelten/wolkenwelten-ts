@@ -5,12 +5,13 @@ import itemIcon from '../../../assets/gfx/items/woodWand.png';
 import meshUrl from '../../../assets/vox/items/woodWand.vox?url';
 
 import type { Entity } from '../../world/entity/entity';
-import { Character } from '../../world/character';
+import { Character } from '../../world/entity/character';
 import { Item } from '../../world/item/item';
 
 export class WoodWand extends Item {
     attackSkill = ['clubmanship', 'onehanded'];
     isWeapon = true;
+    name = 'Wood wand';
     icon = itemIcon;
     meshUrl = meshUrl;
 

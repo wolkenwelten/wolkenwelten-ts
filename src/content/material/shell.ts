@@ -10,4 +10,5 @@ export class Shell extends Item {
     name = 'Shell';
     icon = itemIcon;
     meshUrl = meshUrl;
+    stackSize = 99;
 }

@@ -16,7 +16,7 @@ import { PersistenceManager } from './persistence';
 import { ProfilingManager } from './profiler';
 import { RenderManager } from './render/render';
 import { UIManager } from './ui/ui';
-import { Character } from './world/character';
+import { Character } from './world/entity/character';
 import { StaticObject } from './world/chunk/staticObject';
 import { CraftingRecipe } from './world/crafting';
 import { Mob } from './world/entity/mob';

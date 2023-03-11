@@ -16,7 +16,7 @@ import throwingUrl from '../../assets/gfx/skill/throwing.png';
 import wandwhippingUrl from '../../assets/gfx/skill/wandWhipping.png';
 
 import type { Entity } from '../world/entity/entity';
-import { Character } from '../world/character';
+import { Character } from '../world/entity/character';
 import { Being } from '../world/entity/being';
 import { Projectile } from '../world/entity/projectile';
 import { Skill } from '../world/skill';

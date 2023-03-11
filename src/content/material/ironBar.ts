@@ -10,4 +10,5 @@ export class IronBar extends Item {
     name = 'Iron bar';
     icon = itemIcon;
     meshUrl = meshUrl;
+    stackSize = 99;
 }

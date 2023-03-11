@@ -10,4 +10,5 @@ export class Coal extends Item {
     name = 'Coal';
     icon = itemIcon;
     meshUrl = meshUrl;
+    stackSize = 99;
 }

@@ -9,7 +9,7 @@
  * well as creating DangerZones to make sure that fluids are properly simulated if we dig close to one.
  */
 import type { RenderManager } from '../render/render';
-import type { Character } from './character';
+import type { Character } from './entity/character';
 import type { MaybeItem } from './item/item';
 import type { World } from './world';
 import { clamp } from '../util/math';

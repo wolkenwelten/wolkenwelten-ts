@@ -5,7 +5,7 @@ import itemIcon from '../../../assets/gfx/items/crabMeatRaw.png';
 import meshUrl from '../../../assets/vox/items/crabMeatRaw.vox?url';
 
 import type { Entity } from '../../world/entity/entity';
-import { Character } from '../../world/character';
+import { Character } from '../../world/entity/character';
 import { Item } from '../../world/item/item';
 
 export class CrabMeatRaw extends Item {

@@ -5,7 +5,7 @@ import type { TriangleMesh } from '../../render/meshes/triangleMesh/triangleMesh
 import type { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
 import type { Entity } from '../entity/entity';
 import type { World } from '../world';
-import { Character } from '../character';
+import { Character } from '../entity/character';
 import { Item } from './item';
 
 export class BlockItem extends Item {

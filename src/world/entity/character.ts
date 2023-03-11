@@ -3,15 +3,15 @@
  */
 import { mat4 } from 'gl-matrix';
 
-import type { TriangleMesh } from '../render/meshes/triangleMesh/triangleMesh';
-import type { VoxelMesh } from '../render/meshes/voxelMesh/voxelMesh';
-import type { Entity } from './entity/entity';
-import type { World } from './world';
-import { Being } from './entity/being';
-import { ItemDrop } from './entity/itemDrop';
-import { Inventory } from './item/inventory';
-import { Item, MaybeItem } from './item/item';
-import { ActiveSkill, CharacterSkill, Skill } from './skill';
+import type { TriangleMesh } from '../../render/meshes/triangleMesh/triangleMesh';
+import type { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
+import type { Entity } from './entity';
+import type { World } from '../world';
+import { Being } from './being';
+import { ItemDrop } from './itemDrop';
+import { Inventory } from '../item/inventory';
+import { Item, MaybeItem } from '../item/item';
+import { ActiveSkill, CharacterSkill, Skill } from '../skill';
 
 const CHARACTER_ACCELERATION = 0.05;
 const CHARACTER_STOP_RATE = CHARACTER_ACCELERATION * 3.0;

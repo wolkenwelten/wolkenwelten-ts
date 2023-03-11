@@ -6,7 +6,7 @@ import meshUrl from '../../../assets/vox/items/stone.vox?url';
 
 import type { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
 import type { Entity } from '../../world/entity/entity';
-import { Character } from '../../world/character';
+import { Character } from '../../world/entity/character';
 import { Being } from '../../world/entity/being';
 import { ItemDrop } from '../../world/entity/itemDrop';
 import { Projectile } from '../../world/entity/projectile';
@@ -16,6 +16,7 @@ export class Stone extends Item {
     name = 'Stone';
     icon = itemIcon;
     meshUrl = meshUrl;
+    stackSize = 99;
 
     use(user: Entity) {
         if (!this.destroyed && user instanceof Character) {

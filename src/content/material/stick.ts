@@ -4,7 +4,7 @@
 import itemIcon from '../../../assets/gfx/items/stick.png';
 import meshUrl from '../../../assets/vox/items/stick.vox?url';
 
-import { Character } from '../../world/character';
+import { Character } from '../../world/entity/character';
 import type { Entity } from '../../world/entity/entity';
 import { Item } from '../../world/item/item';
 
@@ -14,6 +14,7 @@ export class Stick extends Item {
     meshUrl = meshUrl;
     attackSkill = ['onehanded'];
     isWeapon = true;
+    stackSize = 99;
 
     attackDamage(e: Entity): number {
         return 2;

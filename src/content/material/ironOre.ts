@@ -10,4 +10,5 @@ export class IronOre extends Item {
     name = 'Iron ore';
     icon = itemIcon;
     meshUrl = meshUrl;
+    stackSize = 99;
 }

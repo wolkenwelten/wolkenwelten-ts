@@ -8,6 +8,7 @@ import { Item } from '../../world/item/item';
 
 export class WoodShield extends Item {
     isShield = true;
+    name = 'Wood shield';
     icon = itemIcon;
     meshUrl = meshUrl;
 }
