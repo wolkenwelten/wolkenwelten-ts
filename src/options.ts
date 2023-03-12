@@ -34,6 +34,7 @@ export class Options {
 
     constructor() {
         const params = new URLSearchParams(window.location.search);
+        this.skipMenu = window.location.hostname === 'localhost';
         this.skipMenu = this.parseBoolean(
             this.skipMenu,
             params.get('skipMenu')
