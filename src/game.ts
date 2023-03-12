@@ -4,10 +4,8 @@
 import { AudioManager } from './audio';
 import { registerAudioContent } from './content/audioContent';
 import { registerBlockTypes } from './content/blockTypes';
-import { registerCraftingRecipes } from './content/craftingRecipes';
 import { registerItems } from './content/itemContent';
 import { registerMobs } from './content/mobContent';
-import { registerSkills } from './content/skillContent';
 import { registerStaticObjects } from './content/staticObjects';
 import { initWorldgen } from './content/worldgen/assets';
 import { InputManager } from './input';
@@ -18,10 +16,8 @@ import { RenderManager } from './render/render';
 import { UIManager } from './ui/ui';
 import { Character } from './world/entity/character';
 import { StaticObject } from './world/chunk/staticObject';
-import { CraftingRecipe } from './world/crafting';
 import { Mob } from './world/entity/mob';
 import { Item } from './world/item/item';
-import { Skill } from './world/skill';
 import { World } from './world/world';
 
 export interface GameConfig {
@@ -35,8 +31,6 @@ export interface BlockTypeRegistry {
 export class Game {
     Item: typeof Item;
     Mob: typeof Mob;
-    CraftingRecipe: typeof CraftingRecipe;
-    Skill: typeof Skill;
     StaticObject: typeof StaticObject;
 
     audio: AudioManager;
@@ -59,8 +53,6 @@ export class Game {
     constructor(config: GameConfig) {
         this.Item = Item;
         this.Mob = Mob;
-        this.CraftingRecipe = CraftingRecipe;
-        this.Skill = Skill;
         this.StaticObject = StaticObject;
 
         this.config = config;
@@ -94,9 +86,7 @@ export class Game {
         registerItems();
         registerBlockTypes(this.world);
         registerStaticObjects();
-        registerSkills();
         registerMobs();
-        registerCraftingRecipes(this.world);
     }
 
     async init() {

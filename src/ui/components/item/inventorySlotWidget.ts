@@ -60,30 +60,6 @@ export class InventorySlotWidget {
                     const t = this.game.player.equipment.items[0];
                     this.game.player.equipment.items[0] = item;
                     this.inventory.items[this.slotIndex] = t;
-                } else if (item.isShield) {
-                    const t = this.game.player.equipment.items[1];
-                    this.game.player.equipment.items[1] = item;
-                    this.inventory.items[this.slotIndex] = t;
-                } else if (item.isHeadwear) {
-                    const t = this.game.player.equipment.items[2];
-                    this.game.player.equipment.items[2] = item;
-                    this.inventory.items[this.slotIndex] = t;
-                } else if (item.isTorsowear) {
-                    const t = this.game.player.equipment.items[3];
-                    this.game.player.equipment.items[3] = item;
-                    this.inventory.items[this.slotIndex] = t;
-                } else if (item.isTorsowear) {
-                    const t = this.game.player.equipment.items[4];
-                    this.game.player.equipment.items[4] = item;
-                    this.inventory.items[this.slotIndex] = t;
-                } else if (item.isLegwear) {
-                    const t = this.game.player.equipment.items[5];
-                    this.game.player.equipment.items[5] = item;
-                    this.inventory.items[this.slotIndex] = t;
-                } else if (item.isFootwear) {
-                    const t = this.game.player.equipment.items[6];
-                    this.game.player.equipment.items[6] = item;
-                    this.inventory.items[this.slotIndex] = t;
                 } else {
                     this.game.ui.heldItem =
                         this.inventory.items[this.slotIndex];
@@ -115,8 +91,6 @@ export class InventorySlotWidget {
             }
         }
 
-        this.game.ui.cursorItem.update(this.game.ui.heldItem);
-        this.game.ui.cursorItem.updatePos(e.pageX, e.pageY);
         this.game.ui.updateInventory(this.slotIndex);
         this.update();
     }
@@ -153,8 +127,6 @@ export class InventorySlotWidget {
             }
         }
 
-        this.game.ui.cursorItem.update(this.game.ui.heldItem);
-        this.game.ui.cursorItem.updatePos(e.pageX, e.pageY);
         this.game.ui.updateInventory(this.slotIndex);
         this.update();
     }

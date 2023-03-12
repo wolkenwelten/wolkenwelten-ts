@@ -134,7 +134,6 @@ export class RenderManager {
         this.gl.enable(this.gl.BLEND);
         this.world.draw(projectionMatrix, viewMatrix, this.cam);
         mat4.multiply(viewMatrix, projectionMatrix, viewMatrix);
-        this.world.renderer.game.world.mining.draw(this.world.renderer);
         this.decals.draw(viewMatrix);
         this.gl.disable(this.gl.BLEND);
 
@@ -175,33 +174,9 @@ export class RenderManager {
         mesh.draw(modelViewMatrix, 1.0);
     }
 
-    drawHudShield(projectionMatrix: mat4) {
-        const item = this.game.player.equipmentShield();
-        if (!item) {
-            return;
-        }
-        const mesh = item.mesh();
-        mat4.identity(modelViewMatrix);
-        let r = Math.PI * -0.04;
-        const player = this.game.player;
-        const viewBob = Math.sin(player.walkCycleCounter + 1) * 0.05;
-        const viewBobH = Math.sin((player.walkCycleCounter + 1) * 0.5) * 0.06;
-        const jumpOff = player.jumpAnimeFactor * -0.2;
-        const rl = 0;
-        transPos[0] = -0.6 - rl * 0.2 + viewBobH + player.inertiaX * 0.5;
-        transPos[1] = -0.6 + rl * 0.2 + viewBob + jumpOff;
-        transPos[2] = -0.5 - rl * 0.25 + player.inertiaZ * 0.5;
-        mat4.translate(modelViewMatrix, modelViewMatrix, transPos);
-        mat4.rotateX(modelViewMatrix, modelViewMatrix, r);
-        mat4.multiply(modelViewMatrix, projectionMatrix, modelViewMatrix);
-
-        mesh.draw(modelViewMatrix, 1.0);
-    }
-
     drawHud(projectionMatrix: mat4) {
         this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
         this.drawHUDWeapon(projectionMatrix);
-        this.drawHudShield(projectionMatrix);
     }
 
     resize() {

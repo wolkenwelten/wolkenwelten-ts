@@ -19,16 +19,10 @@ export class Item {
     name = '';
     world: World;
     destroyed = false;
-    attackSkill: string[] = [];
     amount = 1;
     stackSize = 1;
 
     isWeapon = false;
-    isShield = false;
-    isHeadwear = false;
-    isTorsowear = false;
-    isLegwear = false;
-    isFootwear = false;
 
     static registry: Map<string, ItemConstructor> = new Map();
     static register(name: string, con: ItemConstructor) {
@@ -73,23 +67,13 @@ export class Item {
         return 0;
     }
 
-    miningDamage(block: number): number {
-        return 0;
-    }
-
     attackCooldown(e: Entity): number {
         return 100;
     }
 
-    onAttackWith(e: Character) {
-        for (const id of this.attackSkill) {
-            e.skillXpGain(id, 1);
-        }
-    }
+    onAttackWith(e: Character) {}
 
     mayStackWith(other: Item): boolean {
         return this.constructor === other.constructor;
     }
-
-    onMineWith(e: Entity, block: number) {}
 }

@@ -4,12 +4,11 @@ div[paused='true'] .hotbar {
 
 .hotbar {
     position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: 5px;
+    right: 0;
+    bottom: 0;
     z-index: 1000;
     width: 100%;
-    text-align: center;
+    text-align: right;
 }
 
 .hotbarSlot {

@@ -11,7 +11,6 @@ import { Being } from './being';
 import { ItemDrop } from './itemDrop';
 import { Inventory } from '../item/inventory';
 import { Item, MaybeItem } from '../item/item';
-import { ActiveSkill, CharacterSkill, Skill } from '../skill';
 
 const CHARACTER_ACCELERATION = 0.05;
 const CHARACTER_STOP_RATE = CHARACTER_ACCELERATION * 3.0;
@@ -39,28 +38,14 @@ export class Character extends Being {
     inertiaX = 0;
     inertiaZ = 0;
 
-    miningX = 0;
-    miningY = 0;
-    miningZ = 0;
-    miningActive = false;
-
     health = 12;
     maxHealth = 12;
     isDead = false;
-
-    mana = 12;
-    maxMana = 12;
-    nextManaRegen = 0;
-
-    level = 0;
-    xp = 0;
-    skillPoints = 0;
 
     weight = 70;
 
     equipment: Inventory;
     inventory: Inventory;
-    skill: Map<string, CharacterSkill> = new Map();
 
     /* Simple cheat, can be run from the browser console by typing `wolkenwelten.player.getGoodStuff();` */
     getGoodStuff() {
@@ -74,12 +59,6 @@ export class Character extends Being {
 
         this.equipment.items[0] = Item.create('club', this.world);
         this.equipment.items[1] = Item.create('woodShield', this.world);
-
-        this.skillXpGain('axefighting', 295);
-        this.skillXpGain('pugilism', 100);
-        this.skillXpGain('throwing', 100);
-        this.skillXpGain('magickMissile', 0);
-        this.skillXpGain('heavyStrike', 0);
     }
 
     /* Initialize an already existing Character, that way we can easily reuse the same object, */
@@ -87,20 +66,15 @@ export class Character extends Being {
         this.x = this.spawnX;
         this.y = this.spawnY;
         this.z = this.spawnZ;
-        this.xp = this.level = 0;
         this.yaw = this.spawnYaw;
         this.pitch = this.spawnPitch;
         this.noClip = false;
         this.isDead = false;
         this.maxHealth = this.health = 12;
-        this.maxMana = this.mana = 12;
         this.hitAnimation = -100;
         this.lastAction = 0;
-        this.miningActive = false;
-        this.miningX = this.miningY = this.miningZ = 0;
         this.vx = this.vy = this.vz = 0;
 
-        this.skill.clear();
         this.inventory.clear();
         this.equipment.clear();
         this.inventory.select(0);
@@ -120,22 +94,12 @@ export class Character extends Being {
         pitch: number
     ) {
         super(world, x, y, z);
-        this.inventory = new Inventory(40);
-        this.equipment = new Inventory(10);
+        this.inventory = new Inventory(10);
+        this.equipment = new Inventory(2);
         this.equipment.mayPut = (index: number, item: Item): boolean => {
             switch (index) {
                 case 0:
                     return item.isWeapon;
-                case 1:
-                    return item.isShield;
-                case 2:
-                    return item.isHeadwear;
-                case 3:
-                    return item.isTorsowear;
-                case 4:
-                    return item.isLegwear;
-                case 5:
-                    return item.isFootwear;
                 default:
                     return false;
             }
@@ -165,16 +129,6 @@ export class Character extends Being {
     /* Heal a character by a certain amount of hit points */
     heal(rawAmount: number) {
         this.damage(-rawAmount);
-    }
-
-    /* Try and use a certain amount of mana, returns true when the player had sufficient mana. */
-    useMana(amount: number): boolean {
-        if (this.mana > amount) {
-            this.mana -= amount;
-            return true;
-        } else {
-            return false;
-        }
     }
 
     /* Walk/Run according to the direction of the Entity, ignores pitch */
@@ -236,14 +190,6 @@ export class Character extends Being {
         );
     }
 
-    updateMana() {
-        while (this.world.game.ticks > this.nextManaRegen) {
-            this.nextManaRegen += 5;
-            this.mana += 0.05;
-        }
-        this.mana = Math.max(0, Math.min(this.maxMana, this.mana));
-    }
-
     camOffY() {
         return Math.sin(this.walkCycleCounter) * 0.08;
     }
@@ -252,7 +198,6 @@ export class Character extends Being {
         if (this.isDead) {
             return;
         }
-        this.updateMana();
 
         if (this.noClip) {
             this.vx = this.vy = this.vz = 0;
@@ -366,35 +311,9 @@ export class Character extends Being {
         this.lastAction = this.world.game.ticks + ticks;
     }
 
-    dig() {
-        const ray = this.raycast();
-        if (!ray) {
-            return;
-        }
-        const [x, y, z] = ray;
-        const minedBlock = this.world.getBlock(x, y, z) || 0;
-        if (minedBlock === 0) {
-            return;
-        }
-        const dmg = this.equipmentWeapon()?.miningDamage(minedBlock) || 0;
-        if (dmg > 0) {
-            this.miningActive = true;
-            this.miningX = x;
-            this.miningY = y;
-            this.miningZ = z;
-        }
-    }
-
     doDamage(target: Being, damage: number) {
-        const wasDead = target.isDead;
         target.damage(damage);
         target.onAttack(this);
-        if (!wasDead) {
-            if (target.isDead) {
-                const xp = Math.max(0, target.level - this.level);
-                this.xpGain(xp);
-            }
-        }
     }
 
     attack(radius = 1.6, damageCB?: (e: Entity) => void): boolean {
@@ -483,18 +402,13 @@ export class Character extends Being {
     /* Do a melee attack using whatever item is currently selected */
     strike() {
         if (this.world.game.ticks < this.lastAction) {
-            if (this.miningCooldownUntil < this.world.game.ticks) {
-                this.dig();
-            }
             return;
         }
         const item = this.equipmentWeapon();
 
         this.hitAnimation = this.world.game.render.frames;
         const hit = this.attack();
-        const cooldownDur = item
-            ? item.attackCooldown(this)
-            : 80 - this.skillLevel('pugilism') * 12;
+        const cooldownDur = item ? item.attackCooldown(this) : 80;
         this.cooldown(cooldownDur);
         if (hit) {
             this.world.game.audio.play('punch');
@@ -502,42 +416,14 @@ export class Character extends Being {
 
             if (item) {
                 item.onAttackWith(this);
-            } else {
-                this.skillXpGain('pugilism', 1);
             }
         } else {
             this.world.game.audio.play('punchMiss');
-        }
-        if (this.miningActive) {
-            const minedBlock =
-                this.world.getBlock(this.miningX, this.miningY, this.miningZ) ||
-                0;
-            this.world.blocks[minedBlock].playMineSound(this.world);
         }
     }
 
     equipmentWeapon() {
         return this.equipment.items[0];
-    }
-
-    equipmentShield() {
-        return this.equipment.items[1];
-    }
-
-    equipmentHead() {
-        return this.equipment.items[2];
-    }
-
-    equipmentTorso() {
-        return this.equipment.items[3];
-    }
-
-    equipmentLegs() {
-        return this.equipment.items[4];
-    }
-
-    equipmentFeet() {
-        return this.equipment.items[5];
     }
 
     /* Use the current item or punch if we don't have anything equipped */
@@ -577,101 +463,5 @@ export class Character extends Being {
         } else {
             return heldItem.mesh();
         }
-    }
-
-    /* Return the absolute amount of XP needed to reach a certain level */
-    xpForLevel(level: number): number {
-        return level * 16;
-    }
-
-    /* Return how close we are to reaching the next level in the range 0.0 - 1.0 */
-    xpPercentageTillNextLevel(): number {
-        const base = this.xpForLevel(this.level);
-        const goal = this.xpForLevel(this.level + 1);
-        const relGoal = goal - base;
-        const relBase = this.xp - base;
-        const p = relBase / relGoal;
-        return p;
-    }
-
-    /* Level up if we have enough XP, increasing skillpoints/maxHealth and so on */
-    xpLevelUpIfAvailable() {
-        if (this.xpPercentageTillNextLevel() >= 1) {
-            this.level++;
-            this.maxHealth += 4;
-            this.maxMana += 4;
-            this.skillPoints++;
-            this.health = this.maxHealth;
-            this.mana = this.maxMana;
-            this.world.game.audio.play('levelUp', 0.5);
-            this.world.game.ui.log.addEntry(
-                `You've reached level ${
-                    this.level + 1
-                }! Maximum health increased.`
-            );
-        }
-    }
-
-    /* Gain a certain amount of  XP and check whether a level up is possible */
-    xpGain(amount: number) {
-        this.xp += amount;
-        this.xpLevelUpIfAvailable();
-    }
-
-    /* Gain some XP for a certain skill, learning it if necessary */
-    skillXpGain(skillId: string, amount: number) {
-        if (skillId === '') {
-            return;
-        }
-        const ps = this.skill.get(skillId);
-        if (ps) {
-            ps.xpGain(amount);
-        } else {
-            const skill = Skill.get(skillId);
-            if (!skill) {
-                throw new Error(`Unknown skill: ${skillId}`);
-            }
-            const nps = new CharacterSkill(this, skill);
-            this.skill.set(skillId, nps);
-            nps.xpGain(amount);
-            if (skill instanceof ActiveSkill) {
-                setTimeout(() => {
-                    this.world.game.ui.hotbar.add(skill);
-                }, 0);
-            }
-        }
-    }
-
-    /* Try to learn a certain skill if possible */
-    skillLearn(skillId: string): boolean {
-        if (this.skillPoints <= 0) {
-            return false;
-        }
-        const skill = Skill.get(skillId);
-        if (!skill) {
-            throw new Error(`Unknown skill: ${skillId}`);
-        }
-        if (!(skill instanceof ActiveSkill)) {
-            throw new Error(
-                `${skillId} is not an active skill that must be learned by spending skill points`
-            );
-        }
-        this.skillPoints--;
-        this.skillXpGain(skillId, 0);
-        return true;
-    }
-
-    /* Return whether a given skill is already known to our character */
-    skillIsLearned(skillId: string): boolean {
-        return this.skill.get(skillId) !== undefined;
-    }
-
-    /* Return the level of the given skill, or -1 if unknown */
-    skillLevel(skillId: string): number {
-        return this.skill.get(skillId)?.level || -1;
-    }
-
-    skillUse(skillId: string) {
-        this.skill.get(skillId)?.use();
     }
 }

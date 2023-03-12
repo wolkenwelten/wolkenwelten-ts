@@ -3,7 +3,6 @@
  */
 import type { Game } from './game';
 import { Item } from './world/item/item';
-import { ActiveSkill } from './world/skill';
 
 export class InputManager {
     game: Game;
@@ -27,7 +26,7 @@ export class InputManager {
                 handler();
             }
         });
-        this.keyHandler.set('KeyE', () => {
+        this.keyHandler.set('KeyO', () => {
             if (!that.game.running || !that.game.ready) {
                 return;
             }
@@ -69,10 +68,6 @@ export class InputManager {
                 return;
             }
             e.preventDefault();
-            if (that.game.ui.heldItem instanceof ActiveSkill) {
-                that.game.ui.heldItem = undefined;
-                that.game.ui.cursorItem.update(that.game.ui.heldItem);
-            }
         });
         that.game.ui.rootElement.addEventListener('mouseup', (e) =>
             that.mouseStates.delete(e.button)
@@ -131,7 +126,6 @@ export class InputManager {
                     }
                 }
                 this.game.ui.heldItem = undefined;
-                this.game.ui.cursorItem.update(this.game.ui.heldItem);
             }
         }
     }
@@ -141,7 +135,7 @@ export class InputManager {
     }
 
     update() {
-        const movement = { x: 0, y: 0, z: 0, sprint: false };
+        const movement = { x: 0, y: 0, z: 0, sprint: true };
         const actions = { primary: false, secondary: false };
 
         if (this.keyStates.has('KeyW')) {
@@ -164,9 +158,6 @@ export class InputManager {
         }
         if (this.keyStates.has('Space')) {
             movement.y = 1;
-        }
-        if (this.keyStates.has('ShiftLeft')) {
-            movement.sprint = true;
         }
 
         const player = this.game.player;
@@ -288,9 +279,6 @@ export class InputManager {
                 movement.y * speed,
                 movement.z * speed
             );
-            if (movement.sprint) {
-                this.game.player.mana -= 0.02;
-            }
         }
 
         for (let i = 0; i < 10; i++) {
@@ -300,7 +288,6 @@ export class InputManager {
             }
         }
 
-        this.game.player.miningActive = false;
         if (this.mouseStates.has(0)) {
             actions.primary = true;
         }

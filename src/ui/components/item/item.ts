@@ -3,7 +3,6 @@
  */
 import type { HotbarEntryValue } from '../hotbar/hotbar';
 import { Item } from '../../../world/item/item';
-import { Skill } from '../../../world/skill';
 import { Div, Img } from '../../utils';
 import styles from './item.module.css';
 
@@ -75,20 +74,6 @@ export class ItemWidget {
                 this.img.style.display = 'none';
                 this.lastIcon = '';
             }
-        } else if (item instanceof Skill) {
-            const icon = item.icon;
-            if (icon) {
-                if (icon !== this.lastIcon) {
-                    this.img.setAttribute('src', icon);
-                    this.img.style.display = 'block';
-                    this.lastIcon = icon;
-                }
-            } else {
-                this.img.style.display = 'none';
-                this.lastIcon = '';
-            }
-            this.amount.innerText = '';
-            this.lastAmount = 0;
         } else {
             this.amount.innerText = '';
             this.img.style.display = 'none';

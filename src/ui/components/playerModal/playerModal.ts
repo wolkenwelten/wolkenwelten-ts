@@ -3,11 +3,8 @@
  */
 import type { Game } from '../../../game';
 import { Div } from '../../utils';
-import { CraftingWrap } from './craftingWrap';
-import { InventoryWrap } from './inventoryModal';
 import styles from './playerModal.module.css';
 import { SettingsWrap } from './settingsWrap';
-import { SkillWrap } from './skillWrap';
 
 interface TabClass {
     update: () => void;
@@ -25,10 +22,7 @@ export class PlayerModal {
     tabBar: HTMLElement;
 
     activeTab?: TabClass;
-    crafting: CraftingWrap;
-    inventory: InventoryWrap;
     settings: SettingsWrap;
-    skill: SkillWrap;
 
     private initTab<T extends TabClass>(
         game: Game,
@@ -79,10 +73,7 @@ export class PlayerModal {
         this.div.addEventListener('mousedown', λ);
         this.div.addEventListener('mousewheel', λ);
 
-        this.inventory = this.initTab(game, 'Inventory', InventoryWrap, true);
-        this.crafting = this.initTab(game, 'Crafting', CraftingWrap);
-        this.skill = this.initTab(game, 'Skills', SkillWrap);
-        this.settings = this.initTab(game, 'Settings', SettingsWrap);
+        this.settings = this.initTab(game, 'Settings', SettingsWrap, true);
 
         parent.appendChild(this.div);
     }
@@ -94,7 +85,6 @@ export class PlayerModal {
         this.game.render.canvasWrapper.classList.add('fx-inventory');
         this.div.classList.add(styles.active);
         this.activeTab?.update();
-        this.inventory.update(-1);
         this.active = true;
     }
 
@@ -115,7 +105,5 @@ export class PlayerModal {
         }
     }
 
-    update(i: number) {
-        this.inventory.update(i);
-    }
+    update(i: number) {}
 }

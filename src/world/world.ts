@@ -9,7 +9,6 @@ import { LCG } from '../util/prng';
 import { BlockType } from './blockType';
 import { Chunk } from './chunk/chunk';
 import { DangerZone } from './chunk/dangerZone';
-import { MiningManager } from './mining';
 
 export const coordinateToWorldKey = (x: number, y: number, z: number) =>
     ((Math.floor(x) >> 5) & 0xffff) +
@@ -21,7 +20,6 @@ export class World {
     dangerZone: DangerZone;
     entities: Set<Entity> = new Set();
     seed: number;
-    mining: MiningManager;
     game: Game;
     blocks: BlockType[] = [];
     blockTextureUrl = '';
@@ -31,7 +29,6 @@ export class World {
     constructor(game: Game) {
         this.seed = 1234;
         this.game = game;
-        this.mining = new MiningManager(this);
         this.dangerZone = new DangerZone(this);
         this.worldgenHandler = (chunk: Chunk) => {
             chunk.setSphereUnsafe(16, 16, 16, 7, 3);
@@ -111,7 +108,6 @@ export class World {
                 this.removeEntity(entity);
             }
         }
-        this.mining.update();
         this.dangerZone.update();
     }
 

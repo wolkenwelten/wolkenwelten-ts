@@ -3,12 +3,11 @@
  */
 import type { Game } from '../../../game';
 import { Item } from '../../../world/item/item';
-import { ActiveSkill } from '../../../world/skill';
 import { Div } from '../../utils';
 import { ItemWidget } from '../item/item';
 import styles from './hotbar.module.css';
 
-export type HotbarEntryValue = Item | ActiveSkill | undefined;
+export type HotbarEntryValue = Item | undefined;
 
 export class HotbarEntry {
     i: number;
@@ -55,22 +54,14 @@ export class HotbarEntry {
     }
 
     update() {
-        if (this.value instanceof ActiveSkill) {
-            this.widget.update(this.value);
-        } else {
-            if (this.value?.destroyed) {
-                this.value = undefined;
-            }
-            this.widget.update(this.value);
+        if (this.value?.destroyed) {
+            this.value = undefined;
         }
+        this.widget.update(this.value);
     }
 
     use() {
-        if (this.value instanceof ActiveSkill) {
-            this.game.player.skillUse(this.value.id);
-        } else if (this.value instanceof Item) {
-            this.value.use(this.game.player);
-        }
+        this.value?.use(this.game.player);
     }
 }
 
