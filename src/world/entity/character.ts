@@ -53,7 +53,6 @@ export class Character extends Being {
         this.inventory.add(Item.create('ironPickaxe', this.world));
         this.inventory.add(Item.create('stoneAxe', this.world));
         this.inventory.add(Item.create('stonePickaxe', this.world));
-        this.inventory.add(Item.create('crabMeatRaw', this.world, 3));
         this.inventory.add(Item.create('stick', this.world, 3));
         this.inventory.add(Item.create('stone', this.world, 90));
 

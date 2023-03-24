@@ -64,13 +64,6 @@ export class Crab extends Mob {
             return;
         }
         this.world.game.render.particle.fxDeath(this.x, this.y, this.z);
-        new ItemDrop(
-            this.world,
-            this.x + (Math.random() - 0.5) * 0.3,
-            this.y,
-            this.z + (Math.random() - 0.5) * 0.3,
-            Item.create('crabMeatRaw', this.world)
-        );
         this.changeState('dead');
         this.isDead = true;
         this.world.game.audio.play('crabDeath', 0.5);

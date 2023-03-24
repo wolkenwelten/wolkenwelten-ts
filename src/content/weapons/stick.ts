@@ -12,7 +12,6 @@ export class Stick extends Item {
     icon = itemIcon;
     meshUrl = meshUrl;
     isWeapon = true;
-    stackSize = 99;
 
     attackDamage(e: Entity): number {
         return 2;

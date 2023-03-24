@@ -6,8 +6,6 @@ import meshUrl from '../../../assets/vox/staticShell.vox?url';
 import type { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
 import type { Entity } from '../../world/entity/entity';
 import { StaticObject } from '../../world/chunk/staticObject';
-import { ItemDrop } from '../../world/entity/itemDrop';
-import { Item } from '../../world/item/item';
 
 export class StaticShell extends StaticObject {
     mesh(): VoxelMesh {
@@ -15,13 +13,6 @@ export class StaticShell extends StaticObject {
     }
 
     onAttacked(perpetrator: Entity) {
-        new ItemDrop(
-            this.chunk.world,
-            this.x + 0.5,
-            this.y + 0.5,
-            this.z + 0.5,
-            Item.create('shell', this.chunk.world)
-        );
         this.destroy();
     }
 

@@ -7,6 +7,7 @@ import type { TriangleMesh } from '../../render/meshes/triangleMesh/triangleMesh
 import type { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
 import type { Item } from '../item/item';
 import type { World } from '../world';
+import { Character } from './character';
 import { Entity } from './entity';
 
 const transPos = new Float32Array([0, 0, 0]);
@@ -39,9 +40,43 @@ export class ItemDrop extends Entity {
         return this.item.mesh();
     }
 
+    canCollect(player: Character): boolean {
+        if (this.item.isWeapon) {
+            return player.equipmentWeapon() === undefined;
+        } else {
+            for (let i = 0; i < player.inventory.items.length; i++) {
+                if (player.inventory.items[i] === undefined) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    collectBy(player: Character) {
+        if (!this.canCollect(player)) {
+            return;
+        }
+
+        if (this.item.isWeapon) {
+            player.equipment.items[0] = this.item;
+        } else {
+            if (!player.inventory.add(this.item)) {
+                return;
+            }
+        }
+
+        this.destroy();
+        this.world.game.audio.play('pock', 0.4);
+    }
+
     update() {
         super.update();
         const player = this.world.game.player;
+        const canCollect = this.canCollect(player);
+        if (!canCollect) {
+            return;
+        }
         const dx = player.x - this.x;
         const dy = player.y - this.y;
         const dz = player.z - this.z;
@@ -58,10 +93,7 @@ export class ItemDrop extends Entity {
                 this.vz += dz * 0.006;
             }
             if (dd < 1.3 * 1.3) {
-                if (player.inventory.add(this.item)) {
-                    this.destroy();
-                    this.world.game.audio.play('pock', 0.4);
-                }
+                this.collectBy(player);
             }
         }
     }

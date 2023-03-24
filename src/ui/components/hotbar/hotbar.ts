@@ -4,7 +4,7 @@
 import type { Game } from '../../../game';
 import { Item } from '../../../world/item/item';
 import { Div } from '../../utils';
-import { ItemWidget } from '../item/item';
+import { InventorySlotWidget } from '../item/inventorySlotWidget';
 import styles from './hotbar.module.css';
 
 export type HotbarEntryValue = Item | undefined;
@@ -12,7 +12,7 @@ export type HotbarEntryValue = Item | undefined;
 export class HotbarEntry {
     i: number;
     slot: HTMLElement;
-    widget: ItemWidget;
+    widget: InventorySlotWidget;
     game: Game;
     value: HotbarEntryValue;
 
@@ -30,19 +30,20 @@ export class HotbarEntry {
                 onContextmenu: this.rightClick.bind(this),
             }))
         );
-        this.widget = new ItemWidget(this.slot, false);
+        this.widget = new InventorySlotWidget(
+            this.slot,
+            game.player.inventory,
+            i,
+            game,
+            false
+        );
     }
 
     click(e: Event) {
         e.preventDefault();
         e.stopPropagation();
 
-        if (this.game.ui.heldItem === undefined) {
-            // Use Item/Skill
-        } else {
-            this.value = this.game.ui.heldItem;
-            this.widget.update(this.value);
-        }
+        this.use();
     }
 
     rightClick(e: Event) {
@@ -50,14 +51,14 @@ export class HotbarEntry {
         e.stopPropagation();
 
         this.value = undefined;
-        this.widget.update(this.value);
+        this.widget.update();
     }
 
     update() {
         if (this.value?.destroyed) {
             this.value = undefined;
         }
-        this.widget.update(this.value);
+        this.widget.update();
     }
 
     use() {

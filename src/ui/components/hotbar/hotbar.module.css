@@ -17,20 +17,12 @@ div[paused='true'] .hotbar {
     height: 80px;
     position: relative;
     box-sizing: border-box;
-    padding: 2px;
-    border: solid 2px #999;
-    border-bottom-color: #666;
-    border-right-color: #666;
-    background: rgba(0, 0, 0, 0.4);
-    transition: border-color 100ms, background-color 200ms;
-    text-align: left;
-    vertical-align: bottom;
 }
 
-.hotbarSlot::before {
+.hotbarSlot::after {
     content: attr(slot-index);
     position: absolute;
-    left: 2px;
+    left: 6px;
     top: 2px;
     color: #aaa;
 }
