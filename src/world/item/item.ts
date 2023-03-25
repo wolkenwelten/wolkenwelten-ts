@@ -63,6 +63,8 @@ export class Item {
         e.strike();
     }
 
+    useRelease(e: Character) {}
+
     attackDamage(e: Entity): number {
         return 0;
     }

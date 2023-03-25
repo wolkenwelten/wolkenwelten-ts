@@ -7,7 +7,7 @@ import type { TriangleMesh } from '../../render/meshes/triangleMesh/triangleMesh
 import type { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
 import type { Item } from '../item/item';
 import type { World } from '../world';
-import { Character } from './character';
+import type { Character } from './character';
 import { Entity } from './entity';
 
 const transPos = new Float32Array([0, 0, 0]);

@@ -6,7 +6,8 @@ import { Item } from './world/item/item';
 
 export class InputManager {
     game: Game;
-    keyHandler: Map<string, () => void> = new Map();
+    keyReleaseHandler: Map<string, () => void> = new Map();
+    keyPushHandler: Map<string, () => void> = new Map();
     keyStates: Set<string> = new Set();
     mouseStates: Set<number> = new Set();
     gamepads: Gamepad[] = [];
@@ -15,37 +16,61 @@ export class InputManager {
     constructor(game: Game) {
         this.game = game;
         const that = this;
-        window.addEventListener('keydown', (e) => that.keyStates.add(e.code));
+        window.addEventListener('keydown', (e) => {
+            that.keyStates.add(e.code);
+            const handler = that.keyPushHandler.get(e.code);
+            if (handler) {
+                handler();
+            }
+        });
         window.addEventListener('keyup', (e) => {
             that.keyStates.delete(e.code);
             if (!that.game.running || !that.game.ready) {
                 return;
             }
-            const handler = that.keyHandler.get(e.code);
+            const handler = that.keyReleaseHandler.get(e.code);
             if (handler) {
                 handler();
             }
         });
-        this.keyHandler.set('KeyO', () => {
+        this.keyPushHandler.set('KeyO', () => {
             if (!that.game.running || !that.game.ready) {
                 return;
             }
             that.toggleInventory();
         });
-        this.keyHandler.set('Escape', () => {
+        this.keyPushHandler.set('Escape', () => {
             that.closeInventory();
         });
-        this.keyHandler.set('KeyN', () => {
+        this.keyPushHandler.set('KeyN', () => {
             if (!that.game.running || !that.game.ready) {
                 return;
             }
             that.game.player.noClip = !that.game.player.noClip;
         });
-        this.keyHandler.set('Tab', () => {
+        this.keyPushHandler.set('Tab', () => {
             if (document.pointerLockElement) {
                 document.exitPointerLock();
             }
         });
+
+        for (let i = 0; i < 10; i++) {
+            this.keyPushHandler.set(`Digit${i + 1}`, () => {
+                const item = that.game.player.inventory.items[i];
+                if (item === undefined) {
+                    return;
+                }
+                item.use(that.game.player);
+            });
+
+            this.keyReleaseHandler.set(`Digit${i + 1}`, () => {
+                const item = that.game.player.inventory.items[i];
+                if (item === undefined) {
+                    return;
+                }
+                item.useRelease(that.game.player);
+            });
+        }
 
         that.game.render.canvasWrapper.addEventListener(
             'mousedown',

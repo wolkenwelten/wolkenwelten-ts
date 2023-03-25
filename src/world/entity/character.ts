@@ -38,8 +38,8 @@ export class Character extends Being {
     inertiaX = 0;
     inertiaZ = 0;
 
-    health = 12;
-    maxHealth = 12;
+    health = 24;
+    maxHealth = 24;
     isDead = false;
 
     weight = 70;
@@ -49,15 +49,10 @@ export class Character extends Being {
 
     /* Simple cheat, can be run from the browser console by typing `wolkenwelten.player.getGoodStuff();` */
     getGoodStuff() {
-        this.inventory.add(Item.create('ironAxe', this.world));
-        this.inventory.add(Item.create('ironPickaxe', this.world));
-        this.inventory.add(Item.create('stoneAxe', this.world));
-        this.inventory.add(Item.create('stonePickaxe', this.world));
-        this.inventory.add(Item.create('stick', this.world, 3));
-        this.inventory.add(Item.create('stone', this.world, 90));
+        this.inventory.add(Item.create('earthBullet', this.world));
+        this.inventory.add(Item.create('stone', this.world, 50));
 
         this.equipment.items[0] = Item.create('club', this.world);
-        this.equipment.items[1] = Item.create('woodShield', this.world);
     }
 
     /* Initialize an already existing Character, that way we can easily reuse the same object, */
@@ -69,7 +64,7 @@ export class Character extends Being {
         this.pitch = this.spawnPitch;
         this.noClip = false;
         this.isDead = false;
-        this.maxHealth = this.health = 12;
+        this.maxHealth = this.health = 24;
         this.hitAnimation = -100;
         this.lastAction = 0;
         this.vx = this.vy = this.vz = 0;
@@ -77,11 +72,11 @@ export class Character extends Being {
         this.inventory.clear();
         this.equipment.clear();
         this.inventory.select(0);
-        if (this.world.game.options.startWithEquipment) {
-            setTimeout(() => {
-                this.getGoodStuff();
-            });
-        }
+        //if (this.world.game.options.startWithEquipment) {
+        setTimeout(() => {
+            this.getGoodStuff();
+        });
+        //}
     }
 
     constructor(

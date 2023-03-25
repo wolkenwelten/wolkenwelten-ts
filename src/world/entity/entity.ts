@@ -28,6 +28,7 @@ export class Entity {
     destroyed = false;
     world: World;
     weight = 1; // Necessary for physics calculations
+    scale = 1;
 
     constructor(world: World) {
         this.id = ++entityCounter;
@@ -127,7 +128,7 @@ export class Entity {
             return [lastX, lastY, lastZ];
         }
 
-        for (let i = 0; i < 64; i++) {
+        for (let i = 0; i < 1024; i++) {
             const ix = Math.floor(x);
             const iy = Math.floor(y);
             const iz = Math.floor(z);
@@ -166,6 +167,12 @@ export class Entity {
         mat4.identity(modelViewMatrix);
         mat4.translate(modelViewMatrix, modelViewMatrix, transPos);
         mat4.rotateY(modelViewMatrix, modelViewMatrix, this.yaw);
+        if (this.scale != 1) {
+            transPos[0] = this.scale;
+            transPos[1] = this.scale;
+            transPos[2] = this.scale;
+            mat4.scale(modelViewMatrix, modelViewMatrix, transPos);
+        }
         mat4.mul(modelViewMatrix, viewMatrix, modelViewMatrix);
         mat4.mul(modelViewMatrix, projectionMatrix, modelViewMatrix);
         const dx = this.x - cam.x;

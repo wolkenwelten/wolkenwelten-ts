@@ -2,10 +2,19 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import { Item } from '../world/item/item';
+
 import { Stick } from './weapons/stick';
 import { Club } from './weapons/club';
+
+import { EarthBullet } from './runes/earthBullet';
+
+import { Stone } from './consumables/stone';
 
 export const registerItems = () => {
     Item.register('stick', Stick);
     Item.register('club', Club);
+
+    Item.register('earthBullet', EarthBullet);
+
+    Item.register('stone', Stone);
 };

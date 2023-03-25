@@ -9,7 +9,7 @@ import { Entity } from './entity';
 export class Projectile extends Entity {
     weight = 1;
     source: Entity;
-    projectileMesh: VoxelMesh | null;
+    projectileMesh: TriangleMesh | VoxelMesh | null;
     ttl = 128;
     onHit?: (e: Entity) => void;
     onMiss?: () => void;

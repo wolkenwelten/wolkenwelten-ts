@@ -14,9 +14,7 @@ import type { Entity } from '../../world/entity/entity';
 import type { World } from '../../world/world';
 import { radianDifference } from '../../util/math';
 import { Being } from '../../world/entity/being';
-import { ItemDrop } from '../../world/entity/itemDrop';
 import { Mob } from '../../world/entity/mob';
-import { Item } from '../../world/item/item';
 
 export type CrabState =
     | 'idle'
@@ -67,15 +65,6 @@ export class Crab extends Mob {
         this.changeState('dead');
         this.isDead = true;
         this.world.game.audio.play('crabDeath', 0.5);
-        if (this.world.lootRNG.bool(10)) {
-            new ItemDrop(
-                this.world,
-                this.x + (Math.random() - 0.5) * 0.3,
-                this.y,
-                this.z + (Math.random() - 0.5) * 0.3,
-                Item.create('crabShield', this.world)
-            );
-        }
     }
 
     onAttack(perpetrator: Entity): void {

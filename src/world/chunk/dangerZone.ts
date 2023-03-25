@@ -26,7 +26,10 @@ export class DangerZone {
         this.world = world;
     }
 
-    add(x: number, y: number, z: number, w: number, h: number, d: number) {
+    add(rx: number, ry: number, rz: number, w: number, h: number, d: number) {
+        const x = Math.floor(rx);
+        const y = Math.floor(ry);
+        const z = Math.floor(rz);
         this.entries.push({ x, y, z, w, h, d });
     }
 
