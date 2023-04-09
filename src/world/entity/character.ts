@@ -50,6 +50,7 @@ export class Character extends Being {
     /* Simple cheat, can be run from the browser console by typing `wolkenwelten.player.getGoodStuff();` */
     getGoodStuff() {
         this.inventory.add(Item.create('earthBullet', this.world));
+        this.inventory.add(Item.create('earthWall', this.world));
         this.inventory.add(Item.create('stone', this.world, 50));
 
         this.equipment.items[0] = Item.create('club', this.world);

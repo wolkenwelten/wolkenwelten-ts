@@ -16,6 +16,7 @@ export class EarthBullet extends Rune {
     name = 'Earth bullet';
     icon = itemIcon;
     meshUrl = meshUrl;
+    range = 8;
 
     bulletEntity?: EarthBulletEntity;
 
@@ -36,7 +37,7 @@ export class EarthBullet extends Rune {
         const dy = y + 0.5 - e.y;
         const dz = z + 0.5 - e.z;
         const dd = dx * dx + dy * dy + dz * dz;
-        if (dd > 8 * 8) {
+        if (dd > this.range * this.range) {
             return;
         }
         const bt = this.world.blocks[blockType];
@@ -55,7 +56,6 @@ export class EarthBullet extends Rune {
 
         e.cooldown(32);
         e.hitAnimation = this.world.game.render.frames;
-        return;
     }
 
     useRelease(e: Character) {
@@ -77,10 +77,6 @@ export class EarthBullet extends Rune {
 
         e.cooldown(32);
         e.hitAnimation = this.world.game.render.frames;
-    }
-
-    attackCooldown(e: Character): number {
-        return 80;
     }
 }
 

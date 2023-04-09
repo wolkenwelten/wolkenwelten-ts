@@ -20,7 +20,7 @@ const main = () => {
     });
     window.wow = game;
     console.log(
-        "%cHello there,%c most of the game state is accessible as the 'wolkenwelten' object, happy hacking! :3",
+        "%cHello there,%c most of the game state is accessible as the 'wow' object, happy hacking! :3",
         'color:green',
         'color:inherit'
     );

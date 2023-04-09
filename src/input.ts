@@ -12,6 +12,7 @@ export class InputManager {
     mouseStates: Set<number> = new Set();
     gamepads: Gamepad[] = [];
     buttonCooldown: Map<number, number> = new Map();
+    hotbarKeys: string[] = [];
 
     constructor(game: Game) {
         this.game = game;
@@ -55,7 +56,9 @@ export class InputManager {
         });
 
         for (let i = 0; i < 10; i++) {
-            this.keyPushHandler.set(`Digit${i + 1}`, () => {
+            const hotbarKey = `Digit${(i + 1) % 10}`;
+            this.hotbarKeys[i] = hotbarKey;
+            this.keyPushHandler.set(hotbarKey, () => {
                 const item = that.game.player.inventory.items[i];
                 if (item === undefined) {
                     return;
@@ -63,7 +66,7 @@ export class InputManager {
                 item.use(that.game.player);
             });
 
-            this.keyReleaseHandler.set(`Digit${i + 1}`, () => {
+            this.keyReleaseHandler.set(hotbarKey, () => {
                 const item = that.game.player.inventory.items[i];
                 if (item === undefined) {
                     return;
@@ -307,8 +310,7 @@ export class InputManager {
         }
 
         for (let i = 0; i < 10; i++) {
-            const key = `Digit${(i + 1) % 10}`;
-            if (this.keyStates.has(key)) {
+            if (this.keyStates.has(this.hotbarKeys[i])) {
                 this.game.ui.hotbar.use(i);
             }
         }
