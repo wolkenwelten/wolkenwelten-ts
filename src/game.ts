@@ -107,9 +107,10 @@ export class Game {
             this.world.update();
             if (++ticksRun > 16) {
                 this.ticks = goalTicks;
-                return; // Don't block for too long
+                break; // Don't block for too long
             }
         }
+        this.audio.update(this.player); // Update AudioEmitter positions in case Entities get destroyed
     }
 
     // Try and free some memory by discarding far away objects

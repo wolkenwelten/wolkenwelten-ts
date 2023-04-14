@@ -52,7 +52,7 @@ export class EarthBullet extends Rune {
         this.bulletEntity.y = y + 0.5;
         this.bulletEntity.z = z + 0.5;
         this.bulletEntity.scale = 2;
-        this.world.game.audio.play('tock', 0.3);
+        this.bulletEntity.playUnmovingSound('tock', 0.3);
 
         e.cooldown(32);
         e.hitAnimation = this.world.game.render.frames;
@@ -171,7 +171,7 @@ export class EarthBulletEntity extends Entity {
                 );
                 this.source?.doDamage(e, dmg);
                 this.placeBlock();
-                this.world.game.audio.play('pock', 0.3);
+                this.playUnmovingSound('pock', 0.3);
                 this.destroy();
                 return;
             }
@@ -231,7 +231,7 @@ export class EarthBulletEntity extends Entity {
                     this.world.blocks[this.blockType]
                 );
                 this.placeBlock();
-                this.world.game.audio.play('pock', 0.3);
+                this.playUnmovingSound('pock', 0.3);
                 this.destroy();
                 return;
             }

@@ -42,7 +42,7 @@ export class SettingsWrap {
         });
         const input = wrap.querySelector('input');
         input?.addEventListener('change', (e) => {
-            that.game.audio.volume = parseInt(input.value) / 100.0;
+            that.game.audio.setVolume(parseInt(input.value) / 100.0);
         });
         this.div.append(wrap);
     }

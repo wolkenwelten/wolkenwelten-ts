@@ -115,9 +115,9 @@ export class EarthWall extends Rune {
         }
         for (const b of selection) {
             this.world.setBlock(b.from[0], b.from[1], b.from[2], 0);
-            new EarthWallBlock(this.world, b.block, b.from, b.to);
+            const e = new EarthWallBlock(this.world, b.block, b.from, b.to);
+            e.playSound('pock', 0.3);
         }
-        this.world.game.audio.play('pock', 0.3);
         e.cooldown(80);
     }
 }
@@ -170,14 +170,14 @@ export class EarthWallBlock extends Entity {
                 this.to[2],
                 this.blockType
             );
-            this.destroy();
             this.world.game.render.particle.fxBlockBreak(
                 this.x - 0.5,
                 this.y - 0.5,
                 this.z - 0.5,
                 this.world.blocks[this.blockType]
             );
-            this.world.game.audio.play('pock', 0.3);
+            this.playUnmovingSound('pock', 0.3);
+            this.destroy();
         } else {
             this.x = this.from[0] * (1 - t) + this.to[0] * t + 0.5;
             this.y = this.from[1] * (1 - t) + this.to[1] * t + 0.5;

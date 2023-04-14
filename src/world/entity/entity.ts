@@ -208,4 +208,16 @@ export class Entity {
             }
         }
     }
+
+    playSound(name: string, volume = 1.0) {
+        this.world.game.audio.playFromEntity(name, volume, this);
+    }
+
+    playUnmovingSound(name: string, volume = 1.0) {
+        this.world.game.audio.playAtPosition(name, volume, [
+            this.x,
+            this.y,
+            this.z,
+        ]);
+    }
 }
