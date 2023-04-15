@@ -63,7 +63,7 @@ Mostly melee weapons, since it is more exciting if an encounter doesn't just end
 ## Swords
 Close range, fast, high damage
 
-### Dai-Katana
+### Dai-Katana 大<刀
 The ultimate weapon
 - Close range
 - Fast
