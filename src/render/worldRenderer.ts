@@ -54,10 +54,8 @@ export class WorldRenderer {
             const newMesh = BlockMesh.fromChunk(chunk);
             const key = coordinateToWorldKey(x, y, z);
             this.meshes.set(key, newMesh);
-            return newMesh;
         } else {
             oldMesh.updateFromChunk(chunk);
-            return oldMesh;
         }
     }
 
