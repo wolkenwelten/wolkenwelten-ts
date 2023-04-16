@@ -114,7 +114,6 @@ export class RenderManager {
 
     drawScene() {
         this.updateFOV();
-        mat4.identity(projectionMatrix);
         mat4.perspective(
             projectionMatrix,
             (this.fov * Math.PI) / 180,

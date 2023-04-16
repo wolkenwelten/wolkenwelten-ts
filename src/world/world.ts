@@ -5,6 +5,7 @@ import { registerBlockTypes } from '../content/blockTypes';
 import type { Game } from '../game';
 import type { Entity } from './entity/entity';
 import profiler from '../profiler';
+import { FireSystem } from './fireSystem';
 import { LCG } from '../util/prng';
 import { BlockType } from './blockType';
 import { Chunk } from './chunk/chunk';
@@ -17,6 +18,7 @@ export const coordinateToWorldKey = (x: number, y: number, z: number) =>
 
 export class World {
     chunks: Map<number, Chunk> = new Map();
+    fire: FireSystem;
     dangerZone: DangerZone;
     entities: Set<Entity> = new Set();
     seed: number;
@@ -29,6 +31,7 @@ export class World {
     constructor(game: Game) {
         this.seed = 1234;
         this.game = game;
+        this.fire = new FireSystem(this);
         this.dangerZone = new DangerZone(this);
         this.worldgenHandler = (chunk: Chunk) => {
             chunk.setSphereUnsafe(16, 16, 16, 7, 3);
@@ -109,6 +112,7 @@ export class World {
             }
         }
         this.dangerZone.update();
+        this.fire.update();
     }
 
     addEntity(entity: Entity) {

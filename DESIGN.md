@@ -176,3 +176,14 @@ Generally players should feel empowered, like benders from Avatar, having power 
 A floating Island, that shrinks because it crumbles from the outside in. That way we limit the play area to a small Island, and also have a way to shove players close to each other.
 
 The starting location needs to be chosen somehow, right now I don't know how, spawning in randomly seems kinda boring, Fortnie/Apex were kinda nice in that regard, though I don't wanna copy them blindly.
+
+# Open Questions
+
+## Starting location
+I think it would be better if players can choose where they spawn, especially if there is a clear risk/reward correlation in starting locations. I kinda like the idea of worldgen being something that players can witness, where you see the island coming together as you glide through the skies. Still only a vague idea for now though.
+
+## Cut weapons
+Weapons aren't strictly necessary, so they might be cut since the focus should probably lie on the runes/magic.
+
+## Cut mobs
+They also aren't essential, might be better to focus on the core which is PvP, although once they get dropped we need another way for runes to drop, and mobs seem like kinda fun Treasure chests that can fight back.

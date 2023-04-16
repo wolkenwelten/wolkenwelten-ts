@@ -37,7 +37,7 @@ export class ParticleMesh {
         );
     }
 
-    constructor(renderer: RenderManager, maxParticles = 8192) {
+    constructor(renderer: RenderManager, maxParticles = 32768) {
         const gl = ParticleMesh.gl;
 
         this.renderer = renderer;
