@@ -187,10 +187,12 @@ export class RenderManager {
     }
 
     generateMesh() {
-        for (let i = 0; i < 4; i++) {
+        for (let i = 0; i < 16; i++) {
             this.world.generateOneQueuedMesh();
-            if (this.world.queueEntryIsFarAway()) {
-                break;
+            if(i > 8){
+                if (this.world.queueEntryIsFarAway()) {
+                    break;
+                }
             }
         }
         if (this.world.generatorQueue.length === 0) {

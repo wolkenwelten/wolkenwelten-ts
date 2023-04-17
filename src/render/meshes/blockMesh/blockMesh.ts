@@ -11,7 +11,6 @@ import type { Game } from '../../../game';
 import type { Chunk } from '../../../world/chunk/chunk';
 import { Shader } from '../../shader';
 import { Texture } from '../../texture';
-import { meshgenChunk } from '../meshgen';
 
 export class BlockMesh {
     static gl: WebGL2RenderingContext;
@@ -59,25 +58,14 @@ export class BlockMesh {
     }
 
     /* Create a new blockMesh with data from chunk. Can be quite slow. */
-    static fromChunk(chunk: Chunk): BlockMesh {
-        const [vertices, sideElementCount] = meshgenChunk(chunk);
+    static fromChunk(chunk: Chunk, vertices: Uint8Array, sideElementCount: number[]): BlockMesh {
         return new BlockMesh(vertices, sideElementCount, chunk);
-    }
-
-    /* Recreate a blockMesh with data from chunk. Doesn't check whether an update is
-     * necessary, so be careful about callingthis too often since it can be quite slow.
-     * Doesn't set this.lastUpdated, so that is something the caller needs to do so that
-     * we don't end up generating the same mesh over and over again.
-     */
-    updateFromChunk(chunk: Chunk) {
-        const [vertices, sideElementCount] = meshgenChunk(chunk);
-        this.update(vertices, sideElementCount);
     }
 
     /* Update the buffers of an existing blockMesh, you probably don't want to call this directly,
      * instead prefer the updateFromChunk method.
      */
-    private update(vertices: Uint8Array, sideElementCount: number[]) {
+    update(vertices: Uint8Array, sideElementCount: number[]) {
         const gl = BlockMesh.gl;
 
         this.lastUpdated = this.chunk.lastUpdated;

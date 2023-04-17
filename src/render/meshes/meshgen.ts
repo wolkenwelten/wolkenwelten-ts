@@ -5,23 +5,31 @@
  * Because of this we should be able to put it into a separate worker.
  */
 import type { Chunk } from '../../world/chunk/chunk';
+import type { GenMsg, RetMsg } from './meshgenWorker';
 import profiler from '../../profiler';
 import { clamp } from '../../util/math';
-import { BlockType } from '../../world/blockType';
 import { lightGenSimple } from '../../world/chunk/lightGen';
 import { meshgenReal } from './meshgenWorker';
 
-const createIdentityBlocks = () => {
-    const ret:BlockType[] = [];
-    ret.push(new BlockType(0, 'Void').withInvisible());
-    for (let i = 1; i < 256; i++) {
-        ret.push(new BlockType(i, '').withTexture(i - 1));
-    }
-    return ret;
-};
-
 const tmpSimpleLight = new Uint8Array(32 * 32 * 32);
-const identityBlocks = createIdentityBlocks();
+
+const workers:Worker[] = [];
+const workerCount = navigator.hardwareConcurrency || 4;
+let workerSpin = 0;
+for(let i=0;i<workerCount;i++){
+    workers[i] = new Worker(
+        new URL('./meshgenWorker', import.meta.url),
+        {type: 'module'}
+    );
+    workers[i].onmessage = (e:any) => {
+        msgCallback(e.data);
+    };
+}
+
+let msgCallback:((msg:RetMsg) => void) = () => {};
+export const meshgenMsgCallback = (cb:(msg:RetMsg) => void) => {
+    msgCallback = cb;
+};
 
 const blitChunkData = (
     blockData: Uint8Array,
@@ -60,23 +68,39 @@ export const meshgenVoxelMesh = (voxels: Uint8Array): [Uint8Array, number] => {
     blitChunkData(blockData, voxels, 1, 1, 1);
     blitChunkData(lightData, tmpSimpleLight, 1, 1, 1);
 
-    const blocks = identityBlocks;
-    const msg = {
+    const blockSeeThrough = new Uint8Array(256).fill(1);
+    const textures = new Uint8Array(256);
+    for(let i=1;i<256;i++){
+        textures[i] = i-1;
+    }
+    const msg:GenMsg = {
+        x: 0,
+        y: 0,
+        z: 0,
+        ticks: 0,
         blockData,
         lightData,
-        blocks,
+        blockSeeThrough,
+        blockTextures: [
+            textures,
+            textures,
+            textures,
+            textures,
+            textures,
+            textures,
+        ],
         lightFinished: true,
     }
     const ret = meshgenReal(msg);
     let elementCount = 0;
-    for(let i=0;i<ret[1].length;i++){
-        elementCount += ret[1][i];
+    for(let i=0;i<ret.sideElementCount.length;i++){
+        elementCount += ret.sideElementCount[i];
     }
     profiler.add('meshgenSimple', start, performance.now());
-    return [ret[0], elementCount];
+    return [ret.vertices, elementCount];
 };
 
-export const meshgenChunk = (chunk: Chunk): [Uint8Array, number[]] => {
+export const meshgenChunk = (chunk: Chunk) => {
     const start = performance.now();
     const blockData = new Uint8Array(34 * 34 * 34);
     const lightData = new Uint8Array(34 * 34 * 34);
@@ -107,13 +131,51 @@ export const meshgenChunk = (chunk: Chunk): [Uint8Array, number[]] => {
         }
     }
     const blocks = chunk.world.blocks;
-    const msg = {
+    const l = blocks.length;
+    const blockSeeThrough = new Uint8Array(l);
+    const texFront = new Uint8Array(l);
+    const texBack = new Uint8Array(l);
+    const texTop = new Uint8Array(l);
+    const texBottom = new Uint8Array(l);
+    const texLeft = new Uint8Array(l);
+    const texRight = new Uint8Array(l);
+    for(let i=0;i<l;i++){
+        const bt = blocks[i];
+        blockSeeThrough[i] = bt.seeThrough ? 1 : 0;
+        texFront[i] = bt.texFront;
+        texBack[i] = bt.texBack;
+        texTop[i] = bt.texTop;
+        texBottom[i] = bt.texBottom;
+        texLeft[i] = bt.texLeft;
+        texRight[i] = bt.texRight;
+    }
+    const x = chunk.x;
+    const y = chunk.y;
+    const z = chunk.z;
+    const ticks = chunk.world.game.ticks;
+
+    const msg:GenMsg = {
+        x,
+        y,
+        z,
+        ticks,
         blockData,
         lightData,
-        blocks,
+        blockSeeThrough,
+        blockTextures: [
+            texFront,
+            texBack,
+            texTop,
+            texBottom,
+            texLeft,
+            texRight,
+        ],
         lightFinished: false,
     };
-    const ret = meshgenReal(msg);
-    profiler.add('meshgenComplex', start, performance.now());
-    return ret;
+    const worker = workers[workerSpin++];
+    if(workerSpin >= workerCount){
+        workerSpin = 0;
+    }
+    worker.postMessage(msg);
+    profiler.add('meshgenChunk', start, performance.now());
 };

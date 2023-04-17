@@ -5,9 +5,11 @@ import { mat4 } from 'gl-matrix';
 
 import type { RenderManager } from '../render/render';
 import type { Entity } from '../world/entity/entity';
+import type { RetMsg } from './meshes/meshgenWorker';
 import { coordinateToWorldKey } from '../world/world';
 import { Frustum } from './frustum';
 import { BlockMesh } from './meshes/blockMesh/blockMesh';
+import { meshgenChunk, meshgenMsgCallback } from './meshes/meshgen';
 import { VoxelMesh } from './meshes/voxelMesh/voxelMesh';
 import { VoxelMeshBlit } from './meshes/voxelMesh/voxelMesh';
 
@@ -34,11 +36,27 @@ export class WorldRenderer {
     frustum = new Frustum();
     chunksDrawn = 0;
     chunksSkipped = 0;
+    meshgenRequestsInFlight: Set<number> = new Set()
 
     mvp = mat4.create();
 
     constructor(renderer: RenderManager) {
+        meshgenMsgCallback(this.meshgenCallback.bind(this));
         this.renderer = renderer;
+    }
+
+    meshgenCallback(msg:RetMsg) {
+        const { x, y, z } = msg;
+        const chunk = this.renderer.game.world.getOrGenChunk(x, y, z);
+        const key = coordinateToWorldKey(x, y, z);
+        const oldMesh = this.getMesh(x, y, z);
+        if (!oldMesh) {
+            const newMesh = BlockMesh.fromChunk(chunk, msg.vertices, msg.sideElementCount);
+            this.meshes.set(key, newMesh);
+        } else {
+            oldMesh.update(msg.vertices, msg.sideElementCount);
+        }
+        this.meshgenRequestsInFlight.delete(key);
     }
 
     generateOneQueuedMesh() {
@@ -47,16 +65,14 @@ export class WorldRenderer {
             return;
         }
         const { x, y, z } = entry;
+        const key = coordinateToWorldKey(x, y, z);
+        if(this.meshgenRequestsInFlight.has(key)){
+            return;
+        }
+        this.meshgenRequestsInFlight.add(key);
 
         const chunk = this.renderer.game.world.getOrGenChunk(x, y, z);
-        const oldMesh = this.getMesh(x, y, z);
-        if (!oldMesh) {
-            const newMesh = BlockMesh.fromChunk(chunk);
-            const key = coordinateToWorldKey(x, y, z);
-            this.meshes.set(key, newMesh);
-        } else {
-            oldMesh.updateFromChunk(chunk);
-        }
+        meshgenChunk(chunk);
     }
 
     queueEntryIsFarAway(): boolean {

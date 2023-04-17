@@ -27,22 +27,35 @@
  * And again there are probably better ways, this is just the first version that I thought of and since it works reasonably well my motivation
  * for optimization here is quite low.
  */
-import type { BlockType } from '../../world/blockType';
-
 interface GenArgs {
     blockData: Uint8Array;
     lightData: Uint8Array;
     sideCache: Uint8Array;
-    blocks: BlockType[];
+    blockTextures: [Uint8Array, Uint8Array, Uint8Array, Uint8Array, Uint8Array, Uint8Array];
     seeThrough: boolean;
     foundSeeThrough: boolean;
 }
 
 export interface GenMsg {
+    x: number;
+    y: number;
+    z: number;
+    ticks: number;
     blockData: Uint8Array;
     lightData: Uint8Array;
-    blocks: BlockType[];
+    blockSeeThrough: Uint8Array;
+    blockTextures: [Uint8Array, Uint8Array, Uint8Array, Uint8Array, Uint8Array, Uint8Array];
     lightFinished: boolean;
+}
+
+export interface RetMsg {
+    T: "meshgen";
+    vertices: Uint8Array;
+    sideElementCount: number[];
+    x: number;
+    y: number;
+    z: number;
+    ticks: number;
 }
 
 const sideCache = new Uint8Array(32 * 32 * 32);
@@ -271,13 +284,9 @@ const addRight = (
 const calcSideCache = (
     sideCache: Uint8Array,
     blockData: Uint8Array,
-    blocks: BlockType[]
+    blockSeeThrough: Uint8Array
 ) => {
     let sideOff = 0;
-    const blockSeeThrough:number[] = [];
-    for (let i = 0; i < blocks.length; i++) {
-        blockSeeThrough[i] = blocks[i].seeThrough ? 1 : 0;
-    }
     sideCache.fill(0);
     for (let x = 0; x < 32; x++) {
         for (let y = 0; y < 32; y++) {
@@ -420,7 +429,7 @@ const plane = new PlaneEntry();
 
 const genFront = (vertices: number[], args: GenArgs): number => {
     const start = vertices.length;
-    const { blocks, sideCache, blockData, lightData } = args;
+    const { blockTextures, sideCache, blockData, lightData } = args;
     // First we slice the chunk into many, zero-initialized, planes
     for (let z = 0; z < 32; z++) {
         let found = 0;
@@ -466,8 +475,8 @@ const genFront = (vertices: number[], args: GenArgs): number => {
                 const light = plane.light[off];
                 const cw = plane.width[off];
                 const ch = plane.height[off];
-                const b = blocks[plane.block[off]];
-                addFront(vertices, x, y, z, cw, ch, cd, b.texFront, light);
+                const tex = blockTextures[0][plane.block[off]];
+                addFront(vertices, x, y, z, cw, ch, cd, tex, light);
             }
         }
     }
@@ -476,7 +485,7 @@ const genFront = (vertices: number[], args: GenArgs): number => {
 
 const genBack = (vertices: number[], args: GenArgs) => {
     const start = vertices.length;
-    const { blocks, sideCache, blockData, lightData } = args;
+    const { blockTextures, sideCache, blockData, lightData } = args;
     for (let z = 0; z < 32; z++) {
         let found = 0;
         plane.block.fill(0);
@@ -521,8 +530,8 @@ const genBack = (vertices: number[], args: GenArgs) => {
                 const cw = plane.width[off];
                 const ch = plane.height[off];
                 const light = plane.light[off];
-                const b = blocks[plane.block[off]];
-                addBack(vertices, x, y, z, cw, ch, cd, b.texBack, light);
+                const tex = blockTextures[1][plane.block[off]];
+                addBack(vertices, x, y, z, cw, ch, cd, tex, light);
             }
         }
     }
@@ -531,7 +540,7 @@ const genBack = (vertices: number[], args: GenArgs) => {
 
 const genTop = (vertices: number[], args: GenArgs) => {
     const start = vertices.length;
-    const { blocks, sideCache, blockData, lightData } = args;
+    const { blockTextures, sideCache, blockData, lightData } = args;
     for (let y = 0; y < 32; y++) {
         let found = 0;
         plane.block.fill(0);
@@ -576,8 +585,8 @@ const genTop = (vertices: number[], args: GenArgs) => {
                 const cw = plane.width[off];
                 const cd = plane.height[off];
                 const light = plane.light[off];
-                const b = blocks[plane.block[off]];
-                addTop(vertices, x, y, z, cw, ch, cd, b.texTop, light);
+                const tex = blockTextures[2][plane.block[off]];
+                addTop(vertices, x, y, z, cw, ch, cd, tex, light);
             }
         }
     }
@@ -586,7 +595,7 @@ const genTop = (vertices: number[], args: GenArgs) => {
 
 const genBottom = (vertices: number[], args: GenArgs) => {
     const start = vertices.length;
-    const { blocks, sideCache, blockData, lightData } = args;
+    const { blockTextures, sideCache, blockData, lightData } = args;
     for (let y = 0; y < 32; y++) {
         let found = 0;
         plane.block.fill(0);
@@ -631,8 +640,8 @@ const genBottom = (vertices: number[], args: GenArgs) => {
                 const cw = plane.width[off];
                 const cd = plane.height[off];
                 const light = plane.light[off];
-                const b = blocks[plane.block[off]];
-                addBottom(vertices, x, y, z, cw, ch, cd, b.texBottom, light);
+                const tex = blockTextures[3][plane.block[off]];
+                addBottom(vertices, x, y, z, cw, ch, cd, tex, light);
             }
         }
     }
@@ -641,7 +650,7 @@ const genBottom = (vertices: number[], args: GenArgs) => {
 
 const genRight = (vertices: number[], args: GenArgs) => {
     const start = vertices.length;
-    const { blocks, sideCache, blockData, lightData } = args;
+    const { blockTextures, sideCache, blockData, lightData } = args;
     for (let x = 0; x < 32; x++) {
         let found = 0;
         plane.block.fill(0);
@@ -686,8 +695,8 @@ const genRight = (vertices: number[], args: GenArgs) => {
                 const cd = plane.width[off];
                 const ch = plane.height[off];
                 const light = plane.light[off];
-                const b = blocks[plane.block[off]];
-                addRight(vertices, x, y, z, cw, ch, cd, b.texLeft, light);
+                const tex = blockTextures[4][plane.block[off]];
+                addRight(vertices, x, y, z, cw, ch, cd, tex, light);
             }
         }
     }
@@ -696,7 +705,7 @@ const genRight = (vertices: number[], args: GenArgs) => {
 
 const genLeft = (vertices: number[], args: GenArgs) => {
     const start = vertices.length;
-    const { blocks, sideCache, blockData, lightData } = args;
+    const { blockTextures, sideCache, blockData, lightData } = args;
     for (let x = 0; x < 32; x++) {
         let found = 0;
         plane.block.fill(0);
@@ -741,8 +750,8 @@ const genLeft = (vertices: number[], args: GenArgs) => {
                 const cd = plane.width[off];
                 const ch = plane.height[off];
                 const light = plane.light[off];
-                const b = blocks[plane.block[off]];
-                addLeft(vertices, x, y, z, cw, ch, cd, b.texRight, light);
+                const tex = blockTextures[5][plane.block[off]];
+                addLeft(vertices, x, y, z, cw, ch, cd, tex, light);
             }
         }
     }
@@ -823,41 +832,54 @@ const ambientOcclusion = (out: Uint8Array, blocks: Uint8Array) => {
     }
 };
 
-export const meshgenReal = ({blockData, lightData, blocks, lightFinished}: GenMsg): [Uint8Array, number[]] => {
+export const meshgenReal = ({x, y, z, ticks, blockData, lightData, blockSeeThrough, blockTextures, lightFinished}: GenMsg): RetMsg => {
     const vertices: number[] = [];
-    calcSideCache(sideCache, blockData, blocks);
+    calcSideCache(sideCache, blockData, blockSeeThrough);
     if(!lightFinished){
         lightBlur(lightData);
     }
     ambientOcclusion(lightData, blockData);
 
-    const sideSquareCount = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    const sideElementCount = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     const data = {
         blockData,
         lightData,
         sideCache,
-        blocks,
+        blockSeeThrough,
+        blockTextures,
         seeThrough: false,
         foundSeeThrough: false,
     };
 
-    sideSquareCount[0] = genFront(vertices, data);
-    sideSquareCount[1] = genBack(vertices, data);
-    sideSquareCount[2] = genTop(vertices, data);
-    sideSquareCount[3] = genBottom(vertices, data);
-    sideSquareCount[4] = genLeft(vertices, data);
-    sideSquareCount[5] = genRight(vertices, data);
+    sideElementCount[0] = genFront(vertices, data);
+    sideElementCount[1] = genBack(vertices, data);
+    sideElementCount[2] = genTop(vertices, data);
+    sideElementCount[3] = genBottom(vertices, data);
+    sideElementCount[4] = genLeft(vertices, data);
+    sideElementCount[5] = genRight(vertices, data);
 
     if(data.foundSeeThrough){
         data.seeThrough = true;
-        sideSquareCount[6] = genFront(vertices, data);
-        sideSquareCount[7] = genBack(vertices, data);
-        sideSquareCount[8] = genTop(vertices, data);
-        sideSquareCount[9] = genBottom(vertices, data);
-        sideSquareCount[10] = genLeft(vertices, data);
-        sideSquareCount[11] = genRight(vertices, data);
+        sideElementCount[6] = genFront(vertices, data);
+        sideElementCount[7] = genBack(vertices, data);
+        sideElementCount[8] = genTop(vertices, data);
+        sideElementCount[9] = genBottom(vertices, data);
+        sideElementCount[10] = genLeft(vertices, data);
+        sideElementCount[11] = genRight(vertices, data);
     }
 
-    const vertArr = new Uint8Array(vertices);
-    return [vertArr, sideSquareCount];
+    return {
+        T: "meshgen",
+        vertices: new Uint8Array(vertices),
+        sideElementCount,
+        x,
+        y,
+        z,
+        ticks,
+    };
+};
+
+onmessage = (e) => {
+    const msg:GenMsg = e.data;
+    postMessage(meshgenReal(msg));
 };
