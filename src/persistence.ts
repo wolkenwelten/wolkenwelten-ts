@@ -65,10 +65,10 @@ export class PersistenceManager {
     }
 
     persist() {
-        //this.saveState();
+        this.saveState();
     }
 
     tryToLoad() {
-        //this.loadState();
+        this.loadState();
     }
 }

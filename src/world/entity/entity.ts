@@ -105,6 +105,7 @@ export class Entity {
         }
     }
 
+    /* Get a velocity vector for the direction the Entity is facing */
     direction(ox = 0, oy = 0, oz = 1, vel = 1): [number, number, number] {
         const nox =
             (ox * Math.cos(-this.yaw) + oz * Math.sin(this.yaw)) *
@@ -116,6 +117,9 @@ export class Entity {
         return [nox * vel, noy * vel, noz * vel];
     }
 
+    /* Cast a ray into the direction the Entity is facing and return the world coordinates of either the block, or
+     * the location immediatly in front of the block (useful when placing blocks)
+     */
     raycast(returnFront = false): [number, number, number] | null {
         const [dx, dy, dz] = this.direction(0, 0, -1, 0.0625);
         let x = this.x;
@@ -145,6 +149,35 @@ export class Entity {
             z += dz;
         }
         return null;
+    }
+
+    /* Step into the direction the entity is facing and call cb for every block until cb returns false */
+    stepIntoDirection(cb: (x: number, y: number, z: number) => boolean) {
+        const [dx, dy, dz] = this.direction(0, 0, -1, 0.0625);
+        let x = this.x;
+        let y = this.y;
+        let z = this.z;
+        let lastX = Math.floor(this.x);
+        let lastY = Math.floor(this.y);
+        let lastZ = Math.floor(this.z);
+
+        for (let i = 0; i < 1024; i++) {
+            const ix = Math.floor(x);
+            const iy = Math.floor(y);
+            const iz = Math.floor(z);
+            if (ix != lastX || iy != lastY || iz != lastZ) {
+                lastX = ix;
+                lastY = iy;
+                lastZ = iz;
+                if (!cb(ix, iy, iz)) {
+                    return;
+                }
+            }
+            x += dx;
+            y += dy;
+            z += dz;
+        }
+        return;
     }
 
     mesh(): TriangleMesh | VoxelMesh | null {

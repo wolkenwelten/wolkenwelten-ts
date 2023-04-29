@@ -71,6 +71,7 @@ export class Character extends Being {
         this.lastAction = 0;
         this.vx = this.vy = this.vz = 0;
 
+        this.effects.clear();
         this.inventory.clear();
         this.equipment.clear();
         this.inventory.select(0);
@@ -296,7 +297,7 @@ export class Character extends Being {
             this.vy *= v;
             this.vz *= v;
         }
-        this.beRepelledByEntities();
+        super.update();
 
         this.x += this.vx;
         this.y += this.vy;

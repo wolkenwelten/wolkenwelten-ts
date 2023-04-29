@@ -274,7 +274,7 @@ const calcSideCache = (
     blocks: BlockType[]
 ) => {
     let sideOff = 0;
-    const blockSeeThrough:number[] = [];
+    const blockSeeThrough: number[] = [];
     for (let i = 0; i < blocks.length; i++) {
         blockSeeThrough[i] = blocks[i].seeThrough ? 1 : 0;
     }
@@ -430,7 +430,7 @@ const genFront = (vertices: number[], args: GenArgs): number => {
                 // Skip all faces that can't be seen, due to a block
                 // being right in front of that particular face.
                 const side = sideCache[x * 32 * 32 + y * 32 + z];
-                if((side & 1) === 0){
+                if ((side & 1) === 0) {
                     continue;
                 }
                 if (args.seeThrough === ((side & (1 << 6)) === 0)) {
@@ -485,7 +485,7 @@ const genBack = (vertices: number[], args: GenArgs) => {
                 // Skip all faces that can't be seen, due to a block
                 // being right in front of that particular face.
                 const side = sideCache[x * 32 * 32 + y * 32 + z];
-                if ((side & 2) === 0){
+                if ((side & 2) === 0) {
                     continue;
                 }
                 if (args.seeThrough === ((side & (1 << 6)) === 0)) {
@@ -540,7 +540,7 @@ const genTop = (vertices: number[], args: GenArgs) => {
                 // Skip all faces that can't be seen, due to a block
                 // being right in front of that particular face.
                 const side = sideCache[x * 32 * 32 + y * 32 + z];
-                if ((side & 4) === 0){
+                if ((side & 4) === 0) {
                     continue;
                 }
                 if (args.seeThrough === ((side & (1 << 6)) === 0)) {
@@ -595,7 +595,7 @@ const genBottom = (vertices: number[], args: GenArgs) => {
                 // Skip all faces that can't be seen, due to a block
                 // being right in front of that particular face.
                 const side = sideCache[x * 32 * 32 + y * 32 + z];
-                if ((side & 8) === 0){
+                if ((side & 8) === 0) {
                     continue;
                 }
                 if (args.seeThrough === ((side & (1 << 6)) === 0)) {
@@ -650,7 +650,7 @@ const genRight = (vertices: number[], args: GenArgs) => {
                 // Skip all faces that can't be seen, due to a block
                 // being right in front of that particular face.
                 const side = sideCache[x * 32 * 32 + y * 32 + z];
-                if ((side & 16) === 0){
+                if ((side & 16) === 0) {
                     continue;
                 }
                 if (args.seeThrough === ((side & (1 << 6)) === 0)) {
@@ -705,7 +705,7 @@ const genLeft = (vertices: number[], args: GenArgs) => {
                 // Skip all faces that can't be seen, due to a block
                 // being right in front of that particular face.
                 const side = sideCache[x * 32 * 32 + y * 32 + z];
-                if ((side & 32) === 0){
+                if ((side & 32) === 0) {
                     continue;
                 }
                 if (args.seeThrough === ((side & (1 << 6)) === 0)) {
@@ -823,10 +823,15 @@ const ambientOcclusion = (out: Uint8Array, blocks: Uint8Array) => {
     }
 };
 
-export const meshgenReal = ({blockData, lightData, blocks, lightFinished}: GenMsg): [Uint8Array, number[]] => {
+export const meshgenReal = ({
+    blockData,
+    lightData,
+    blocks,
+    lightFinished,
+}: GenMsg): [Uint8Array, number[]] => {
     const vertices: number[] = [];
     calcSideCache(sideCache, blockData, blocks);
-    if(!lightFinished){
+    if (!lightFinished) {
         lightBlur(lightData);
     }
     ambientOcclusion(lightData, blockData);
@@ -848,7 +853,7 @@ export const meshgenReal = ({blockData, lightData, blocks, lightFinished}: GenMs
     sideSquareCount[4] = genLeft(vertices, data);
     sideSquareCount[5] = genRight(vertices, data);
 
-    if(data.foundSeeThrough){
+    if (data.foundSeeThrough) {
         data.seeThrough = true;
         sideSquareCount[6] = genFront(vertices, data);
         sideSquareCount[7] = genBack(vertices, data);

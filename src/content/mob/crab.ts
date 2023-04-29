@@ -330,11 +330,12 @@ export class Crab extends Mob {
         this.stateChange();
         this.doState();
         this.updatePhysics();
-        this.beRepelledByEntities();
 
         this.x += this.vx;
         this.y += this.vy;
         this.z += this.vz;
         this.vy -= 0.005;
+
+        super.update();
     }
 }

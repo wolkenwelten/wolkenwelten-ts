@@ -95,19 +95,6 @@ export class Mob extends Being {
     }
 
     update() {
-        if (this.noClip) {
-            this.vx = this.vy = this.vz = 0;
-            return;
-        }
-        this.x += this.vx;
-        this.y += this.vy;
-        this.z += this.vz;
-        this.vy -= 0.005;
-
-        if (this.collides()) {
-            this.vy = 0;
-            this.vx = 0;
-            this.vz = 0;
-        }
+        super.update();
     }
 }

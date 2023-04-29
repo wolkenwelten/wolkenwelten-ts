@@ -12,7 +12,7 @@ import { lightGenSimple } from '../../world/chunk/lightGen';
 import { meshgenReal } from './meshgenWorker';
 
 const createIdentityBlocks = () => {
-    const ret:BlockType[] = [];
+    const ret: BlockType[] = [];
     ret.push(new BlockType(0, 'Void').withInvisible());
     for (let i = 1; i < 256; i++) {
         ret.push(new BlockType(i, '').withTexture(i - 1));
@@ -66,10 +66,10 @@ export const meshgenVoxelMesh = (voxels: Uint8Array): [Uint8Array, number] => {
         lightData,
         blocks,
         lightFinished: true,
-    }
+    };
     const ret = meshgenReal(msg);
     let elementCount = 0;
-    for(let i=0;i<ret[1].length;i++){
+    for (let i = 0; i < ret[1].length; i++) {
         elementCount += ret[1][i];
     }
     profiler.add('meshgenSimple', start, performance.now());

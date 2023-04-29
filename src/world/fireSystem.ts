@@ -45,6 +45,11 @@ export class FireSystem {
         }
     }
 
+    get(x: number, y: number, z: number): number {
+        const key = coordinateToKey(x, y, z);
+        return this.fires.get(key)?.strength || 0;
+    }
+
     queue(x: number, y: number, z: number, strength: number) {
         this.fireQueue.push({ x, y, z, strength });
     }
@@ -107,7 +112,7 @@ export class Fire {
             return;
         }
         if (--this.ticksTillNextSpread <= 0) {
-            this.ticksTillNextSpread = 4;
+            this.ticksTillNextSpread = 48;
             this.spreadDirection = (this.spreadDirection + 1) % 6;
             switch (this.spreadDirection) {
                 case 0:
@@ -132,24 +137,34 @@ export class Fire {
                     break;
             }
         }
+        Fire.addParticle(system.world, this.x, this.y, this.z, this.strength);
+    }
 
+    static addParticle(
+        world: World,
+        x: number,
+        y: number,
+        z: number,
+        strength: number
+    ) {
         const ox = Math.random();
+        const oy = Math.random();
         const oz = Math.random();
         const r = 0xf0 | (Math.random() * 16);
-        const g = 0x10 | (Math.random() * 16);
+        const g = 0x20 | (Math.random() * 16);
         const b = 0x00;
         const a = 0xff;
         const color = r | (g << 8) | (b << 16) | (a << 24);
-        system.world.game.render.particle.add(
-            this.x + ox,
-            this.y,
-            this.z + oz,
-            Math.max(64, Math.min(384, this.strength / 8)),
+        world.game.render.particle.add(
+            x + ox,
+            y + oy,
+            z + oz,
+            Math.max(64, Math.min(384, strength / 8)),
             color,
-            0,
-            0.02,
-            0,
-            -1,
+            (Math.random() - 0.5) * 0.02,
+            0.05,
+            (Math.random() - 0.5) * 0.02,
+            -3.5,
             0,
             0,
             0,
