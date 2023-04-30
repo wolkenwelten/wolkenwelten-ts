@@ -25,6 +25,7 @@ export class FireBreath extends Rune {
                 if(i > 6){
                     e.world.fire.add(x, y, z, 4096);
                     firesSpawned++;
+                    e.world.game.audio.playAtPosition('bomb', 0.1, [x,y,z]);
                 }
             } else {
                 return false;
@@ -41,6 +42,6 @@ export class FireBreath extends Rune {
         this.world.game.render.shake.add(1);
         e.cooldown(64);
         e.hitAnimation = this.world.game.render.frames;
-        e.playSound('bomb', 0.2);
+
     }
 }

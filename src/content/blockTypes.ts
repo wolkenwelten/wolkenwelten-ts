@@ -304,5 +304,7 @@ export const registerBlockTypes = (world: World) => {
         .withLiquid()
         .withSeeThrough()
         .withItemDropHandler(() => {})
+        .withFireDamage(0)
+        .withFireHealth(10000)
         .withBlockHealth(340);
 };
