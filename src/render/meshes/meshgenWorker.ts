@@ -836,7 +836,7 @@ export const meshgenReal = ({
     }
     ambientOcclusion(lightData, blockData);
 
-    const sideSquareCount = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    const sideVertCount = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     const data = {
         blockData,
         lightData,
@@ -846,23 +846,23 @@ export const meshgenReal = ({
         foundSeeThrough: false,
     };
 
-    sideSquareCount[0] = genFront(vertices, data);
-    sideSquareCount[1] = genBack(vertices, data);
-    sideSquareCount[2] = genTop(vertices, data);
-    sideSquareCount[3] = genBottom(vertices, data);
-    sideSquareCount[4] = genLeft(vertices, data);
-    sideSquareCount[5] = genRight(vertices, data);
+    sideVertCount[0] = genFront(vertices, data);
+    sideVertCount[1] = genBack(vertices, data);
+    sideVertCount[2] = genTop(vertices, data);
+    sideVertCount[3] = genBottom(vertices, data);
+    sideVertCount[4] = genLeft(vertices, data);
+    sideVertCount[5] = genRight(vertices, data);
 
     if (data.foundSeeThrough) {
         data.seeThrough = true;
-        sideSquareCount[6] = genFront(vertices, data);
-        sideSquareCount[7] = genBack(vertices, data);
-        sideSquareCount[8] = genTop(vertices, data);
-        sideSquareCount[9] = genBottom(vertices, data);
-        sideSquareCount[10] = genLeft(vertices, data);
-        sideSquareCount[11] = genRight(vertices, data);
+        sideVertCount[6] = genFront(vertices, data);
+        sideVertCount[7] = genBack(vertices, data);
+        sideVertCount[8] = genTop(vertices, data);
+        sideVertCount[9] = genBottom(vertices, data);
+        sideVertCount[10] = genLeft(vertices, data);
+        sideVertCount[11] = genRight(vertices, data);
     }
 
     const vertArr = new Uint8Array(vertices);
-    return [vertArr, sideSquareCount];
+    return [vertArr, sideVertCount];
 };

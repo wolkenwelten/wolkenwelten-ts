@@ -28,8 +28,8 @@ export class VoxelMesh {
     static colorPalette: Map<number, number> = new Map();
 
     lastUpdated = 0;
-    elementCount = 0;
-    vertices: Uint8Array | Uint16Array;
+    vertCount = 0;
+    vertices: Uint8Array;
     readonly vao: WebGLVertexArrayObject;
     readonly vbo: WebGLBuffer;
     size = {
@@ -95,15 +95,15 @@ export class VoxelMesh {
                 tmpBlocks[off] = VoxelMesh.colorLookup(rgb);
             }
 
-            const [vertices, elementCount] = meshgenVoxelMesh(tmpBlocks);
-            mesh.update(vertices, elementCount);
+            const [vertices, vertCount] = meshgenVoxelMesh(tmpBlocks);
+            mesh.updateTiny(vertices, vertCount);
         }, 0);
         return mesh;
     }
 
-    update(vertices: Uint8Array | Uint16Array, elementCount: number) {
+    updateTiny(vertices: Uint8Array, elementCount: number) {
         const gl = VoxelMesh.gl;
-        this.elementCount = elementCount;
+        this.vertCount = elementCount;
         this.vertices = vertices;
         gl.bindVertexArray(this.vao);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
@@ -111,15 +111,26 @@ export class VoxelMesh {
         gl.enableVertexAttribArray(0);
         gl.enableVertexAttribArray(1);
         gl.enableVertexAttribArray(2);
-        if (vertices instanceof Uint16Array) {
-            gl.vertexAttribIPointer(0, 3, gl.UNSIGNED_SHORT, 8, 0);
-            gl.vertexAttribIPointer(1, 1, gl.UNSIGNED_BYTE, 8, 6);
-            gl.vertexAttribIPointer(2, 1, gl.UNSIGNED_BYTE, 8, 7);
-        } else {
-            gl.vertexAttribIPointer(0, 3, gl.UNSIGNED_BYTE, 5, 0);
-            gl.vertexAttribIPointer(1, 1, gl.UNSIGNED_BYTE, 5, 3);
-            gl.vertexAttribIPointer(2, 1, gl.UNSIGNED_BYTE, 5, 4);
-        }
+
+        gl.vertexAttribIPointer(0, 3, gl.UNSIGNED_BYTE, 5, 0);
+        gl.vertexAttribIPointer(1, 1, gl.UNSIGNED_BYTE, 5, 3);
+        gl.vertexAttribIPointer(2, 1, gl.UNSIGNED_BYTE, 5, 4);
+    }
+
+    updateShort(vertices: Uint8Array, elementCount: number) {
+        const gl = VoxelMesh.gl;
+        this.vertCount = elementCount;
+        this.vertices = vertices;
+        gl.bindVertexArray(this.vao);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
+        gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+        gl.enableVertexAttribArray(0);
+        gl.enableVertexAttribArray(1);
+        gl.enableVertexAttribArray(2);
+
+        gl.vertexAttribIPointer(0, 3, gl.UNSIGNED_SHORT, 8, 0);
+        gl.vertexAttribIPointer(1, 1, gl.UNSIGNED_BYTE, 8, 6);
+        gl.vertexAttribIPointer(2, 1, gl.UNSIGNED_BYTE, 8, 7);
     }
 
     updateFromMultiple(blits: VoxelMeshBlit[], ticks: number) {
@@ -145,14 +156,15 @@ export class VoxelMesh {
                 shorts[i * 4] = blit.vertices[ii * 5] + blit.x;
                 shorts[i * 4 + 1] = blit.vertices[ii * 5 + 1] + blit.y;
                 shorts[i * 4 + 2] = blit.vertices[ii * 5 + 2] + blit.z;
+
                 buffer[i * 8 + 6] = blit.vertices[ii * 5 + 3];
                 buffer[i * 8 + 7] = blit.vertices[ii * 5 + 4];
                 i++;
             }
         }
-        const elementCount = ((overallLength / 8) * 3) / 2;
+        const vertCount = overallLength / 8;
         this.lastUpdated = ticks;
-        this.update(shorts, elementCount);
+        this.updateShort(buffer, vertCount);
     }
 
     constructor() {
@@ -171,7 +183,7 @@ export class VoxelMesh {
     }
 
     draw(modelViewProjection: mat4, alpha: number, x = 0, y = 0, z = 0) {
-        if (this.elementCount === 0) {
+        if (this.vertCount === 0) {
             return;
         }
         const gl = VoxelMesh.gl;
@@ -184,6 +196,6 @@ export class VoxelMesh {
         VoxelMesh.texture.bind(2);
 
         gl.bindVertexArray(this.vao);
-        gl.drawArrays(gl.TRIANGLES, 0, this.elementCount);
+        gl.drawArrays(gl.TRIANGLES, 0, this.vertCount);
     }
 }

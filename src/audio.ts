@@ -17,8 +17,21 @@ export class AudioManager {
         this.emitters.add(new AudioEmitter(this, name, volume, [0, 0, 0]));
     }
 
-    playFromEntity(name: string, volume = 1, entity: Entity, stopWhenEntityDestroyed = false) {
-        this.emitters.add(new AudioEmitter(this, name, volume, entity, stopWhenEntityDestroyed));
+    playFromEntity(
+        name: string,
+        volume = 1,
+        entity: Entity,
+        stopWhenEntityDestroyed = false
+    ) {
+        this.emitters.add(
+            new AudioEmitter(
+                this,
+                name,
+                volume,
+                entity,
+                stopWhenEntityDestroyed
+            )
+        );
     }
 
     playAtPosition(
@@ -98,7 +111,7 @@ export class AudioEmitter {
         if (this.entity) {
             if (this.entity.destroyed) {
                 this.entity = undefined;
-                if(this.stopWhenEntityDestroyed){
+                if (this.stopWhenEntityDestroyed) {
                     this.destroy();
                     return;
                 }

@@ -21,7 +21,9 @@ export class EarthBullet extends Rune {
     bulletEntity?: EarthBulletEntity;
 
     use(e: Character) {
-        if(e.isOnCooldown()){return;}
+        if (e.isOnCooldown()) {
+            return;
+        }
         if (this.bulletEntity) {
             return;
         }
@@ -73,7 +75,7 @@ export class EarthBullet extends Rune {
         this.bulletEntity.vx = vx;
         this.bulletEntity.vy = vy;
         this.bulletEntity.vz = vz;
-        this.bulletEntity.playSound("projectile", 1, true);
+        this.bulletEntity.playSound('projectile', 1, true);
         this.bulletEntity = undefined;
 
         e.cooldown(32);

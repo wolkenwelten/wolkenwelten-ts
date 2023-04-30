@@ -22,7 +22,9 @@ export class Comet extends Rune {
     range = 12;
 
     use(e: Character) {
-        if(e.isOnCooldown()){return;}
+        if (e.isOnCooldown()) {
+            return;
+        }
         const frame = e.world.game.render.frames;
         const decals = e.world.game.render.decals;
         if (this.lastUseFrameCount !== frame) {
@@ -32,8 +34,8 @@ export class Comet extends Rune {
                 const dx = x - e.x;
                 const dy = y - e.y;
                 const dz = z - e.z;
-                const dd = dx*dx + dy*dy + dz*dz;
-                if(dd > (this.range * this.range)){
+                const dd = dx * dx + dy * dy + dz * dz;
+                if (dd > this.range * this.range) {
                     return;
                 }
                 decals.addBlock(x, y, z, 0, 2);
@@ -43,18 +45,20 @@ export class Comet extends Rune {
     }
 
     useRelease(e: Character) {
-        if(e.isOnCooldown()){return;}
+        if (e.isOnCooldown()) {
+            return;
+        }
         const ray = e.raycast(false);
         if (ray) {
             const [x, y, z] = ray;
             const dx = x - e.x;
             const dy = y - e.y;
             const dz = z - e.z;
-            const dd = dx*dx + dy*dy + dz*dz;
-            if(dd > (this.range * this.range)){
+            const dd = dx * dx + dy * dy + dz * dz;
+            if (dd > this.range * this.range) {
                 return;
             }
-            for(let i=0;i<9;i++){
+            for (let i = 0; i < 9; i++) {
                 const comet = new CometEntity(e.world, 4, e);
                 const ox = (Math.random() - 0.5) * 3;
                 const oy = Math.random() * 24;
@@ -83,7 +87,7 @@ export class CometEntity extends Entity {
         this.caster = caster;
         this.source = caster;
         this.vy = 0.2;
-        this.playSound("projectile", 1, true);
+        this.playSound('projectile', 1, true);
     }
 
     mesh(): TriangleMesh | VoxelMesh | null {
@@ -102,7 +106,7 @@ export class CometEntity extends Entity {
                 }
             }
         }
-        this.playUnmovingSound("bomb", 1);
+        this.playUnmovingSound('bomb', 1);
     }
 
     private damageMobs(x: number, y: number, z: number) {

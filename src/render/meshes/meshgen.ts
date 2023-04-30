@@ -68,12 +68,12 @@ export const meshgenVoxelMesh = (voxels: Uint8Array): [Uint8Array, number] => {
         lightFinished: true,
     };
     const ret = meshgenReal(msg);
-    let elementCount = 0;
+    let vertCount = 0;
     for (let i = 0; i < ret[1].length; i++) {
-        elementCount += ret[1][i];
+        vertCount += ret[1][i];
     }
     profiler.add('meshgenSimple', start, performance.now());
-    return [ret[0], elementCount];
+    return [ret[0], vertCount];
 };
 
 export const meshgenChunk = (chunk: Chunk): [Uint8Array, number[]] => {

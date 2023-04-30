@@ -243,7 +243,12 @@ export class Entity {
     }
 
     playSound(name: string, volume = 1.0, stopWhenEntityDestroyed = false) {
-        this.world.game.audio.playFromEntity(name, volume, this, stopWhenEntityDestroyed);
+        this.world.game.audio.playFromEntity(
+            name,
+            volume,
+            this,
+            stopWhenEntityDestroyed
+        );
     }
 
     playUnmovingSound(name: string, volume = 1.0) {
