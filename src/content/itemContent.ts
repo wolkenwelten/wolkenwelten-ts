@@ -9,6 +9,7 @@ import { Club } from './weapons/club';
 import { EarthBullet } from './runes/earthBullet';
 import { EarthWall } from './runes/earthWall';
 import { FireBreath } from './runes/fireBreath';
+import { Comet } from './runes/comet';
 
 import { Stone } from './consumables/stone';
 
@@ -19,6 +20,7 @@ export const registerItems = () => {
     Item.register('earthBullet', EarthBullet);
     Item.register('earthWall', EarthWall);
     Item.register('fireBreath', FireBreath);
+    Item.register('comet', Comet);
 
     Item.register('stone', Stone);
 };

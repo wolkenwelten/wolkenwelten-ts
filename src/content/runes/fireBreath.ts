@@ -15,20 +15,19 @@ export class FireBreath extends Rune {
     use(e: Character) {
         let i = 0;
         e.stepIntoDirection((x, y, z) => {
-            if (++i < 5) {
+            if (++i < 6) {
                 return true;
             }
             const b = e.world.getBlock(x, y, z);
             if (!b) {
                 e.world.fire.add(x, y, z, 4096);
             }
-            if (i > 16) {
+            if (i > 24) {
                 return false;
             } else {
                 return true;
             }
         });
+        e.cooldown(80);
     }
-
-    useRelease(e: Character) {}
 }

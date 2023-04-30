@@ -3,8 +3,8 @@
  */
 import itemIcon from '../../../assets/gfx/items/earthBullet.png';
 import meshUrl from '../../../assets/vox/items/stone.vox?url';
-import { TriangleMesh } from '../../render/meshes/triangleMesh/triangleMesh';
-import { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
+import type { TriangleMesh } from '../../render/meshes/triangleMesh/triangleMesh';
+import type { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
 import { Character } from '../../world/entity/character';
 import { Entity } from '../../world/entity/entity';
 import { Mob } from '../../world/entity/mob';

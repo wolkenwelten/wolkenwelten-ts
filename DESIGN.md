@@ -16,7 +16,7 @@ Breath fire onto everything in front of the player
 ## Comet
 Conjure a comet from the skies
 - Very slow to actually hit
-- Absolutely Devastating if it hitsS
+- Absolutely Devastating if it hits
 
 ## Lightning strike
 Summon a bolt of lightning from the skies
@@ -37,7 +37,7 @@ Slows everything down it hits and blows it away slightly, turns water to ice and
 ## Watertorrent
 Shoot a torrent of water at a Target
 - Extinguishes flames
-- Throw one Entity far away and doing a no damage by itself
+- Throw one Entity far away, doing no damage by itself
 - Makes the target wet, making it resistant to fire damage but very vulerable to shock
 
 ## Healingwave

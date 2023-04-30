@@ -124,6 +124,7 @@ export const registerBlockTypes = (world: World) => {
         .withColours(0x5e5e5eff, 0x484848ff)
         .withMiningCat('Pickaxe')
         .withItemDropHandler(stoneDropHandler)
+        .withFireHealth(8192)
         .withBlockHealth(800);
 
     world
