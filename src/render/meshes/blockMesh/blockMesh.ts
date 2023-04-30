@@ -152,9 +152,10 @@ export class BlockMesh {
      */
     drawFast(mask: number, alpha: number, sideOffset = 0): number {
         const elementCount =
-            this.sideStart[sideOffset + 5] +
-            this.sideElementCount[sideOffset + 5];
-        if (elementCount === 0 || mask === 0) {
+            (this.sideStart[sideOffset + 5] +
+            this.sideElementCount[sideOffset + 5])
+            - this.sideStart[sideOffset];
+        if ((elementCount === 0) || (mask === 0)) {
             return 0;
         }
         BlockMesh.gl.bindVertexArray(this.vao);
