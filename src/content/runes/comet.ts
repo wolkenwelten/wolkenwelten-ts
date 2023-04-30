@@ -37,11 +37,18 @@ export class Comet extends Rune {
         const ray = e.raycast(false);
         if (ray) {
             const [x, y, z] = ray;
-            const comet = new CometEntity(e.world, 4, e);
-            comet.x = x + 1;
-            comet.y = y + 96;
-            comet.z = z + 1;
-            comet.vy = -0.5;
+            for(let i=0;i<9;i++){
+                const comet = new CometEntity(e.world, 4, e);
+                const ox = (Math.random() - 0.5) * 3;
+                const oy = Math.random() * 24;
+                const oz = (Math.random() - 0.5) * 3;
+                comet.x = x + 1 + ox;
+                comet.y = y + 96 + oy;
+                comet.z = z + 1 + oz;
+                comet.vy = -1;
+                comet.vx = (Math.random() - 0.5) * 0.1;
+                comet.vz = (Math.random() - 0.5) * 0.1;
+            }
         }
 
         e.cooldown(80);
