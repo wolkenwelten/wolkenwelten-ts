@@ -1,6 +1,8 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
+import bombUrl from '../../assets/sfx/bomb.ogg?url';
+import projectileUrl from '../../assets/sfx/projectile.ogg?url';
 import crabClickUrl from '../../assets/sfx/crabClick.mp3?url';
 import crabDeathUrl from '../../assets/sfx/crabDeath.mp3?url';
 import pockUrl from '../../assets/sfx/pock.ogg?url';
@@ -28,4 +30,6 @@ export const registerAudioContent = (audio: AudioManager) => {
     audio.add('crabDeath', crabDeathUrl);
     audio.add('ratAttack', ratAttackUrl);
     audio.add('ratDeath', ratDeathUrl);
+    audio.add('bomb', bombUrl);
+    audio.add('projectile', projectileUrl);
 };

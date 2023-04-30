@@ -93,6 +93,7 @@ export class EarthWall extends Rune {
     }
 
     use(e: Character) {
+        if(e.isOnCooldown()){return;}
         const frame = e.world.game.render.frames;
         const decals = e.world.game.render.decals;
         if (this.lastUseFrameCount !== frame) {

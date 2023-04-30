@@ -13,6 +13,7 @@ export class FireBreath extends Rune {
     meshUrl = meshUrl;
 
     use(e: Character) {
+        if(e.isOnCooldown()){return;}
         let i = 0;
         e.stepIntoDirection((x, y, z) => {
             if (++i < 6) {
@@ -29,6 +30,8 @@ export class FireBreath extends Rune {
             }
         });
         this.world.game.render.shake.add(1);
-        e.cooldown(80);
+        e.cooldown(64);
+        e.hitAnimation = this.world.game.render.frames;
+        e.playSound("bomb", 0.2);
     }
 }

@@ -17,8 +17,8 @@ export class AudioManager {
         this.emitters.add(new AudioEmitter(this, name, volume, [0, 0, 0]));
     }
 
-    playFromEntity(name: string, volume = 1, entity: Entity) {
-        this.emitters.add(new AudioEmitter(this, name, volume, entity));
+    playFromEntity(name: string, volume = 1, entity: Entity, stopWhenEntityDestroyed = false) {
+        this.emitters.add(new AudioEmitter(this, name, volume, entity, stopWhenEntityDestroyed));
     }
 
     playAtPosition(
@@ -50,6 +50,7 @@ export class AudioEmitter {
     y: number;
     z: number;
     entity?: Entity;
+    stopWhenEntityDestroyed = false;
 
     manager: AudioManager;
     howl: Howl;
@@ -58,7 +59,8 @@ export class AudioEmitter {
         manager: AudioManager,
         name: string,
         volume = 1.0,
-        position: Entity | [number, number, number]
+        position: Entity | [number, number, number],
+        stopWhenEntityDestroyed = false
     ) {
         this.manager = manager;
         if (Array.isArray(position)) {
@@ -75,7 +77,7 @@ export class AudioEmitter {
         if (!url) {
             throw new Error(`Can't find audio called ${name}`);
         }
-
+        this.stopWhenEntityDestroyed = stopWhenEntityDestroyed;
         const destroy = this.destroy.bind(this);
         this.howl = new Howl({ src: [url], volume });
         this.howl.on('end', destroy);
@@ -96,6 +98,10 @@ export class AudioEmitter {
         if (this.entity) {
             if (this.entity.destroyed) {
                 this.entity = undefined;
+                if(this.stopWhenEntityDestroyed){
+                    this.destroy();
+                    return;
+                }
             } else {
                 this.x = this.entity.x;
                 this.y = this.entity.y;

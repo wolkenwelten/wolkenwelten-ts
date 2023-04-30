@@ -19,14 +19,23 @@ export class Comet extends Rune {
     meshUrl = meshUrl;
 
     private lastUseFrameCount = -1;
+    range = 12;
 
     use(e: Character) {
+        if(e.isOnCooldown()){return;}
         const frame = e.world.game.render.frames;
         const decals = e.world.game.render.decals;
         if (this.lastUseFrameCount !== frame) {
             const ray = e.raycast(false);
             if (ray) {
                 const [x, y, z] = ray;
+                const dx = x - e.x;
+                const dy = y - e.y;
+                const dz = z - e.z;
+                const dd = dx*dx + dy*dy + dz*dz;
+                if(dd > (this.range * this.range)){
+                    return;
+                }
                 decals.addBlock(x, y, z, 0, 2);
                 this.lastUseFrameCount = frame;
             }
@@ -34,9 +43,17 @@ export class Comet extends Rune {
     }
 
     useRelease(e: Character) {
+        if(e.isOnCooldown()){return;}
         const ray = e.raycast(false);
         if (ray) {
             const [x, y, z] = ray;
+            const dx = x - e.x;
+            const dy = y - e.y;
+            const dz = z - e.z;
+            const dd = dx*dx + dy*dy + dz*dz;
+            if(dd > (this.range * this.range)){
+                return;
+            }
             for(let i=0;i<9;i++){
                 const comet = new CometEntity(e.world, 4, e);
                 const ox = (Math.random() - 0.5) * 3;
@@ -50,8 +67,7 @@ export class Comet extends Rune {
                 comet.vz = (Math.random() - 0.5) * 0.1;
             }
         }
-
-        e.cooldown(80);
+        e.cooldown(128);
     }
 }
 
@@ -67,6 +83,7 @@ export class CometEntity extends Entity {
         this.caster = caster;
         this.source = caster;
         this.vy = 0.2;
+        this.playSound("projectile", 1, true);
     }
 
     mesh(): TriangleMesh | VoxelMesh | null {
@@ -85,6 +102,7 @@ export class CometEntity extends Entity {
                 }
             }
         }
+        this.playUnmovingSound("bomb", 1);
     }
 
     private damageMobs(x: number, y: number, z: number) {
