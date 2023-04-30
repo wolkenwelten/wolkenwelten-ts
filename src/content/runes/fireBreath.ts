@@ -17,13 +17,17 @@ export class FireBreath extends Rune {
             return;
         }
         let i = 0;
+        let firesSpawned = 0;
         e.stepIntoDirection((x, y, z) => {
-            if (++i < 6) {
-                return true;
-            }
+            i++;
             const b = e.world.getBlock(x, y, z);
             if (!b) {
-                e.world.fire.add(x, y, z, 4096);
+                if(i > 6){
+                    e.world.fire.add(x, y, z, 4096);
+                    firesSpawned++;
+                }
+            } else {
+                return false;
             }
             if (i > 24) {
                 return false;
@@ -31,6 +35,9 @@ export class FireBreath extends Rune {
                 return true;
             }
         });
+        if(firesSpawned === 0){
+            return;
+        }
         this.world.game.render.shake.add(1);
         e.cooldown(64);
         e.hitAnimation = this.world.game.render.frames;
