@@ -10,6 +10,7 @@ import { AssetList } from './asset';
 import { DecalMesh } from './meshes/decalMesh/decalMesh';
 import { ParticleMesh } from './meshes/particleMesh/particleMesh';
 import { allTexturesLoaded } from './texture';
+import { ScreenShakeSystem } from './screenShake';
 import { WorldRenderer } from './worldRenderer';
 
 const transPos = new Float32Array([0, 0, 0]);
@@ -39,6 +40,7 @@ export class RenderManager {
     decals: DecalMesh;
     particle: ParticleMesh;
     cam: Entity;
+    shake: ScreenShakeSystem;
     world: WorldRenderer;
 
     setPlatformDefaults() {
@@ -80,7 +82,7 @@ export class RenderManager {
         this.gl = gl;
         this.initGLContext();
         this.assets = new AssetList(game, gl);
-
+        this.shake = new ScreenShakeSystem();
         this.world = new WorldRenderer(this);
         this.decals = new DecalMesh(this);
         this.particle = new ParticleMesh(this);
@@ -114,6 +116,7 @@ export class RenderManager {
 
     drawScene() {
         this.updateFOV();
+        this.shake.update();
         mat4.perspective(
             projectionMatrix,
             (this.fov * Math.PI) / 180,
@@ -125,9 +128,10 @@ export class RenderManager {
         mat4.identity(viewMatrix);
         mat4.rotateX(viewMatrix, viewMatrix, -this.cam.pitch);
         mat4.rotateY(viewMatrix, viewMatrix, -this.cam.yaw);
-        transPos[0] = -this.cam.x;
-        transPos[1] = -(this.cam.y + this.cam.camOffY());
-        transPos[2] = -this.cam.z;
+        const shakeOff = this.shake.getCamOffset(this.game.ticks);
+        transPos[0] = -this.cam.x + shakeOff[0];
+        transPos[1] = -(this.cam.y + this.cam.camOffY()) + shakeOff[1];
+        transPos[2] = -this.cam.z + shakeOff[2];
         mat4.translate(viewMatrix, viewMatrix, transPos);
 
         this.gl.enable(this.gl.BLEND);
@@ -163,9 +167,11 @@ export class RenderManager {
         const jumpOff = player.jumpAnimeFactor * -0.2;
         const rl = Math.sin(rt);
         const mesh = this.game.player.hudMesh();
-        transPos[0] = 0.6 - rl * 0.2 + viewBobH + player.inertiaX * 0.5;
-        transPos[1] = -0.6 + rl * 0.2 + viewBob + jumpOff;
-        transPos[2] = -0.5 - rl * 0.25 + player.inertiaZ * 0.5;
+        const shakeOff = this.shake.getCamOffset(this.game.ticks);
+        transPos[0] =
+            0.6 - rl * 0.2 + viewBobH + player.inertiaX * 0.5 - shakeOff[0];
+        transPos[1] = -0.6 + rl * 0.2 + viewBob + jumpOff - shakeOff[1];
+        transPos[2] = -0.5 - rl * 0.25 + player.inertiaZ * 0.5 - shakeOff[2];
         mat4.translate(modelViewMatrix, modelViewMatrix, transPos);
         mat4.rotateX(modelViewMatrix, modelViewMatrix, r);
         mat4.multiply(modelViewMatrix, projectionMatrix, modelViewMatrix);

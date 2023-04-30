@@ -72,6 +72,7 @@ export class Character extends Being {
         this.lastAction = 0;
         this.vx = this.vy = this.vz = 0;
 
+        this?.world?.game?.render?.shake?.stop();
         this.effects.clear();
         this.inventory.clear();
         this.equipment.clear();

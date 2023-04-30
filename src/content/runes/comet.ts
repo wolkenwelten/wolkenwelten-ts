@@ -25,8 +25,8 @@ export class Comet extends Rune {
         const decals = e.world.game.render.decals;
         if (this.lastUseFrameCount !== frame) {
             const ray = e.raycast(false);
-            if(ray){
-                const [x,y,z] = ray;
+            if (ray) {
+                const [x, y, z] = ray;
                 decals.addBlock(x, y, z, 0, 2);
                 this.lastUseFrameCount = frame;
             }
@@ -35,9 +35,9 @@ export class Comet extends Rune {
 
     useRelease(e: Character) {
         const ray = e.raycast(false);
-        if(ray){
-            const [x,y,z] = ray;
-            const comet = new CometEntity(e.world, 3, e);
+        if (ray) {
+            const [x, y, z] = ray;
+            const comet = new CometEntity(e.world, 4, e);
             comet.x = x + 1;
             comet.y = y + 96;
             comet.z = z + 1;
@@ -69,18 +69,18 @@ export class CometEntity extends Entity {
         );
     }
 
-    private removeArea(x:number, y:number, z:number) {
+    private removeArea(x: number, y: number, z: number) {
         for (let ox = -1; ox < 2; ox++) {
             for (let oy = -1; oy < 2; oy++) {
                 for (let oz = -1; oz < 2; oz++) {
-                    this.world.setBlock(x+ox, y+oy, z+oz, 0);
-                    this.world.fire.add(x+ox, y+oy, z+oz, 4096);
+                    this.world.setBlock(x + ox, y + oy, z + oz, 0);
+                    this.world.fire.add(x + ox, y + oy, z + oz, 4096);
                 }
             }
         }
     }
 
-    private damageMobs(x:number, y:number, z:number) {
+    private damageMobs(x: number, y: number, z: number) {
         for (const e of this.world.entities) {
             if (e === this || e.destroyed) {
                 continue;
@@ -92,9 +92,12 @@ export class CometEntity extends Entity {
             const dy = e.y - y - 0.5;
             const dz = e.z - z;
             const dd = dx * dx + dy * dy * 0.5 + dz * dz;
-            if (dd <= 3*3) {
-                const dmg = Math.max(1, Math.floor(9-dd));
-                this.source?.doDamage(e, dmg*dmg);
+            if (dd <= 3 * 3) {
+                const dmg = Math.max(1, Math.floor(9 - dd));
+                this.source?.doDamage(e, dmg * dmg);
+            }
+            if (e === this.world.game.player) {
+                this.world.game.render.shake.add(Math.max(0, 27 - dd));
             }
         }
     }
@@ -122,8 +125,8 @@ export class CometEntity extends Entity {
                             this.z + oz
                         )
                     ) {
-                        this.removeArea(this.x+ox, this.y+oy, this.z+oz);
-                        this.damageMobs(this.x+ox, this.y+oy, this.z+oz);
+                        this.removeArea(this.x + ox, this.y + oy, this.z + oz);
+                        this.damageMobs(this.x + ox, this.y + oy, this.z + oz);
                         this.world.setBlock(
                             this.x + ox,
                             this.y + oy - 1,
@@ -180,12 +183,29 @@ export class CometEntity extends Entity {
 
         ++this.ticksAlive;
 
-        Fire.addParticle(this.world, this.x - 0.5, this.y - 0.5, this.z - 0.5, 4096);
-        Fire.addParticle(this.world, this.x - 0.5, this.y - 0.5, this.z - 0.5, 4096);
-        Fire.addParticle(this.world, this.x - 0.5, this.y - 0.5, this.z - 0.5, 4096);
+        Fire.addParticle(
+            this.world,
+            this.x - 0.5,
+            this.y - 0.5,
+            this.z - 0.5,
+            4096
+        );
+        Fire.addParticle(
+            this.world,
+            this.x - 0.5,
+            this.y - 0.5,
+            this.z - 0.5,
+            4096
+        );
+        Fire.addParticle(
+            this.world,
+            this.x - 0.5,
+            this.y - 0.5,
+            this.z - 0.5,
+            4096
+        );
 
-        const vv =
-            this.vx * this.vx + this.vy * this.vy + this.vz * this.vz;
+        const vv = this.vx * this.vx + this.vy * this.vy + this.vz * this.vz;
         if (vv < 0.01 && this.collides()) {
             this.placeBlock();
             this.playUnmovingSound('pock', 0.3);
