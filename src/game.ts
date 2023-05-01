@@ -20,6 +20,7 @@ import { StaticObject } from './world/chunk/staticObject';
 import { Mob } from './world/entity/mob';
 import { Item } from './world/item/item';
 import { World } from './world/world';
+import * as wasm from './wasm';
 
 export interface GameConfig {
     parent: HTMLElement;
@@ -61,6 +62,7 @@ export class Game {
         this.options = new Options();
         this.profiler = ProfilingManager.profiler();
         this.benchmark = new BenchmarkManager(this);
+        wasm.init();
         this.world = new World(this);
         this.player = new Character(
             this.world,
@@ -127,5 +129,10 @@ export class Game {
     // Return the amount of milliseconds elapsed since the game started
     millis(): number {
         return +Date.now() - this.startTime;
+    }
+
+    meminfo() {
+        console.log(`Chunks in use: ${wasm.chunksInUse()}`);
+        console.log(`Chunks free: ${wasm.chunksFree()}`);
     }
 }

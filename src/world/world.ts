@@ -130,6 +130,7 @@ export class World {
             4;
         for (const chunk of this.chunks.values()) {
             if (chunk.gc(maxDistance, this.game.player)) {
+                chunk.destroy();
                 const key = coordinateToWorldKey(chunk.x, chunk.y, chunk.z);
                 this.chunks.delete(key);
                 this.game.render.dropBlockMesh(chunk.x, chunk.y, chunk.z);

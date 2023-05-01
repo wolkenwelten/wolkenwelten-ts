@@ -10,6 +10,7 @@ import { clamp } from '../../util/math';
 import { BlockType } from '../../world/blockType';
 import { lightGenSimple } from '../../world/chunk/lightGen';
 import { meshgenReal } from './meshgenWorker';
+import * as wasm from '../../wasm';
 
 const createIdentityBlocks = () => {
     const ret: BlockType[] = [];
@@ -20,12 +21,11 @@ const createIdentityBlocks = () => {
     return ret;
 };
 
-const tmpSimpleLight = new Uint8Array(32 * 32 * 32);
 const identityBlocks = createIdentityBlocks();
 
 const blitChunkData = (
     blockData: Uint8Array,
-    chunkData: Uint8Array,
+    inPtr: number,
     offX: number,
     offY: number,
     offZ: number
@@ -44,7 +44,7 @@ const blitChunkData = (
             const cz = zStart - offZ;
             let chunkOff = cz * 32 * 32 + cy * 32 + cx; // Transposing the X and Z axes shouldn't be necessary
             for (let z = zStart; z < zEnd; z++) {
-                blockData[blockOff++] = chunkData[chunkOff];
+                blockData[blockOff++] = wasm.u8[inPtr + chunkOff];
                 chunkOff += 32 * 32;
             }
         }
@@ -53,12 +53,15 @@ const blitChunkData = (
 
 export const meshgenVoxelMesh = (voxels: Uint8Array): [Uint8Array, number] => {
     const start = performance.now();
+    const blockPtr = wasm.malloc();
+    const lightPtr = wasm.malloc();
+    wasm.u8.set(voxels, blockPtr);
     const blockData = new Uint8Array(34 * 34 * 34);
     const lightData = new Uint8Array(34 * 34 * 34);
     lightData.fill(15);
-    lightGenSimple(tmpSimpleLight, voxels);
-    blitChunkData(blockData, voxels, 1, 1, 1);
-    blitChunkData(lightData, tmpSimpleLight, 1, 1, 1);
+    lightGenSimple(lightPtr, blockPtr);
+    blitChunkData(blockData, blockPtr, 1, 1, 1);
+    blitChunkData(lightData, lightPtr, 1, 1, 1);
 
     const blocks = identityBlocks;
     const msg = {
@@ -73,6 +76,8 @@ export const meshgenVoxelMesh = (voxels: Uint8Array): [Uint8Array, number] => {
         vertCount += ret[1][i];
     }
     profiler.add('meshgenSimple', start, performance.now());
+    wasm.free(lightPtr);
+    wasm.free(blockPtr);
     return [ret[0], vertCount];
 };
 
@@ -91,14 +96,14 @@ export const meshgenChunk = (chunk: Chunk): [Uint8Array, number[]] => {
                 curChunk.updateSimpleLight();
                 blitChunkData(
                     blockData,
-                    curChunk.blocks,
+                    curChunk.blockPtr,
                     1 + x * 32,
                     1 + y * 32,
                     1 + z * 32
                 );
                 blitChunkData(
                     lightData,
-                    curChunk.simpleLight,
+                    curChunk.lightPtr,
                     1 + x * 32,
                     1 + y * 32,
                     1 + z * 32

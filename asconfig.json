@@ -1,0 +1,26 @@
+{
+  "targets": {
+    "debug": {
+      "outFile": "build/main.wasm",
+      "textFile": "build/main.wat",
+      "sourceMap": true,
+      "debug": true
+    },
+    "release": {
+      "outFile": "build/main.wasm",
+      "textFile": "build/main.wat",
+      "sourceMap": true,
+      "optimize": true,
+      "optimizeLevel": 3,
+      "shrinkLevel": 0,
+      "converge": false,
+      "noAssert": false
+    }
+  },
+  "options": {
+    "bindings": "esm",
+    "initialMemory": 8192,
+    "memoryBase": 520093696,
+    "runtime": "stub"
+  }
+}

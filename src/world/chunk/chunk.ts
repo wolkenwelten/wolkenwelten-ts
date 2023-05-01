@@ -5,6 +5,7 @@ import type { Entity } from '../entity/entity';
 import type { World } from '../world';
 import type { StaticObject } from './staticObject';
 import { lightGenSimple } from './lightGen';
+import * as wasm from '../../wasm';
 
 const coordinateToOffset = (x: number, y: number, z: number) =>
     (Math.floor(x) & 0x1f) |
@@ -12,20 +13,37 @@ const coordinateToOffset = (x: number, y: number, z: number) =>
     ((Math.floor(z) & 0x1f) * 32 * 32);
 
 export class Chunk {
-    blocks: Uint8Array;
+    blockPtr: number;
+    lightPtr: number;
+
     lastUpdated: number;
     staticLastUpdated: number;
-    simpleLight: Uint8Array;
-    simpleLightLastUpdated = 0;
+    lightLastUpdated = 0;
+
     x: number;
     y: number;
     z: number;
+
     static: Set<StaticObject> = new Set();
     world: World;
 
     constructor(world: World, x: number, y: number, z: number) {
-        this.blocks = new Uint8Array(32 * 32 * 32);
-        this.simpleLight = new Uint8Array(32 * 32 * 32);
+        this.blockPtr = wasm.malloc();
+        if (this.blockPtr === 0) {
+            world.gc();
+            this.blockPtr = wasm.malloc();
+            if (this.blockPtr === 0) {
+                throw new Error('OOM');
+            }
+        }
+        this.lightPtr = wasm.malloc();
+        if (this.lightPtr === 0) {
+            world.gc();
+            this.lightPtr = wasm.malloc();
+            if (this.lightPtr === 0) {
+                throw new Error('OOM');
+            }
+        }
         this.x = x;
         this.y = y;
         this.z = z;
@@ -34,21 +52,21 @@ export class Chunk {
     }
 
     updateSimpleLight() {
-        if (this.simpleLightLastUpdated >= this.lastUpdated) {
+        if (this.lightLastUpdated >= this.lastUpdated) {
             return;
         }
-        lightGenSimple(this.simpleLight, this.blocks);
-        this.simpleLightLastUpdated = this.lastUpdated;
+        lightGenSimple(this.lightPtr, this.blockPtr);
+        this.lightLastUpdated = this.lastUpdated;
     }
 
     getBlock(x: number, y: number, z: number): number {
         const i = coordinateToOffset(x, y, z);
-        return this.blocks[i];
+        return wasm.u8[this.blockPtr + i];
     }
 
     setBlockUnsafe(x: number, y: number, z: number, block: number) {
         const i = coordinateToOffset(x, y, z);
-        this.blocks[i] = block;
+        wasm.u8[this.blockPtr + i] = block;
     }
 
     setBlock(x: number, y: number, z: number, block: number) {
@@ -81,7 +99,7 @@ export class Chunk {
                     }
                     const zOff = (Math.floor(z) & 0x1f) * (32 * 32);
                     const off = xOff | yOff | zOff;
-                    this.blocks[off] = block;
+                    wasm.u8[this.blockPtr + off] = block;
                 }
             }
         }
@@ -132,7 +150,9 @@ export class Chunk {
                         if (tz < 0 || tz >= 32) {
                             continue;
                         }
-                        this.blocks[coordinateToOffset(tx, ty, tz)] = block;
+                        wasm.u8[
+                            this.blockPtr + coordinateToOffset(tx, ty, tz)
+                        ] = block;
                     }
                 }
             }
@@ -169,5 +189,16 @@ export class Chunk {
     staticDelete(obj: StaticObject) {
         this.staticLastUpdated = this.world.game.ticks;
         this.static.delete(obj);
+    }
+
+    destroy() {
+        if (this.blockPtr) {
+            wasm.free(this.blockPtr);
+            this.blockPtr = 0;
+        }
+        if (this.lightPtr) {
+            wasm.free(this.lightPtr);
+            this.lightPtr = 0;
+        }
     }
 }

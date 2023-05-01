@@ -9,6 +9,7 @@ xcuserdata/
 
 **/node_modules/
 dist/
+build/
 
 *.kate-swp
 *.blend1
