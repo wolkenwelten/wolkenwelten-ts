@@ -247,7 +247,6 @@ export class RenderManager {
             return;
         }
         this.world.meshes.delete(key);
-        this.gl.deleteBuffer(mesh.vbo);
-        this.gl.deleteVertexArray(mesh.vao);
+        mesh.destroy();
     }
 }

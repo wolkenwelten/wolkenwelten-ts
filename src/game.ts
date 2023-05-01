@@ -2,6 +2,7 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import { AudioManager } from './audio';
+import { BenchmarkManager } from './benchmark';
 import { registerAudioContent } from './content/audioContent';
 import { registerBlockTypes } from './content/blockTypes';
 import { registerItems } from './content/itemContent';
@@ -34,6 +35,7 @@ export class Game {
     StaticObject: typeof StaticObject;
 
     audio: AudioManager;
+    benchmark: BenchmarkManager;
     blocks: BlockTypeRegistry = {};
     config: GameConfig;
     input: InputManager;
@@ -58,6 +60,7 @@ export class Game {
         this.config = config;
         this.options = new Options();
         this.profiler = ProfilingManager.profiler();
+        this.benchmark = new BenchmarkManager(this);
         this.world = new World(this);
         this.player = new Character(
             this.world,

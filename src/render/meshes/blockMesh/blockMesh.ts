@@ -26,6 +26,7 @@ export class BlockMesh {
     readonly vao: WebGLVertexArrayObject;
     readonly vbo: WebGLBuffer;
     readonly chunk: Chunk;
+    destroyed = false;
     lastUpdated = 0;
     sideElementCount: number[] = [];
     sideStart: number[] = [];
@@ -151,11 +152,14 @@ export class BlockMesh {
      * is slightly faster than drawArrays.
      */
     drawFast(mask: number, alpha: number, sideOffset = 0): number {
+        if (this.destroyed) {
+            throw new Error('Tried to draw destroyed mesh');
+        }
         const elementCount =
-            (this.sideStart[sideOffset + 5] +
-            this.sideElementCount[sideOffset + 5])
-            - this.sideStart[sideOffset];
-        if ((elementCount === 0) || (mask === 0)) {
+            this.sideStart[sideOffset + 5] +
+            this.sideElementCount[sideOffset + 5] -
+            this.sideStart[sideOffset];
+        if (elementCount === 0 || mask === 0) {
             return 0;
         }
         BlockMesh.gl.bindVertexArray(this.vao);
@@ -189,5 +193,15 @@ export class BlockMesh {
             calls++;
         }
         return calls;
+    }
+
+    destroy() {
+        if (this.destroyed) {
+            return;
+        }
+        const gl = BlockMesh.gl;
+        gl.deleteBuffer(this.vbo);
+        gl.deleteVertexArray(this.vao);
+        this.destroyed = true;
     }
 }

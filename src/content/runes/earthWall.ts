@@ -154,7 +154,7 @@ export class EarthWallBlock extends Entity {
             this.z - 0.5,
             this.world.blocks[this.blockType]
         );
-        this.playSound("projectile", 0.2, true);
+        this.playSound('projectile', 0.2, true);
     }
 
     mesh(): TriangleMesh | VoxelMesh | null {

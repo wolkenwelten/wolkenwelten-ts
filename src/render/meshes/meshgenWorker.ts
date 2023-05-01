@@ -837,7 +837,7 @@ export const meshgenReal = ({
     ambientOcclusion(lightData, blockData);
 
     const sideVertCount = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    const data = {
+    let data = {
         blockData,
         lightData,
         sideCache,
