@@ -12,7 +12,7 @@
       "sourceMap": true,
       "optimize": true,
       "optimizeLevel": 3,
-      "shrinkLevel": 0,
+      "shrinkLevel": 2,
       "converge": false,
       "noAssert": false
     }
