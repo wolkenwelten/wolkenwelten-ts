@@ -20,6 +20,8 @@ const createIdentityBlocks = () => {
     return ret;
 };
 
+const blockData = new Uint8Array(34 * 34 * 34);
+const lightData = new Uint8Array(34 * 34 * 34);
 const tmpSimpleLight = new Uint8Array(32 * 32 * 32);
 const identityBlocks = createIdentityBlocks();
 
@@ -53,8 +55,7 @@ const blitChunkData = (
 
 export const meshgenVoxelMesh = (voxels: Uint8Array): [Uint8Array, number] => {
     const start = performance.now();
-    const blockData = new Uint8Array(34 * 34 * 34);
-    const lightData = new Uint8Array(34 * 34 * 34);
+    blockData.fill(0);
     lightData.fill(15);
     lightGenSimple(tmpSimpleLight, voxels);
     blitChunkData(blockData, voxels, 1, 1, 1);
@@ -78,8 +79,6 @@ export const meshgenVoxelMesh = (voxels: Uint8Array): [Uint8Array, number] => {
 
 export const meshgenChunk = (chunk: Chunk): [Uint8Array, number[]] => {
     const start = performance.now();
-    const blockData = new Uint8Array(34 * 34 * 34);
-    const lightData = new Uint8Array(34 * 34 * 34);
 
     for (let x = -1; x <= 1; x++) {
         for (let y = -1; y <= 1; y++) {
@@ -106,6 +105,7 @@ export const meshgenChunk = (chunk: Chunk): [Uint8Array, number[]] => {
             }
         }
     }
+
     const blocks = chunk.world.blocks;
     const msg = {
         blockData,

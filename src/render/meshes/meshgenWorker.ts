@@ -46,6 +46,23 @@ export interface GenMsg {
 }
 
 const sideCache = new Uint8Array(32 * 32 * 32);
+const vertBuf = new Uint8Array(2 ** 23);
+let vertBufEnd = 0;
+
+const outPush = (
+    x: number,
+    y: number,
+    z: number,
+    sideAndLight: number,
+    tex: number
+) => {
+    vertBuf[vertBufEnd] = x;
+    vertBuf[vertBufEnd + 1] = y;
+    vertBuf[vertBufEnd + 2] = z;
+    vertBuf[vertBufEnd + 3] = sideAndLight;
+    vertBuf[vertBufEnd + 4] = tex;
+    vertBufEnd += 5;
+};
 
 const blockBufferPosToOffset = (x: number, y: number, z: number): number =>
     x * 34 * 34 + y * 34 + z;
@@ -62,7 +79,6 @@ const sides = {
 */
 
 const addFront = (
-    out: number[],
     x: number,
     y: number,
     z: number,
@@ -78,26 +94,25 @@ const addFront = (
     const aa = ((light << 4) & 0xf0) + ((light >> 4) & 0xf0);
     const ab = (light & 0xf0) + ((light >> 8) & 0xf0);
     if (aa > ab) {
-        out.push(x, y, zd, tex, side | ((light << 4) & 0xf0));
-        out.push(x + w, y, zd, tex, side | (light & 0xf0));
-        out.push(x + w, y + h, zd, tex, side | ((light >> 4) & 0xf0));
+        outPush(x, y, zd, tex, side | ((light << 4) & 0xf0));
+        outPush(x + w, y, zd, tex, side | (light & 0xf0));
+        outPush(x + w, y + h, zd, tex, side | ((light >> 4) & 0xf0));
 
-        out.push(x + w, y + h, zd, tex, side | ((light >> 4) & 0xf0));
-        out.push(x, y + h, zd, tex, side | ((light >> 8) & 0xf0));
-        out.push(x, y, zd, tex, side | ((light << 4) & 0xf0));
+        outPush(x + w, y + h, zd, tex, side | ((light >> 4) & 0xf0));
+        outPush(x, y + h, zd, tex, side | ((light >> 8) & 0xf0));
+        outPush(x, y, zd, tex, side | ((light << 4) & 0xf0));
     } else {
-        out.push(x, y + h, zd, tex, side | ((light >> 8) & 0xf0));
-        out.push(x, y, zd, tex, side | ((light << 4) & 0xf0));
-        out.push(x + w, y, zd, tex, side | (light & 0xf0));
+        outPush(x, y + h, zd, tex, side | ((light >> 8) & 0xf0));
+        outPush(x, y, zd, tex, side | ((light << 4) & 0xf0));
+        outPush(x + w, y, zd, tex, side | (light & 0xf0));
 
-        out.push(x + w, y, zd, tex, side | (light & 0xf0));
-        out.push(x + w, y + h, zd, tex, side | ((light >> 4) & 0xf0));
-        out.push(x, y + h, zd, tex, side | ((light >> 8) & 0xf0));
+        outPush(x + w, y, zd, tex, side | (light & 0xf0));
+        outPush(x + w, y + h, zd, tex, side | ((light >> 4) & 0xf0));
+        outPush(x, y + h, zd, tex, side | ((light >> 8) & 0xf0));
     }
 };
 
 const addBack = (
-    out: number[],
     x: number,
     y: number,
     z: number,
@@ -112,26 +127,25 @@ const addBack = (
     const aa = ((light << 4) & 0xf0) + ((light >> 4) & 0xf0);
     const ab = (light & 0xf0) + ((light >> 8) & 0xf0);
     if (aa > ab) {
-        out.push(x, y + h, z, tex, side | ((light >> 8) & 0xf0));
-        out.push(x + w, y + h, z, tex, side | ((light >> 4) & 0xf0));
-        out.push(x + w, y, z, tex, side | (light & 0xf0));
+        outPush(x, y + h, z, tex, side | ((light >> 8) & 0xf0));
+        outPush(x + w, y + h, z, tex, side | ((light >> 4) & 0xf0));
+        outPush(x + w, y, z, tex, side | (light & 0xf0));
 
-        out.push(x + w, y, z, tex, side | (light & 0xf0));
-        out.push(x, y, z, tex, side | ((light << 4) & 0xf0));
-        out.push(x, y + h, z, tex, side | ((light >> 8) & 0xf0));
+        outPush(x + w, y, z, tex, side | (light & 0xf0));
+        outPush(x, y, z, tex, side | ((light << 4) & 0xf0));
+        outPush(x, y + h, z, tex, side | ((light >> 8) & 0xf0));
     } else {
-        out.push(x, y, z, tex, side | ((light << 4) & 0xf0));
-        out.push(x, y + h, z, tex, side | ((light >> 8) & 0xf0));
-        out.push(x + w, y + h, z, tex, side | ((light >> 4) & 0xf0));
+        outPush(x, y, z, tex, side | ((light << 4) & 0xf0));
+        outPush(x, y + h, z, tex, side | ((light >> 8) & 0xf0));
+        outPush(x + w, y + h, z, tex, side | ((light >> 4) & 0xf0));
 
-        out.push(x + w, y + h, z, tex, side | ((light >> 4) & 0xf0));
-        out.push(x + w, y, z, tex, side | (light & 0xf0));
-        out.push(x, y, z, tex, side | ((light << 4) & 0xf0));
+        outPush(x + w, y + h, z, tex, side | ((light >> 4) & 0xf0));
+        outPush(x + w, y, z, tex, side | (light & 0xf0));
+        outPush(x, y, z, tex, side | ((light << 4) & 0xf0));
     }
 };
 
 const addTop = (
-    out: number[],
     x: number,
     y: number,
     z: number,
@@ -147,26 +161,25 @@ const addTop = (
     const aa = ((light << 4) & 0xf0) + ((light >> 4) & 0xf0);
     const ab = (light & 0xf0) + ((light >> 8) & 0xf0);
     if (aa > ab) {
-        out.push(x, yh, z, tex, side | ((light << 4) & 0xf0));
-        out.push(x, yh, z + d, tex, side | (light & 0xf0));
-        out.push(x + w, yh, z + d, tex, side | ((light >> 4) & 0xf0));
+        outPush(x, yh, z, tex, side | ((light << 4) & 0xf0));
+        outPush(x, yh, z + d, tex, side | (light & 0xf0));
+        outPush(x + w, yh, z + d, tex, side | ((light >> 4) & 0xf0));
 
-        out.push(x + w, yh, z + d, tex, side | ((light >> 4) & 0xf0));
-        out.push(x + w, yh, z, tex, side | ((light >> 8) & 0xf0));
-        out.push(x, yh, z, tex, side | ((light << 4) & 0xf0));
+        outPush(x + w, yh, z + d, tex, side | ((light >> 4) & 0xf0));
+        outPush(x + w, yh, z, tex, side | ((light >> 8) & 0xf0));
+        outPush(x, yh, z, tex, side | ((light << 4) & 0xf0));
     } else {
-        out.push(x + w, yh, z, tex, side | ((light >> 8) & 0xf0));
-        out.push(x, yh, z, tex, side | ((light << 4) & 0xf0));
-        out.push(x, yh, z + d, tex, side | (light & 0xf0));
+        outPush(x + w, yh, z, tex, side | ((light >> 8) & 0xf0));
+        outPush(x, yh, z, tex, side | ((light << 4) & 0xf0));
+        outPush(x, yh, z + d, tex, side | (light & 0xf0));
 
-        out.push(x, yh, z + d, tex, side | (light & 0xf0));
-        out.push(x + w, yh, z + d, tex, side | ((light >> 4) & 0xf0));
-        out.push(x + w, yh, z, tex, side | ((light >> 8) & 0xf0));
+        outPush(x, yh, z + d, tex, side | (light & 0xf0));
+        outPush(x + w, yh, z + d, tex, side | ((light >> 4) & 0xf0));
+        outPush(x + w, yh, z, tex, side | ((light >> 8) & 0xf0));
     }
 };
 
 const addBottom = (
-    out: number[],
     x: number,
     y: number,
     z: number,
@@ -181,26 +194,25 @@ const addBottom = (
     const aa = ((light << 4) & 0xf0) + ((light >> 4) & 0xf0);
     const ab = (light & 0xf0) + ((light >> 8) & 0xf0);
     if (aa > ab) {
-        out.push(x, y, z, tex, side | ((light << 4) & 0xf0));
-        out.push(x + w, y, z, tex, side | (light & 0xf0));
-        out.push(x + w, y, z + d, tex, side | ((light >> 4) & 0xf0));
+        outPush(x, y, z, tex, side | ((light << 4) & 0xf0));
+        outPush(x + w, y, z, tex, side | (light & 0xf0));
+        outPush(x + w, y, z + d, tex, side | ((light >> 4) & 0xf0));
 
-        out.push(x + w, y, z + d, tex, side | ((light >> 4) & 0xf0));
-        out.push(x, y, z + d, tex, side | ((light >> 8) & 0xf0));
-        out.push(x, y, z, tex, side | ((light << 4) & 0xf0));
+        outPush(x + w, y, z + d, tex, side | ((light >> 4) & 0xf0));
+        outPush(x, y, z + d, tex, side | ((light >> 8) & 0xf0));
+        outPush(x, y, z, tex, side | ((light << 4) & 0xf0));
     } else {
-        out.push(x, y, z + d, tex, side | ((light >> 8) & 0xf0));
-        out.push(x, y, z, tex, side | ((light << 4) & 0xf0));
-        out.push(x + w, y, z, tex, side | (light & 0xf0));
+        outPush(x, y, z + d, tex, side | ((light >> 8) & 0xf0));
+        outPush(x, y, z, tex, side | ((light << 4) & 0xf0));
+        outPush(x + w, y, z, tex, side | (light & 0xf0));
 
-        out.push(x + w, y, z, tex, side | (light & 0xf0));
-        out.push(x + w, y, z + d, tex, side | ((light >> 4) & 0xf0));
-        out.push(x, y, z + d, tex, side | ((light >> 8) & 0xf0));
+        outPush(x + w, y, z, tex, side | (light & 0xf0));
+        outPush(x + w, y, z + d, tex, side | ((light >> 4) & 0xf0));
+        outPush(x, y, z + d, tex, side | ((light >> 8) & 0xf0));
     }
 };
 
 const addLeft = (
-    out: number[],
     x: number,
     y: number,
     z: number,
@@ -215,26 +227,25 @@ const addLeft = (
     const aa = ((light << 4) & 0xf0) + ((light >> 4) & 0xf0);
     const ab = (light & 0xf0) + ((light >> 8) & 0xf0);
     if (aa > ab) {
-        out.push(x, y, z, tex, side | ((light << 4) & 0xf0));
-        out.push(x, y, z + d, tex, side | (light & 0xf0));
-        out.push(x, y + h, z + d, tex, side | ((light >> 4) & 0xf0));
+        outPush(x, y, z, tex, side | ((light << 4) & 0xf0));
+        outPush(x, y, z + d, tex, side | (light & 0xf0));
+        outPush(x, y + h, z + d, tex, side | ((light >> 4) & 0xf0));
 
-        out.push(x, y + h, z + d, tex, side | ((light >> 4) & 0xf0));
-        out.push(x, y + h, z, tex, side | ((light >> 8) & 0xf0));
-        out.push(x, y, z, tex, side | ((light << 4) & 0xf0));
+        outPush(x, y + h, z + d, tex, side | ((light >> 4) & 0xf0));
+        outPush(x, y + h, z, tex, side | ((light >> 8) & 0xf0));
+        outPush(x, y, z, tex, side | ((light << 4) & 0xf0));
     } else {
-        out.push(x, y + h, z, tex, side | ((light >> 8) & 0xf0));
-        out.push(x, y, z, tex, side | ((light << 4) & 0xf0));
-        out.push(x, y, z + d, tex, side | (light & 0xf0));
+        outPush(x, y + h, z, tex, side | ((light >> 8) & 0xf0));
+        outPush(x, y, z, tex, side | ((light << 4) & 0xf0));
+        outPush(x, y, z + d, tex, side | (light & 0xf0));
 
-        out.push(x, y, z + d, tex, side | (light & 0xf0));
-        out.push(x, y + h, z + d, tex, side | ((light >> 4) & 0xf0));
-        out.push(x, y + h, z, tex, side | ((light >> 8) & 0xf0));
+        outPush(x, y, z + d, tex, side | (light & 0xf0));
+        outPush(x, y + h, z + d, tex, side | ((light >> 4) & 0xf0));
+        outPush(x, y + h, z, tex, side | ((light >> 8) & 0xf0));
     }
 };
 
 const addRight = (
-    out: number[],
     x: number,
     y: number,
     z: number,
@@ -250,21 +261,21 @@ const addRight = (
     const aa = ((light << 4) & 0xf0) + ((light >> 4) & 0xf0);
     const ab = (light & 0xf0) + ((light >> 8) & 0xf0);
     if (aa > ab) {
-        out.push(xw, y, z, tex, side | ((light << 4) & 0xf0));
-        out.push(xw, y + h, z, tex, side | (light & 0xf0));
-        out.push(xw, y + h, z + d, tex, side | ((light >> 4) & 0xf0));
+        outPush(xw, y, z, tex, side | ((light << 4) & 0xf0));
+        outPush(xw, y + h, z, tex, side | (light & 0xf0));
+        outPush(xw, y + h, z + d, tex, side | ((light >> 4) & 0xf0));
 
-        out.push(xw, y + h, z + d, tex, side | ((light >> 4) & 0xf0));
-        out.push(xw, y, z + d, tex, side | ((light >> 8) & 0xf0));
-        out.push(xw, y, z, tex, side | ((light << 4) & 0xf0));
+        outPush(xw, y + h, z + d, tex, side | ((light >> 4) & 0xf0));
+        outPush(xw, y, z + d, tex, side | ((light >> 8) & 0xf0));
+        outPush(xw, y, z, tex, side | ((light << 4) & 0xf0));
     } else {
-        out.push(xw, y, z + d, tex, side | ((light >> 8) & 0xf0));
-        out.push(xw, y, z, tex, side | ((light << 4) & 0xf0));
-        out.push(xw, y + h, z, tex, side | (light & 0xf0));
+        outPush(xw, y, z + d, tex, side | ((light >> 8) & 0xf0));
+        outPush(xw, y, z, tex, side | ((light << 4) & 0xf0));
+        outPush(xw, y + h, z, tex, side | (light & 0xf0));
 
-        out.push(xw, y + h, z, tex, side | (light & 0xf0));
-        out.push(xw, y + h, z + d, tex, side | ((light >> 4) & 0xf0));
-        out.push(xw, y, z + d, tex, side | ((light >> 8) & 0xf0));
+        outPush(xw, y + h, z, tex, side | (light & 0xf0));
+        outPush(xw, y + h, z + d, tex, side | ((light >> 4) & 0xf0));
+        outPush(xw, y, z + d, tex, side | ((light >> 8) & 0xf0));
     }
 };
 
@@ -418,8 +429,8 @@ const lightFrontBack = (
 
 const plane = new PlaneEntry();
 
-const genFront = (vertices: number[], args: GenArgs): number => {
-    const start = vertices.length;
+const genFront = (args: GenArgs): number => {
+    const start = vertBufEnd;
     const { blocks, sideCache, blockData, lightData } = args;
     // First we slice the chunk into many, zero-initialized, planes
     for (let z = 0; z < 32; z++) {
@@ -467,15 +478,15 @@ const genFront = (vertices: number[], args: GenArgs): number => {
                 const cw = plane.width[off];
                 const ch = plane.height[off];
                 const b = blocks[plane.block[off]];
-                addFront(vertices, x, y, z, cw, ch, cd, b.texFront, light);
+                addFront(x, y, z, cw, ch, cd, b.texFront, light);
             }
         }
     }
-    return (vertices.length - start) / 5;
+    return (vertBufEnd - start) / 5;
 };
 
-const genBack = (vertices: number[], args: GenArgs) => {
-    const start = vertices.length;
+const genBack = (args: GenArgs) => {
+    const start = vertBufEnd;
     const { blocks, sideCache, blockData, lightData } = args;
     for (let z = 0; z < 32; z++) {
         let found = 0;
@@ -522,15 +533,15 @@ const genBack = (vertices: number[], args: GenArgs) => {
                 const ch = plane.height[off];
                 const light = plane.light[off];
                 const b = blocks[plane.block[off]];
-                addBack(vertices, x, y, z, cw, ch, cd, b.texBack, light);
+                addBack(x, y, z, cw, ch, cd, b.texBack, light);
             }
         }
     }
-    return (vertices.length - start) / 5;
+    return (vertBufEnd - start) / 5;
 };
 
-const genTop = (vertices: number[], args: GenArgs) => {
-    const start = vertices.length;
+const genTop = (args: GenArgs) => {
+    const start = vertBufEnd;
     const { blocks, sideCache, blockData, lightData } = args;
     for (let y = 0; y < 32; y++) {
         let found = 0;
@@ -577,15 +588,15 @@ const genTop = (vertices: number[], args: GenArgs) => {
                 const cd = plane.height[off];
                 const light = plane.light[off];
                 const b = blocks[plane.block[off]];
-                addTop(vertices, x, y, z, cw, ch, cd, b.texTop, light);
+                addTop(x, y, z, cw, ch, cd, b.texTop, light);
             }
         }
     }
-    return (vertices.length - start) / 5;
+    return (vertBufEnd - start) / 5;
 };
 
-const genBottom = (vertices: number[], args: GenArgs) => {
-    const start = vertices.length;
+const genBottom = (args: GenArgs) => {
+    const start = vertBufEnd;
     const { blocks, sideCache, blockData, lightData } = args;
     for (let y = 0; y < 32; y++) {
         let found = 0;
@@ -632,15 +643,15 @@ const genBottom = (vertices: number[], args: GenArgs) => {
                 const cd = plane.height[off];
                 const light = plane.light[off];
                 const b = blocks[plane.block[off]];
-                addBottom(vertices, x, y, z, cw, ch, cd, b.texBottom, light);
+                addBottom(x, y, z, cw, ch, cd, b.texBottom, light);
             }
         }
     }
-    return (vertices.length - start) / 5;
+    return (vertBufEnd - start) / 5;
 };
 
-const genRight = (vertices: number[], args: GenArgs) => {
-    const start = vertices.length;
+const genRight = (args: GenArgs) => {
+    const start = vertBufEnd;
     const { blocks, sideCache, blockData, lightData } = args;
     for (let x = 0; x < 32; x++) {
         let found = 0;
@@ -687,15 +698,15 @@ const genRight = (vertices: number[], args: GenArgs) => {
                 const ch = plane.height[off];
                 const light = plane.light[off];
                 const b = blocks[plane.block[off]];
-                addRight(vertices, x, y, z, cw, ch, cd, b.texLeft, light);
+                addRight(x, y, z, cw, ch, cd, b.texLeft, light);
             }
         }
     }
-    return (vertices.length - start) / 5;
+    return (vertBufEnd - start) / 5;
 };
 
-const genLeft = (vertices: number[], args: GenArgs) => {
-    const start = vertices.length;
+const genLeft = (args: GenArgs) => {
+    const start = vertBufEnd;
     const { blocks, sideCache, blockData, lightData } = args;
     for (let x = 0; x < 32; x++) {
         let found = 0;
@@ -742,11 +753,11 @@ const genLeft = (vertices: number[], args: GenArgs) => {
                 const ch = plane.height[off];
                 const light = plane.light[off];
                 const b = blocks[plane.block[off]];
-                addLeft(vertices, x, y, z, cw, ch, cd, b.texRight, light);
+                addLeft(x, y, z, cw, ch, cd, b.texRight, light);
             }
         }
     }
-    return (vertices.length - start) / 5;
+    return (vertBufEnd - start) / 5;
 };
 
 /* This has 3 separate functions bluring XYZ separately combined,
@@ -829,7 +840,7 @@ export const meshgenReal = ({
     blocks,
     lightFinished,
 }: GenMsg): [Uint8Array, number[]] => {
-    const vertices: number[] = [];
+    vertBufEnd = 0;
     calcSideCache(sideCache, blockData, blocks);
     if (!lightFinished) {
         lightBlur(lightData);
@@ -846,23 +857,21 @@ export const meshgenReal = ({
         foundSeeThrough: Boolean(false), // The Boolean is necessary since otherwise we won't see Water in production builds...
     };
 
-    sideVertCount[0] = genFront(vertices, data);
-    sideVertCount[1] = genBack(vertices, data);
-    sideVertCount[2] = genTop(vertices, data);
-    sideVertCount[3] = genBottom(vertices, data);
-    sideVertCount[4] = genLeft(vertices, data);
-    sideVertCount[5] = genRight(vertices, data);
+    sideVertCount[0] = genFront(data);
+    sideVertCount[1] = genBack(data);
+    sideVertCount[2] = genTop(data);
+    sideVertCount[3] = genBottom(data);
+    sideVertCount[4] = genLeft(data);
+    sideVertCount[5] = genRight(data);
 
     if (data.foundSeeThrough) {
         data.seeThrough = true;
-        sideVertCount[6] = genFront(vertices, data);
-        sideVertCount[7] = genBack(vertices, data);
-        sideVertCount[8] = genTop(vertices, data);
-        sideVertCount[9] = genBottom(vertices, data);
-        sideVertCount[10] = genLeft(vertices, data);
-        sideVertCount[11] = genRight(vertices, data);
+        sideVertCount[6] = genFront(data);
+        sideVertCount[7] = genBack(data);
+        sideVertCount[8] = genTop(data);
+        sideVertCount[9] = genBottom(data);
+        sideVertCount[10] = genLeft(data);
+        sideVertCount[11] = genRight(data);
     }
-
-    const vertArr = new Uint8Array(vertices);
-    return [vertArr, sideVertCount];
+    return [vertBuf.subarray(0, vertBufEnd), sideVertCount];
 };

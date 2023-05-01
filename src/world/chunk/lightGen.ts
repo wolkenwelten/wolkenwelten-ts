@@ -18,11 +18,11 @@ const sunlight = (out: Uint8Array, blocks: Uint8Array) => {
     light.fill(15);
     for (let y = 31; y >= 0; y--) {
         for (let x = 0; x < 32; x++) {
+            let off = x * 32 * 32 + y * 32;
             for (let z = 0; z < 32; z++) {
-                const off = x * 32 * 32 + y * 32 + z;
                 const l =
                     blocks[off] === 0 ? Math.min(15, light[x * 32 + z] + 1) : 0;
-                out[off] = light[x * 32 + z] = l;
+                out[off++] = light[x * 32 + z] = l;
             }
         }
     }
