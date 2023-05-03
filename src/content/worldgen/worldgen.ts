@@ -185,7 +185,7 @@ const worldgenSurface = (assets: WorldgenAssetList, chunk: Chunk) => {
                                     gh + 1,
                                     cz
                                 );
-                            } else if (rng.bool(300)) {
+                            } else if (rng.bool(120)) {
                                 StaticObject.create(
                                     'flower',
                                     chunk,
@@ -193,7 +193,7 @@ const worldgenSurface = (assets: WorldgenAssetList, chunk: Chunk) => {
                                     gh + 1,
                                     cz
                                 );
-                            } else if (rng.bool(300)) {
+                            } else if (rng.bool(40)) {
                                 StaticObject.create(
                                     'grass',
                                     chunk,

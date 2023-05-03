@@ -4,7 +4,8 @@
 
 export interface ProfilingResults {
     id: string;
-    results: number[];
+    i: number;
+    results: Float32Array;
 }
 
 export class ProfilingManager {
@@ -19,11 +20,13 @@ export class ProfilingManager {
         if (!res) {
             res = {
                 id,
-                results: [],
+                i: 0,
+                results: new Float32Array(1024),
             };
             this.profiles.set(id, res);
         }
-        res.results.push(stop - start);
+        res.results[res.i] = stop - start;
+        res.i = (res.i + 1) % res.results.length;
     }
 
     addAmount(id: string, n: number) {
@@ -33,10 +36,17 @@ export class ProfilingManager {
     showResults() {
         const tmp: any = {};
         for (const prof of this.profiles.values()) {
+            const results: number[] = []; // First we move the results out of the ring buffer
+            for (let i = 0; i < prof.results.length; i++) {
+                const v = prof.results[i];
+                if (v > 0) {
+                    results.push(v);
+                }
+            }
+
             const average =
-                prof.results.reduceRight((a, b) => a + b, 0) /
-                prof.results.length;
-            const sorted = prof.results.sort((a, b) => a - b);
+                results.reduceRight((a, b) => a + b, 0) / results.length;
+            const sorted = results.sort((a, b) => a - b);
             const best = sorted[0];
             const median = sorted[Math.floor(sorted.length / 2)];
             const worst = sorted[sorted.length - 1];
