@@ -99,7 +99,6 @@ const lightBlur = (out: Uint8Array) => {
 export const lightGenSimple = (out: Uint8Array, blocks: Uint8Array) => {
     const start = performance.now();
     sunlight(out, blocks);
-    //lightBlur(out);
-    // Blur isn't necessary for now since we don't have any artificial light sources in the game yet
+    lightBlur(out);
     profiler.add('lightGenSimple', start, performance.now());
 };
