@@ -118,6 +118,14 @@ export class EarthWall extends Rune {
         }
         for (const b of selection) {
             this.world.setBlock(b.from[0], b.from[1], b.from[2], 0);
+            this.world.dangerZone.add(
+                b.from[0] - 1,
+                b.from[1] - 1,
+                b.from[2] - 1,
+                3,
+                3,
+                3
+            );
             const e = new EarthWallBlock(this.world, b.block, b.from, b.to);
             e.playSound('pock', 0.3);
         }
@@ -173,6 +181,14 @@ export class EarthWallBlock extends Entity {
                 this.to[1],
                 this.to[2],
                 this.blockType
+            );
+            this.world.dangerZone.add(
+                this.to[0] - 1,
+                this.to[1] - 1,
+                this.to[2] - 1,
+                3,
+                3,
+                3
             );
             this.world.game.render.particle.fxBlockBreak(
                 this.x - 0.5,

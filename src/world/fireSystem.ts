@@ -2,6 +2,8 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 
+import { Being as Entity } from './entity/being';
+import { StatusEffect } from './statusEffects/statusEffect';
 import type { World } from './world';
 
 export const coordinateToKey = (x: number, y: number, z: number) =>
@@ -91,6 +93,33 @@ export class Fire {
         this.spreadDirection = Math.floor(Math.random() * 6);
     }
 
+    tryToBurnEntities(system: FireSystem) {
+        const x = this.x;
+        const y = this.y;
+        const z = this.z;
+        for (const b of system.world.entities.values()) {
+            const dx = b.x - x;
+            const dy = b.y - y;
+            const dz = b.z - z;
+            const dd = dx * dx + dy * dy + dz * dz;
+            if (dd < 4) {
+                if (b instanceof Entity) {
+                    const e = b.effects.get('Burning');
+                    if (!e) {
+                        const e = new BurningEffect();
+                        b.effects.set(e.id, e);
+                    } else {
+                        e.ttl += 16;
+                    }
+                    this.strength -= 32;
+                    if (this.strength < 64) {
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
     update(system: FireSystem) {
         this.damageDealt += 64;
         const block = system.world.getBlock(this.x, this.y, this.z);
@@ -100,6 +129,14 @@ export class Fire {
             if (this.damageDealt > bt.fireHealth) {
                 bt.burnHandler(system.world, this.x, this.y, this.z);
                 this.damageDealt -= bt.fireHealth;
+                system.world.dangerZone.add(
+                    this.x - 1,
+                    this.y - 1,
+                    this.z - 1,
+                    3,
+                    3,
+                    3
+                );
             }
         } else {
             this.ticksTillNextSpread -= 8;
@@ -114,6 +151,9 @@ export class Fire {
         if (--this.ticksTillNextSpread <= 0) {
             this.ticksTillNextSpread = 48;
             this.spreadDirection = (this.spreadDirection + 1) % 6;
+            if (this.strength > 64) {
+                this.tryToBurnEntities(system);
+            }
             switch (this.spreadDirection) {
                 case 0:
                     system.queue(this.x + 1, this.y, this.z, 32);
@@ -170,5 +210,28 @@ export class Fire {
             0,
             0
         );
+    }
+}
+
+export class BurningEffect extends StatusEffect {
+    id = 'Burning';
+    lastDamageDealt = 0;
+
+    update(e: Entity): void {
+        this.ticks++;
+        if (this.ticks > this.lastDamageDealt + 40) {
+            e.damage(1);
+            this.lastDamageDealt += 40;
+        }
+        Fire.addParticle(e.world, e.x - 0.5, e.y - 0.5, e.z - 0.5, 4096);
+
+        const wet = e.effects.get('Wet');
+        if (wet) {
+            wet.ttl -= 5;
+        }
+
+        if (this.ticks > this.ttl) {
+            this.destroy();
+        }
     }
 }

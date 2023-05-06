@@ -6,6 +6,7 @@ import { mat4 } from 'gl-matrix';
 import type { TriangleMesh } from '../../render/meshes/triangleMesh/triangleMesh';
 import type { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
 import type { World } from '../world';
+import { StatusEffect } from '../statusEffects/statusEffect';
 
 let entityCounter = 0;
 const modelViewMatrix = mat4.create();
@@ -29,6 +30,8 @@ export class Entity {
     world: World;
     weight = 1; // Necessary for physics calculations
     scale = 1;
+
+    effects: Map<string, StatusEffect> = new Map();
 
     constructor(world: World) {
         this.id = ++entityCounter;

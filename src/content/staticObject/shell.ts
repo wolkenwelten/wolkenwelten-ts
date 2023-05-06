@@ -12,7 +12,7 @@ export class StaticShell extends StaticObject {
         return this.chunk.world.game.render.assets.get(meshUrl);
     }
 
-    onAttacked(perpetrator: Entity) {
+    onAttacked(perpetrator?: Entity) {
         this.destroy();
     }
 

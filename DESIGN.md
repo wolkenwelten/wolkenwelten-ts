@@ -187,3 +187,8 @@ Weapons aren't strictly necessary, so they might be cut since the focus should p
 
 ## Cut mobs
 They also aren't essential, might be better to focus on the core which is PvP, although once they get dropped we need another way for runes to drop, and mobs seem like kinda fun Treasure chests that can fight back.
+
+
+# Ideas to try out
+
+Instead of the current fire system, store a temperature (diffential) and then ignite blocks/entities based on that. That way we could also do hot/cold weather. Even nicer would be if we also simulated oxygen supply at some level, so that one could extinguish (or strengthen) a flame.

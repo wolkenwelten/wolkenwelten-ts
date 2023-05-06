@@ -14,7 +14,7 @@ export class StaticStone extends StaticObject {
         return this.chunk.world.game.render.assets.get(meshUrl);
     }
 
-    onAttacked(perpetrator: Entity) {
+    onAttacked(perpetrator?: Entity) {
         new ItemDrop(
             this.chunk.world,
             this.x + 0.5,

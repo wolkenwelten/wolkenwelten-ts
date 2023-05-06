@@ -65,5 +65,5 @@ export class StaticObject {
         return [-0.5, -0.5, -0.5];
     }
 
-    onAttacked(perpetrator: Entity) {}
+    onAttacked(perpetrator?: Entity) {}
 }

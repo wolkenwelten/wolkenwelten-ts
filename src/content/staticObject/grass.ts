@@ -16,7 +16,7 @@ export class StaticGrass extends StaticObject {
         return [0.5, 6 / 32, 0.5];
     }
 
-    onAttacked(perpetrator: Entity) {
+    onAttacked(perpetrator?: Entity) {
         this.chunk.world.game.audio.play('tock', 0.5);
         this.chunk.world.game.render.particle.fxBlockBreak(
             this.x,
