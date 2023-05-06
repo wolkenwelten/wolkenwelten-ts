@@ -15,6 +15,9 @@ export interface WallSelection {
     block: number;
     from: [number, number, number];
     to: [number, number, number];
+    vx: number;
+    vy: number;
+    vz: number;
 }
 
 export class EarthWall extends Rune {
@@ -58,21 +61,29 @@ export class EarthWall extends Rune {
                 let gx = x + ox;
                 let gy = y + oy;
                 let gz = z + oz;
+                let vx = 0;
+                let vy = 0.15;
+                let vz = 0;
+
                 if (Math.abs(walkDir[0]) > Math.abs(walkDir[1])) {
                     if (walkDir[0] > 0) {
                         gy += ox + 2;
                         gx = x - oy - 2;
+                        vx -= 0.5;
                     } else {
                         gy += ox + 2;
                         gx = x - oy + 2;
+                        vx += 0.5;
                     }
                 } else {
                     if (walkDir[1] > 0) {
                         gy += oz + 2;
                         gz = z - oy - 2;
+                        vz -= 0.5;
                     } else {
                         gy += oz + 2;
                         gz = z - oy + 2;
+                        vz += 0.5;
                     }
                 }
                 const gb = e.world.getBlock(gx, gy, gz);
@@ -86,6 +97,9 @@ export class EarthWall extends Rune {
                     from: [x + ox, y + oy, z + oz],
                     to: [gx, gy, gz],
                     block: b,
+                    vx,
+                    vy,
+                    vz,
                 });
             }
         }
@@ -126,8 +140,41 @@ export class EarthWall extends Rune {
                 3,
                 3
             );
+
+            for (const t of this.world.entities) {
+                const dx = t.x - b.from[0];
+                const dy = t.y - (b.from[1] + 1);
+                const dz = t.z - b.from[2];
+                const dd = dx * dx + dy * dy * 0.5 + dz * dz;
+                if (dd < 1.5) {
+                    t.vx += b.vx;
+                    t.vy += b.vy;
+                    t.vz += b.vz;
+                    t.x = b.to[0];
+                    t.y = b.to[1];
+                    t.z = b.to[2];
+                    t.vx = Math.min(0.4, Math.max(-0.4, t.vx));
+                    t.vy = Math.min(0.3, Math.max(-0.3, t.vy));
+                    t.vz = Math.min(0.4, Math.max(-0.4, t.vz));
+                }
+            }
             const e = new EarthWallBlock(this.world, b.block, b.from, b.to);
             e.playSound('pock', 0.3);
+        }
+        this.world.dangerZone.update(); // This way staticMeshes will be turned into entities that will be thrown around in the next loop
+
+        for (const b of selection) {
+            for (const t of this.world.entities) {
+                const dx = t.x - b.from[0];
+                const dy = t.y - (b.from[1] + 1);
+                const dz = t.z - b.from[2];
+                const dd = dx * dx + dy * dy * 0.5 + dz * dz;
+                if (dd < 2) {
+                    t.vx += b.vx;
+                    t.vy += b.vy;
+                    t.vz += b.vz;
+                }
+            }
         }
         e.cooldown(80);
     }
@@ -174,7 +221,7 @@ export class EarthWallBlock extends Entity {
 
     update() {
         super.update();
-        const t = Math.sin(++this.ticksActive * 0.02 * Math.PI);
+        const t = Math.sin(++this.ticksActive * 0.03 * Math.PI);
         if (t >= 0.95) {
             this.world.setBlock(
                 this.to[0],

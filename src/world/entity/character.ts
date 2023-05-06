@@ -226,7 +226,8 @@ export class Character extends Being {
                 : CHARACTER_STOP_RATE;
 
         if (!this.mayJump()) {
-            speed *= 0.5; // Slow down player movement changes during jumps
+            speed *= 0.8; // Slow down player movement changes during jumps
+            accel *= 0.4;
         }
         if (underwater) {
             speed *= 0.5; // Slow down player movement while underwater
@@ -293,7 +294,7 @@ export class Character extends Being {
         }
 
         const len = this.vx * this.vx + this.vz * this.vz + this.vy * this.vy;
-        if (len > 2.0) {
+        if (len > 8.0) {
             const v = clamp(1.0 - (len - 0.2), 0.0001, 1.0);
             this.vx *= v;
             this.vy *= v;

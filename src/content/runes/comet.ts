@@ -58,11 +58,11 @@ export class Comet extends Rune {
             if (dd > this.range * this.range) {
                 return;
             }
-            for (let i = 0; i < 9; i++) {
+            for (let i = 0; i < 16; i++) {
                 const comet = new CometEntity(e.world, 4, e);
-                const ox = (Math.random() - 0.5) * 3;
+                const ox = (Math.random() - 0.5) * 6;
                 const oy = Math.random() * 24;
-                const oz = (Math.random() - 0.5) * 3;
+                const oz = (Math.random() - 0.5) * 6;
                 comet.x = x + 1 + ox;
                 comet.y = y + 96 + oy;
                 comet.z = z + 1 + oz;

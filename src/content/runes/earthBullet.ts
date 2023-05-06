@@ -16,7 +16,7 @@ export class EarthBullet extends Rune {
     name = 'Earth bullet';
     icon = itemIcon;
     meshUrl = meshUrl;
-    range = 8;
+    range = 10;
 
     bulletEntity?: EarthBulletEntity;
 
