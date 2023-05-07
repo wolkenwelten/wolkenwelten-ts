@@ -854,7 +854,7 @@ export const meshgenReal = ({
         sideCache,
         blocks,
         seeThrough: false,
-        foundSeeThrough: Boolean(false), // The Boolean is necessary since otherwise we won't see Water in production builds...
+        foundSeeThrough: false,
     };
 
     sideVertCount[0] = genFront(data);

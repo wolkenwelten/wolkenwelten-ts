@@ -1,7 +1,7 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { Game } from './game';
+import { Game } from './src/game';
 import './style.css';
 
 declare global {

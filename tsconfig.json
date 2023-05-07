@@ -13,6 +13,6 @@
         "types": ["node"]
     },
     "files": [
-        "src/main.ts"
+        "main.ts"
     ],
 }
