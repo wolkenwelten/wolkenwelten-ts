@@ -91,6 +91,7 @@ export class Fire {
         this.z = z;
         this.strength = strength;
         this.spreadDirection = Math.floor(Math.random() * 6);
+        this.ticksTillNextSpread = (Math.random() * 48) | 0;
     }
 
     tryToBurnEntities(system: FireSystem) {
