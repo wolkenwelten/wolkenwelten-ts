@@ -32,7 +32,8 @@ export class Stone extends Item {
 
             const proj = new Projectile(user, 1.4);
             proj.projectileMesh = this.mesh() as VoxelMesh;
-            this.world.game.audio.play('punchMiss');
+            proj.playSound('projectile', 0.05, true);
+            user.playUnmovingSound('punchMiss', 0.5);
             proj.onHit = function (this: Projectile, e: Entity) {
                 if (e instanceof Being) {
                     user.doDamage(e, 1);
