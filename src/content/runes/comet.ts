@@ -10,7 +10,6 @@ import { Character } from '../../world/entity/character';
 import { Entity } from '../../world/entity/entity';
 import type { World } from '../../world/world';
 import { Fire } from '../../world/fireSystem';
-
 import { Rune } from './rune';
 
 export class Comet extends Rune {
@@ -126,7 +125,7 @@ export class CometEntity extends Entity {
                 this.source?.doDamage(e, dmg * dmg);
             }
             if (e === this.world.game.player) {
-                this.world.game.render.shake.add(Math.max(0, 27 - dd));
+                this.world.game.render.shake.add(Math.max(0, 27 - dd) * 3);
             }
         }
     }
