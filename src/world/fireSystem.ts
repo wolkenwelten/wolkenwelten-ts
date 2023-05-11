@@ -188,9 +188,9 @@ export class Fire {
         z: number,
         strength: number
     ) {
-        const ox = Math.random();
-        const oy = Math.random();
-        const oz = Math.random();
+        const ox = Math.random() * 1.4 - 0.2;
+        const oy = Math.random() - 0.5;
+        const oz = Math.random() * 1.4 - 0.2;
         const r = 0xf0 | (Math.random() * 16);
         const g = 0x20 | (Math.random() * 16);
         const b = 0x00;
@@ -205,7 +205,7 @@ export class Fire {
             (Math.random() - 0.5) * 0.02,
             0.05,
             (Math.random() - 0.5) * 0.02,
-            -3.5,
+            -4.5,
             0,
             0,
             0,
