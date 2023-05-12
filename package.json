@@ -8,7 +8,7 @@
     "scripts": {
         "build": "vite build",
         "check": "npm run check:circular && npm run check:types",
-        "check:circular": "madge --circular src/main.ts",
+        "check:circular": "madge --circular index.ts",
         "check:types": "tsc -p ./tsconfig.json --noEmit",
         "dev": "vite",
         "preview": "vite preview",
