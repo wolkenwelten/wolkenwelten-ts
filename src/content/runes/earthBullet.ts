@@ -72,9 +72,9 @@ export class EarthBullet extends Rune {
         const d = Math.sqrt(dx * dx + dy * dy + dz * dz);
         const vel = Math.max(0.1, Math.min(0.5, 1 - d * 0.1));
         const [vx, vy, vz] = e.direction(0, 0, -2, vel);
-        this.bulletEntity.vx = vx;
-        this.bulletEntity.vy = vy;
-        this.bulletEntity.vz = vz;
+        this.bulletEntity.shotX = this.bulletEntity.vx = vx;
+        this.bulletEntity.shotY = this.bulletEntity.vy = vy;
+        this.bulletEntity.shotZ = this.bulletEntity.vz = vz;
         this.bulletEntity.playSound('projectile', 1, true);
         this.bulletEntity = undefined;
 
@@ -89,6 +89,9 @@ export class EarthBulletEntity extends Entity {
     caster?: Character;
     source?: Character;
     ticksAlive = 0;
+    shotX = 0;
+    shotY = 0;
+    shotZ = 0;
 
     constructor(world: World, blockType: number, caster: Character) {
         super(world);
@@ -108,47 +111,22 @@ export class EarthBulletEntity extends Entity {
         );
     }
 
-    private placeBlock() {
-        if (!this.world.getBlock(this.x, this.y, this.z)) {
-            this.world.setBlock(this.x, this.y, this.z, this.blockType);
-            this.world.dangerZone.add(
-                this.x - 1,
-                this.y - 1,
-                this.z - 1,
-                3,
-                3,
-                3
-            );
-            return;
-        }
-        for (let ox = -1; ox < 2; ox++) {
-            for (let oy = -1; oy < 2; oy++) {
-                for (let oz = -1; oz < 2; oz++) {
-                    if (
-                        !this.world.getBlock(
-                            this.x + ox,
-                            this.y + oy,
-                            this.z + oz
-                        )
-                    ) {
-                        this.world.setBlock(
-                            this.x + ox,
-                            this.y + oy,
-                            this.z + oz,
-                            this.blockType
-                        );
-                        this.world.dangerZone.add(
-                            this.x + ox - 1,
-                            this.y + oy - 1,
-                            this.z + oz - 1,
-                            3,
-                            3,
-                            3
-                        );
-                        return;
-                    }
-                }
-            }
+    private disintegrate() {
+        const bt = this.world.blocks[this.blockType];
+        const particle = this.world.game.render.particle;
+        const bx = this.x - 0.5;
+        const by = this.y - 0.5;
+        const bz = this.z - 0.5;
+
+        for(let i=0;i<128;i++){
+            const color = i < 64 ? bt.colorA : bt.colorB;
+            const x = bx + Math.random();
+            const y = by + Math.random();
+            const z = bz + Math.random();
+            const vx = this.shotX * 0.5 + (Math.random() - 0.5)*0.1;
+            const vy = this.shotY * 0.5 + (Math.random() - 0.5)*0.1;
+            const vz = this.shotZ * 0.5 + (Math.random() - 0.5)*0.1;
+            particle.add(x, y, z, 192, color, vx, vy, vz, -1, 0, -0.0001, 0, 0);
         }
     }
 
@@ -174,7 +152,7 @@ export class EarthBulletEntity extends Entity {
                     this.world.blocks[this.blockType].health * 0.05
                 );
                 this.source?.doDamage(e, dmg);
-                this.placeBlock();
+                this.disintegrate();
                 this.playUnmovingSound('punch', 1);
                 this.destroy();
                 return;
@@ -225,16 +203,14 @@ export class EarthBulletEntity extends Entity {
                 this.z - 0.5,
                 this.world.blocks[this.blockType]
             );
-            const vv =
-                this.vx * this.vx + this.vy * this.vy + this.vz * this.vz;
-            if (vv < 0.01 && this.collides()) {
+            if (this.collides()) {
                 this.world.game.render.particle.fxBlockBreak(
                     this.x - 0.5,
                     this.y - 0.5,
                     this.z - 0.5,
                     this.world.blocks[this.blockType]
                 );
-                this.placeBlock();
+                this.disintegrate();
                 this.playUnmovingSound('punch', 1);
                 this.destroy();
                 return;
