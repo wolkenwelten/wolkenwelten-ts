@@ -5,7 +5,6 @@ import { LCG } from '../../util/prng';
 import type { Chunk } from '../../world/chunk/chunk';
 import type { WorldgenAssetList } from './assets';
 import { StaticObject } from '../../world/chunk/staticObject';
-import { Mob } from '../../world/entity/mob';
 
 export const worldgen = (assets: WorldgenAssetList, chunk: Chunk) => {
     if (chunk.y < -512) {
@@ -93,9 +92,7 @@ const worldgenSurface = (assets: WorldgenAssetList, chunk: Chunk) => {
                         }
                     }
 
-                    if (gh > -3 && endY < 32 && rng.bool(740)) {
-                        Mob.create('crab', chunk.world, cx, gh + 2, cz);
-                    } else if (
+                    if (
                         gh > -3 &&
                         gh < 0 &&
                         endY < 32 &&
@@ -167,8 +164,6 @@ const worldgenSurface = (assets: WorldgenAssetList, chunk: Chunk) => {
                                 assets.spruceA.fits(chunk, x, gh - 2, z)
                             ) {
                                 assets.spruceA.blit(chunk, x, gh - 2, z);
-                            } else if (rng.bool(400)) {
-                                Mob.create('rat', chunk.world, cx, gh + 2, cz);
                             } else if (rng.bool(300)) {
                                 StaticObject.create(
                                     'stone',

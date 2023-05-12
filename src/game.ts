@@ -6,7 +6,6 @@ import { BenchmarkManager } from './benchmark';
 import { registerAudioContent } from './content/audioContent';
 import { registerBlockTypes } from './content/blockTypes';
 import { registerItems } from './content/itemContent';
-import { registerMobs } from './content/mobContent';
 import { registerStaticObjects } from './content/staticObjects';
 import { initWorldgen } from './content/worldgen/assets';
 import { InputManager } from './input';
@@ -89,7 +88,6 @@ export class Game {
         registerItems();
         registerBlockTypes(this.world);
         registerStaticObjects();
-        registerMobs();
     }
 
     async init() {

@@ -185,6 +185,46 @@ export class ParticleMesh {
         }
     }
 
+    fxJump(x: number, y:number, z:number) {
+        for (let i = 0; i < 96; i++) {
+            const ox = Math.random() - 0.5;
+            const oz = Math.random() - 0.5;
+            const cx = x + ox * 0.1;
+            const cy = y - 0.5;
+            const cz = z + oz * 0.1;
+            const cs = 48 + ((Math.random() * 24)|0);
+            let cc = 0xff80c0e0;
+            cc |= (Math.random() * 32) | 0;
+            cc |= ((Math.random() * 16) | 0) << 8;
+            cc |= ((Math.random() * 16) | 0) << 16;
+            const vx = ox * 0.2;
+            const vy = (Math.random() - 0.5) * 0.002;
+            const vz = oz * 0.2;
+            const vs = -2;
+            this.add(cx, cy, cz, cs, cc, vx, vy, vz, vs, 0, -0.001, 0, 0);
+        }
+    }
+
+    fxLand(x: number, y:number, z:number) {
+        for (let i = 0; i < 32; i++) {
+            const ox = Math.random() - 0.5;
+            const oz = Math.random() - 0.5;
+            const cx = x + ox * 0.1;
+            const cy = y - 0.5;
+            const cz = z + oz * 0.1;
+            const cs = 32 + ((Math.random() * 16)|0);
+            let cc = 0xff80c0e0;
+            cc |= (Math.random() * 32) | 0;
+            cc |= ((Math.random() * 16) | 0) << 8;
+            cc |= ((Math.random() * 16) | 0) << 16;
+            const vx = ox * 0.2;
+            const vy = (Math.random() - 0.5) * 0.002;
+            const vz = oz * 0.2;
+            const vs = -2;
+            this.add(cx, cy, cz, cs, cc, vx, vy, vz, vs, 0, -0.001, 0, 0);
+        }
+    }
+
     private update() {
         for (let i = this.particleCount - 1; i >= 0; i--) {
             const bufOff = i * 5;

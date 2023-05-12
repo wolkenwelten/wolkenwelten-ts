@@ -55,7 +55,7 @@ export class Character extends Being {
         this.inventory.add(Item.create('comet', this.world));
         this.inventory.add(Item.create('stone', this.world, 50));
 
-        this.equipment.items[0] = Item.create('club', this.world);
+        //this.equipment.items[0] = Item.create('club', this.world);
     }
 
     /* Initialize an already existing Character, that way we can easily reuse the same object, */
@@ -219,7 +219,7 @@ export class Character extends Being {
             this.nextStepSound = this.walkCycleCounter + 6;
             this.world.game.audio.play('step', 0.5);
         }
-        let speed = 0.3;
+        let speed = 0.4;
         let accel =
             movementLength > 0.01
                 ? CHARACTER_ACCELERATION
@@ -250,7 +250,8 @@ export class Character extends Being {
             this.vx *= 0.99;
             this.vz *= 0.99;
         } else if (this.movementY > 0 && this.mayJump()) {
-            this.vy = 0.12;
+            this.vy = 0.15;
+            //this.world.game.render.particle.fxJump(this.x, this.y - 0.5, this.z);
             this.jumpAnimeFactor = 1;
         }
         if (this.movementY > 0 && this.maySwim() && Math.abs(this.vy) < 0.07) {
@@ -266,6 +267,11 @@ export class Character extends Being {
         }
 
         if (this.world.isSolid(this.x, this.y - 1.7, this.z)) {
+            /*
+            if(Math.abs(this.vy) > 0.01){
+                this.world.game.render.particle.fxLand(this.x, this.y - 0.5, this.z);
+            }
+            */
             this.vy = Math.max(this.vy, 0);
         }
         if (this.world.isSolid(this.x, this.y + 0.7, this.z)) {

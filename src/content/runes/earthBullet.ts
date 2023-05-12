@@ -126,7 +126,7 @@ export class EarthBulletEntity extends Entity {
             const vx = this.shotX * 0.5 + (Math.random() - 0.5)*0.1;
             const vy = this.shotY * 0.5 + (Math.random() - 0.5)*0.1;
             const vz = this.shotZ * 0.5 + (Math.random() - 0.5)*0.1;
-            particle.add(x, y, z, 192, color, vx, vy, vz, -1, 0, -0.0001, 0, 0);
+            particle.add(x, y, z, 192, color, vx, vy, vz, -1, 0, -0.002, 0, 0);
         }
     }
 
