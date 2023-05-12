@@ -17,3 +17,7 @@ export const radianDifference = (α: number, β: number) => {
     const diff = ((β - α + Math.PI) % Math.PI) * 2 - Math.PI;
     return diff < -Math.PI ? diff + Math.PI : diff;
 };
+
+export const easeInSine = (x: number): number => 1 - Math.cos((x * Math.PI) / 2);
+export const easeOutSine = (x: number): number =>Math.sin((x * Math.PI) / 2);
+export const easeInOutSine = (x: number): number => -(Math.cos(Math.PI * x) - 1) / 2;

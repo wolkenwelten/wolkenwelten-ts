@@ -5,6 +5,7 @@ import itemIcon from '../../../assets/gfx/items/earthWall.png';
 import meshUrl from '../../../assets/vox/items/stone.vox?url';
 import { TriangleMesh } from '../../render/meshes/triangleMesh/triangleMesh';
 import { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
+import { easeInOutSine, easeOutSine } from '../../util/math';
 import { Character } from '../../world/entity/character';
 import { Entity } from '../../world/entity/entity';
 import { World } from '../../world/world';
@@ -71,7 +72,7 @@ export class EarthWall extends Rune {
                         gx = x - oy - 2;
                         vx -= 0.5;
                     } else {
-                        gy += ox + 2;
+                        gy += 2 -ox;
                         gx = x - oy + 2;
                         vx += 0.5;
                     }
@@ -81,7 +82,7 @@ export class EarthWall extends Rune {
                         gz = z - oy - 2;
                         vz -= 0.5;
                     } else {
-                        gy += oz + 2;
+                        gy += 2 - oz;
                         gz = z - oy + 2;
                         vz += 0.5;
                     }
@@ -221,8 +222,9 @@ export class EarthWallBlock extends Entity {
 
     update() {
         super.update();
-        const t = Math.sin(++this.ticksActive * 0.03 * Math.PI);
-        if (t >= 0.95) {
+        const t = easeOutSine(++this.ticksActive * 0.025);
+        this.pitch = t * Math.PI;
+        if (t >= 0.99) {
             this.world.setBlock(
                 this.to[0],
                 this.to[1],

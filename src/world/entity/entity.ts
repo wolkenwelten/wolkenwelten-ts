@@ -202,13 +202,13 @@ export class Entity {
         transPos[2] = this.z;
         mat4.identity(modelViewMatrix);
         mat4.translate(modelViewMatrix, modelViewMatrix, transPos);
-        mat4.rotateY(modelViewMatrix, modelViewMatrix, this.yaw);
         if (this.scale != 1) {
             transPos[0] = this.scale;
             transPos[1] = this.scale;
             transPos[2] = this.scale;
             mat4.scale(modelViewMatrix, modelViewMatrix, transPos);
         }
+        mat4.rotateY(modelViewMatrix, modelViewMatrix, this.yaw);
         mat4.mul(modelViewMatrix, viewMatrix, modelViewMatrix);
         mat4.mul(modelViewMatrix, projectionMatrix, modelViewMatrix);
         const dx = this.x - cam.x;
