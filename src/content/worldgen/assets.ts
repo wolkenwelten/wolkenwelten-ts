@@ -16,6 +16,7 @@ import voxTreeC from '../../../assets/wg/tree_c.vox?url';
 
 import type { Chunk } from '../../world/chunk/chunk';
 import { worldgen } from './worldgen';
+import { isServer } from '../../util/compat';
 
 class WorldgenAsset {
     w: number;
@@ -84,6 +85,11 @@ export interface WorldgenAssetList {
 const loadAsset = (href: string, palette: number[]): Promise<WorldgenAsset> => {
     return new Promise((resolve) => {
         setTimeout(async () => {
+            if (isServer()) {
+                // ToDo: Actually load the asset
+                resolve(new WorldgenAsset(0, 0, 0, new Uint8Array(0), []));
+                return;
+            }
             const data = new Uint8Array(
                 await (await fetch(href)).arrayBuffer()
             );

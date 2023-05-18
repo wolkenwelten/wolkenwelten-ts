@@ -10,6 +10,7 @@ import { IntroWindow } from './components/introWindow';
 import { PlayerModal } from './components/playerModal/playerModal';
 import { SystemLog } from './components/systemLog';
 import { IconManager } from './icon';
+import { isClient, mockElement } from '../util/compat';
 
 export class UIManager {
     game: Game;
@@ -27,12 +28,14 @@ export class UIManager {
 
     constructor(game: Game) {
         this.game = game;
-        this.rootElement = game.config.parent;
+        this.rootElement = game.config.parent || mockElement();
         this.rootElement.setAttribute('paused', 'false');
 
         this.icon = new IconManager(this);
 
-        this.uiWrapper = document.createElement('div');
+        this.uiWrapper = isClient()
+            ? document.createElement('div')
+            : mockElement();
         this.uiWrapper.id = 'wolkenwelten-ui-root';
         this.rootElement.append(this.uiWrapper);
         new FpsCounter(this.uiWrapper, game);

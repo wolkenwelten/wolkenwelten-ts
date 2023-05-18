@@ -11,6 +11,7 @@ import '../../../types';
 import { Shader } from '../../shader';
 import { Texture } from '../../texture';
 import { meshgenVoxelMesh } from '../meshgen';
+import { isClient } from '../../../util/compat';
 
 const tmpBlocks = new Uint8Array(32 * 32 * 32);
 
@@ -65,39 +66,41 @@ export class VoxelMesh {
 
     static fromVoxFile(href: string): VoxelMesh {
         const mesh = new VoxelMesh();
-        setTimeout(async () => {
-            const data = new Uint8Array(
-                await (await fetch(href)).arrayBuffer()
-            );
-            const voxData = readVox(data);
-            const size = voxData.size;
-            if (
-                size.x > 32 ||
-                size.y > 32 ||
-                size.z > 32 ||
-                size.x <= 0 ||
-                size.y <= 0 ||
-                size.z <= 0
-            ) {
-                throw new Error(`Invalid .vox file: ${href}`);
-            }
-            mesh.size.x = size.x;
-            mesh.size.y = size.z;
-            mesh.size.z = size.y;
-            const ox = 32 / 2 - Math.floor(size.x / 2);
-            const oy = 32 / 2 - Math.floor(size.y / 2);
-            const oz = 32 / 2 - Math.floor(size.z / 2);
-            tmpBlocks.fill(0);
-            for (const { x, y, z, i } of voxData.xyzi.values) {
-                const off = (y + oy) * 32 * 32 + (z + oz) * 32 + (x + ox);
-                const c = voxData.rgba.values[i - 1];
-                const rgb = c.r | (c.g << 8) | (c.b << 16);
-                tmpBlocks[off] = VoxelMesh.colorLookup(rgb);
-            }
+        if (isClient()) {
+            setTimeout(async () => {
+                const data = new Uint8Array(
+                    await (await fetch(href)).arrayBuffer()
+                );
+                const voxData = readVox(data);
+                const size = voxData.size;
+                if (
+                    size.x > 32 ||
+                    size.y > 32 ||
+                    size.z > 32 ||
+                    size.x <= 0 ||
+                    size.y <= 0 ||
+                    size.z <= 0
+                ) {
+                    throw new Error(`Invalid .vox file: ${href}`);
+                }
+                mesh.size.x = size.x;
+                mesh.size.y = size.z;
+                mesh.size.z = size.y;
+                const ox = 32 / 2 - Math.floor(size.x / 2);
+                const oy = 32 / 2 - Math.floor(size.y / 2);
+                const oz = 32 / 2 - Math.floor(size.z / 2);
+                tmpBlocks.fill(0);
+                for (const { x, y, z, i } of voxData.xyzi.values) {
+                    const off = (y + oy) * 32 * 32 + (z + oz) * 32 + (x + ox);
+                    const c = voxData.rgba.values[i - 1];
+                    const rgb = c.r | (c.g << 8) | (c.b << 16);
+                    tmpBlocks[off] = VoxelMesh.colorLookup(rgb);
+                }
 
-            const [vertices, vertCount] = meshgenVoxelMesh(tmpBlocks);
-            mesh.updateTiny(vertices, vertCount);
-        }, 0);
+                const [vertices, vertCount] = meshgenVoxelMesh(tmpBlocks);
+                mesh.updateTiny(vertices, vertCount);
+            }, 0);
+        }
         return mesh;
     }
 

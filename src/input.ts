@@ -2,6 +2,7 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import type { Game } from './game';
+import { isClient } from './util/compat';
 import { Item } from './world/item/item';
 
 export class InputManager {
@@ -17,23 +18,25 @@ export class InputManager {
     constructor(game: Game) {
         this.game = game;
         const that = this;
-        window.addEventListener('keydown', (e) => {
-            that.keyStates.add(e.code);
-            const handler = that.keyPushHandler.get(e.code);
-            if (handler) {
-                handler();
-            }
-        });
-        window.addEventListener('keyup', (e) => {
-            that.keyStates.delete(e.code);
-            if (!that.game.running || !that.game.ready) {
-                return;
-            }
-            const handler = that.keyReleaseHandler.get(e.code);
-            if (handler) {
-                handler();
-            }
-        });
+        if (isClient()) {
+            window.addEventListener('keydown', (e) => {
+                that.keyStates.add(e.code);
+                const handler = that.keyPushHandler.get(e.code);
+                if (handler) {
+                    handler();
+                }
+            });
+            window.addEventListener('keyup', (e) => {
+                that.keyStates.delete(e.code);
+                if (!that.game.running || !that.game.ready) {
+                    return;
+                }
+                const handler = that.keyReleaseHandler.get(e.code);
+                if (handler) {
+                    handler();
+                }
+            });
+        }
         this.keyPushHandler.set('KeyO', () => {
             if (!that.game.running || !that.game.ready) {
                 return;
@@ -75,43 +78,45 @@ export class InputManager {
             });
         }
 
-        that.game.render.canvasWrapper.addEventListener(
-            'mousedown',
-            async (e) => {
+        if (isClient()) {
+            that.game.render.canvasWrapper.addEventListener(
+                'mousedown',
+                async (e) => {
+                    if (!that.game.running || !that.game.ready) {
+                        return;
+                    }
+                    if (that.game.ui.inventory.active) {
+                        that.toggleInventory(true);
+                    }
+                    await that.requestFullscreenAndPointerLock();
+                },
+                false
+            );
+            that.game.ui.rootElement.addEventListener('mousedown', (e) =>
+                that.mouseStates.add(e.button)
+            );
+            that.game.ui.rootElement.addEventListener('contextmenu', (e) => {
                 if (!that.game.running || !that.game.ready) {
                     return;
                 }
-                if (that.game.ui.inventory.active) {
-                    that.toggleInventory(true);
-                }
-                await that.requestFullscreenAndPointerLock();
-            },
-            false
-        );
-        that.game.ui.rootElement.addEventListener('mousedown', (e) =>
-            that.mouseStates.add(e.button)
-        );
-        that.game.ui.rootElement.addEventListener('contextmenu', (e) => {
-            if (!that.game.running || !that.game.ready) {
-                return;
-            }
-            e.preventDefault();
-        });
-        that.game.ui.rootElement.addEventListener('mouseup', (e) =>
-            that.mouseStates.delete(e.button)
-        );
-        that.game.ui.rootElement.addEventListener(
-            'mousemove',
-            (e) => {
-                if (document.pointerLockElement) {
-                    that.game.player.rotate(
-                        e.movementX * -0.001,
-                        e.movementY * -0.001
-                    );
-                }
-            },
-            false
-        );
+                e.preventDefault();
+            });
+            that.game.ui.rootElement.addEventListener('mouseup', (e) =>
+                that.mouseStates.delete(e.button)
+            );
+            that.game.ui.rootElement.addEventListener(
+                'mousemove',
+                (e) => {
+                    if (document.pointerLockElement) {
+                        that.game.player.rotate(
+                            e.movementX * -0.001,
+                            e.movementY * -0.001
+                        );
+                    }
+                },
+                false
+            );
+        }
     }
 
     async requestFullscreenAndPointerLock() {

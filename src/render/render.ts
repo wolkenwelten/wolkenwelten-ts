@@ -12,6 +12,13 @@ import { ParticleMesh } from './meshes/particleMesh/particleMesh';
 import { allTexturesLoaded } from './texture';
 import { ScreenShakeSystem } from './screenShake';
 import { WorldRenderer } from './worldRenderer';
+import {
+    isClient,
+    isServer,
+    mockCanvas,
+    mockContextWebGL2,
+} from '../util/compat';
+import { Div } from '../ui/utils';
 
 const transPos = new Float32Array([0, 0, 0]);
 const projectionMatrix = mat4.create();
@@ -44,6 +51,9 @@ export class RenderManager {
     world: WorldRenderer;
 
     setPlatformDefaults() {
+        if (isServer()) {
+            return;
+        }
         const isFirefox =
             navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
         const isSafari = /^((?!chrome|android).)*safari/i.test(
@@ -67,13 +77,16 @@ export class RenderManager {
         this.game = game;
         this.setPlatformDefaults();
         this.cam = cam;
-        this.canvas = document.createElement('canvas');
+        this.canvas = isClient()
+            ? document.createElement('canvas')
+            : mockCanvas();
         this.canvas.classList.add('wolkenwelten-canvas');
-        this.canvasWrapper = document.createElement('div');
-        this.canvasWrapper.classList.add('wolkenwelten-canvas-wrapper');
+        this.canvasWrapper = Div({ class: 'wolkenwelten-canvas-wrapper' });
         game.ui.rootElement.append(this.canvasWrapper);
         this.canvasWrapper.append(this.canvas);
-        const gl = this.canvas.getContext('webgl2');
+        const gl = isClient()
+            ? this.canvas.getContext('webgl2')
+            : mockContextWebGL2();
         if (!gl) {
             throw new Error(
                 "Can't create WebGL2 context, please try upgrading your browser or use a different device"
@@ -89,11 +102,12 @@ export class RenderManager {
 
         this.drawFrameClosure = this.drawFrame.bind(this);
         this.generateMeshClosue = this.generateMesh.bind(this);
-        window.requestAnimationFrame(this.drawFrameClosure);
-        setInterval(this.updateFPS.bind(this), 1000);
-
-        window.addEventListener('resize', this.resize.bind(this));
-        this.resize();
+        if (isClient()) {
+            window.requestAnimationFrame(this.drawFrameClosure);
+            setInterval(this.updateFPS.bind(this), 1000);
+            window.addEventListener('resize', this.resize.bind(this));
+            this.resize();
+        }
     }
 
     updateFPS() {
@@ -102,6 +116,9 @@ export class RenderManager {
     }
 
     initGLContext() {
+        if (isServer()) {
+            return;
+        }
         this.gl.enable(this.gl.DEPTH_TEST);
         this.gl.enable(this.gl.CULL_FACE);
         this.gl.cullFace(this.gl.BACK);
@@ -115,6 +132,9 @@ export class RenderManager {
     }
 
     drawScene() {
+        if (isServer()) {
+            return;
+        }
         this.updateFOV();
         this.shake.update();
         mat4.perspective(
@@ -185,6 +205,9 @@ export class RenderManager {
     }
 
     resize() {
+        if (isServer()) {
+            return;
+        }
         this.width = (window.innerWidth | 0) * this.renderSizeMultiplier;
         this.height = (window.innerHeight | 0) * this.renderSizeMultiplier;
         this.canvas.width = this.width;
@@ -207,6 +230,9 @@ export class RenderManager {
     }
 
     drawFrame() {
+        if (isServer()) {
+            return;
+        }
         window.requestAnimationFrame(this.drawFrameClosure);
         this.game.ui.update();
 

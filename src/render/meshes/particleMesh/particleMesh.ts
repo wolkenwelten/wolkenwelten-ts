@@ -185,14 +185,14 @@ export class ParticleMesh {
         }
     }
 
-    fxJump(x: number, y:number, z:number) {
+    fxJump(x: number, y: number, z: number) {
         for (let i = 0; i < 96; i++) {
             const ox = Math.random() - 0.5;
             const oz = Math.random() - 0.5;
             const cx = x + ox * 0.1;
             const cy = y - 0.5;
             const cz = z + oz * 0.1;
-            const cs = 48 + ((Math.random() * 24)|0);
+            const cs = 48 + ((Math.random() * 24) | 0);
             let cc = 0xff80c0e0;
             cc |= (Math.random() * 32) | 0;
             cc |= ((Math.random() * 16) | 0) << 8;
@@ -205,14 +205,14 @@ export class ParticleMesh {
         }
     }
 
-    fxLand(x: number, y:number, z:number) {
+    fxLand(x: number, y: number, z: number) {
         for (let i = 0; i < 32; i++) {
             const ox = Math.random() - 0.5;
             const oz = Math.random() - 0.5;
             const cx = x + ox * 0.1;
             const cy = y - 0.5;
             const cz = z + oz * 0.1;
-            const cs = 32 + ((Math.random() * 16)|0);
+            const cs = 32 + ((Math.random() * 16) | 0);
             let cc = 0xff80c0e0;
             cc |= (Math.random() * 32) | 0;
             cc |= ((Math.random() * 16) | 0) << 8;

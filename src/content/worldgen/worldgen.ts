@@ -92,12 +92,7 @@ const worldgenSurface = (assets: WorldgenAssetList, chunk: Chunk) => {
                         }
                     }
 
-                    if (
-                        gh > -3 &&
-                        gh < 0 &&
-                        endY < 32 &&
-                        rng.bool(640)
-                    ) {
+                    if (gh > -3 && gh < 0 && endY < 32 && rng.bool(640)) {
                         StaticObject.create('shell', chunk, cx, gh + 1, cz);
                     } else if (
                         gh > -3 &&

@@ -72,7 +72,7 @@ export class EarthWall extends Rune {
                         gx = x - oy - 2;
                         vx -= 0.5;
                     } else {
-                        gy += 2 -ox;
+                        gy += 2 - ox;
                         gx = x - oy + 2;
                         vx += 0.5;
                     }

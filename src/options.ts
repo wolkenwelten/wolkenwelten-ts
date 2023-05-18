@@ -1,6 +1,8 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
+import { isClient } from './util/compat';
+
 export class Options {
     skipMenu = false;
     startWithEquipment = false;
@@ -33,16 +35,20 @@ export class Options {
     */
 
     constructor() {
-        const params = new URLSearchParams(window.location.search);
-        this.skipMenu = window.location.hostname === 'localhost';
-        this.skipMenu = this.parseBoolean(
-            this.skipMenu,
-            params.get('skipMenu')
-        );
-        this.startWithEquipment = this.parseBoolean(
-            this.startWithEquipment,
-            params.get('startWithEquipment')
-        );
+        if (isClient()) {
+            const params = new URLSearchParams(window.location.search);
+            this.skipMenu = window.location.hostname === 'localhost';
+            this.skipMenu = this.parseBoolean(
+                this.skipMenu,
+                params.get('skipMenu')
+            );
+            this.startWithEquipment = this.parseBoolean(
+                this.startWithEquipment,
+                params.get('startWithEquipment')
+            );
+        } else {
+            this.skipMenu = true;
+        }
     }
 }
 

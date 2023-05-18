@@ -1,3 +1,5 @@
+import { isClient, mockElement } from '../util/compat';
+
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
@@ -34,7 +36,9 @@ export interface DivData {
 }
 
 export const Div = (data: DivData) => {
-    const ret = document.createElement(data.tagname || 'DIV');
+    const ret = isClient()
+        ? document.createElement(data.tagname || 'DIV')
+        : mockElement();
     for (const [k, v] of Object.entries(data)) {
         switch (k) {
             case 'class':

@@ -118,14 +118,14 @@ export class EarthBulletEntity extends Entity {
         const by = this.y - 0.5;
         const bz = this.z - 0.5;
 
-        for(let i=0;i<128;i++){
+        for (let i = 0; i < 128; i++) {
             const color = i < 64 ? bt.colorA : bt.colorB;
             const x = bx + Math.random();
             const y = by + Math.random();
             const z = bz + Math.random();
-            const vx = this.shotX * 0.5 + (Math.random() - 0.5)*0.1;
-            const vy = this.shotY * 0.5 + (Math.random() - 0.5)*0.1;
-            const vz = this.shotZ * 0.5 + (Math.random() - 0.5)*0.1;
+            const vx = this.shotX * 0.5 + (Math.random() - 0.5) * 0.1;
+            const vy = this.shotY * 0.5 + (Math.random() - 0.5) * 0.1;
+            const vz = this.shotZ * 0.5 + (Math.random() - 0.5) * 0.1;
             particle.add(x, y, z, 192, color, vx, vy, vz, -1, 0, -0.002, 0, 0);
         }
     }

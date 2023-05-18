@@ -1,6 +1,7 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
+import { isClient, mockElement } from '../../../util/compat';
 import styles from './heart.module.css';
 
 export class Heart {
@@ -9,7 +10,7 @@ export class Heart {
     animate = false;
 
     constructor(parent: HTMLElement, hp: number) {
-        const div = document.createElement('div');
+        const div = isClient() ? document.createElement('div') : mockElement();
         this.div = div;
         div.classList.add(styles.heart);
         parent.appendChild(div);

@@ -1,6 +1,7 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
+import { isServer } from '../util/compat';
 const isPowerOf2 = (value: number) => (value & (value - 1)) === 0;
 
 type MaybeWebGLTexture = WebGLTexture | undefined;
@@ -22,6 +23,9 @@ export class Texture {
     dirtyLUT = false;
 
     loadTexture2D(url: string) {
+        if (isServer()) {
+            return;
+        }
         texturesInFlight++;
         const gl = this.gl;
         this.bind();
@@ -82,6 +86,9 @@ export class Texture {
     }
 
     loadTexture2DArray(url: string) {
+        if (isServer()) {
+            return;
+        }
         const gl = this.gl;
         this.bind();
 
@@ -139,6 +146,9 @@ export class Texture {
     }
 
     updateLUT() {
+        if (isServer()) {
+            return;
+        }
         const gl = this.gl;
         this.gl.activeTexture(this.gl.TEXTURE0);
         this.gl.bindTexture(this.target(), this.texture);

@@ -10,7 +10,9 @@
         "check": "npm run check:circular && npm run check:types",
         "check:circular": "madge --circular index.ts",
         "check:types": "tsc -p ./tsconfig.json --noEmit",
-        "dev": "vite",
+        "dev": "npm run dev:client & npm run dev:server",
+        "dev:client": "vite",
+        "dev:server": "node --loader tsx --loader ./serverLoader.ts --watch ./server.ts",
         "preview": "vite preview",
         "pretty": "prettier --write \"src/**/*.{css,ts}\"",
         "optimize": "node scripts/optimizeAssets.js",
@@ -19,14 +21,15 @@
     "devDependencies": {
         "@types/howler": "latest",
         "@types/node": "latest",
-        "typescript": "latest",
-        "prettier": "latest",
         "madge": "latest",
+        "prettier": "latest",
+        "typescript": "latest",
         "vite": "latest"
     },
     "dependencies": {
         "gl-matrix": "latest",
         "howler": "latest",
+        "tsx": "latest",
         "vox-reader": "latest"
     }
 }

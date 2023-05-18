@@ -1,6 +1,7 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
+import { isClient, mockCanvas, mockContext2D } from '../util/compat';
 import type { BlockType } from '../world/blockType';
 import type { UIManager } from './ui';
 
@@ -11,13 +12,20 @@ export class IconManager {
 
     constructor(ui: UIManager) {
         this.ui = ui;
-        this.canvas = document.createElement('canvas');
-        const ctx = this.canvas.getContext('2d');
-        if (!ctx) {
-            throw new Error("Couldn't create 2D context for building icons");
+        if (isClient()) {
+            this.canvas = document.createElement('canvas');
+            const ctx = this.canvas.getContext('2d');
+            if (!ctx) {
+                throw new Error(
+                    "Couldn't create 2D context for building icons"
+                );
+            }
+            this.ctx = ctx;
+            this.buildAllBlockTypeIcons();
+        } else {
+            this.canvas = mockCanvas();
+            this.ctx = mockContext2D();
         }
-        this.ctx = ctx;
-        this.buildAllBlockTypeIcons();
     }
 
     buildBlockTypeIcon(bimg: HTMLImageElement, bt: BlockType) {

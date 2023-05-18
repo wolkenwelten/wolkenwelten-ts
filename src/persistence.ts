@@ -2,6 +2,7 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import type { Game } from './game';
+import { isClient, isServer } from './util/compat';
 
 export interface PersistentState {
     version: 'stateV1';
@@ -21,11 +22,16 @@ export class PersistenceManager {
     constructor(game: Game) {
         this.game = game;
         setInterval(this.persist.bind(this), 60000);
-        addEventListener('beforeunload', this.persist.bind(this));
+        if (isClient()) {
+            addEventListener('beforeunload', this.persist.bind(this));
+        }
         this.tryToLoad();
     }
 
     loadState() {
+        if (isServer()) {
+            return;
+        }
         const stateRaw = window.localStorage.getItem(this.lsKey);
         if (!stateRaw) {
             return;
@@ -47,6 +53,9 @@ export class PersistenceManager {
     }
 
     saveState() {
+        if (isServer()) {
+            return;
+        }
         const player = this.game.player;
         const { x, y, z, yaw, pitch } = player;
 
