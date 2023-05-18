@@ -12,7 +12,7 @@
         "check:types": "tsc -p ./tsconfig.json --noEmit",
         "dev": "npm run dev:client & npm run dev:server",
         "dev:client": "vite",
-        "dev:server": "node --loader tsx --loader ./serverLoader.ts --watch ./server.ts",
+        "dev:server": "node --loader tsx --loader ./src/server/loader.ts --watch ./src/server/main.ts",
         "preview": "vite preview",
         "pretty": "prettier --write \"src/**/*.{css,ts}\"",
         "optimize": "node scripts/optimizeAssets.js",
@@ -21,6 +21,7 @@
     "devDependencies": {
         "@types/howler": "latest",
         "@types/node": "latest",
+        "@types/ws": "latest",
         "madge": "latest",
         "prettier": "latest",
         "typescript": "latest",
@@ -30,6 +31,7 @@
         "gl-matrix": "latest",
         "howler": "latest",
         "tsx": "latest",
-        "vox-reader": "latest"
+        "vox-reader": "latest",
+        "ws": "latest"
     }
 }

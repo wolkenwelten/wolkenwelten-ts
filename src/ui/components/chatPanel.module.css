@@ -1,0 +1,23 @@
+.chatPanel {
+    position: absolute;
+    left: 0px;
+    bottom: 0;
+    width: 480px;
+    height: 32px;
+    background: #ccc;
+    padding: 2px;
+    transform: scaleY(0);
+    transform-origin: 0 100%;
+    transition: transform 0.3s;
+}
+
+.chatPanel > input {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    font-size: 1.4rem;
+}
+
+.chatPanel.show {
+    transform: scaleY(1);
+}

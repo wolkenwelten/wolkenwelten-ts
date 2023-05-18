@@ -3,6 +3,7 @@
  */
 import type { Game } from '../game';
 import { Crosshair } from './components/crosshair';
+import { ChatPanel } from './components/chatPanel';
 import { HealthBar } from './components/health/healthBar';
 import { FpsCounter } from './components/fpsCounter';
 import { Hotbar, HotbarEntryValue } from './components/hotbar/hotbar';
@@ -23,6 +24,7 @@ export class UIManager {
     heldItem: HotbarEntryValue;
     log: SystemLog;
     introWindow: IntroWindow;
+    chat: ChatPanel;
 
     rootHasPaused = false;
 
@@ -45,6 +47,7 @@ export class UIManager {
         this.inventory = new PlayerModal(this.uiWrapper, game);
         this.hotbar = new Hotbar(this.uiWrapper, game);
         this.introWindow = new IntroWindow(this.uiWrapper, game);
+        this.chat = new ChatPanel(this.uiWrapper, game);
     }
 
     updateInventory(i = -1) {

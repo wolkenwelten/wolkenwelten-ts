@@ -19,6 +19,7 @@ import { StaticObject } from './world/chunk/staticObject';
 import { Mob } from './world/entity/mob';
 import { Item } from './world/item/item';
 import { World } from './world/world';
+import { NetworkManager } from './network';
 
 export interface GameConfig {
     parent: HTMLElement;
@@ -39,6 +40,7 @@ export class Game {
     config: GameConfig;
     input: InputManager;
     persistence: PersistenceManager;
+    network: NetworkManager;
     player: Character;
     profiler: ProfilingManager;
     render: RenderManager;
@@ -59,6 +61,7 @@ export class Game {
         this.config = config;
         this.options = new Options();
         this.profiler = ProfilingManager.profiler();
+        this.network = new NetworkManager();
         this.benchmark = new BenchmarkManager(this);
         this.world = new World(this);
         this.player = new Character(

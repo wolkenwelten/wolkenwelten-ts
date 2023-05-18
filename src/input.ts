@@ -45,6 +45,9 @@ export class InputManager {
         });
         this.keyPushHandler.set('Escape', () => {
             that.closeInventory();
+            if (that.game.ui.chat.visible()) {
+                that.game.ui.chat.hide();
+            }
         });
         this.keyPushHandler.set('KeyN', () => {
             if (!that.game.running || !that.game.ready) {
@@ -55,6 +58,17 @@ export class InputManager {
         this.keyPushHandler.set('Tab', () => {
             if (document.pointerLockElement) {
                 document.exitPointerLock();
+            }
+        });
+        this.keyPushHandler.set('Enter', () => {
+            if (that.game.ui.chat.visible()) {
+                const msg = that.game.ui.chat.input.value.trim();
+                if (msg) {
+                    that.game.network.sendChat(msg);
+                }
+                that.game.ui.chat.hide();
+            } else {
+                that.game.ui.chat.show();
             }
         });
 

@@ -5,7 +5,7 @@ import itemIcon from '../../../assets/gfx/items/earthWall.png';
 import meshUrl from '../../../assets/vox/items/stone.vox?url';
 import { TriangleMesh } from '../../render/meshes/triangleMesh/triangleMesh';
 import { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
-import { easeInOutSine, easeOutSine } from '../../util/math';
+import { easeOutSine } from '../../util/math';
 import { Character } from '../../world/entity/character';
 import { Entity } from '../../world/entity/entity';
 import { World } from '../../world/world';

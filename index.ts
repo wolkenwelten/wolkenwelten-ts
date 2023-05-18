@@ -2,11 +2,12 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import { Game } from './src/game';
+import { ClientGame } from "./src/client/clientGame";
 import './style.css';
 
 declare global {
     interface Window {
-        wow: Game;
+        wow: ClientGame;
     }
 }
 
@@ -18,7 +19,8 @@ const main = () => {
     const game = new Game({
         parent: parent as HTMLElement,
     });
-    window.wow = game;
+    const clientGame = new ClientGame(game);
+    window.wow = clientGame;
     console.log(
         "%cHello there,%c most of the game state is accessible as the 'wow' object, happy hacking! :3",
         'color:green',
