@@ -30,8 +30,9 @@
     "dependencies": {
         "gl-matrix": "latest",
         "howler": "latest",
-        "tsx": "latest",
         "vox-reader": "latest",
+
+        "tsx": "latest",
         "ws": "latest"
     }
 }

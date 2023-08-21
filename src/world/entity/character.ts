@@ -15,6 +15,9 @@ import { Item, MaybeItem } from '../item/item';
 const CHARACTER_ACCELERATION = 0.05;
 const CHARACTER_STOP_RATE = CHARACTER_ACCELERATION * 3.0;
 
+const transPos = new Float32Array([0, 0, 0]);
+const modelViewMatrix = mat4.create();
+
 const clamp = (x: number, min: number, max: number) =>
     Math.min(Math.max(x, min), max);
 
@@ -458,7 +461,35 @@ export class Character extends Being {
 
     /* Since right now WW is only singleplayer we can ignore this method */
     draw(projectionMatrix: mat4, viewMatrix: mat4, cam: Entity) {
-        return;
+        if (this.world.game.player === this) {
+            return;
+        }
+
+        this.world.game.render.decals.addShadow(this.x, this.y, this.z, 1);
+
+        mat4.identity(modelViewMatrix);
+        const yOff =
+            Math.sin(this.id * 7 + this.world.game.ticks * 0.07) * 0.1 + 0.2;
+        transPos[0] = this.x;
+        transPos[1] = this.y;
+        transPos[2] = this.z;
+        mat4.translate(modelViewMatrix, modelViewMatrix, transPos);
+
+        mat4.rotateY(modelViewMatrix, modelViewMatrix, this.yaw);
+        mat4.rotateX(modelViewMatrix, modelViewMatrix, this.pitch);
+        mat4.mul(modelViewMatrix, viewMatrix, modelViewMatrix);
+        mat4.mul(modelViewMatrix, projectionMatrix, modelViewMatrix);
+        const dx = this.x - cam.x;
+        const dy = this.y - cam.y;
+        const dz = this.z - cam.z;
+        const d = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        const renderDistance = this.world.game.render.renderDistance;
+        const alpha = Math.min(1, Math.max(0, renderDistance - d) / 8);
+        this.mesh().draw(modelViewMatrix, alpha);
+    }
+
+    mesh(): VoxelMesh {
+        return this.world.game.render.assets.bag;
     }
 
     /* Return the mesh of whatever we are currently holding, or a hand */
