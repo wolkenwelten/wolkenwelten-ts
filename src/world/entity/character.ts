@@ -468,8 +468,6 @@ export class Character extends Being {
         this.world.game.render.decals.addShadow(this.x, this.y, this.z, 1);
 
         mat4.identity(modelViewMatrix);
-        const yOff =
-            Math.sin(this.id * 7 + this.world.game.ticks * 0.07) * 0.1 + 0.2;
         transPos[0] = this.x;
         transPos[1] = this.y;
         transPos[2] = this.z;
