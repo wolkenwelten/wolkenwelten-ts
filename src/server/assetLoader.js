@@ -4,18 +4,7 @@
 import { URL } from 'url';
 import { readFile } from 'fs/promises';
 
-interface LoaderResult {
-    format: 'module';
-    source: string;
-    shortCirtcuit: boolean;
-}
-type Loader = (
-    url: string,
-    context: any,
-    defaultLoader: Loader
-) => Promise<LoaderResult>;
-
-export async function load(url: string, context: any, defaultLoader: Loader) {
+export async function load(url, context, nextLoad) {
     const checkUrl = url.split('?')[0]; // Cutting the possible search parameters
     if (
         checkUrl.endsWith('.css') ||
@@ -32,5 +21,5 @@ export async function load(url: string, context: any, defaultLoader: Loader) {
             shortCircuit: true,
         };
     }
-    return defaultLoader(url, context, defaultLoader);
+    return nextLoad(url);
 }
