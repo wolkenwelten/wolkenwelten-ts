@@ -14,13 +14,13 @@ import { Comet } from './runes/comet';
 import { Stone } from './consumables/stone';
 
 export const registerItems = () => {
-    Item.register('stick', Stick);
-    Item.register('club', Club);
+	Item.register('stick', Stick);
+	Item.register('club', Club);
 
-    Item.register('earthBullet', EarthBullet);
-    Item.register('earthWall', EarthWall);
-    Item.register('fireBreath', FireBreath);
-    Item.register('comet', Comet);
+	Item.register('earthBullet', EarthBullet);
+	Item.register('earthWall', EarthWall);
+	Item.register('fireBreath', FireBreath);
+	Item.register('comet', Comet);
 
-    Item.register('stone', Stone);
+	Item.register('stone', Stone);
 };

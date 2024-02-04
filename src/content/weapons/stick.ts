@@ -8,16 +8,16 @@ import type { Entity } from '../../world/entity/entity';
 import { Item } from '../../world/item/item';
 
 export class Stick extends Item {
-    name = 'Stick';
-    icon = itemIcon;
-    meshUrl = meshUrl;
-    isWeapon = true;
+	name = 'Stick';
+	icon = itemIcon;
+	meshUrl = meshUrl;
+	isWeapon = true;
 
-    attackDamage(e: Entity): number {
-        return 2;
-    }
+	attackDamage(e: Entity): number {
+		return 2;
+	}
 
-    attackCooldown(e: Entity): number {
-        return 80;
-    }
+	attackCooldown(e: Entity): number {
+		return 80;
+	}
 }

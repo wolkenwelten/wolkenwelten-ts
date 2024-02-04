@@ -5,9 +5,9 @@ import type { Entity } from '../../world/entity/entity';
 import { Item } from '../../world/item/item';
 
 export class Rune extends Item {
-    isWeapon = false;
+	isWeapon = false;
 
-    attackDamage(e: Entity): number {
-        return 0;
-    }
+	attackDamage(e: Entity): number {
+		return 0;
+	}
 }

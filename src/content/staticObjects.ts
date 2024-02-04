@@ -9,9 +9,9 @@ import { StaticStick } from './staticObject/stick';
 import { StaticStone } from './staticObject/stone';
 
 export const registerStaticObjects = () => {
-    StaticObject.register('flower', StaticFlower);
-    StaticObject.register('grass', StaticGrass);
-    StaticObject.register('shell', StaticShell);
-    StaticObject.register('stick', StaticStick);
-    StaticObject.register('stone', StaticStone);
+	StaticObject.register('flower', StaticFlower);
+	StaticObject.register('grass', StaticGrass);
+	StaticObject.register('shell', StaticShell);
+	StaticObject.register('stick', StaticStick);
+	StaticObject.register('stone', StaticStone);
 };

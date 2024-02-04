@@ -15,13 +15,13 @@ import type { AudioManager } from '../audio';
 import '../types';
 
 export const registerAudioContent = (audio: AudioManager) => {
-    audio.add('ungh', unghUrl);
-    audio.add('pock', pockUrl);
-    audio.add('tock', tockUrl);
-    audio.add('step', stepUrl);
-    audio.add('stomp', stompUrl);
-    audio.add('punch', punchUrl);
-    audio.add('punchMiss', punchMissUrl);
-    audio.add('bomb', bombUrl);
-    audio.add('projectile', projectileUrl);
+	audio.add('ungh', unghUrl);
+	audio.add('pock', pockUrl);
+	audio.add('tock', tockUrl);
+	audio.add('step', stepUrl);
+	audio.add('stomp', stompUrl);
+	audio.add('punch', punchUrl);
+	audio.add('punchMiss', punchMissUrl);
+	audio.add('bomb', bombUrl);
+	audio.add('projectile', projectileUrl);
 };
