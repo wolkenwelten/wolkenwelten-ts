@@ -88,6 +88,9 @@ export class ClientGame {
 			this.connect();
 			return;
 		}
+		if(this.ws.readyState !== this.ws.OPEN){
+			return;
+		}
 		this.game.network.sendPlayerUpdate(
 			this.game.options.playerName,
 			this.game.player
