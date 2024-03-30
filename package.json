@@ -1,37 +1,39 @@
 {
-    "name": "wolkenwelten-ts",
-    "version": "0.0.1",
-    "description": "An experiment with voxels",
-    "author": "Benjamin Vincent Schulenburg <ben@wolkenwelten.net>",
-    "license": "AGPL3",
-    "type": "module",
-    "scripts": {
-        "build": "vite build",
-        "check": "npm run check:circular && npm run check:types",
-        "check:circular": "madge --circular index.ts",
-        "check:types": "tsc -p ./tsconfig.json --noEmit",
-        "dev": "npm run dev:client & npm run dev:server",
-        "dev:client": "vite",
-        "dev:server": "node --import tsx --import ./src/server/loader.js --watch ./src/server/main.ts",
-        "preview": "vite preview",
-        "pretty": "npx @biomejs/biome format --write ./src",
-        "optimize": "node scripts/optimizeAssets.js",
-        "zip": "npm run build && zip -r ld-itch-compatible.zip dist/"
-    },
-    "devDependencies": {
-        "@biomejs/biome": "latest",
-        "@types/howler": "latest",
-        "@types/node": "latest",
-        "@types/ws": "latest",
-        "madge": "latest",
-        "typescript": "latest",
-        "vite": "latest"
-    },
-    "dependencies": {
-        "gl-matrix": "latest",
-        "howler": "latest",
-        "tsx": "latest",
-        "vox-reader": "latest",
-        "ws": "latest"
-    }
+  "name": "wolkenwelten-ts",
+  "version": "0.0.1",
+  "description": "An experiment with voxels",
+  "author": "Benjamin Vincent Schulenburg <ben@wolkenwelten.net>",
+  "license": "AGPL3",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "check": "npm run check:circular && npm run check:types",
+    "check:circular": "madge --circular index.ts",
+    "check:types": "tsc -p ./tsconfig.json --noEmit",
+    "dev": "npm run dev:client & npm run dev:server",
+    "dev:client": "vite",
+    "dev:server": "node --import tsx --import ./src/server/loader.js --watch ./src/server/main.ts",
+    "preview": "vite preview",
+    "pretty": "npx @biomejs/biome format --write ./src",
+    "optimize": "node scripts/optimizeAssets.js",
+    "zip": "npm run build && zip -r ld-itch-compatible.zip dist/",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "latest",
+    "@types/howler": "latest",
+    "@types/node": "latest",
+    "@types/ws": "latest",
+    "husky": "^9.0.11",
+    "madge": "latest",
+    "typescript": "latest",
+    "vite": "latest"
+  },
+  "dependencies": {
+    "gl-matrix": "latest",
+    "howler": "latest",
+    "tsx": "latest",
+    "vox-reader": "latest",
+    "ws": "latest"
+  }
 }
