@@ -1,24 +1,24 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { mat4 } from 'gl-matrix';
+import { mat4 } from "gl-matrix";
 
-import type { Game } from '../game';
-import type { Entity } from '../world/entity/entity';
-import { coordinateToWorldKey } from '../world/world';
-import { AssetList } from './asset';
-import { DecalMesh } from './meshes/decalMesh/decalMesh';
-import { ParticleMesh } from './meshes/particleMesh/particleMesh';
-import { allTexturesLoaded } from './texture';
-import { ScreenShakeSystem } from './screenShake';
-import { WorldRenderer } from './worldRenderer';
+import type { Game } from "../game";
+import type { Entity } from "../world/entity/entity";
+import { coordinateToWorldKey } from "../world/world";
+import { AssetList } from "./asset";
+import { DecalMesh } from "./meshes/decalMesh/decalMesh";
+import { ParticleMesh } from "./meshes/particleMesh/particleMesh";
+import { allTexturesLoaded } from "./texture";
+import { ScreenShakeSystem } from "./screenShake";
+import { WorldRenderer } from "./worldRenderer";
 import {
 	isClient,
 	isServer,
 	mockCanvas,
 	mockContextWebGL2,
-} from '../util/compat';
-import { Div } from '../ui/utils';
+} from "../util/compat";
+import { Div } from "../ui/utils";
 
 const transPos = new Float32Array([0, 0, 0]);
 const projectionMatrix = mat4.create();
@@ -54,11 +54,8 @@ export class RenderManager {
 		if (isServer()) {
 			return;
 		}
-		const isFirefox =
-			navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
-		const isSafari = /^((?!chrome|android).)*safari/i.test(
-			navigator.userAgent
-		);
+		const isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
+		const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 		const isMobile =
 			navigator.userAgent.match(/Android/i) ||
 			navigator.userAgent.match(/iPhone/i) ||
@@ -77,19 +74,17 @@ export class RenderManager {
 		this.game = game;
 		this.setPlatformDefaults();
 		this.cam = cam;
-		this.canvas = isClient()
-			? document.createElement('canvas')
-			: mockCanvas();
-		this.canvas.classList.add('wolkenwelten-canvas');
-		this.canvasWrapper = Div({ class: 'wolkenwelten-canvas-wrapper' });
+		this.canvas = isClient() ? document.createElement("canvas") : mockCanvas();
+		this.canvas.classList.add("wolkenwelten-canvas");
+		this.canvasWrapper = Div({ class: "wolkenwelten-canvas-wrapper" });
 		game.ui.rootElement.append(this.canvasWrapper);
 		this.canvasWrapper.append(this.canvas);
 		const gl = isClient()
-			? this.canvas.getContext('webgl2')
+			? this.canvas.getContext("webgl2")
 			: mockContextWebGL2();
 		if (!gl) {
 			throw new Error(
-				"Can't create WebGL2 context, please try upgrading your browser or use a different device"
+				"Can't create WebGL2 context, please try upgrading your browser or use a different device",
 			);
 		}
 		this.gl = gl;
@@ -105,7 +100,7 @@ export class RenderManager {
 		if (isClient()) {
 			window.requestAnimationFrame(this.drawFrameClosure);
 			setInterval(this.updateFPS.bind(this), 1000);
-			window.addEventListener('resize', this.resize.bind(this));
+			window.addEventListener("resize", this.resize.bind(this));
 			this.resize();
 		}
 	}
@@ -142,7 +137,7 @@ export class RenderManager {
 			(this.fov * Math.PI) / 180,
 			this.width / this.height,
 			0.1,
-			512.0
+			512.0,
 		);
 
 		mat4.identity(viewMatrix);
@@ -175,9 +170,7 @@ export class RenderManager {
 			} else {
 				rt = t * Math.PI;
 				const rMax =
-					this.game.player.equipmentWeapon() === undefined
-						? 0.125
-						: 0.4;
+					this.game.player.equipmentWeapon() === undefined ? 0.125 : 0.4;
 				r = Math.PI * (0.1 - Math.sin(t * Math.PI) * rMax);
 			}
 		}
@@ -246,22 +239,19 @@ export class RenderManager {
 
 		this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 		this.drawScene();
-		if (
-			!this.generateMeshClosureActive &&
-			this.world.generatorQueue.length
-		) {
+		if (!this.generateMeshClosureActive && this.world.generatorQueue.length) {
 			this.generateMeshClosureActive = true;
 			setTimeout(this.generateMeshClosue, 0);
 		}
 		if (this.wasUnderwater) {
 			if (!this.game.player.isUnderwater()) {
 				this.wasUnderwater = false;
-				this.canvasWrapper.classList.remove('fx-underwater');
+				this.canvasWrapper.classList.remove("fx-underwater");
 			}
 		} else {
 			if (this.game.player.isUnderwater()) {
 				this.wasUnderwater = true;
-				this.canvasWrapper.classList.add('fx-underwater');
+				this.canvasWrapper.classList.add("fx-underwater");
 			}
 		}
 	}

@@ -1,22 +1,22 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import readVox from 'vox-reader';
+import readVox from "vox-reader";
 
-import voxBushA from '../../../assets/wg/bush_a.vox?url';
-import voxBushB from '../../../assets/wg/bush_b.vox?url';
-import voxBushC from '../../../assets/wg/bush_c.vox?url';
-import voxRockA from '../../../assets/wg/rock_a.vox?url';
-import voxRockB from '../../../assets/wg/rock_b.vox?url';
-import voxRockC from '../../../assets/wg/rock_c.vox?url';
-import voxSpruceA from '../../../assets/wg/spruce_a.vox?url';
-import voxTreeA from '../../../assets/wg/tree_a.vox?url';
-import voxTreeB from '../../../assets/wg/tree_b.vox?url';
-import voxTreeC from '../../../assets/wg/tree_c.vox?url';
+import voxBushA from "../../../assets/wg/bush_a.vox?url";
+import voxBushB from "../../../assets/wg/bush_b.vox?url";
+import voxBushC from "../../../assets/wg/bush_c.vox?url";
+import voxRockA from "../../../assets/wg/rock_a.vox?url";
+import voxRockB from "../../../assets/wg/rock_b.vox?url";
+import voxRockC from "../../../assets/wg/rock_c.vox?url";
+import voxSpruceA from "../../../assets/wg/spruce_a.vox?url";
+import voxTreeA from "../../../assets/wg/tree_a.vox?url";
+import voxTreeB from "../../../assets/wg/tree_b.vox?url";
+import voxTreeC from "../../../assets/wg/tree_c.vox?url";
 
-import type { Chunk } from '../../world/chunk/chunk';
-import { worldgen } from './worldgen';
-import { isServer } from '../../util/compat';
+import type { Chunk } from "../../world/chunk/chunk";
+import { worldgen } from "./worldgen";
+import { isServer } from "../../util/compat";
 
 class WorldgenAsset {
 	w: number;
@@ -30,7 +30,7 @@ class WorldgenAsset {
 		h: number,
 		d: number,
 		data: Uint8Array,
-		palette: number[]
+		palette: number[],
 	) {
 		this.w = w;
 		this.h = h;
@@ -83,16 +83,14 @@ export interface WorldgenAssetList {
 }
 
 const loadAsset = (href: string, palette: number[]): Promise<WorldgenAsset> => {
-	return new Promise(resolve => {
+	return new Promise((resolve) => {
 		setTimeout(async () => {
 			if (isServer()) {
 				// ToDo: Actually load the asset
 				resolve(new WorldgenAsset(0, 0, 0, new Uint8Array(0), []));
 				return;
 			}
-			const data = new Uint8Array(
-				await (await fetch(href)).arrayBuffer()
-			);
+			const data = new Uint8Array(await (await fetch(href)).arrayBuffer());
 			const voxData = readVox(data);
 			const size = voxData.size;
 			if (
@@ -116,9 +114,7 @@ const loadAsset = (href: string, palette: number[]): Promise<WorldgenAsset> => {
 				}
 				tmpBlocks[off] = li;
 			}
-			resolve(
-				new WorldgenAsset(size.y, size.z, size.x, tmpBlocks, palette)
-			);
+			resolve(new WorldgenAsset(size.y, size.z, size.x, tmpBlocks, palette));
 		}, 0);
 	});
 };

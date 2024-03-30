@@ -1,11 +1,11 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import meshUrl from '../../../assets/vox/staticShell.vox?url';
+import meshUrl from "../../../assets/vox/staticShell.vox?url";
 
-import type { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
-import type { Entity } from '../../world/entity/entity';
-import { StaticObject } from '../../world/chunk/staticObject';
+import type { VoxelMesh } from "../../render/meshes/voxelMesh/voxelMesh";
+import type { Entity } from "../../world/entity/entity";
+import { StaticObject } from "../../world/chunk/staticObject";
 
 export class StaticShell extends StaticObject {
 	mesh(): VoxelMesh {

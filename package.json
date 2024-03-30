@@ -14,25 +14,24 @@
         "dev:client": "vite",
         "dev:server": "node --import tsx --import ./src/server/loader.js --watch ./src/server/main.ts",
         "preview": "vite preview",
-        "pretty": "prettier --write \"src/**/*.{css,ts}\"",
+        "pretty": "npx @biomejs/biome format --write ./src",
         "optimize": "node scripts/optimizeAssets.js",
         "zip": "npm run build && zip -r ld-itch-compatible.zip dist/"
     },
     "devDependencies": {
+        "@biomejs/biome": "latest",
         "@types/howler": "latest",
         "@types/node": "latest",
         "@types/ws": "latest",
         "madge": "latest",
-        "prettier": "latest",
         "typescript": "latest",
         "vite": "latest"
     },
     "dependencies": {
         "gl-matrix": "latest",
         "howler": "latest",
-        "vox-reader": "latest",
-
         "tsx": "latest",
+        "vox-reader": "latest",
         "ws": "latest"
     }
 }

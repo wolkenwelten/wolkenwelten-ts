@@ -1,15 +1,15 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { registerBlockTypes } from '../content/blockTypes';
-import type { Game } from '../game';
-import type { Entity } from './entity/entity';
-import profiler from '../profiler';
-import { FireSystem } from './fireSystem';
-import { LCG } from '../util/prng';
-import { BlockType } from './blockType';
-import { Chunk } from './chunk/chunk';
-import { DangerZone } from './chunk/dangerZone';
+import { registerBlockTypes } from "../content/blockTypes";
+import type { Game } from "../game";
+import type { Entity } from "./entity/entity";
+import profiler from "../profiler";
+import { FireSystem } from "./fireSystem";
+import { LCG } from "../util/prng";
+import { BlockType } from "./blockType";
+import { Chunk } from "./chunk/chunk";
+import { DangerZone } from "./chunk/dangerZone";
 
 export const coordinateToWorldKey = (x: number, y: number, z: number) =>
 	((Math.floor(x) >> 5) & 0xffff) +
@@ -24,7 +24,7 @@ export class World {
 	seed: number;
 	game: Game;
 	blocks: BlockType[] = [];
-	blockTextureUrl = '';
+	blockTextureUrl = "";
 	lootRNG: LCG;
 	worldgenHandler: (chunk: Chunk) => void;
 
@@ -43,7 +43,7 @@ export class World {
 	worldgen(chunk: Chunk): Chunk {
 		const start = performance.now();
 		this.worldgenHandler(chunk);
-		profiler.add('worldgen', start, performance.now());
+		profiler.add("worldgen", start, performance.now());
 		return chunk;
 	}
 
@@ -125,9 +125,7 @@ export class World {
 
 	gc() {
 		const maxDistance =
-			this.game.render.renderDistance *
-			this.game.render.renderDistance *
-			4;
+			this.game.render.renderDistance * this.game.render.renderDistance * 4;
 		for (const chunk of this.chunks.values()) {
 			if (chunk.gc(maxDistance, this.game.player)) {
 				const key = coordinateToWorldKey(chunk.x, chunk.y, chunk.z);

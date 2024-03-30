@@ -1,15 +1,15 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { mat4 } from 'gl-matrix';
+import { mat4 } from "gl-matrix";
 
-import type { RenderManager } from '../render/render';
-import type { Entity } from '../world/entity/entity';
-import { coordinateToWorldKey } from '../world/world';
-import { Frustum } from './frustum';
-import { BlockMesh } from './meshes/blockMesh/blockMesh';
-import { VoxelMesh } from './meshes/voxelMesh/voxelMesh';
-import { VoxelMeshBlit } from './meshes/voxelMesh/voxelMesh';
+import type { RenderManager } from "../render/render";
+import type { Entity } from "../world/entity/entity";
+import { coordinateToWorldKey } from "../world/world";
+import { Frustum } from "./frustum";
+import { BlockMesh } from "./meshes/blockMesh/blockMesh";
+import { VoxelMesh } from "./meshes/voxelMesh/voxelMesh";
+import { VoxelMeshBlit } from "./meshes/voxelMesh/voxelMesh";
 
 type GeneratorQueueEntry = {
 	dd: number;
@@ -69,7 +69,7 @@ export class WorldRenderer {
 		const dmax = Math.min(
 			Math.abs(x - player.x),
 			Math.abs(y - player.y),
-			Math.abs(z - player.z)
+			Math.abs(z - player.z),
 		);
 		return dmax > 24;
 	}
@@ -103,7 +103,7 @@ export class WorldRenderer {
 		BlockMesh.bindShaderAndTexture(
 			projectionMatrix,
 			viewMatrix,
-			this.renderer.renderDistance
+			this.renderer.renderDistance,
 		);
 
 		let drawn = 0;
@@ -133,7 +133,7 @@ export class WorldRenderer {
 					if (mesh) {
 						const alpha = Math.min(
 							1.0,
-							(ticks - mesh.createdAt) * (1.0 / 24.0)
+							(ticks - mesh.createdAt) * (1.0 / 24.0),
 						);
 						const mask = this.calcMask(x, y, z);
 						if (drawQLen < this.drawQueue.length) {
@@ -173,7 +173,7 @@ export class WorldRenderer {
 		for (const { mesh, mask, alpha } of this.drawQueue) {
 			drawCalls += mesh.drawFast(mask, alpha, 6);
 		}
-		this.renderer.game.profiler.addAmount('blockMeshDrawCalls', drawCalls);
+		this.renderer.game.profiler.addAmount("blockMeshDrawCalls", drawCalls);
 
 		let staticCalls = 0;
 
@@ -189,7 +189,7 @@ export class WorldRenderer {
 			const key = coordinateToWorldKey(
 				mesh.chunk.x,
 				mesh.chunk.y,
-				mesh.chunk.z
+				mesh.chunk.z,
 			);
 			let staticMesh = this.staticMeshes.get(key);
 			if (!staticMesh) {
@@ -206,24 +206,18 @@ export class WorldRenderer {
 					const z = (s.z - s.chunk.z + transOff[2]) * 32;
 					blits.push({ vertices, x, y, z });
 				}
-				staticMesh.updateFromMultiple(
-					blits,
-					mesh.chunk.staticLastUpdated
-				);
+				staticMesh.updateFromMultiple(blits, mesh.chunk.staticLastUpdated);
 			}
 			staticMesh.draw(
 				mvp,
 				1.0,
 				mesh.chunk.x * 32,
 				mesh.chunk.y * 32,
-				mesh.chunk.z * 32
+				mesh.chunk.z * 32,
 			);
 			staticCalls++;
 		}
 
-		this.renderer.game.profiler.addAmount(
-			'staticMeshesDrawCalls',
-			staticCalls
-		);
+		this.renderer.game.profiler.addAmount("staticMeshesDrawCalls", staticCalls);
 	}
 }

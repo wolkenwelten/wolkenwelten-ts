@@ -1,7 +1,7 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { mat4 } from 'gl-matrix';
+import { mat4 } from "gl-matrix";
 
 export class Shader {
 	readonly name: string;
@@ -14,7 +14,7 @@ export class Shader {
 		name: string,
 		vert: string,
 		frag: string,
-		uniforms: string[]
+		uniforms: string[],
 	) {
 		this.name = name;
 
@@ -57,7 +57,7 @@ export class Shader {
 			const loc = gl.getUniformLocation(program, u);
 			if (!loc) {
 				throw new Error(
-					`Couldn't determine location of uniform '${u}' for '${name}'`
+					`Couldn't determine location of uniform '${u}' for '${name}'`,
 				);
 			}
 			this.uniforms.set(u, loc);
@@ -73,7 +73,7 @@ export class Shader {
 		const loc = this.uniforms.get(name);
 		if (!loc) {
 			throw new Error(
-				`No uniform location stored for '${name}' for shader '${this.name}'`
+				`No uniform location stored for '${name}' for shader '${this.name}'`,
 			);
 		}
 		this.gl.uniform1i(loc, value);
@@ -84,7 +84,7 @@ export class Shader {
 		const loc = this.uniforms.get(name);
 		if (!loc) {
 			throw new Error(
-				`No uniform location stored for '${name}' for shader '${this.name}'`
+				`No uniform location stored for '${name}' for shader '${this.name}'`,
 			);
 		}
 		this.gl.uniform1f(loc, value);
@@ -95,7 +95,7 @@ export class Shader {
 		const loc = this.uniforms.get(name);
 		if (!loc) {
 			throw new Error(
-				`No uniform location stored for '${name}' for shader '${this.name}'`
+				`No uniform location stored for '${name}' for shader '${this.name}'`,
 			);
 		}
 		this.gl.uniform3f(loc, x, y, z);
@@ -106,7 +106,7 @@ export class Shader {
 		const loc = this.uniforms.get(name);
 		if (!loc) {
 			throw new Error(
-				`No uniform location stored for '${name}' for shader '${this.name}'`
+				`No uniform location stored for '${name}' for shader '${this.name}'`,
 			);
 		}
 		this.gl.uniform4f(loc, r, g, b, a);
@@ -117,7 +117,7 @@ export class Shader {
 		const loc = this.uniforms.get(name);
 		if (!loc) {
 			throw new Error(
-				`No uniform location stored for '${name}' for shader '${this.name}'`
+				`No uniform location stored for '${name}' for shader '${this.name}'`,
 			);
 		}
 		this.gl.uniformMatrix4fv(loc, false, value);

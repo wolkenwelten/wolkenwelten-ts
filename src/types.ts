@@ -2,27 +2,27 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 
-declare module '*?raw' {
+declare module "*?raw" {
 	const content: string;
 	export default content;
 }
 
-declare module '*?url' {
+declare module "*?url" {
 	const content: string;
 	export default content;
 }
 
-declare module '*.png' {
+declare module "*.png" {
 	const content: string;
 	export default content;
 }
 
-declare module '*.jpg' {
+declare module "*.jpg" {
 	const content: string;
 	export default content;
 }
 
-declare module '*.module.css' {
+declare module "*.module.css" {
 	const content: any;
 	export default content;
 }

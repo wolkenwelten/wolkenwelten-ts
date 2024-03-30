@@ -1,25 +1,25 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { AudioManager } from './audio';
-import { BenchmarkManager } from './benchmark';
-import { registerAudioContent } from './content/audioContent';
-import { registerBlockTypes } from './content/blockTypes';
-import { registerItems } from './content/itemContent';
-import { registerStaticObjects } from './content/staticObjects';
-import { initWorldgen } from './content/worldgen/assets';
-import { InputManager } from './input';
-import { Options } from './options';
-import { PersistenceManager } from './persistence';
-import { ProfilingManager } from './profiler';
-import { RenderManager } from './render/render';
-import { UIManager } from './ui/ui';
-import { Character } from './world/entity/character';
-import { StaticObject } from './world/chunk/staticObject';
-import { Mob } from './world/entity/mob';
-import { Item } from './world/item/item';
-import { World } from './world/world';
-import { NetworkManager } from './network';
+import { AudioManager } from "./audio";
+import { BenchmarkManager } from "./benchmark";
+import { registerAudioContent } from "./content/audioContent";
+import { registerBlockTypes } from "./content/blockTypes";
+import { registerItems } from "./content/itemContent";
+import { registerStaticObjects } from "./content/staticObjects";
+import { initWorldgen } from "./content/worldgen/assets";
+import { InputManager } from "./input";
+import { Options } from "./options";
+import { PersistenceManager } from "./persistence";
+import { ProfilingManager } from "./profiler";
+import { RenderManager } from "./render/render";
+import { UIManager } from "./ui/ui";
+import { Character } from "./world/entity/character";
+import { StaticObject } from "./world/chunk/staticObject";
+import { Mob } from "./world/entity/mob";
+import { Item } from "./world/item/item";
+import { World } from "./world/world";
+import { NetworkManager } from "./network";
 
 export interface GameConfig {
 	parent: HTMLElement;
@@ -70,7 +70,7 @@ export class Game {
 			-1,
 			955,
 			Math.PI * 0.25,
-			-Math.PI / 18
+			-Math.PI / 18,
 		);
 		this.world.addEntity(this.player);
 		this.persistence = new PersistenceManager(this);

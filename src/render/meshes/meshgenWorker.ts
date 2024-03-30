@@ -27,7 +27,7 @@
  * And again there are probably better ways, this is just the first version that I thought of and since it works reasonably well my motivation
  * for optimization here is quite low.
  */
-import type { BlockType } from '../../world/blockType';
+import type { BlockType } from "../../world/blockType";
 
 interface GenArgs {
 	blockData: Uint8Array;
@@ -54,7 +54,7 @@ const outPush = (
 	y: number,
 	z: number,
 	sideAndLight: number,
-	tex: number
+	tex: number,
 ) => {
 	vertBuf[vertBufEnd++] = x;
 	vertBuf[vertBufEnd++] = y;
@@ -85,7 +85,7 @@ const addFront = (
 	h: number,
 	d: number,
 	tex: number,
-	light: number
+	light: number,
 ) => {
 	const side = 0; // sides.front
 	const zd = z + d;
@@ -119,7 +119,7 @@ const addBack = (
 	h: number,
 	d: number,
 	tex: number,
-	light: number
+	light: number,
 ) => {
 	const side = 1; // sides.front
 
@@ -152,7 +152,7 @@ const addTop = (
 	h: number,
 	d: number,
 	tex: number,
-	light: number
+	light: number,
 ) => {
 	const side = 2;
 	const yh = y + h;
@@ -186,7 +186,7 @@ const addBottom = (
 	h: number,
 	d: number,
 	tex: number,
-	light: number
+	light: number,
 ) => {
 	const side = 3;
 
@@ -219,7 +219,7 @@ const addLeft = (
 	h: number,
 	d: number,
 	tex: number,
-	light: number
+	light: number,
 ) => {
 	const side = 4;
 
@@ -252,7 +252,7 @@ const addRight = (
 	h: number,
 	d: number,
 	tex: number,
-	light: number
+	light: number,
 ) => {
 	const side = 5;
 	const xw = x + w;
@@ -281,7 +281,7 @@ const addRight = (
 const calcSideCache = (
 	sideCache: Uint8Array,
 	blockData: Uint8Array,
-	blocks: BlockType[]
+	blocks: BlockType[],
 ) => {
 	let sideOff = 0;
 	const blockSeeThrough: number[] = [];
@@ -299,23 +299,19 @@ const calcSideCache = (
 					if (blockSeeThrough[cb]) {
 						let ret = 1 << 6;
 						ret |=
-							blockData[off + 1] !== cb &&
-							blockSeeThrough[blockData[off + 1]]
+							blockData[off + 1] !== cb && blockSeeThrough[blockData[off + 1]]
 								? 1
 								: 0;
 						ret |=
-							blockData[off - 1] !== cb &&
-							blockSeeThrough[blockData[off - 1]]
+							blockData[off - 1] !== cb && blockSeeThrough[blockData[off - 1]]
 								? 2
 								: 0;
 						ret |=
-							blockData[off + 34] !== cb &&
-							blockSeeThrough[blockData[off + 34]]
+							blockData[off + 34] !== cb && blockSeeThrough[blockData[off + 34]]
 								? 4
 								: 0;
 						ret |=
-							blockData[off - 34] !== cb &&
-							blockSeeThrough[blockData[off - 34]]
+							blockData[off - 34] !== cb && blockSeeThrough[blockData[off - 34]]
 								? 8
 								: 0;
 						ret |=
@@ -391,7 +387,7 @@ const lightLeftRight = (
 	lightData: Uint8Array,
 	x: number,
 	y: number,
-	z: number
+	z: number,
 ) => {
 	const a = lightData[x * 34 * 34 + y * 34 + z];
 	const b = lightData[x * 34 * 34 + (y + 1) * 34 + z];
@@ -404,7 +400,7 @@ const lightTopBottom = (
 	lightData: Uint8Array,
 	x: number,
 	y: number,
-	z: number
+	z: number,
 ) => {
 	const a = lightData[x * 34 * 34 + y * 34 + z];
 	const b = lightData[x * 34 * 34 + y * 34 + z + 1];
@@ -417,7 +413,7 @@ const lightFrontBack = (
 	lightData: Uint8Array,
 	x: number,
 	y: number,
-	z: number
+	z: number,
 ) => {
 	const a = lightData[x * 34 * 34 + y * 34 + z];
 	const b = lightData[x * 34 * 34 + (y + 1) * 34 + z];

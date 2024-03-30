@@ -1,21 +1,17 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { WebSocket } from 'ws';
-import type { Server } from './server';
-import type {
-	WSHelloMessage,
-	WSMessage,
-	WSPlayerUpdate,
-} from '../network';
-import { handler } from './handler';
+import { WebSocket } from "ws";
+import type { Server } from "./server";
+import type { WSHelloMessage, WSMessage, WSPlayerUpdate } from "../network";
+import { handler } from "./handler";
 
 let idCounter = 0;
 export class ClientConnection {
 	private socket: WebSocket;
 
 	id: number;
-	playerName = '';
+	playerName = "";
 	server: Server;
 
 	x = 0;
@@ -30,7 +26,7 @@ export class ClientConnection {
 
 	getPlayerUpdateMsg(): WSPlayerUpdate {
 		return {
-			T: 'playerUpdate',
+			T: "playerUpdate",
 			playerID: this.id,
 			playerName: this.playerName,
 
@@ -53,17 +49,17 @@ export class ClientConnection {
 		const that = this;
 
 		const helloMsg: WSHelloMessage = {
-			T: 'hello',
+			T: "hello",
 			playerID: this.id,
 		};
 		this.send(helloMsg);
 
-		socket.on('close', () => {
+		socket.on("close", () => {
 			console.log(`Closing connection`);
 			server.sockets.delete(that.id);
 		});
 
-		socket.on('message', msg => {
+		socket.on("message", (msg) => {
 			try {
 				that.dispatch(JSON.parse(msg.toString()));
 			} catch (e) {

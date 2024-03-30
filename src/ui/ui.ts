@@ -1,17 +1,17 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import type { Game } from '../game';
-import { Crosshair } from './components/crosshair';
-import { ChatPanel } from './components/chatPanel';
-import { HealthBar } from './components/health/healthBar';
-import { FpsCounter } from './components/fpsCounter';
-import { Hotbar, HotbarEntryValue } from './components/hotbar/hotbar';
-import { IntroWindow } from './components/introWindow';
-import { PlayerModal } from './components/playerModal/playerModal';
-import { SystemLog } from './components/systemLog';
-import { IconManager } from './icon';
-import { isClient, mockElement } from '../util/compat';
+import type { Game } from "../game";
+import { Crosshair } from "./components/crosshair";
+import { ChatPanel } from "./components/chatPanel";
+import { HealthBar } from "./components/health/healthBar";
+import { FpsCounter } from "./components/fpsCounter";
+import { Hotbar, HotbarEntryValue } from "./components/hotbar/hotbar";
+import { IntroWindow } from "./components/introWindow";
+import { PlayerModal } from "./components/playerModal/playerModal";
+import { SystemLog } from "./components/systemLog";
+import { IconManager } from "./icon";
+import { isClient, mockElement } from "../util/compat";
 
 export class UIManager {
 	game: Game;
@@ -31,14 +31,12 @@ export class UIManager {
 	constructor(game: Game) {
 		this.game = game;
 		this.rootElement = game.config.parent || mockElement();
-		this.rootElement.setAttribute('paused', 'false');
+		this.rootElement.setAttribute("paused", "false");
 
 		this.icon = new IconManager(this);
 
-		this.uiWrapper = isClient()
-			? document.createElement('div')
-			: mockElement();
-		this.uiWrapper.id = 'wolkenwelten-ui-root';
+		this.uiWrapper = isClient() ? document.createElement("div") : mockElement();
+		this.uiWrapper.id = "wolkenwelten-ui-root";
 		this.rootElement.append(this.uiWrapper);
 		new FpsCounter(this.uiWrapper, game);
 		new Crosshair(this.uiWrapper);
@@ -57,19 +55,16 @@ export class UIManager {
 	update() {
 		if (this.game.running) {
 			if (this.rootHasPaused) {
-				this.rootElement.setAttribute('paused', 'false');
+				this.rootElement.setAttribute("paused", "false");
 				this.rootHasPaused = false;
 			}
 		} else {
 			if (!this.rootHasPaused) {
-				this.rootElement.setAttribute('paused', 'true');
+				this.rootElement.setAttribute("paused", "true");
 				this.rootHasPaused = true;
 			}
 		}
 		this.hotbar.update();
-		this.healthBar.update(
-			this.game.player.health,
-			this.game.player.maxHealth
-		);
+		this.healthBar.update(this.game.player.health, this.game.player.maxHealth);
 	}
 }

@@ -1,11 +1,11 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import type { Game } from './game';
-import { isClient, isServer } from './util/compat';
+import type { Game } from "./game";
+import { isClient, isServer } from "./util/compat";
 
 export interface PersistentState {
-	version: 'stateV1';
+	version: "stateV1";
 	player: {
 		x: number;
 		y: number;
@@ -17,13 +17,13 @@ export interface PersistentState {
 
 export class PersistenceManager {
 	game: Game;
-	lsKey = 'WolkenWeltenState';
+	lsKey = "WolkenWeltenState";
 
 	constructor(game: Game) {
 		this.game = game;
 		setInterval(this.persist.bind(this), 60000);
 		if (isClient()) {
-			addEventListener('beforeunload', this.persist.bind(this));
+			addEventListener("beforeunload", this.persist.bind(this));
 		}
 		this.tryToLoad();
 	}
@@ -38,7 +38,7 @@ export class PersistenceManager {
 		}
 		try {
 			const stateAny = JSON.parse(stateRaw);
-			if (stateAny.version !== 'stateV1') {
+			if (stateAny.version !== "stateV1") {
 				throw 123;
 			}
 			const state = stateAny as PersistentState;
@@ -60,7 +60,7 @@ export class PersistenceManager {
 		const { x, y, z, yaw, pitch } = player;
 
 		const state: PersistentState = {
-			version: 'stateV1',
+			version: "stateV1",
 			player: {
 				x,
 				y,

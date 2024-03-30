@@ -1,9 +1,9 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import type { Game } from './game';
-import { isClient } from './util/compat';
-import { Item } from './world/item/item';
+import type { Game } from "./game";
+import { isClient } from "./util/compat";
+import { Item } from "./world/item/item";
 
 export class InputManager {
 	game: Game;
@@ -19,14 +19,14 @@ export class InputManager {
 		this.game = game;
 		const that = this;
 		if (isClient()) {
-			window.addEventListener('keydown', e => {
+			window.addEventListener("keydown", (e) => {
 				that.keyStates.add(e.code);
 				const handler = that.keyPushHandler.get(e.code);
 				if (handler) {
 					handler();
 				}
 			});
-			window.addEventListener('keyup', e => {
+			window.addEventListener("keyup", (e) => {
 				that.keyStates.delete(e.code);
 				if (!that.game.running || !that.game.ready) {
 					return;
@@ -37,30 +37,30 @@ export class InputManager {
 				}
 			});
 		}
-		this.keyPushHandler.set('KeyO', () => {
+		this.keyPushHandler.set("KeyO", () => {
 			if (!that.game.running || !that.game.ready) {
 				return;
 			}
 			that.toggleInventory();
 		});
-		this.keyPushHandler.set('Escape', () => {
+		this.keyPushHandler.set("Escape", () => {
 			that.closeInventory();
 			if (that.game.ui.chat.visible()) {
 				that.game.ui.chat.hide();
 			}
 		});
-		this.keyPushHandler.set('KeyN', () => {
+		this.keyPushHandler.set("KeyN", () => {
 			if (!that.game.running || !that.game.ready) {
 				return;
 			}
 			that.game.player.noClip = !that.game.player.noClip;
 		});
-		this.keyPushHandler.set('Tab', () => {
+		this.keyPushHandler.set("Tab", () => {
 			if (document.pointerLockElement) {
 				document.exitPointerLock();
 			}
 		});
-		this.keyPushHandler.set('Enter', () => {
+		this.keyPushHandler.set("Enter", () => {
 			if (that.game.ui.chat.visible()) {
 				const msg = that.game.ui.chat.input.value.trim();
 				if (msg) {
@@ -94,8 +94,8 @@ export class InputManager {
 
 		if (isClient()) {
 			that.game.render.canvasWrapper.addEventListener(
-				'mousedown',
-				async e => {
+				"mousedown",
+				async (e) => {
 					if (!that.game.running || !that.game.ready) {
 						return;
 					}
@@ -104,31 +104,28 @@ export class InputManager {
 					}
 					await that.requestFullscreenAndPointerLock();
 				},
-				false
+				false,
 			);
-			that.game.ui.rootElement.addEventListener('mousedown', e =>
-				that.mouseStates.add(e.button)
+			that.game.ui.rootElement.addEventListener("mousedown", (e) =>
+				that.mouseStates.add(e.button),
 			);
-			that.game.ui.rootElement.addEventListener('contextmenu', e => {
+			that.game.ui.rootElement.addEventListener("contextmenu", (e) => {
 				if (!that.game.running || !that.game.ready) {
 					return;
 				}
 				e.preventDefault();
 			});
-			that.game.ui.rootElement.addEventListener('mouseup', e =>
-				that.mouseStates.delete(e.button)
+			that.game.ui.rootElement.addEventListener("mouseup", (e) =>
+				that.mouseStates.delete(e.button),
 			);
 			that.game.ui.rootElement.addEventListener(
-				'mousemove',
-				e => {
+				"mousemove",
+				(e) => {
 					if (document.pointerLockElement) {
-						that.game.player.rotate(
-							e.movementX * -0.001,
-							e.movementY * -0.001
-						);
+						that.game.player.rotate(e.movementX * -0.001, e.movementY * -0.001);
 					}
 				},
-				false
+				false,
 			);
 		}
 	}
@@ -185,25 +182,25 @@ export class InputManager {
 		const movement = { x: 0, y: 0, z: 0, sprint: true };
 		const actions = { primary: false, secondary: false };
 
-		if (this.keyStates.has('KeyW')) {
+		if (this.keyStates.has("KeyW")) {
 			movement.z = -1;
 		}
-		if (this.keyStates.has('KeyS')) {
+		if (this.keyStates.has("KeyS")) {
 			movement.z = 1;
 		}
-		if (this.keyStates.has('KeyA')) {
+		if (this.keyStates.has("KeyA")) {
 			movement.x = -1;
 		}
-		if (this.keyStates.has('KeyD')) {
+		if (this.keyStates.has("KeyD")) {
 			movement.x = 1;
 		}
-		if (this.keyStates.has('KeyF')) {
+		if (this.keyStates.has("KeyF")) {
 			movement.y = -1;
 		}
-		if (this.keyStates.has('KeyR')) {
+		if (this.keyStates.has("KeyR")) {
 			movement.y = 1;
 		}
-		if (this.keyStates.has('Space')) {
+		if (this.keyStates.has("Space")) {
 			movement.y = 1;
 		}
 
@@ -214,7 +211,7 @@ export class InputManager {
 				if (gamepad.axes.length >= 2) {
 					const len = Math.sqrt(
 						gamepad.axes[0] * gamepad.axes[0] +
-							gamepad.axes[1] * gamepad.axes[1]
+							gamepad.axes[1] * gamepad.axes[1],
 					);
 					if (len > 0.16) {
 						movement.x = gamepad.axes[0];
@@ -224,13 +221,10 @@ export class InputManager {
 				if (gamepad.axes.length >= 4) {
 					const len = Math.sqrt(
 						gamepad.axes[2] * gamepad.axes[2] +
-							gamepad.axes[3] * gamepad.axes[3]
+							gamepad.axes[3] * gamepad.axes[3],
 					);
 					if (len > 0.16) {
-						player.rotate(
-							gamepad.axes[2] * -0.01,
-							gamepad.axes[3] * -0.01
-						);
+						player.rotate(gamepad.axes[2] * -0.01, gamepad.axes[3] * -0.01);
 					}
 				}
 				if (gamepad.buttons[0]?.pressed) {
@@ -239,10 +233,7 @@ export class InputManager {
 				if (gamepad.buttons[2]?.pressed) {
 					movement.y = -1;
 				}
-				if (
-					gamepad.buttons[4]?.pressed ||
-					gamepad.buttons[5]?.pressed
-				) {
+				if (gamepad.buttons[4]?.pressed || gamepad.buttons[5]?.pressed) {
 					movement.sprint = true;
 				}
 				if (gamepad.buttons[14]?.pressed) {
@@ -250,14 +241,11 @@ export class InputManager {
 					const cooldown = this.buttonCooldown.get(key) || 0;
 					if (cooldown < this.game.ticks) {
 						const newSelection =
-							(player.inventory.selection - 1) %
-							player.inventory.items.length;
+							(player.inventory.selection - 1) % player.inventory.items.length;
 						player.inventory.select(
 							newSelection >= 0
 								? newSelection
-								: player.inventory.items.length -
-										newSelection -
-										2
+								: player.inventory.items.length - newSelection - 2,
 						);
 						this.buttonCooldown.set(key, this.game.ticks + 20);
 					}
@@ -270,14 +258,11 @@ export class InputManager {
 					const cooldown = this.buttonCooldown.get(key) || 0;
 					if (cooldown < this.game.ticks) {
 						const newSelection =
-							(player.inventory.selection + 1) %
-							player.inventory.items.length;
+							(player.inventory.selection + 1) % player.inventory.items.length;
 						player.inventory.select(
 							newSelection >= 0
 								? newSelection
-								: player.inventory.items.length -
-										newSelection -
-										2
+								: player.inventory.items.length - newSelection - 2,
 						);
 						this.buttonCooldown.set(key, this.game.ticks + 20);
 					}
@@ -293,18 +278,12 @@ export class InputManager {
 				}
 
 				if (gamepad.buttons[7]?.pressed) {
-					if (
-						!gamepad.buttons[7].value ||
-						gamepad.buttons[7].value > 0.5
-					) {
+					if (!gamepad.buttons[7].value || gamepad.buttons[7].value > 0.5) {
 						actions.primary = true;
 					}
 				}
 				if (gamepad.buttons[6]?.pressed) {
-					if (
-						!gamepad.buttons[6].value ||
-						gamepad.buttons[6].value > 0.5
-					) {
+					if (!gamepad.buttons[6].value || gamepad.buttons[6].value > 0.5) {
 						actions.secondary = true;
 					}
 				}
@@ -314,18 +293,10 @@ export class InputManager {
 
 		if (player.noClip) {
 			const speed = movement.sprint ? 1.5 : 0.3;
-			player.fly(
-				movement.x * speed,
-				movement.y * speed,
-				movement.z * speed
-			);
+			player.fly(movement.x * speed, movement.y * speed, movement.z * speed);
 		} else {
 			const speed = movement.sprint ? 0.3 : 0.2;
-			player.move(
-				movement.x * speed,
-				movement.y * speed,
-				movement.z * speed
-			);
+			player.move(movement.x * speed, movement.y * speed, movement.z * speed);
 		}
 
 		for (let i = 0; i < 10; i++) {

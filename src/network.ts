@@ -2,31 +2,31 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 
-import type { Character } from './world/entity/character';
+import type { Character } from "./world/entity/character";
 
 export interface WSMessage {
 	T: string;
 }
 
 export interface WSHelloMessage extends WSMessage {
-	T: 'hello';
+	T: "hello";
 	playerID: number;
 }
 
 export interface WSChatMessage extends WSMessage {
-	T: 'msg';
+	T: "msg";
 	playerID: number;
 	msg: string;
 }
 
 export interface WSNameChange extends WSMessage {
-	T: 'nameChange';
+	T: "nameChange";
 	playerID: number;
 	newName: string;
 }
 
 export interface WSPlayerUpdate extends WSMessage {
-	T: 'playerUpdate';
+	T: "playerUpdate";
 
 	playerID: number;
 	playerName: string;
@@ -52,7 +52,7 @@ export class NetworkManager {
 
 	sendChat(msg: string) {
 		const m: WSChatMessage = {
-			T: 'msg',
+			T: "msg",
 			msg,
 			playerID: this.id,
 		};
@@ -61,7 +61,7 @@ export class NetworkManager {
 
 	sendNameChange(newName: string) {
 		const msg: WSNameChange = {
-			T: 'nameChange',
+			T: "nameChange",
 			newName,
 			playerID: this.id,
 		};
@@ -70,7 +70,7 @@ export class NetworkManager {
 
 	sendPlayerUpdate(playerName: string, player: Character) {
 		const msg: WSPlayerUpdate = {
-			T: 'playerUpdate',
+			T: "playerUpdate",
 
 			playerID: this.id,
 			playerName,

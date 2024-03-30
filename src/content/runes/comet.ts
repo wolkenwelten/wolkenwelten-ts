@@ -1,19 +1,19 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import itemIcon from '../../../assets/gfx/items/comet.png';
-import meshUrl from '../../../assets/vox/items/stone.vox?url';
-import type { TriangleMesh } from '../../render/meshes/triangleMesh/triangleMesh';
-import type { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
-import { Mob } from '../../world/entity/mob';
-import { Character } from '../../world/entity/character';
-import { Entity } from '../../world/entity/entity';
-import type { World } from '../../world/world';
-import { Fire } from '../../world/fireSystem';
-import { Rune } from './rune';
+import itemIcon from "../../../assets/gfx/items/comet.png";
+import meshUrl from "../../../assets/vox/items/stone.vox?url";
+import type { TriangleMesh } from "../../render/meshes/triangleMesh/triangleMesh";
+import type { VoxelMesh } from "../../render/meshes/voxelMesh/voxelMesh";
+import { Mob } from "../../world/entity/mob";
+import { Character } from "../../world/entity/character";
+import { Entity } from "../../world/entity/entity";
+import type { World } from "../../world/world";
+import { Fire } from "../../world/fireSystem";
+import { Rune } from "./rune";
 
 export class Comet extends Rune {
-	name = 'Comet';
+	name = "Comet";
 	icon = itemIcon;
 	meshUrl = meshUrl;
 
@@ -86,7 +86,7 @@ export class CometEntity extends Entity {
 		this.caster = caster;
 		this.source = caster;
 		this.vy = 0.2;
-		this.playSound('projectile', 1, true);
+		this.playSound("projectile", 1, true);
 	}
 
 	mesh(): TriangleMesh | VoxelMesh | null {
@@ -105,7 +105,7 @@ export class CometEntity extends Entity {
 				}
 			}
 		}
-		this.playUnmovingSound('bomb', 1);
+		this.playUnmovingSound("bomb", 1);
 	}
 
 	private damageMobs(x: number, y: number, z: number) {
@@ -133,33 +133,20 @@ export class CometEntity extends Entity {
 	private placeBlock() {
 		if (!this.world.getBlock(this.x, this.y, this.z)) {
 			this.world.setBlock(this.x, this.y, this.z, this.blockType);
-			this.world.dangerZone.add(
-				this.x - 1,
-				this.y - 1,
-				this.z - 1,
-				3,
-				3,
-				3
-			);
+			this.world.dangerZone.add(this.x - 1, this.y - 1, this.z - 1, 3, 3, 3);
 			return;
 		}
 		for (let ox = -1; ox < 2; ox++) {
 			for (let oy = -1; oy < 2; oy++) {
 				for (let oz = -1; oz < 2; oz++) {
-					if (
-						!this.world.getBlock(
-							this.x + ox,
-							this.y + oy,
-							this.z + oz
-						)
-					) {
+					if (!this.world.getBlock(this.x + ox, this.y + oy, this.z + oz)) {
 						this.removeArea(this.x + ox, this.y + oy, this.z + oz);
 						this.damageMobs(this.x + ox, this.y + oy, this.z + oz);
 						this.world.setBlock(
 							this.x + ox,
 							this.y + oy - 1,
 							this.z + oz,
-							this.blockType
+							this.blockType,
 						);
 						this.world.dangerZone.add(
 							this.x + ox - 2,
@@ -167,7 +154,7 @@ export class CometEntity extends Entity {
 							this.z + oz - 2,
 							5,
 							5,
-							5
+							5,
 						);
 						return;
 					}
@@ -195,11 +182,11 @@ export class CometEntity extends Entity {
 			if (dd <= 1.1) {
 				const dmg = Math.max(
 					2,
-					this.world.blocks[this.blockType].health * 0.05
+					this.world.blocks[this.blockType].health * 0.05,
 				);
 				this.source?.doDamage(e, dmg);
 				this.placeBlock();
-				this.playUnmovingSound('pock', 0.3);
+				this.playUnmovingSound("pock", 0.3);
 				this.destroy();
 				return;
 			}
@@ -216,27 +203,27 @@ export class CometEntity extends Entity {
 			this.x - 0.5,
 			this.y - 0.5,
 			this.z - 0.5,
-			4096
+			4096,
 		);
 		Fire.addParticle(
 			this.world,
 			this.x - 0.5,
 			this.y - 0.5,
 			this.z - 0.5,
-			4096
+			4096,
 		);
 		Fire.addParticle(
 			this.world,
 			this.x - 0.5,
 			this.y - 0.5,
 			this.z - 0.5,
-			4096
+			4096,
 		);
 
 		const vv = this.vx * this.vx + this.vy * this.vy + this.vz * this.vz;
 		if (vv < 0.01 && this.collides()) {
 			this.placeBlock();
-			this.playUnmovingSound('pock', 0.3);
+			this.playUnmovingSound("pock", 0.3);
 			this.destroy();
 			return;
 		}

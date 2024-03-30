@@ -1,8 +1,8 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import type { Game } from './game';
-import { BlockMesh } from './render/meshes/blockMesh/blockMesh';
+import type { Game } from "./game";
+import { BlockMesh } from "./render/meshes/blockMesh/blockMesh";
 
 export class BenchmarkManager {
 	game: Game;
@@ -36,7 +36,7 @@ export class BenchmarkManager {
 							this.benchmarkChunk(
 								c[0] + ox * 32,
 								c[1] + oy * 32,
-								c[2] + oz * 32
+								c[2] + oz * 32,
 							);
 						}
 					}

@@ -1,9 +1,9 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import type { Game } from '../../game';
-import { Div } from '../utils';
-import styles from './introWindow.module.css';
+import type { Game } from "../../game";
+import { Div } from "../utils";
+import styles from "./introWindow.module.css";
 
 export class IntroWindow {
 	div: HTMLElement;
@@ -27,7 +27,7 @@ export class IntroWindow {
 
 		const startButton = Div({
 			class: styles.startButton,
-			text: 'Start',
+			text: "Start",
 			onClick: () => {
 				game.running = true;
 				game.input.requestFullscreenAndPointerLock();

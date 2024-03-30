@@ -1,7 +1,7 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import type { World } from '../world';
+import type { World } from "../world";
 
 export interface DangerZoneEntry {
 	x: number;
@@ -39,7 +39,7 @@ export class DangerZone {
 		fromZ: number,
 		toX: number,
 		toY: number,
-		toZ: number
+		toZ: number,
 	): boolean {
 		const b = this.world.getBlock(fromX, fromY, fromZ) || 0;
 		const bt = this.world.blocks[b];

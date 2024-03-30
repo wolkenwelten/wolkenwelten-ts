@@ -1,16 +1,16 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { mat4 } from 'gl-matrix';
+import { mat4 } from "gl-matrix";
 
-import shaderFragSource from './triangleMesh.frag?raw';
-import shaderVertSource from './triangleMesh.vert?raw';
+import shaderFragSource from "./triangleMesh.frag?raw";
+import shaderVertSource from "./triangleMesh.vert?raw";
 
-import '../../../types';
-import type { BlockType } from '../../../world/blockType';
-import type { Texture } from '../../texture';
-import { Shader } from '../../shader';
-import { WavefrontFile, WavefrontObject } from './objLoader';
+import "../../../types";
+import type { BlockType } from "../../../world/blockType";
+import type { Texture } from "../../texture";
+import { Shader } from "../../shader";
+import { WavefrontFile, WavefrontObject } from "./objLoader";
 
 export class TriangleMesh {
 	static gl: WebGL2RenderingContext;
@@ -39,10 +39,10 @@ export class TriangleMesh {
 		this.gl = glc;
 		this.shader = new Shader(
 			this.gl,
-			'textMesh',
+			"textMesh",
 			shaderVertSource,
 			shaderFragSource,
-			['cur_tex', 'mat_mvp', 'in_color']
+			["cur_tex", "mat_mvp", "in_color"],
 		);
 	}
 
@@ -63,7 +63,7 @@ export class TriangleMesh {
 			this.vertices.push(pos[2]);
 
 			if (f.textureCoordinateIndex === undefined) {
-				throw new Error('Missing texture coordinates');
+				throw new Error("Missing texture coordinates");
 			}
 			const tex = obj.textureCoordinates[f.textureCoordinateIndex];
 			this.vertices.push(tex[0]);
@@ -178,12 +178,12 @@ export class TriangleMesh {
 	draw(mat_mvp: mat4) {
 		const gl = TriangleMesh.gl;
 		if (!this.finished) {
-			throw new Error('Trying to draw unfinished mesh');
+			throw new Error("Trying to draw unfinished mesh");
 		}
 		TriangleMesh.shader
 			.bind()
-			.uniform4fv('mat_mvp', mat_mvp)
-			.uniform4f('in_color', 1, 1, 1, 1);
+			.uniform4fv("mat_mvp", mat_mvp)
+			.uniform4f("in_color", 1, 1, 1, 1);
 
 		this.texture.bind();
 		gl.bindVertexArray(this.vao);

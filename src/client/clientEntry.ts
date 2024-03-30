@@ -1,13 +1,13 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import type { Game } from '../game';
-import type { WSPlayerUpdate } from '../network';
-import { Character } from '../world/entity/character';
+import type { Game } from "../game";
+import type { WSPlayerUpdate } from "../network";
+import { Character } from "../world/entity/character";
 
 export class ClientEntry {
 	id: number;
-	name = '';
+	name = "";
 
 	char: Character;
 

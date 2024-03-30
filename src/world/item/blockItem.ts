@@ -1,12 +1,12 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import type { TriangleMesh } from '../../render/meshes/triangleMesh/triangleMesh';
-import type { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
-import type { Entity } from '../entity/entity';
-import type { World } from '../world';
-import { Character } from '../entity/character';
-import { Item } from './item';
+import type { TriangleMesh } from "../../render/meshes/triangleMesh/triangleMesh";
+import type { VoxelMesh } from "../../render/meshes/voxelMesh/voxelMesh";
+import type { Entity } from "../entity/entity";
+import type { World } from "../world";
+import { Character } from "../entity/character";
+import { Item } from "./item";
 
 export class BlockItem extends Item {
 	blockType: number;

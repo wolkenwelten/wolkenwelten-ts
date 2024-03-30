@@ -9,7 +9,7 @@ export class LCG {
 	}
 
 	constructor(seed: number | string | number[]) {
-		if (typeof seed === 'number') {
+		if (typeof seed === "number") {
 			this.seed = seed;
 		} else if (Array.isArray(seed)) {
 			this.seed = 2345;

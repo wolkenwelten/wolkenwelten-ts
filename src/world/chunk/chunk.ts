@@ -1,10 +1,10 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import type { Entity } from '../entity/entity';
-import type { World } from '../world';
-import type { StaticObject } from './staticObject';
-import { lightGenSimple } from './lightGen';
+import type { Entity } from "../entity/entity";
+import type { World } from "../world";
+import type { StaticObject } from "./staticObject";
+import { lightGenSimple } from "./lightGen";
 
 const coordinateToOffset = (x: number, y: number, z: number) =>
 	(Math.floor(x) & 0x1f) |
@@ -63,7 +63,7 @@ export class Chunk {
 		w: number,
 		h: number,
 		d: number,
-		block: number
+		block: number,
 	) {
 		for (let x = cx; x < cx + w; x++) {
 			const xOff = Math.floor(x) & 0x1f;
@@ -94,7 +94,7 @@ export class Chunk {
 		w: number,
 		h: number,
 		d: number,
-		block: number
+		block: number,
 	) {
 		this.setBoxUnsafe(cx, cy, cz, w, h, d, block);
 		this.world.invalidatePosition(cx, cy, cz);
@@ -112,7 +112,7 @@ export class Chunk {
 		cy: number,
 		cz: number,
 		r: number,
-		block: number
+		block: number,
 	) {
 		const rrr = r * r;
 		for (let x = -r; x <= r; x++) {

@@ -1,7 +1,7 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { isServer } from '../util/compat';
+import { isServer } from "../util/compat";
 const isPowerOf2 = (value: number) => (value & (value - 1)) === 0;
 
 type MaybeWebGLTexture = WebGLTexture | undefined;
@@ -16,7 +16,7 @@ export const allTexturesLoaded = () => texturesLoaded >= texturesInFlight;
 export class Texture {
 	readonly name: string;
 	readonly texture: WebGLTexture;
-	readonly type: '2D' | '2DArray' | 'LUT';
+	readonly type: "2D" | "2DArray" | "LUT";
 	readonly gl: WebGL2RenderingContext;
 	hasMipmap = false;
 	colors: number[] = [];
@@ -47,7 +47,7 @@ export class Texture {
 			border,
 			srcFormat,
 			srcType,
-			pixel
+			pixel,
 		);
 
 		const image = new Image();
@@ -60,19 +60,11 @@ export class Texture {
 				internalFormat,
 				srcFormat,
 				srcType,
-				image
+				image,
 			);
 
-			gl.texParameteri(
-				gl.TEXTURE_2D,
-				gl.TEXTURE_WRAP_S,
-				gl.CLAMP_TO_EDGE
-			);
-			gl.texParameteri(
-				gl.TEXTURE_2D,
-				gl.TEXTURE_WRAP_T,
-				gl.CLAMP_TO_EDGE
-			);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 			if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
 				gl.generateMipmap(gl.TEXTURE_2D);
 				that.hasMipmap = true;
@@ -111,7 +103,7 @@ export class Texture {
 			border,
 			srcFormat,
 			srcType,
-			pixel
+			pixel,
 		);
 
 		const image = new Image();
@@ -131,7 +123,7 @@ export class Texture {
 				0,
 				srcFormat,
 				srcType,
-				image
+				image,
 			);
 
 			if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
@@ -171,7 +163,7 @@ export class Texture {
 			border,
 			srcFormat,
 			srcType,
-			pixel
+			pixel,
 		);
 		this.dirtyLUT = false;
 	}
@@ -197,7 +189,7 @@ export class Texture {
 		gl: WebGL2RenderingContext,
 		name: string,
 		url: string,
-		type: '2D' | '2DArray' | 'LUT' = '2D'
+		type: "2D" | "2DArray" | "LUT" = "2D",
 	) {
 		this.name = name;
 		this.gl = gl;
@@ -210,13 +202,13 @@ export class Texture {
 		this.texture = texture;
 		switch (type) {
 			default:
-			case '2D':
+			case "2D":
 				this.loadTexture2D(url);
 				break;
-			case '2DArray':
+			case "2DArray":
 				this.loadTexture2DArray(url);
 				break;
-			case 'LUT':
+			case "LUT":
 				this.bind();
 				this.createLUT();
 				this.nearest();
@@ -225,7 +217,7 @@ export class Texture {
 	}
 
 	target() {
-		return this.type === '2DArray'
+		return this.type === "2DArray"
 			? this.gl.TEXTURE_2D_ARRAY
 			: this.gl.TEXTURE_2D;
 	}
@@ -253,24 +245,16 @@ export class Texture {
 			this.gl.texParameteri(
 				target,
 				this.gl.TEXTURE_MIN_FILTER,
-				this.gl.NEAREST_MIPMAP_LINEAR
+				this.gl.NEAREST_MIPMAP_LINEAR,
 			);
 			this.gl.texParameteri(
 				target,
 				this.gl.TEXTURE_MAG_FILTER,
-				this.gl.NEAREST_MIPMAP_LINEAR
+				this.gl.NEAREST_MIPMAP_LINEAR,
 			);
 		} else {
-			this.gl.texParameteri(
-				target,
-				this.gl.TEXTURE_MIN_FILTER,
-				this.gl.LINEAR
-			);
-			this.gl.texParameteri(
-				target,
-				this.gl.TEXTURE_MAG_FILTER,
-				this.gl.LINEAR
-			);
+			this.gl.texParameteri(target, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
+			this.gl.texParameteri(target, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
 		}
 		return this;
 	}
@@ -282,23 +266,23 @@ export class Texture {
 			this.gl.texParameteri(
 				target,
 				this.gl.TEXTURE_MIN_FILTER,
-				this.gl.NEAREST_MIPMAP_NEAREST
+				this.gl.NEAREST_MIPMAP_NEAREST,
 			);
 			this.gl.texParameteri(
 				target,
 				this.gl.TEXTURE_MAG_FILTER,
-				this.gl.NEAREST
+				this.gl.NEAREST,
 			);
 		} else {
 			this.gl.texParameteri(
 				target,
 				this.gl.TEXTURE_MIN_FILTER,
-				this.gl.NEAREST
+				this.gl.NEAREST,
 			);
 			this.gl.texParameteri(
 				target,
 				this.gl.TEXTURE_MAG_FILTER,
-				this.gl.NEAREST
+				this.gl.NEAREST,
 			);
 		}
 		return this;

@@ -6,33 +6,35 @@ import type {
 	WSMessage,
 	WSNameChange,
 	WSPlayerUpdate,
-} from '../network';
-import { ClientConnection } from './connection';
+} from "../network";
+import { ClientConnection } from "./connection";
 
-export const handler: Map<string, (con: ClientConnection, msg: WSMessage) => void> =
-	new Map();
+export const handler: Map<
+	string,
+	(con: ClientConnection, msg: WSMessage) => void
+> = new Map();
 
 export const addHandler = (
 	T: string,
-	fun: (con: ClientConnection, msg: WSMessage) => void
+	fun: (con: ClientConnection, msg: WSMessage) => void,
 ) => handler.set(T, fun);
 
-handler.set('msg', (con, raw) => {
+handler.set("msg", (con, raw) => {
 	const msg = raw as WSChatMessage;
 	console.log(`Chat: ${msg.msg}`);
 	con.server.sendAll(raw);
 });
 
-handler.set('nameChange', (con, raw) => {
+handler.set("nameChange", (con, raw) => {
 	const msg = raw as WSNameChange;
 	con.playerName = msg.newName;
 	con.server.sendAll({
-		T: 'msg',
+		T: "msg",
 		msg: `${con.playerName} joined`,
 	} as WSChatMessage);
 });
 
-handler.set('playerUpdate', (con, raw) => {
+handler.set("playerUpdate", (con, raw) => {
 	const msg = raw as WSPlayerUpdate;
 	con.x = msg.x;
 	con.y = msg.y;

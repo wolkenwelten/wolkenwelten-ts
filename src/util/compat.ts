@@ -1,5 +1,5 @@
 export const isServer = () =>
-	typeof window === 'undefined' && typeof process === 'object';
+	typeof window === "undefined" && typeof process === "object";
 export const isClient = () => !isServer();
 
 export const mockElement = () => {
@@ -44,7 +44,7 @@ export const mockContextWebGL2 = () => {
 		attachShader: (program: any, shader: any) => {},
 		linkProgram: (program: any) => true,
 		getProgramParameter: (program: any, t: any) => true,
-		getProgramInfoLog: (program: any, t: any) => '',
+		getProgramInfoLog: (program: any, t: any) => "",
 		getShaderParameter: (shader: any, t: any) => true,
 		getUniformLocation: (program: any, u: any) => 1,
 		useProgram: (program: any) => {},

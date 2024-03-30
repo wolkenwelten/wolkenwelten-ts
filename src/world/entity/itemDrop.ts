@@ -1,14 +1,14 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { mat4 } from 'gl-matrix';
+import { mat4 } from "gl-matrix";
 
-import type { TriangleMesh } from '../../render/meshes/triangleMesh/triangleMesh';
-import type { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
-import type { Item } from '../item/item';
-import type { World } from '../world';
-import type { Character } from './character';
-import { Entity } from './entity';
+import type { TriangleMesh } from "../../render/meshes/triangleMesh/triangleMesh";
+import type { VoxelMesh } from "../../render/meshes/voxelMesh/voxelMesh";
+import type { Item } from "../item/item";
+import type { World } from "../world";
+import type { Character } from "./character";
+import { Entity } from "./entity";
 
 const transPos = new Float32Array([0, 0, 0]);
 const modelViewMatrix = mat4.create();
@@ -67,7 +67,7 @@ export class ItemDrop extends Entity {
 		}
 
 		this.destroy();
-		this.world.game.audio.play('pock', 0.4);
+		this.world.game.audio.play("pock", 0.4);
 	}
 
 	update() {
@@ -115,7 +115,7 @@ export class ItemDrop extends Entity {
 		mat4.rotateY(
 			modelViewMatrix,
 			modelViewMatrix,
-			this.id * 7 + this.world.game.ticks * 0.01
+			this.id * 7 + this.world.game.ticks * 0.01,
 		);
 		mat4.mul(modelViewMatrix, viewMatrix, modelViewMatrix);
 		mat4.mul(modelViewMatrix, projectionMatrix, modelViewMatrix);

@@ -1,16 +1,16 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { mat4 } from 'gl-matrix';
+import { mat4 } from "gl-matrix";
 
-import type { TriangleMesh } from '../../render/meshes/triangleMesh/triangleMesh';
-import type { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
-import type { Entity } from './entity';
-import type { World } from '../world';
-import { Being } from './being';
-import { ItemDrop } from './itemDrop';
-import { Inventory } from '../item/inventory';
-import { Item, MaybeItem } from '../item/item';
+import type { TriangleMesh } from "../../render/meshes/triangleMesh/triangleMesh";
+import type { VoxelMesh } from "../../render/meshes/voxelMesh/voxelMesh";
+import type { Entity } from "./entity";
+import type { World } from "../world";
+import { Being } from "./being";
+import { ItemDrop } from "./itemDrop";
+import { Inventory } from "../item/inventory";
+import { Item, MaybeItem } from "../item/item";
 
 const CHARACTER_ACCELERATION = 0.05;
 const CHARACTER_STOP_RATE = CHARACTER_ACCELERATION * 3.0;
@@ -52,11 +52,11 @@ export class Character extends Being {
 
 	/* Simple cheat, can be run from the browser console by typing `wolkenwelten.player.getGoodStuff();` */
 	getGoodStuff() {
-		this.inventory.add(Item.create('earthBullet', this.world));
-		this.inventory.add(Item.create('earthWall', this.world));
-		this.inventory.add(Item.create('fireBreath', this.world));
-		this.inventory.add(Item.create('comet', this.world));
-		this.inventory.add(Item.create('stone', this.world, 50));
+		this.inventory.add(Item.create("earthBullet", this.world));
+		this.inventory.add(Item.create("earthWall", this.world));
+		this.inventory.add(Item.create("fireBreath", this.world));
+		this.inventory.add(Item.create("comet", this.world));
+		this.inventory.add(Item.create("stone", this.world, 50));
 
 		//this.equipment.items[0] = Item.create('club', this.world);
 	}
@@ -93,7 +93,7 @@ export class Character extends Being {
 		y: number,
 		z: number,
 		yaw: number,
-		pitch: number
+		pitch: number,
 	) {
 		super(world, x, y, z);
 		this.inventory = new Inventory(10);
@@ -118,7 +118,7 @@ export class Character extends Being {
 	damage(rawAmount: number) {
 		this.health = Math.min(
 			this.maxHealth,
-			Math.max(0, this.health - rawAmount)
+			Math.max(0, this.health - rawAmount),
 		);
 		if (this.health <= 0) {
 			if (!this.isDead) {
@@ -215,18 +215,16 @@ export class Character extends Being {
 		const underwater = this.isUnderwater();
 
 		const movementLength = Math.sqrt(
-			this.movementX * this.movementX + this.movementZ * this.movementZ
+			this.movementX * this.movementX + this.movementZ * this.movementZ,
 		);
 		this.walkCycleCounter += Math.min(0.2, movementLength);
 		if (this.walkCycleCounter > this.nextStepSound && this.mayJump()) {
 			this.nextStepSound = this.walkCycleCounter + 6;
-			this.world.game.audio.play('step', 0.5);
+			this.world.game.audio.play("step", 0.5);
 		}
 		let speed = 0.4;
 		let accel =
-			movementLength > 0.01
-				? CHARACTER_ACCELERATION
-				: CHARACTER_STOP_RATE;
+			movementLength > 0.01 ? CHARACTER_ACCELERATION : CHARACTER_STOP_RATE;
 
 		if (!this.mayJump()) {
 			speed *= 0.8; // Slow down player movement changes during jumps
@@ -293,7 +291,7 @@ export class Character extends Being {
 		const dz = this.vz - oldVz;
 		const force = Math.sqrt(dx * dx + dy * dy + dz * dz);
 		if (force > 0.2) {
-			this.world.game.audio.play('stomp', 0.5);
+			this.world.game.audio.play("stomp", 0.5);
 		}
 		if (force > 0.1) {
 			const amount = Math.floor(force * 2);
@@ -389,18 +387,18 @@ export class Character extends Being {
 
 	/* Callback function that gets called when this Character dies */
 	onDeath() {
-		this.world.game.audio.play('ungh', 0.2);
+		this.world.game.audio.play("ungh", 0.2);
 		this.world.game.ui.hotbar.clear();
 		this.init();
 	}
 
 	/* Callback function that gets called whenever this character is attacked */
 	onAttack(perpetrator: Entity): void {
-		this.world.game.render.canvasWrapper.classList.remove('fx-damage');
+		this.world.game.render.canvasWrapper.classList.remove("fx-damage");
 		this.world.game.render.canvasWrapper.getBoundingClientRect();
-		this.world.game.render.canvasWrapper.classList.add('fx-damage');
+		this.world.game.render.canvasWrapper.classList.add("fx-damage");
 		this.miningCooldownUntil = this.world.game.ticks + 10;
-		this.world.game.audio.play('ungh', 0.2);
+		this.world.game.audio.play("ungh", 0.2);
 	}
 
 	/* Return true when the character shouldn't be able to do anything */
@@ -420,14 +418,14 @@ export class Character extends Being {
 		const cooldownDur = item ? item.attackCooldown(this) : 80;
 		this.cooldown(cooldownDur);
 		if (hit) {
-			this.world.game.audio.play('punch');
+			this.world.game.audio.play("punch");
 			this.miningCooldownUntil = this.world.game.ticks + cooldownDur;
 
 			if (item) {
 				item.onAttackWith(this);
 			}
 		} else {
-			this.world.game.audio.play('punchMiss');
+			this.world.game.audio.play("punchMiss");
 		}
 	}
 

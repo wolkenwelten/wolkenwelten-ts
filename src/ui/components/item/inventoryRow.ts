@@ -1,11 +1,11 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import type { Game } from '../../../game';
-import type { Inventory } from '../../../world/item/inventory';
-import { Div } from '../../utils';
-import styles from './inventoryRow.module.css';
-import { InventorySlotWidget } from './inventorySlotWidget';
+import type { Game } from "../../../game";
+import type { Inventory } from "../../../world/item/inventory";
+import { Div } from "../../utils";
+import styles from "./inventoryRow.module.css";
+import { InventorySlotWidget } from "./inventorySlotWidget";
 
 export class InventoryRow {
 	div: HTMLElement;
@@ -18,7 +18,7 @@ export class InventoryRow {
 		inventory: Inventory,
 		offset = 0,
 		game: Game,
-		showActive = true
+		showActive = true,
 	) {
 		parent.appendChild((this.div = Div({ class: styles.row })));
 		this.inventory = inventory;
@@ -30,8 +30,8 @@ export class InventoryRow {
 					inventory,
 					i + offset,
 					game,
-					showActive
-				)
+					showActive,
+				),
 			);
 		}
 	}

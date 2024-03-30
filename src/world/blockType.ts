@@ -1,19 +1,19 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { abgrToRgba } from '../util/math';
-import { ItemDrop } from './entity/itemDrop';
-import { BlockItem } from './item/blockItem';
-import type { Item, MaybeItem } from './item/item';
-import type { World } from './world';
+import { abgrToRgba } from "../util/math";
+import { ItemDrop } from "./entity/itemDrop";
+import { BlockItem } from "./item/blockItem";
+import type { Item, MaybeItem } from "./item/item";
+import type { World } from "./world";
 
-export type MiningCat = 'Pickaxe' | 'Axe';
+export type MiningCat = "Pickaxe" | "Axe";
 export type BlockTypeItemDropHandler = (
 	world: World,
 	x: number,
 	y: number,
 	z: number,
-	tool: MaybeItem
+	tool: MaybeItem,
 ) => void;
 
 export class BlockType {
@@ -31,7 +31,7 @@ export class BlockType {
 	colorA = 0xff8822ff;
 	colorB = 0xff11aaff;
 
-	miningCat: MiningCat = 'Pickaxe';
+	miningCat: MiningCat = "Pickaxe";
 	health = 100;
 	fireHealth = 1000;
 	fireDamage = 1;
@@ -42,9 +42,9 @@ export class BlockType {
 
 	burnHandler: (world: World, x: number, y: number, z: number) => void;
 
-	icon = '';
-	placeSound = 'pock';
-	mineSound = 'tock';
+	icon = "";
+	placeSound = "pock";
+	mineSound = "tock";
 
 	static defaultBurnHandler(world: World, x: number, y: number, z: number) {
 		world.setBlock(x, y, z, 0);
@@ -151,7 +151,7 @@ export class BlockType {
 		x: number,
 		y: number,
 		z: number,
-		tool: MaybeItem
+		tool: MaybeItem,
 	) {
 		if (this.id === 0) {
 			return;
@@ -161,18 +161,12 @@ export class BlockType {
 			x + 0.5,
 			y + 0.4,
 			z + 0.5,
-			new BlockItem(world, this.id, 1)
+			new BlockItem(world, this.id, 1),
 		);
 	}
 
 	static simpleHandler(item: Item): BlockTypeItemDropHandler {
-		return (
-			world: World,
-			x: number,
-			y: number,
-			z: number,
-			tool: MaybeItem
-		) => {
+		return (world: World, x: number, y: number, z: number, tool: MaybeItem) => {
 			new ItemDrop(world, x + 0.5, y + 0.4, z + 0.5, item.clone());
 		};
 	}
@@ -197,7 +191,7 @@ export class BlockType {
 	}
 
 	withBurnHandler(
-		handler: (world: World, x: number, y: number, z: number) => void
+		handler: (world: World, x: number, y: number, z: number) => void,
 	) {
 		this.burnHandler = handler;
 		return this;

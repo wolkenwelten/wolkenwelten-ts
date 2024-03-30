@@ -1,13 +1,13 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import meshUrl from '../../../assets/vox/staticStick.vox?url';
+import meshUrl from "../../../assets/vox/staticStick.vox?url";
 
-import type { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
-import type { Entity } from '../../world/entity/entity';
-import { StaticObject } from '../../world/chunk/staticObject';
-import { ItemDrop } from '../../world/entity/itemDrop';
-import { Item } from '../../world/item/item';
+import type { VoxelMesh } from "../../render/meshes/voxelMesh/voxelMesh";
+import type { Entity } from "../../world/entity/entity";
+import { StaticObject } from "../../world/chunk/staticObject";
+import { ItemDrop } from "../../world/entity/itemDrop";
+import { Item } from "../../world/item/item";
 
 export class StaticStick extends StaticObject {
 	mesh(): VoxelMesh {
@@ -20,7 +20,7 @@ export class StaticStick extends StaticObject {
 			this.x + 0.5,
 			this.y + 0.5,
 			this.z + 0.5,
-			Item.create('stick', this.chunk.world)
+			Item.create("stick", this.chunk.world),
 		);
 		this.destroy();
 	}

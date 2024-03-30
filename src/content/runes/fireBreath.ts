@@ -1,14 +1,14 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import itemIcon from '../../../assets/gfx/items/fireBreath.png';
-import meshUrl from '../../../assets/vox/items/stone.vox?url';
-import { Character } from '../../world/entity/character';
+import itemIcon from "../../../assets/gfx/items/fireBreath.png";
+import meshUrl from "../../../assets/vox/items/stone.vox?url";
+import { Character } from "../../world/entity/character";
 
-import { Rune } from './rune';
+import { Rune } from "./rune";
 
 export class FireBreath extends Rune {
-	name = 'Fire breath';
+	name = "Fire breath";
 	icon = itemIcon;
 	meshUrl = meshUrl;
 
@@ -25,7 +25,7 @@ export class FireBreath extends Rune {
 				if (i > 6) {
 					e.world.fire.add(x, y, z, 4096);
 					firesSpawned++;
-					e.world.game.audio.playAtPosition('bomb', 0.1, [x, y, z]);
+					e.world.game.audio.playAtPosition("bomb", 0.1, [x, y, z]);
 				}
 			} else {
 				return false;

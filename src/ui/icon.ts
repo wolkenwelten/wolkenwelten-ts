@@ -1,9 +1,9 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { isClient, mockCanvas, mockContext2D } from '../util/compat';
-import type { BlockType } from '../world/blockType';
-import type { UIManager } from './ui';
+import { isClient, mockCanvas, mockContext2D } from "../util/compat";
+import type { BlockType } from "../world/blockType";
+import type { UIManager } from "./ui";
 
 export class IconManager {
 	ui: UIManager;
@@ -13,12 +13,10 @@ export class IconManager {
 	constructor(ui: UIManager) {
 		this.ui = ui;
 		if (isClient()) {
-			this.canvas = document.createElement('canvas');
-			const ctx = this.canvas.getContext('2d');
+			this.canvas = document.createElement("canvas");
+			const ctx = this.canvas.getContext("2d");
 			if (!ctx) {
-				throw new Error(
-					"Couldn't create 2D context for building icons"
-				);
+				throw new Error("Couldn't create 2D context for building icons");
 			}
 			this.ctx = ctx;
 			this.buildAllBlockTypeIcons();
@@ -31,29 +29,29 @@ export class IconManager {
 	buildBlockTypeIcon(bimg: HTMLImageElement, bt: BlockType) {
 		const ctx = this.ctx;
 
-		ctx.fillStyle = '#ff4020';
+		ctx.fillStyle = "#ff4020";
 		ctx.imageSmoothingEnabled = false;
 		ctx.resetTransform();
 		ctx.clearRect(0, 0, 64, 64);
 		ctx.translate(32, 0);
 		ctx.transform(0.75, 0, 0, 0.375, 0, 0);
 		ctx.rotate(Math.PI / 4);
-		ctx.filter = 'brightness(100%)';
+		ctx.filter = "brightness(100%)";
 		ctx.drawImage(bimg, 0, bt.texTop * 64, 32, 32, 0, 0, 64, 64);
 
 		ctx.resetTransform();
 		ctx.translate(0, 48);
 		ctx.transform(1, 0.5, 0, -0.5, 0, 0);
-		ctx.filter = 'brightness(80%)';
+		ctx.filter = "brightness(80%)";
 		ctx.drawImage(bimg, 0, bt.texLeft * 64, 32, 32, 0, 0, 32, 64);
 
 		ctx.resetTransform();
 		ctx.translate(32, 64);
 		ctx.transform(1, -0.5, 0, -0.5, 0, 0);
-		ctx.filter = 'brightness(60%)';
+		ctx.filter = "brightness(60%)";
 		ctx.drawImage(bimg, 0, bt.texRight * 64, 32, 32, 0, 0, 32, 64);
 
-		bt.icon = this.canvas.toDataURL('image/png');
+		bt.icon = this.canvas.toDataURL("image/png");
 	}
 
 	buildAllBlockTypeIcons() {

@@ -1,17 +1,17 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import type { Game } from '../../../game';
-import { Div } from '../../utils';
-import styles from './playerModal.module.css';
-import { SettingsWrap } from './settingsWrap';
+import type { Game } from "../../../game";
+import { Div } from "../../utils";
+import styles from "./playerModal.module.css";
+import { SettingsWrap } from "./settingsWrap";
 
 interface TabClass {
 	update: () => void;
 }
 type TabConstructor<T extends TabClass> = new (
 	tab: HTMLElement,
-	game: Game
+	game: Game,
 ) => T;
 
 export class PlayerModal {
@@ -28,7 +28,7 @@ export class PlayerModal {
 		game: Game,
 		title: string,
 		constructor: TabConstructor<T>,
-		activeTab = false
+		activeTab = false,
 	): T {
 		const that = this;
 		const tab = Div({
@@ -70,10 +70,10 @@ export class PlayerModal {
 		const λ = (e: Event) => {
 			e.stopPropagation();
 		};
-		this.div.addEventListener('mousedown', λ);
-		this.div.addEventListener('mousewheel', λ);
+		this.div.addEventListener("mousedown", λ);
+		this.div.addEventListener("mousewheel", λ);
 
-		this.settings = this.initTab(game, 'Settings', SettingsWrap, true);
+		this.settings = this.initTab(game, "Settings", SettingsWrap, true);
 
 		parent.appendChild(this.div);
 	}
@@ -82,7 +82,7 @@ export class PlayerModal {
 		if (this.active) {
 			return;
 		}
-		this.game.render.canvasWrapper.classList.add('fx-inventory');
+		this.game.render.canvasWrapper.classList.add("fx-inventory");
 		this.div.classList.add(styles.active);
 		this.activeTab?.update();
 		this.active = true;
@@ -92,7 +92,7 @@ export class PlayerModal {
 		if (!this.active) {
 			return;
 		}
-		this.game.render.canvasWrapper.classList.remove('fx-inventory');
+		this.game.render.canvasWrapper.classList.remove("fx-inventory");
 		this.div.classList.remove(styles.active);
 		this.active = false;
 	}

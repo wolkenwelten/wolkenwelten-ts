@@ -1,10 +1,10 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import type { HotbarEntryValue } from '../hotbar/hotbar';
-import { Item } from '../../../world/item/item';
-import { Div, Img } from '../../utils';
-import styles from './item.module.css';
+import type { HotbarEntryValue } from "../hotbar/hotbar";
+import { Item } from "../../../world/item/item";
+import { Div, Img } from "../../utils";
+import styles from "./item.module.css";
 
 export class ItemWidget {
 	div: HTMLElement;
@@ -12,9 +12,9 @@ export class ItemWidget {
 	img: HTMLImageElement;
 
 	wasActive = false;
-	lastName = '';
+	lastName = "";
 	lastAmount = 0;
-	lastIcon = '';
+	lastIcon = "";
 
 	constructor(parent: HTMLElement, showActive = true) {
 		parent.appendChild(
@@ -24,7 +24,7 @@ export class ItemWidget {
 					(this.img = Img({ class: styles.img })),
 					(this.amount = Div({ class: styles.amount })),
 				],
-			}))
+			})),
 		);
 		if (showActive) {
 			this.img.classList.add(styles.showActive);
@@ -33,7 +33,7 @@ export class ItemWidget {
 	}
 
 	update(item: HotbarEntryValue, active = false) {
-		const name = item?.name || '';
+		const name = item?.name || "";
 
 		if (active) {
 			if (!this.wasActive) {
@@ -46,12 +46,12 @@ export class ItemWidget {
 		}
 		if (name) {
 			if (name !== this.lastName) {
-				this.div.setAttribute('title', name);
+				this.div.setAttribute("title", name);
 				this.lastName = name;
 			}
 		} else {
-			this.div.removeAttribute('title');
-			this.lastName = '';
+			this.div.removeAttribute("title");
+			this.lastName = "";
 		}
 		if (item instanceof Item) {
 			if (item.stackSize > 1 && item.amount > 0) {
@@ -60,25 +60,25 @@ export class ItemWidget {
 					this.lastAmount = item.amount;
 				}
 			} else {
-				this.amount.innerText = '';
+				this.amount.innerText = "";
 				this.lastAmount = 0;
 			}
 			const icon = item.icon;
 			if (icon) {
 				if (icon !== this.lastIcon) {
-					this.img.setAttribute('src', icon);
-					this.img.style.display = 'block';
+					this.img.setAttribute("src", icon);
+					this.img.style.display = "block";
 					this.lastIcon = icon;
 				}
 			} else {
-				this.img.style.display = 'none';
-				this.lastIcon = '';
+				this.img.style.display = "none";
+				this.lastIcon = "";
 			}
 		} else {
-			this.amount.innerText = '';
-			this.img.style.display = 'none';
+			this.amount.innerText = "";
+			this.img.style.display = "none";
 			this.lastAmount = 0;
-			this.lastIcon = '';
+			this.lastIcon = "";
 		}
 	}
 }

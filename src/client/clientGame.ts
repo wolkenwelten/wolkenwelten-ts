@@ -1,14 +1,14 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import type { Game } from '../game';
+import type { Game } from "../game";
 import type {
 	WSMessage,
 	WSChatMessage,
 	WSHelloMessage,
 	WSPlayerUpdate,
-} from '../network';
-import { ClientEntry } from './clientEntry';
+} from "../network";
+import { ClientEntry } from "./clientEntry";
 
 export class ClientGame {
 	game: Game;
@@ -25,17 +25,17 @@ export class ClientGame {
 
 	private addDefaultHandler() {
 		const game = this.game;
-		this.setHandler('msg', (raw: WSMessage) => {
+		this.setHandler("msg", (raw: WSMessage) => {
 			const msg = raw as WSChatMessage;
 			game.ui.log.addEntry(msg.msg);
 		});
 
-		this.setHandler('hello', (raw: WSMessage) => {
+		this.setHandler("hello", (raw: WSMessage) => {
 			const msg = raw as WSHelloMessage;
 			game.network.id = msg.playerID;
 		});
 
-		this.setHandler('playerUpdate', (raw: WSMessage) => {
+		this.setHandler("playerUpdate", (raw: WSMessage) => {
 			const msg = raw as WSPlayerUpdate;
 			const cli = this.clients.get(msg.playerID);
 			if (!cli) {
@@ -56,14 +56,14 @@ export class ClientGame {
 		if (this.ws) {
 			this.ws.close();
 		}
-		this.ws = new WebSocket('ws://localhost:8080');
+		this.ws = new WebSocket("ws://localhost:8080");
 		const that = this;
-		this.ws.onmessage = ev => {
-			const raw = ev.data || '';
+		this.ws.onmessage = (ev) => {
+			const raw = ev.data || "";
 			const msg = JSON.parse(raw);
-			if (typeof msg.T !== 'string') {
+			if (typeof msg.T !== "string") {
 				console.error(msg);
-				throw new Error('Invalid message received');
+				throw new Error("Invalid message received");
 			}
 			that.dispatch(msg);
 		};
@@ -76,7 +76,7 @@ export class ClientGame {
 	private dispatch(msg: WSMessage) {
 		const handler = this.handler.get(msg.T);
 		if (!handler) {
-			console.error('Received unknown Message:');
+			console.error("Received unknown Message:");
 			console.error(msg);
 		} else {
 			handler(msg);
@@ -88,12 +88,12 @@ export class ClientGame {
 			this.connect();
 			return;
 		}
-		if(this.ws.readyState !== this.ws.OPEN){
+		if (this.ws.readyState !== this.ws.OPEN) {
 			return;
 		}
 		this.game.network.sendPlayerUpdate(
 			this.game.options.playerName,
-			this.game.player
+			this.game.player,
 		);
 
 		for (const m of this.game.network.queue) {

@@ -1,12 +1,12 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import type { Game } from '../../../game';
-import type { Inventory } from '../../../world/item/inventory';
-import { Item } from '../../../world/item/item';
-import { Div } from '../../utils';
-import styles from './inventorySlotWidget.module.css';
-import { ItemWidget } from './item';
+import type { Game } from "../../../game";
+import type { Inventory } from "../../../world/item/inventory";
+import { Item } from "../../../world/item/item";
+import { Div } from "../../utils";
+import styles from "./inventorySlotWidget.module.css";
+import { ItemWidget } from "./item";
 
 export class InventorySlotWidget {
 	div: HTMLElement;
@@ -22,16 +22,16 @@ export class InventorySlotWidget {
 		slotIndex: number,
 		game: Game,
 		showActive = true,
-		additionalClass?: string
+		additionalClass?: string,
 	) {
 		this.game = game;
 		parent.appendChild(
 			(this.div = Div({
 				class: styles.slot,
-				onMousedown: e => e.stopPropagation(),
+				onMousedown: (e) => e.stopPropagation(),
 				onClick: this.click.bind(this),
 				onContextmenu: this.rightClick.bind(this),
-			}))
+			})),
 		);
 		if (additionalClass) {
 			this.div.classList.add(additionalClass);
@@ -61,19 +61,14 @@ export class InventorySlotWidget {
 					this.game.player.equipment.items[0] = item;
 					this.inventory.items[this.slotIndex] = t;
 				} else {
-					this.game.ui.heldItem =
-						this.inventory.items[this.slotIndex];
+					this.game.ui.heldItem = this.inventory.items[this.slotIndex];
 					this.inventory.items[this.slotIndex] = undefined;
 				}
 			}
 		} else if (a instanceof Item) {
 			const b = this.inventory.items[this.slotIndex];
 			if (b) {
-				if (
-					a.mayStackWith(b) &&
-					b.mayStackWith(a) &&
-					b.amount < b.stackSize
-				) {
+				if (a.mayStackWith(b) && b.mayStackWith(a) && b.amount < b.stackSize) {
 					a.amount--;
 					b.amount++;
 				}

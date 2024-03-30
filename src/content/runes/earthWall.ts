@@ -1,16 +1,16 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import itemIcon from '../../../assets/gfx/items/earthWall.png';
-import meshUrl from '../../../assets/vox/items/stone.vox?url';
-import { TriangleMesh } from '../../render/meshes/triangleMesh/triangleMesh';
-import { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
-import { easeOutSine } from '../../util/math';
-import { Character } from '../../world/entity/character';
-import { Entity } from '../../world/entity/entity';
-import { World } from '../../world/world';
+import itemIcon from "../../../assets/gfx/items/earthWall.png";
+import meshUrl from "../../../assets/vox/items/stone.vox?url";
+import { TriangleMesh } from "../../render/meshes/triangleMesh/triangleMesh";
+import { VoxelMesh } from "../../render/meshes/voxelMesh/voxelMesh";
+import { easeOutSine } from "../../util/math";
+import { Character } from "../../world/entity/character";
+import { Entity } from "../../world/entity/entity";
+import { World } from "../../world/world";
 
-import { Rune } from './rune';
+import { Rune } from "./rune";
 
 export interface WallSelection {
 	block: number;
@@ -22,7 +22,7 @@ export interface WallSelection {
 }
 
 export class EarthWall extends Rune {
-	name = 'Earth wall';
+	name = "Earth wall";
 	icon = itemIcon;
 	meshUrl = meshUrl;
 	range = 5;
@@ -56,7 +56,7 @@ export class EarthWall extends Rune {
 				if (!b) {
 					continue;
 				}
-				if (this.world.blocks[b].miningCat !== 'Pickaxe') {
+				if (this.world.blocks[b].miningCat !== "Pickaxe") {
 					continue;
 				}
 				let gx = x + ox;
@@ -139,7 +139,7 @@ export class EarthWall extends Rune {
 				b.from[2] - 1,
 				3,
 				3,
-				3
+				3,
 			);
 
 			for (const t of this.world.entities) {
@@ -160,7 +160,7 @@ export class EarthWall extends Rune {
 				}
 			}
 			const e = new EarthWallBlock(this.world, b.block, b.from, b.to);
-			e.playSound('pock', 0.3);
+			e.playSound("pock", 0.3);
 		}
 		this.world.dangerZone.update(); // This way staticMeshes will be turned into entities that will be thrown around in the next loop
 
@@ -191,7 +191,7 @@ export class EarthWallBlock extends Entity {
 		world: World,
 		blockType: number,
 		from: [number, number, number],
-		to: [number, number, number]
+		to: [number, number, number],
 	) {
 		super(world);
 		if (blockType === 2) {
@@ -208,9 +208,9 @@ export class EarthWallBlock extends Entity {
 			this.x - 0.5,
 			this.y - 0.5,
 			this.z - 0.5,
-			this.world.blocks[this.blockType]
+			this.world.blocks[this.blockType],
 		);
-		this.playSound('projectile', 0.2, true);
+		this.playSound("projectile", 0.2, true);
 	}
 
 	mesh(): TriangleMesh | VoxelMesh | null {
@@ -225,27 +225,22 @@ export class EarthWallBlock extends Entity {
 		const t = easeOutSine(++this.ticksActive * 0.025);
 		this.pitch = t * Math.PI;
 		if (t >= 0.99) {
-			this.world.setBlock(
-				this.to[0],
-				this.to[1],
-				this.to[2],
-				this.blockType
-			);
+			this.world.setBlock(this.to[0], this.to[1], this.to[2], this.blockType);
 			this.world.dangerZone.add(
 				this.to[0] - 1,
 				this.to[1] - 1,
 				this.to[2] - 1,
 				3,
 				3,
-				3
+				3,
 			);
 			this.world.game.render.particle.fxBlockBreak(
 				this.x - 0.5,
 				this.y - 0.5,
 				this.z - 0.5,
-				this.world.blocks[this.blockType]
+				this.world.blocks[this.blockType],
 			);
-			this.playUnmovingSound('pock', 0.3);
+			this.playUnmovingSound("pock", 0.3);
 			this.destroy();
 		} else {
 			this.x = this.from[0] * (1 - t) + this.to[0] * t + 0.5;

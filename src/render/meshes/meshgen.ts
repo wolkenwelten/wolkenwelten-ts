@@ -4,18 +4,18 @@
  * This file prepares all the chunk data so that the meshing function itself can be pure.
  * Because of this we should be able to put it into a separate worker.
  */
-import type { Chunk } from '../../world/chunk/chunk';
-import profiler from '../../profiler';
-import { clamp } from '../../util/math';
-import { BlockType } from '../../world/blockType';
-import { lightGenSimple } from '../../world/chunk/lightGen';
-import { meshgenReal } from './meshgenWorker';
+import type { Chunk } from "../../world/chunk/chunk";
+import profiler from "../../profiler";
+import { clamp } from "../../util/math";
+import { BlockType } from "../../world/blockType";
+import { lightGenSimple } from "../../world/chunk/lightGen";
+import { meshgenReal } from "./meshgenWorker";
 
 const createIdentityBlocks = () => {
 	const ret: BlockType[] = [];
-	ret.push(new BlockType(0, 'Void').withInvisible());
+	ret.push(new BlockType(0, "Void").withInvisible());
 	for (let i = 1; i < 256; i++) {
-		ret.push(new BlockType(i, '').withTexture(i - 1));
+		ret.push(new BlockType(i, "").withTexture(i - 1));
 	}
 	return ret;
 };
@@ -30,7 +30,7 @@ const blitChunkData = (
 	chunkData: Uint8Array,
 	offX: number,
 	offY: number,
-	offZ: number
+	offZ: number,
 ) => {
 	const xStart = clamp(offX, 0, 34);
 	const xEnd = clamp(offX + 32, 0, 34);
@@ -73,7 +73,7 @@ export const meshgenVoxelMesh = (voxels: Uint8Array): [Uint8Array, number] => {
 	for (let i = 0; i < ret[1].length; i++) {
 		vertCount += ret[1][i];
 	}
-	profiler.add('meshgenSimple', start, performance.now());
+	profiler.add("meshgenSimple", start, performance.now());
 	return [ret[0], vertCount];
 };
 
@@ -93,14 +93,14 @@ export const meshgenChunk = (chunk: Chunk): [Uint8Array, number[]] => {
 					curChunk.blocks,
 					1 + x * 32,
 					1 + y * 32,
-					1 + z * 32
+					1 + z * 32,
 				);
 				blitChunkData(
 					lightData,
 					curChunk.simpleLight,
 					1 + x * 32,
 					1 + y * 32,
-					1 + z * 32
+					1 + z * 32,
 				);
 			}
 		}
@@ -114,6 +114,6 @@ export const meshgenChunk = (chunk: Chunk): [Uint8Array, number[]] => {
 		lightFinished: false,
 	};
 	const ret = meshgenReal(msg);
-	profiler.add('meshgenComplex', start, performance.now());
+	profiler.add("meshgenComplex", start, performance.now());
 	return ret;
 };

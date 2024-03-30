@@ -1,7 +1,7 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { PerlinNoise } from '../util/noise';
+import { PerlinNoise } from "../util/noise";
 
 export class ScreenShakeSystem {
 	private shakeIntensity = 0;
@@ -13,10 +13,7 @@ export class ScreenShakeSystem {
 	}
 
 	add(intensity: number) {
-		this.shakeIntensity = Math.min(
-			1,
-			Math.max(this.shakeIntensity, intensity)
-		);
+		this.shakeIntensity = Math.min(1, Math.max(this.shakeIntensity, intensity));
 	}
 
 	stop() {

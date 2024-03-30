@@ -1,7 +1,7 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import profiler from '../../profiler';
+import profiler from "../../profiler";
 
 const light = new Uint8Array(32 * 32);
 
@@ -20,8 +20,7 @@ const sunlight = (out: Uint8Array, blocks: Uint8Array) => {
 		for (let x = 0; x < 32; x++) {
 			let off = x * 32 * 32 + y * 32;
 			for (let z = 0; z < 32; z++) {
-				const l =
-					blocks[off] === 0 ? Math.min(15, light[x * 32 + z] + 1) : 0;
+				const l = blocks[off] === 0 ? Math.min(15, light[x * 32 + z] + 1) : 0;
 				out[off++] = light[x * 32 + z] = l;
 			}
 		}
@@ -100,5 +99,5 @@ export const lightGenSimple = (out: Uint8Array, blocks: Uint8Array) => {
 	const start = performance.now();
 	sunlight(out, blocks);
 	lightBlur(out);
-	profiler.add('lightGenSimple', start, performance.now());
+	profiler.add("lightGenSimple", start, performance.now());
 };

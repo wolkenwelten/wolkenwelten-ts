@@ -1,10 +1,10 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import type { Game } from '../game';
-import { WebSocketServer, WebSocket } from 'ws';
-import { ClientConnection } from './connection';
-import type { WSMessage } from '../network';
+import type { Game } from "../game";
+import { WebSocketServer, WebSocket } from "ws";
+import { ClientConnection } from "./connection";
+import type { WSMessage } from "../network";
 
 export class Server {
 	game: Game;
@@ -25,8 +25,8 @@ export class Server {
 	constructor(game: Game) {
 		this.game = game;
 		this.wss = new WebSocketServer({ port: 8080 });
-		this.wss.on('connection', this.onConnect.bind(this));
+		this.wss.on("connection", this.onConnect.bind(this));
 
-		console.log('Starting WolkenWelten Server on port 8080');
+		console.log("Starting WolkenWelten Server on port 8080");
 	}
 }

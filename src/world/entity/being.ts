@@ -1,9 +1,9 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import type { World } from '../world';
-import { Entity } from './entity';
-import { WetEffect } from '../statusEffects/wet';
+import type { World } from "../world";
+import { Entity } from "./entity";
+import { WetEffect } from "../statusEffects/wet";
 
 export abstract class Being extends Entity {
 	level = 0;
@@ -20,7 +20,7 @@ export abstract class Being extends Entity {
 
 	checkForWater() {
 		if (this.world.isLiquid(this.x, this.y, this.z)) {
-			const e = this.effects.get('Wet');
+			const e = this.effects.get("Wet");
 			if (!e) {
 				const e = new WetEffect();
 				this.effects.set(e.id, e);
@@ -33,7 +33,7 @@ export abstract class Being extends Entity {
 	damage(rawAmount: number): void {
 		this.health = Math.max(
 			0,
-			Math.min(this.health - rawAmount, this.maxHealth)
+			Math.min(this.health - rawAmount, this.maxHealth),
 		);
 		if (this.health <= 0) {
 			this.isDead = true;

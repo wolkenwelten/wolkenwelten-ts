@@ -1,19 +1,19 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { isClient } from './util/compat';
+import { isClient } from "./util/compat";
 
 const randomNames = [
-	'Asuka Langley',
-	'Lain Iwakura',
-	'Faye Valentine',
-	'Spike Spiegel',
-	'Ranma Saotome',
-	'Lum',
-	'Rokuro Okajima',
-	'Edward Elric',
-	'Eikichi Onizuka',
-	'Tsukasa Hiiragi',
+	"Asuka Langley",
+	"Lain Iwakura",
+	"Faye Valentine",
+	"Spike Spiegel",
+	"Ranma Saotome",
+	"Lum",
+	"Rokuro Okajima",
+	"Edward Elric",
+	"Eikichi Onizuka",
+	"Tsukasa Hiiragi",
 ];
 
 const getRandomPlayerName = () => {
@@ -31,13 +31,13 @@ export class Options {
 			return def;
 		}
 		switch (paramValue.trim().toLowerCase()) {
-			case '1':
-			case 'on':
-			case 'true':
+			case "1":
+			case "on":
+			case "true":
 				return true;
-			case '0':
-			case 'off':
-			case 'false':
+			case "0":
+			case "off":
+			case "false":
 				return false;
 		}
 		return def;
@@ -56,19 +56,16 @@ export class Options {
 	constructor() {
 		if (isClient()) {
 			const params = new URLSearchParams(window.location.search);
-			this.skipMenu = window.location.hostname === 'localhost';
-			this.skipMenu = this.parseBoolean(
-				this.skipMenu,
-				params.get('skipMenu')
-			);
+			this.skipMenu = window.location.hostname === "localhost";
+			this.skipMenu = this.parseBoolean(this.skipMenu, params.get("skipMenu"));
 			this.startWithEquipment = this.parseBoolean(
 				this.startWithEquipment,
-				params.get('startWithEquipment')
+				params.get("startWithEquipment"),
 			);
-			this.playerName = params.get('playerName') || getRandomPlayerName();
+			this.playerName = params.get("playerName") || getRandomPlayerName();
 		} else {
 			this.skipMenu = true;
-			this.playerName = '';
+			this.playerName = "";
 		}
 	}
 }

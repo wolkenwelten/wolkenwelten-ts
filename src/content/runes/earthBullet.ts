@@ -1,19 +1,19 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import itemIcon from '../../../assets/gfx/items/earthBullet.png';
-import meshUrl from '../../../assets/vox/items/stone.vox?url';
-import type { TriangleMesh } from '../../render/meshes/triangleMesh/triangleMesh';
-import type { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
-import { Character } from '../../world/entity/character';
-import { Entity } from '../../world/entity/entity';
-import { Mob } from '../../world/entity/mob';
-import { World } from '../../world/world';
+import itemIcon from "../../../assets/gfx/items/earthBullet.png";
+import meshUrl from "../../../assets/vox/items/stone.vox?url";
+import type { TriangleMesh } from "../../render/meshes/triangleMesh/triangleMesh";
+import type { VoxelMesh } from "../../render/meshes/voxelMesh/voxelMesh";
+import { Character } from "../../world/entity/character";
+import { Entity } from "../../world/entity/entity";
+import { Mob } from "../../world/entity/mob";
+import { World } from "../../world/world";
 
-import { Rune } from './rune';
+import { Rune } from "./rune";
 
 export class EarthBullet extends Rune {
-	name = 'Earth bullet';
+	name = "Earth bullet";
 	icon = itemIcon;
 	meshUrl = meshUrl;
 	range = 10;
@@ -44,7 +44,7 @@ export class EarthBullet extends Rune {
 			return;
 		}
 		const bt = this.world.blocks[blockType];
-		if (bt.miningCat !== 'Pickaxe') {
+		if (bt.miningCat !== "Pickaxe") {
 			return;
 		}
 		this.world.game.render.particle.fxBlockBreak(x, y, z, bt);
@@ -55,7 +55,7 @@ export class EarthBullet extends Rune {
 		this.bulletEntity.y = y + 0.5;
 		this.bulletEntity.z = z + 0.5;
 		this.bulletEntity.scale = 2;
-		this.bulletEntity.playUnmovingSound('tock', 0.3);
+		this.bulletEntity.playUnmovingSound("tock", 0.3);
 
 		e.cooldown(32);
 		e.hitAnimation = this.world.game.render.frames;
@@ -75,7 +75,7 @@ export class EarthBullet extends Rune {
 		this.bulletEntity.shotX = this.bulletEntity.vx = vx;
 		this.bulletEntity.shotY = this.bulletEntity.vy = vy;
 		this.bulletEntity.shotZ = this.bulletEntity.vz = vz;
-		this.bulletEntity.playSound('projectile', 1, true);
+		this.bulletEntity.playSound("projectile", 1, true);
 		this.bulletEntity = undefined;
 
 		e.cooldown(32);
@@ -149,11 +149,11 @@ export class EarthBulletEntity extends Entity {
 			if (dd <= 1.1) {
 				const dmg = Math.max(
 					2,
-					this.world.blocks[this.blockType].health * 0.05
+					this.world.blocks[this.blockType].health * 0.05,
 				);
 				this.source?.doDamage(e, dmg);
 				this.disintegrate();
-				this.playUnmovingSound('punch', 1);
+				this.playUnmovingSound("punch", 1);
 				this.destroy();
 				return;
 			}
@@ -201,17 +201,17 @@ export class EarthBulletEntity extends Entity {
 				this.x - 0.5,
 				this.y - 0.5,
 				this.z - 0.5,
-				this.world.blocks[this.blockType]
+				this.world.blocks[this.blockType],
 			);
 			if (this.collides()) {
 				this.world.game.render.particle.fxBlockBreak(
 					this.x - 0.5,
 					this.y - 0.5,
 					this.z - 0.5,
-					this.world.blocks[this.blockType]
+					this.world.blocks[this.blockType],
 				);
 				this.disintegrate();
-				this.playUnmovingSound('punch', 1);
+				this.playUnmovingSound("punch", 1);
 				this.destroy();
 				return;
 			}

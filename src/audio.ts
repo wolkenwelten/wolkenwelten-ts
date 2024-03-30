@@ -1,8 +1,8 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { Howl, Howler } from 'howler';
-import type { Entity } from './world/entity/entity';
+import { Howl, Howler } from "howler";
+import type { Entity } from "./world/entity/entity";
 
 export class AudioManager {
 	assets: Map<string, string> = new Map();
@@ -21,24 +21,14 @@ export class AudioManager {
 		name: string,
 		volume = 1,
 		entity: Entity,
-		stopWhenEntityDestroyed = false
+		stopWhenEntityDestroyed = false,
 	) {
 		this.emitters.add(
-			new AudioEmitter(
-				this,
-				name,
-				volume,
-				entity,
-				stopWhenEntityDestroyed
-			)
+			new AudioEmitter(this, name, volume, entity, stopWhenEntityDestroyed),
 		);
 	}
 
-	playAtPosition(
-		name: string,
-		volume = 1,
-		position: [number, number, number]
-	) {
+	playAtPosition(name: string, volume = 1, position: [number, number, number]) {
 		this.emitters.add(new AudioEmitter(this, name, volume, position));
 	}
 
@@ -73,7 +63,7 @@ export class AudioEmitter {
 		name: string,
 		volume = 1.0,
 		position: Entity | [number, number, number],
-		stopWhenEntityDestroyed = false
+		stopWhenEntityDestroyed = false,
 	) {
 		this.manager = manager;
 		if (Array.isArray(position)) {
@@ -93,10 +83,10 @@ export class AudioEmitter {
 		this.stopWhenEntityDestroyed = stopWhenEntityDestroyed;
 		const destroy = this.destroy.bind(this);
 		this.howl = new Howl({ src: [url], volume });
-		this.howl.on('end', destroy);
-		this.howl.on('stop', destroy);
-		this.howl.on('playerror', destroy);
-		this.howl.on('loaderror', destroy);
+		this.howl.on("end", destroy);
+		this.howl.on("stop", destroy);
+		this.howl.on("playerror", destroy);
+		this.howl.on("loaderror", destroy);
 		this.howl.pos(this.x, this.y, this.z);
 		this.howl.play();
 	}

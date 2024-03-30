@@ -1,11 +1,11 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import type { Being } from '../entity/being';
-import { StatusEffect } from './statusEffect';
+import type { Being } from "../entity/being";
+import { StatusEffect } from "./statusEffect";
 
 export class WetEffect extends StatusEffect {
-	id = 'Wet';
+	id = "Wet";
 
 	update(e: Being): void {
 		this.ticks++;
@@ -38,15 +38,15 @@ export class WetEffect extends StatusEffect {
 				0,
 				0,
 				0,
-				0
+				0,
 			);
 
-			const burn = e.effects.get('Burning');
+			const burn = e.effects.get("Burning");
 			if (burn) {
 				burn.ttl -= 20;
 			}
 		} else {
-			const burn = e.effects.get('Burning');
+			const burn = e.effects.get("Burning");
 			if (burn) {
 				burn.ttl -= 200;
 			}

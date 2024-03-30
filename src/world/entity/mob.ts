@@ -1,11 +1,11 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { mat4 } from 'gl-matrix';
+import { mat4 } from "gl-matrix";
 
-import type { World } from '../world';
-import type { Entity } from './entity';
-import { Being } from './being';
+import type { World } from "../world";
+import type { Entity } from "./entity";
+import { Being } from "./being";
 
 const modelViewMatrix = mat4.create();
 const transPos = new Float32Array([0, 0, 0]);
@@ -14,7 +14,7 @@ type MobConstructor = new (
 	world: World,
 	x: number,
 	y: number,
-	z: number
+	z: number,
 ) => Mob;
 
 export class Mob extends Being {
@@ -28,7 +28,7 @@ export class Mob extends Being {
 		world: World,
 		x: number,
 		y: number,
-		z: number
+		z: number,
 	): Mob {
 		const con = this.registry.get(name);
 		if (con) {

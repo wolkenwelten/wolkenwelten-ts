@@ -1,17 +1,17 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { mat4 } from 'gl-matrix';
-import readVox from 'vox-reader';
+import { mat4 } from "gl-matrix";
+import readVox from "vox-reader";
 
-import shaderFragSource from './voxelMesh.frag?raw';
-import shaderVertSource from './voxelMesh.vert?raw';
+import shaderFragSource from "./voxelMesh.frag?raw";
+import shaderVertSource from "./voxelMesh.vert?raw";
 
-import '../../../types';
-import { Shader } from '../../shader';
-import { Texture } from '../../texture';
-import { meshgenVoxelMesh } from '../meshgen';
-import { isClient } from '../../../util/compat';
+import "../../../types";
+import { Shader } from "../../shader";
+import { Texture } from "../../texture";
+import { meshgenVoxelMesh } from "../meshgen";
+import { isClient } from "../../../util/compat";
 
 const tmpBlocks = new Uint8Array(32 * 32 * 32);
 
@@ -43,12 +43,12 @@ export class VoxelMesh {
 		this.gl = glc;
 		this.shader = new Shader(
 			this.gl,
-			'voxelMesh',
+			"voxelMesh",
 			shaderVertSource,
 			shaderFragSource,
-			['cur_tex', 'mat_mvp', 'alpha', 'trans_pos']
+			["cur_tex", "mat_mvp", "alpha", "trans_pos"],
 		);
-		this.texture = new Texture(this.gl, 'voxelLUT', '', 'LUT');
+		this.texture = new Texture(this.gl, "voxelLUT", "", "LUT");
 		this.texture.nearest();
 	}
 
@@ -68,9 +68,7 @@ export class VoxelMesh {
 		const mesh = new VoxelMesh();
 		if (isClient()) {
 			setTimeout(async () => {
-				const data = new Uint8Array(
-					await (await fetch(href)).arrayBuffer()
-				);
+				const data = new Uint8Array(await (await fetch(href)).arrayBuffer());
 				const voxData = readVox(data);
 				const size = voxData.size;
 				if (
@@ -145,7 +143,7 @@ export class VoxelMesh {
 			// We need to increase the size of the position attribute because we need 32*32 distinct values
 			overallLength += (blit.vertices.length / 5) * 8;
 			if (!(blit.vertices instanceof Uint8Array)) {
-				throw new Error('Expected Uint8 vertex buffer');
+				throw new Error("Expected Uint8 vertex buffer");
 			}
 			if (blit.vertices.length === 0) {
 				// This means a mesh isn't loaded yet, so we just abort the overall blitting since it'll most likely
@@ -195,10 +193,10 @@ export class VoxelMesh {
 		const gl = VoxelMesh.gl;
 
 		VoxelMesh.shader.bind();
-		VoxelMesh.shader.uniform4fv('mat_mvp', modelViewProjection);
-		VoxelMesh.shader.uniform3f('trans_pos', x, y, z);
-		VoxelMesh.shader.uniform1i('cur_tex', 2);
-		VoxelMesh.shader.uniform1f('alpha', alpha);
+		VoxelMesh.shader.uniform4fv("mat_mvp", modelViewProjection);
+		VoxelMesh.shader.uniform3f("trans_pos", x, y, z);
+		VoxelMesh.shader.uniform1i("cur_tex", 2);
+		VoxelMesh.shader.uniform1f("alpha", alpha);
 		VoxelMesh.texture.bind(2);
 
 		gl.bindVertexArray(this.vao);

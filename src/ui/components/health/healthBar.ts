@@ -1,10 +1,10 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import styles from './healthBar.module.css';
-import type { Game } from '../../../game';
-import { Heart } from './heart';
-import { isClient, mockElement } from '../../../util/compat';
+import styles from "./healthBar.module.css";
+import type { Game } from "../../../game";
+import { Heart } from "./heart";
+import { isClient, mockElement } from "../../../util/compat";
 
 export class HealthBar {
 	div: HTMLElement;
@@ -12,7 +12,7 @@ export class HealthBar {
 	maxHealth = -999;
 
 	constructor(parent: HTMLElement, game: Game) {
-		const div = isClient() ? document.createElement('div') : mockElement();
+		const div = isClient() ? document.createElement("div") : mockElement();
 		this.div = div;
 		div.classList.add(styles.bar);
 		const player = game.player;

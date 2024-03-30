@@ -26,46 +26,44 @@ export class WavefrontFile {
 	constructor(content: string) {
 		let curObject;
 		let lineNumber = 0;
-		for (const line of content.split('\n')) {
+		for (const line of content.split("\n")) {
 			switch (line.substring(0, 1)) {
-				case '':
-				case ' ':
-				case '\t':
-				case '\r':
-				case '\n':
-				case '#': // Ignore Comments and white space
+				case "":
+				case " ":
+				case "\t":
+				case "\r":
+				case "\n":
+				case "#": // Ignore Comments and white space
 					break;
-				case 'o':
+				case "o":
 					curObject = new WavefrontObject(line.substring(1).trim());
 					this.objects.push(curObject);
 					break;
-				case 's': {
-					const val = line.substring(2).trim() === 'on';
+				case "s": {
+					const val = line.substring(2).trim() === "on";
 					if (!curObject) {
 						throw new Error(
-							`Can't set smooth shading before the first object, error in line ${lineNumber}`
+							`Can't set smooth shading before the first object, error in line ${lineNumber}`,
 						);
 					}
 					curObject.smoothShading = val;
 					break;
 				}
-				case 'f': {
+				case "f": {
 					if (!curObject) {
-						throw new Error(
-							`Vertex without object in line ${lineNumber}`
-						);
+						throw new Error(`Vertex without object in line ${lineNumber}`);
 					}
-					const s = line.substring(2).split(' ');
+					const s = line.substring(2).split(" ");
 					if (s.length !== 3) {
 						throw new Error(
-							`Faces need to be triangles, error in line ${lineNumber}, line: ${line}`
+							`Faces need to be triangles, error in line ${lineNumber}, line: ${line}`,
 						);
 					}
 					for (const f of s) {
-						const parts = f.split('/');
+						const parts = f.split("/");
 						if (parts.length !== 3) {
 							throw new Error(
-								`Faces need exactly 3 indices, error in line ${lineNumber}, line: ${line}`
+								`Faces need exactly 3 indices, error in line ${lineNumber}, line: ${line}`,
 							);
 						}
 
@@ -77,18 +75,16 @@ export class WavefrontFile {
 					}
 					break;
 				}
-				case 'v': {
+				case "v": {
 					if (!curObject) {
-						throw new Error(
-							`Vertex without object in line ${lineNumber}`
-						);
+						throw new Error(`Vertex without object in line ${lineNumber}`);
 					}
 					switch (line.substring(1, 2)) {
-						case ' ': {
-							const s = line.substring(2).split(' ');
+						case " ": {
+							const s = line.substring(2).split(" ");
 							if (s.length !== 3) {
 								throw new Error(
-									`Invalid vertex in line ${lineNumber}: '${line}'`
+									`Invalid vertex in line ${lineNumber}: '${line}'`,
 								);
 							}
 							curObject.positions.push([
@@ -98,11 +94,11 @@ export class WavefrontFile {
 							]);
 							break;
 						}
-						case 't': {
-							const s = line.substring(3).split(' ');
+						case "t": {
+							const s = line.substring(3).split(" ");
 							if (s.length !== 2) {
 								throw new Error(
-									`Invalid texture coordinate in line ${lineNumber}: '${line}'`
+									`Invalid texture coordinate in line ${lineNumber}: '${line}'`,
 								);
 							}
 							curObject.textureCoordinates.push([
@@ -111,11 +107,11 @@ export class WavefrontFile {
 							]);
 							break;
 						}
-						case 'n': {
-							const s = line.substring(3).split(' ');
+						case "n": {
+							const s = line.substring(3).split(" ");
 							if (s.length !== 3) {
 								throw new Error(
-									`Invalid normal coordinate in line ${lineNumber}: '${line}'`
+									`Invalid normal coordinate in line ${lineNumber}: '${line}'`,
 								);
 							}
 							curObject.normals.push([

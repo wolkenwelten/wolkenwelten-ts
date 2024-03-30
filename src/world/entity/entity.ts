@@ -1,12 +1,12 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { mat4 } from 'gl-matrix';
+import { mat4 } from "gl-matrix";
 
-import type { TriangleMesh } from '../../render/meshes/triangleMesh/triangleMesh';
-import type { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
-import type { World } from '../world';
-import { StatusEffect } from '../statusEffects/statusEffect';
+import type { TriangleMesh } from "../../render/meshes/triangleMesh/triangleMesh";
+import type { VoxelMesh } from "../../render/meshes/voxelMesh/voxelMesh";
+import type { World } from "../world";
+import { StatusEffect } from "../statusEffects/statusEffect";
 
 let entityCounter = 0;
 const modelViewMatrix = mat4.create();
@@ -233,14 +233,9 @@ export class Entity {
 			const dz = e.z - this.z;
 			const dd = dx * dx + dy * dy * 0.5 + dz * dz;
 			if (dd < 1.8) {
-				const w = Math.max(
-					0.98,
-					Math.min(0.999, this.weight / e.weight)
-				);
-				this.vx =
-					this.vx * w + (dx < 0 ? 1.35 : -1.35 - dx) * (1.0 - w);
-				this.vz =
-					this.vz * w + (dz < 0 ? 1.35 : -1.35 - dz) * (1.0 - w);
+				const w = Math.max(0.98, Math.min(0.999, this.weight / e.weight));
+				this.vx = this.vx * w + (dx < 0 ? 1.35 : -1.35 - dx) * (1.0 - w);
+				this.vz = this.vz * w + (dz < 0 ? 1.35 : -1.35 - dz) * (1.0 - w);
 			}
 		}
 	}
@@ -250,7 +245,7 @@ export class Entity {
 			name,
 			volume,
 			this,
-			stopWhenEntityDestroyed
+			stopWhenEntityDestroyed,
 		);
 	}
 

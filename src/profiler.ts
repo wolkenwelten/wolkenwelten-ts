@@ -44,8 +44,7 @@ export class ProfilingManager {
 				}
 			}
 
-			const average =
-				results.reduceRight((a, b) => a + b, 0) / results.length;
+			const average = results.reduceRight((a, b) => a + b, 0) / results.length;
 			const sorted = results.sort((a, b) => a - b);
 			const best = sorted[0];
 			const median = sorted[Math.floor(sorted.length / 2)];

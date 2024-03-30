@@ -1,11 +1,11 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import meshUrl from '../../../assets/vox/grass.vox?url';
+import meshUrl from "../../../assets/vox/grass.vox?url";
 
-import type { VoxelMesh } from '../../render/meshes/voxelMesh/voxelMesh';
-import type { Entity } from '../../world/entity/entity';
-import { StaticObject } from '../../world/chunk/staticObject';
+import type { VoxelMesh } from "../../render/meshes/voxelMesh/voxelMesh";
+import type { Entity } from "../../world/entity/entity";
+import { StaticObject } from "../../world/chunk/staticObject";
 
 export class StaticGrass extends StaticObject {
 	mesh(): VoxelMesh {
@@ -17,12 +17,12 @@ export class StaticGrass extends StaticObject {
 	}
 
 	onAttacked(perpetrator?: Entity) {
-		this.chunk.world.game.audio.play('tock', 0.5);
+		this.chunk.world.game.audio.play("tock", 0.5);
 		this.chunk.world.game.render.particle.fxBlockBreak(
 			this.x,
 			this.y,
 			this.z,
-			this.chunk.world.blocks[6]
+			this.chunk.world.blocks[6],
 		);
 		this.destroy();
 	}

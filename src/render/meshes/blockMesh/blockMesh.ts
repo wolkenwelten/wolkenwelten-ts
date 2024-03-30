@@ -1,17 +1,17 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { mat4 } from 'gl-matrix';
+import { mat4 } from "gl-matrix";
 
-import shaderFragSource from './blockMesh.frag?raw';
-import shaderVertSource from './blockMesh.vert?raw';
+import shaderFragSource from "./blockMesh.frag?raw";
+import shaderVertSource from "./blockMesh.vert?raw";
 
-import '../../../types';
-import type { Game } from '../../../game';
-import type { Chunk } from '../../../world/chunk/chunk';
-import { Shader } from '../../shader';
-import { Texture } from '../../texture';
-import { meshgenChunk } from '../meshgen';
+import "../../../types";
+import type { Game } from "../../../game";
+import type { Chunk } from "../../../world/chunk/chunk";
+import { Shader } from "../../shader";
+import { Texture } from "../../texture";
+import { meshgenChunk } from "../meshgen";
 
 export class BlockMesh {
 	static gl: WebGL2RenderingContext;
@@ -38,23 +38,16 @@ export class BlockMesh {
 		this.gl = glc;
 		this.shader = new Shader(
 			this.gl,
-			'blockMesh',
+			"blockMesh",
 			shaderVertSource,
 			shaderFragSource,
-			[
-				'cur_tex',
-				'mat_mv',
-				'mat_mvp',
-				'trans_pos',
-				'alpha',
-				'fade_distance',
-			]
+			["cur_tex", "mat_mv", "mat_mvp", "trans_pos", "alpha", "fade_distance"],
 		);
 		this.texture = new Texture(
 			this.gl,
-			'blocks',
+			"blocks",
 			game.world.blockTextureUrl,
-			'2DArray'
+			"2DArray",
 		);
 		this.texture.nearest();
 	}
@@ -85,8 +78,7 @@ export class BlockMesh {
 		this.sideElementCount = sideElementCount;
 		this.sideStart = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 		for (let i = 1; i < 12; i++) {
-			this.sideStart[i] =
-				this.sideStart[i - 1] + this.sideElementCount[i - 1];
+			this.sideStart[i] = this.sideStart[i - 1] + this.sideElementCount[i - 1];
 		}
 		gl.bindVertexArray(this.vao);
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
@@ -106,7 +98,7 @@ export class BlockMesh {
 	private constructor(
 		vertices: Uint8Array,
 		sideElementCount: number[],
-		chunk: Chunk
+		chunk: Chunk,
 	) {
 		this.x = chunk.x;
 		this.y = chunk.y;
@@ -132,17 +124,17 @@ export class BlockMesh {
 	static bindShaderAndTexture(
 		projection: mat4,
 		modelView: mat4,
-		renderDistance: number
+		renderDistance: number,
 	) {
 		BlockMesh.shader.bind();
 
 		const modelViewProjection = BlockMesh.mvp;
 		mat4.identity(modelViewProjection);
 		mat4.multiply(modelViewProjection, projection, modelView);
-		BlockMesh.shader.uniform4fv('mat_mv', modelView);
-		BlockMesh.shader.uniform4fv('mat_mvp', modelViewProjection);
-		BlockMesh.shader.uniform1i('cur_tex', 1);
-		BlockMesh.shader.uniform1f('fade_distance', renderDistance);
+		BlockMesh.shader.uniform4fv("mat_mv", modelView);
+		BlockMesh.shader.uniform4fv("mat_mvp", modelViewProjection);
+		BlockMesh.shader.uniform1i("cur_tex", 1);
+		BlockMesh.shader.uniform1f("fade_distance", renderDistance);
 		BlockMesh.texture.bind(1);
 	}
 
@@ -153,7 +145,7 @@ export class BlockMesh {
 	 */
 	drawFast(mask: number, alpha: number, sideOffset = 0): number {
 		if (this.destroyed) {
-			throw new Error('Tried to draw destroyed mesh');
+			throw new Error("Tried to draw destroyed mesh");
 		}
 		const elementCount =
 			this.sideStart[sideOffset + 5] +
@@ -163,8 +155,8 @@ export class BlockMesh {
 			return 0;
 		}
 		BlockMesh.gl.bindVertexArray(this.vao);
-		BlockMesh.shader.uniform3f('trans_pos', this.x, this.y, this.z);
-		BlockMesh.shader.uniform1f('alpha', alpha);
+		BlockMesh.shader.uniform3f("trans_pos", this.x, this.y, this.z);
+		BlockMesh.shader.uniform1f("alpha", alpha);
 
 		let calls = 0;
 		let start = 0;
@@ -177,11 +169,7 @@ export class BlockMesh {
 			const curEnd = curStart + this.sideElementCount[i + sideOffset];
 			if (curStart !== end) {
 				if (end !== start) {
-					BlockMesh.gl.drawArrays(
-						BlockMesh.gl.TRIANGLES,
-						start,
-						end - start
-					);
+					BlockMesh.gl.drawArrays(BlockMesh.gl.TRIANGLES, start, end - start);
 					calls++;
 				}
 				start = curStart;

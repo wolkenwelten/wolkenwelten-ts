@@ -1,14 +1,14 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { mat4 } from 'gl-matrix';
+import { mat4 } from "gl-matrix";
 
-import shaderFragSource from './particleMesh.frag?raw';
-import shaderVertSource from './particleMesh.vert?raw';
+import shaderFragSource from "./particleMesh.frag?raw";
+import shaderVertSource from "./particleMesh.vert?raw";
 
-import type { BlockType } from '../../../world/blockType';
-import type { RenderManager } from '../../render';
-import { Shader } from '../../shader';
+import type { BlockType } from "../../../world/blockType";
+import type { RenderManager } from "../../render";
+import { Shader } from "../../shader";
 
 export class ParticleMesh {
 	static gl: WebGL2RenderingContext;
@@ -30,10 +30,10 @@ export class ParticleMesh {
 		this.gl = glc;
 		this.shader = new Shader(
 			this.gl,
-			'particleMesh',
+			"particleMesh",
 			shaderVertSource,
 			shaderFragSource,
-			['mat_mvp']
+			["mat_mvp"],
 		);
 	}
 
@@ -68,7 +68,7 @@ export class ParticleMesh {
 		gl.bufferData(
 			gl.ARRAY_BUFFER,
 			this.floatBuffer.slice(0, this.particleCount * 5),
-			gl.DYNAMIC_DRAW
+			gl.DYNAMIC_DRAW,
 		);
 
 		gl.vertexAttribPointer(0, 4, gl.FLOAT, false, 5 * 4, 0);
@@ -91,7 +91,7 @@ export class ParticleMesh {
 		gx: number,
 		gy: number,
 		gz: number,
-		gs: number
+		gs: number,
 	) {
 		let i = this.particleCount;
 		if (this.particleCount >= this.maxParticles) {
@@ -273,7 +273,7 @@ export class ParticleMesh {
 		gl.enable(gl.BLEND);
 		gl.depthMask(false);
 		gl.blendFunc(gl.ONE, gl.ONE);
-		ParticleMesh.shader.bind().uniform4fv('mat_mvp', mat_mvp);
+		ParticleMesh.shader.bind().uniform4fv("mat_mvp", mat_mvp);
 		gl.drawArrays(gl.POINTS, 0, this.particleCount);
 		gl.depthMask(true);
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);

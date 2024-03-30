@@ -1,16 +1,16 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { mat4 } from 'gl-matrix';
+import { mat4 } from "gl-matrix";
 
-import shadowTextureUrl from '../../../../assets/gfx/decals.png';
-import shaderFragSource from './decalMesh.frag?raw';
-import shaderVertSource from './decalMesh.vert?raw';
+import shadowTextureUrl from "../../../../assets/gfx/decals.png";
+import shaderFragSource from "./decalMesh.frag?raw";
+import shaderVertSource from "./decalMesh.vert?raw";
 
-import type { RenderManager } from '../../render';
-import { clamp } from '../../../util/math';
-import { Shader } from '../../shader';
-import { Texture } from '../../texture';
+import type { RenderManager } from "../../render";
+import { clamp } from "../../../util/math";
+import { Shader } from "../../shader";
+import { Texture } from "../../texture";
 
 const uvs = 1 / 8;
 
@@ -30,12 +30,12 @@ export class DecalMesh {
 		this.gl = glc;
 		this.shader = new Shader(
 			this.gl,
-			'decalMesh',
+			"decalMesh",
 			shaderVertSource,
 			shaderFragSource,
-			['cur_tex', 'mat_mvp']
+			["cur_tex", "mat_mvp"],
 		);
-		this.texture = new Texture(this.gl, 'decals', shadowTextureUrl, '2D');
+		this.texture = new Texture(this.gl, "decals", shadowTextureUrl, "2D");
 		this.texture.linear();
 	}
 
@@ -64,7 +64,7 @@ export class DecalMesh {
 		gl.bufferData(
 			gl.ARRAY_BUFFER,
 			this.vertices.slice(0, this.endOfBuffer),
-			gl.DYNAMIC_DRAW
+			gl.DYNAMIC_DRAW,
 		);
 
 		gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 6 * 4, 0);
@@ -86,7 +86,7 @@ export class DecalMesh {
 		z: number,
 		u: number,
 		v: number,
-		lightness: number
+		lightness: number,
 	) {
 		this.vertices[this.endOfBuffer] = x;
 		this.vertices[this.endOfBuffer + 1] = y;
@@ -104,7 +104,7 @@ export class DecalMesh {
 		size: number,
 		lightness: number,
 		tx: number,
-		ty: number
+		ty: number,
 	) {
 		const u = tx * uvs;
 		const v = ty * uvs;
@@ -124,7 +124,7 @@ export class DecalMesh {
 		size: number,
 		lightness: number,
 		tx: number,
-		ty: number
+		ty: number,
 	) {
 		const u = tx * uvs;
 		const v = ty * uvs;
@@ -144,7 +144,7 @@ export class DecalMesh {
 		size: number,
 		lightness: number,
 		tx: number,
-		ty: number
+		ty: number,
 	) {
 		const u = tx * uvs;
 		const v = ty * uvs;
@@ -164,7 +164,7 @@ export class DecalMesh {
 		size: number,
 		lightness: number,
 		tx: number,
-		ty: number
+		ty: number,
 	) {
 		const u = tx * uvs;
 		const v = ty * uvs;
@@ -184,7 +184,7 @@ export class DecalMesh {
 		size: number,
 		lightness: number,
 		tx: number,
-		ty: number
+		ty: number,
 	) {
 		const u = tx * uvs;
 		const v = ty * uvs;
@@ -204,7 +204,7 @@ export class DecalMesh {
 		size: number,
 		lightness: number,
 		tx: number,
-		ty: number
+		ty: number,
 	) {
 		const u = tx * uvs;
 		const v = ty * uvs;
@@ -246,8 +246,8 @@ export class DecalMesh {
 		}
 		const gl = DecalMesh.gl;
 		this.finish();
-		DecalMesh.shader.bind().uniform4fv('mat_mvp', mat_mvp);
-		DecalMesh.shader.bind().uniform1i('cur_tex', 3);
+		DecalMesh.shader.bind().uniform4fv("mat_mvp", mat_mvp);
+		DecalMesh.shader.bind().uniform1i("cur_tex", 3);
 		DecalMesh.texture.bind(3);
 		gl.enable(gl.POLYGON_OFFSET_FILL);
 		gl.depthMask(false);

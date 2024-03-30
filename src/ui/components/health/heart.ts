@@ -1,8 +1,8 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { isClient, mockElement } from '../../../util/compat';
-import styles from './heart.module.css';
+import { isClient, mockElement } from "../../../util/compat";
+import styles from "./heart.module.css";
 
 export class Heart {
 	div: HTMLElement;
@@ -10,7 +10,7 @@ export class Heart {
 	animate = false;
 
 	constructor(parent: HTMLElement, hp: number) {
-		const div = isClient() ? document.createElement('div') : mockElement();
+		const div = isClient() ? document.createElement("div") : mockElement();
 		this.div = div;
 		div.classList.add(styles.heart);
 		parent.appendChild(div);
@@ -19,7 +19,7 @@ export class Heart {
 
 	update(hp: number, animate: boolean) {
 		if (this.hp !== hp) {
-			this.div.setAttribute('hp-val', String(hp));
+			this.div.setAttribute("hp-val", String(hp));
 			this.hp = hp;
 		}
 		if (this.animate !== animate) {

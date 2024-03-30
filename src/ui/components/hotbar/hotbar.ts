@@ -1,11 +1,11 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import type { Game } from '../../../game';
-import { Item } from '../../../world/item/item';
-import { Div } from '../../utils';
-import { InventorySlotWidget } from '../item/inventorySlotWidget';
-import styles from './hotbar.module.css';
+import type { Game } from "../../../game";
+import { Item } from "../../../world/item/item";
+import { Div } from "../../utils";
+import { InventorySlotWidget } from "../item/inventorySlotWidget";
+import styles from "./hotbar.module.css";
 
 export type HotbarEntryValue = Item | undefined;
 
@@ -23,19 +23,19 @@ export class HotbarEntry {
 			(this.slot = Div({
 				class: styles.hotbarSlot,
 				attributes: {
-					'slot-index': String((i + 1) % 10),
+					"slot-index": String((i + 1) % 10),
 				},
-				onMousedown: e => e.stopPropagation(),
+				onMousedown: (e) => e.stopPropagation(),
 				onClick: this.click.bind(this),
 				onContextmenu: this.rightClick.bind(this),
-			}))
+			})),
 		);
 		this.widget = new InventorySlotWidget(
 			this.slot,
 			game.player.inventory,
 			i,
 			game,
-			false
+			false,
 		);
 	}
 

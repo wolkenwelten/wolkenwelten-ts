@@ -1,10 +1,10 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { LCG } from '../../util/prng';
-import type { Chunk } from '../../world/chunk/chunk';
-import type { WorldgenAssetList } from './assets';
-import { StaticObject } from '../../world/chunk/staticObject';
+import { LCG } from "../../util/prng";
+import type { Chunk } from "../../world/chunk/chunk";
+import type { WorldgenAssetList } from "./assets";
+import { StaticObject } from "../../world/chunk/staticObject";
 
 export const worldgen = (assets: WorldgenAssetList, chunk: Chunk) => {
 	if (chunk.y < -512) {
@@ -82,25 +82,15 @@ const worldgenSurface = (assets: WorldgenAssetList, chunk: Chunk) => {
 						if (rng.bool(31)) {
 							chunk.setBlockUnsafe(x, Math.floor(endY), z, 3);
 							if (rng.bool(31)) {
-								chunk.setBlockUnsafe(
-									x,
-									Math.floor(endY) + 1,
-									z,
-									3
-								);
+								chunk.setBlockUnsafe(x, Math.floor(endY) + 1, z, 3);
 							}
 						}
 					}
 
 					if (gh > -3 && gh < 0 && endY < 32 && rng.bool(640)) {
-						StaticObject.create('shell', chunk, cx, gh + 1, cz);
-					} else if (
-						gh > -3 &&
-						gh < 0 &&
-						endY < 32 &&
-						rng.bool(1240)
-					) {
-						StaticObject.create('stick', chunk, cx, gh + 1, cz);
+						StaticObject.create("shell", chunk, cx, gh + 1, cz);
+					} else if (gh > -3 && gh < 0 && endY < 32 && rng.bool(1240)) {
+						StaticObject.create("stick", chunk, cx, gh + 1, cz);
 					}
 				} else if (gh > 24) {
 					chunk.setBoxUnsafe(x, 0, z, 1, Math.min(endY, 32), 1, 3);
@@ -109,35 +99,17 @@ const worldgenSurface = (assets: WorldgenAssetList, chunk: Chunk) => {
 					if (endY < 32) {
 						chunk.setBlockUnsafe(x, Math.floor(endY), z, 2);
 						if (gh > 2 && gh < 23) {
-							if (
-								rng.bool(1725) &&
-								assets.bushA.fits(chunk, x, gh, z)
-							) {
+							if (rng.bool(1725) && assets.bushA.fits(chunk, x, gh, z)) {
 								assets.bushA.blit(chunk, x, gh, z);
-							} else if (
-								rng.bool(1625) &&
-								assets.bushB.fits(chunk, x, gh, z)
-							) {
+							} else if (rng.bool(1625) && assets.bushB.fits(chunk, x, gh, z)) {
 								assets.bushB.blit(chunk, x, gh, z);
-							} else if (
-								rng.bool(1525) &&
-								assets.bushC.fits(chunk, x, gh, z)
-							) {
+							} else if (rng.bool(1525) && assets.bushC.fits(chunk, x, gh, z)) {
 								assets.bushC.blit(chunk, x, gh, z);
-							} else if (
-								rng.bool(1625) &&
-								assets.rockA.fits(chunk, x, gh, z)
-							) {
+							} else if (rng.bool(1625) && assets.rockA.fits(chunk, x, gh, z)) {
 								assets.rockA.blit(chunk, x, gh, z);
-							} else if (
-								rng.bool(1925) &&
-								assets.rockB.fits(chunk, x, gh, z)
-							) {
+							} else if (rng.bool(1925) && assets.rockB.fits(chunk, x, gh, z)) {
 								assets.rockB.blit(chunk, x, gh, z);
-							} else if (
-								rng.bool(1825) &&
-								assets.rockC.fits(chunk, x, gh, z)
-							) {
+							} else if (rng.bool(1825) && assets.rockC.fits(chunk, x, gh, z)) {
 								assets.rockC.blit(chunk, x, gh, z);
 							} else if (
 								rng.bool(620) &&
@@ -160,37 +132,13 @@ const worldgenSurface = (assets: WorldgenAssetList, chunk: Chunk) => {
 							) {
 								assets.spruceA.blit(chunk, x, gh - 2, z);
 							} else if (rng.bool(300)) {
-								StaticObject.create(
-									'stone',
-									chunk,
-									cx,
-									gh + 1,
-									cz
-								);
+								StaticObject.create("stone", chunk, cx, gh + 1, cz);
 							} else if (rng.bool(300)) {
-								StaticObject.create(
-									'stick',
-									chunk,
-									cx,
-									gh + 1,
-									cz
-								);
+								StaticObject.create("stick", chunk, cx, gh + 1, cz);
 							} else if (rng.bool(120)) {
-								StaticObject.create(
-									'flower',
-									chunk,
-									cx,
-									gh + 1,
-									cz
-								);
+								StaticObject.create("flower", chunk, cx, gh + 1, cz);
 							} else if (rng.bool(40)) {
-								StaticObject.create(
-									'grass',
-									chunk,
-									cx,
-									gh + 1,
-									cz
-								);
+								StaticObject.create("grass", chunk, cx, gh + 1, cz);
 							}
 						}
 					}

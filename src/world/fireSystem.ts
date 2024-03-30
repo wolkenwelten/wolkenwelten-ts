@@ -2,9 +2,9 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 
-import { Being as Entity } from './entity/being';
-import { StatusEffect } from './statusEffects/statusEffect';
-import type { World } from './world';
+import { Being as Entity } from "./entity/being";
+import { StatusEffect } from "./statusEffects/statusEffect";
+import type { World } from "./world";
 
 export const coordinateToKey = (x: number, y: number, z: number) =>
 	(Math.floor(x) & 0xffff) +
@@ -34,10 +34,7 @@ export class FireSystem {
 		const key = coordinateToKey(x, y, z);
 		const fire = this.fires.get(key);
 		if (fire) {
-			fire.strength = Math.min(
-				FIRE_MAX_STRENGTH,
-				fire.strength + strength
-			);
+			fire.strength = Math.min(FIRE_MAX_STRENGTH, fire.strength + strength);
 		} else {
 			const fire = new Fire(x, y, z, strength);
 			this.fires.set(key, fire);
@@ -105,7 +102,7 @@ export class Fire {
 			const dd = dx * dx + dy * dy + dz * dz;
 			if (dd < 4) {
 				if (b instanceof Entity) {
-					const e = b.effects.get('Burning');
+					const e = b.effects.get("Burning");
 					if (!e) {
 						const e = new BurningEffect();
 						b.effects.set(e.id, e);
@@ -136,7 +133,7 @@ export class Fire {
 					this.z - 1,
 					3,
 					3,
-					3
+					3,
 				);
 			}
 		} else {
@@ -186,7 +183,7 @@ export class Fire {
 		x: number,
 		y: number,
 		z: number,
-		strength: number
+		strength: number,
 	) {
 		const ox = Math.random() * 1.4 - 0.2;
 		const oy = Math.random() - 0.5;
@@ -209,13 +206,13 @@ export class Fire {
 			0,
 			0,
 			0,
-			0
+			0,
 		);
 	}
 }
 
 export class BurningEffect extends StatusEffect {
-	id = 'Burning';
+	id = "Burning";
 	lastDamageDealt = 0;
 
 	update(e: Entity): void {
@@ -226,7 +223,7 @@ export class BurningEffect extends StatusEffect {
 		}
 		Fire.addParticle(e.world, e.x - 0.5, e.y - 0.5, e.z - 0.5, 4096);
 
-		const wet = e.effects.get('Wet');
+		const wet = e.effects.get("Wet");
 		if (wet) {
 			wet.ttl -= 5;
 		}

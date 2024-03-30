@@ -1,7 +1,7 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { mat4, vec4 } from 'gl-matrix';
+import { mat4, vec4 } from "gl-matrix";
 
 export class Frustum {
 	clip: mat4;
@@ -11,12 +11,7 @@ export class Frustum {
 
 	constructor() {
 		this.clip = mat4.create();
-		this.rows = [
-			vec4.create(),
-			vec4.create(),
-			vec4.create(),
-			vec4.create(),
-		];
+		this.rows = [vec4.create(), vec4.create(), vec4.create(), vec4.create()];
 		this.planes = [
 			vec4.create(),
 			vec4.create(),
