@@ -423,10 +423,10 @@ export class Character extends Being {
 		} else {
 			this.world.game.audio.play("punchMiss");
 		}
-		const px = this.x + Math.cos(-this.yaw - Math.PI/2);
+		const px = this.x + Math.cos(-this.yaw - Math.PI / 2);
 		const py = this.y - 0.9;
-		const pz = this.z + Math.sin(-this.yaw - Math.PI/2);
-		this.world.game.render.particle.fxStrike(px,py,pz);
+		const pz = this.z + Math.sin(-this.yaw - Math.PI / 2);
+		this.world.game.render.particle.fxStrike(px, py, pz);
 	}
 
 	equipmentWeapon() {
@@ -502,11 +502,11 @@ export class Character extends Being {
 
 		let headPitch = this.walkAnimationFactor * 0.025;
 		let bodyPitch = 0;
-		let leftArmPitch = this.walkAnimationFactor * 0.4;
-		let rightArmPitch = this.walkAnimationFactor * -0.4;
-		let rightLegPitch = this.walkAnimationFactor * -0.2;
-		let leftLegPitch = this.walkAnimationFactor * 0.2;
-		if(this.hitAnimation + 100 > this.world.game.render.frames){
+		let leftArmPitch = this.walkAnimationFactor * 0.7;
+		let rightArmPitch = this.walkAnimationFactor * -0.7;
+		let rightLegPitch = this.walkAnimationFactor * 0.6;
+		let leftLegPitch = this.walkAnimationFactor * -0.6;
+		if (this.hitAnimation + 100 > this.world.game.render.frames) {
 			const t = this.hitAnimation + 100 - this.world.game.render.frames;
 			rightArmPitch = (t / 100) * 1.5;
 			rightArmPitch *= rightArmPitch;
@@ -576,7 +576,7 @@ export class Character extends Being {
 			projectionMatrix,
 			viewMatrix,
 			alpha,
-			-0.15,
+			0.125,
 			-1.25,
 			0,
 			rightLegPitch,
@@ -589,7 +589,7 @@ export class Character extends Being {
 			projectionMatrix,
 			viewMatrix,
 			alpha,
-			0.15,
+			-0.125,
 			-1.25,
 			0,
 			leftLegPitch,
