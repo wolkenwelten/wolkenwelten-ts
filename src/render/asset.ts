@@ -2,8 +2,8 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import voxelBagFile from "../../assets/vox/bag.vox?url";
-import voxelFistFile from "../../assets/vox/fist.vox?url";
 import voxelTestOutlineFile from "../../assets/vox/testOutline.vox?url";
+import voxelPlayerFile from "../../assets/vox/player/head.vox?url";
 
 import type { Game } from "../game";
 import { BlockMesh } from "./meshes/blockMesh/blockMesh";
@@ -20,8 +20,8 @@ export class AssetList {
 	cache: Map<string, VoxelMesh> = new Map();
 
 	bag: VoxelMesh;
-	fist: VoxelMesh;
 	test: VoxelMesh;
+	player: VoxelMesh;
 	blockType: TriangleMesh[] = [];
 
 	generateBlockTypeMeshes() {
@@ -66,8 +66,8 @@ export class AssetList {
 		VoxelMesh.init(gl);
 
 		this.bag = VoxelMesh.fromVoxFile(voxelBagFile);
-		this.fist = VoxelMesh.fromVoxFile(voxelFistFile);
 		this.test = VoxelMesh.fromVoxFile(voxelTestOutlineFile);
+		this.player = VoxelMesh.fromVoxFile(voxelPlayerFile);
 		this.generateBlockTypeMeshes();
 	}
 }

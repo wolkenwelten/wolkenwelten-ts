@@ -39,7 +39,6 @@ export class UIManager {
 		this.uiWrapper.id = "wolkenwelten-ui-root";
 		this.rootElement.append(this.uiWrapper);
 		new FpsCounter(this.uiWrapper, game);
-		new Crosshair(this.uiWrapper);
 		this.healthBar = new HealthBar(this.uiWrapper, game);
 		this.log = new SystemLog(this.uiWrapper, game);
 		this.inventory = new PlayerModal(this.uiWrapper, game);

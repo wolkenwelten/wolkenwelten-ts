@@ -80,7 +80,7 @@ export class EarthBullet extends Rune {
 
 		e.cooldown(32);
 		e.hitAnimation = this.world.game.render.frames;
-		this.world.game.render.shake.add(0.3);
+		this.world.game.render.camera.shake(0.3);
 	}
 }
 

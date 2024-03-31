@@ -75,7 +75,7 @@ export class Character extends Being {
 		this.lastAction = 0;
 		this.vx = this.vy = this.vz = 0;
 
-		this?.world?.game?.render?.shake?.stop();
+		this?.world?.game?.render?.camera?.stop();
 		this.effects.clear();
 		this.inventory.clear();
 		this.equipment.clear();
@@ -209,6 +209,8 @@ export class Character extends Being {
 			return;
 		}
 
+		this.pitch = 0;
+
 		if (!this.world.isLoaded(this.x, this.y, this.z)) {
 			return; // Just freeze the character until we have loaded the area, this shouldn't happen if at all possible
 		}
@@ -268,11 +270,6 @@ export class Character extends Being {
 		}
 
 		if (this.world.isSolid(this.x, this.y - 1.7, this.z)) {
-			/*
-            if(Math.abs(this.vy) > 0.01){
-                this.world.game.render.particle.fxLand(this.x, this.y - 0.5, this.z);
-            }
-            */
 			this.vy = Math.max(this.vy, 0);
 		}
 		if (this.world.isSolid(this.x, this.y + 0.7, this.z)) {
@@ -459,10 +456,6 @@ export class Character extends Being {
 
 	/* Since right now WW is only singleplayer we can ignore this method */
 	draw(projectionMatrix: mat4, viewMatrix: mat4, cam: Entity) {
-		if (this.world.game.player === this) {
-			return;
-		}
-
 		this.world.game.render.decals.addShadow(this.x, this.y, this.z, 1);
 
 		mat4.identity(modelViewMatrix);
@@ -485,16 +478,6 @@ export class Character extends Being {
 	}
 
 	mesh(): VoxelMesh {
-		return this.world.game.render.assets.bag;
-	}
-
-	/* Return the mesh of whatever we are currently holding, or a hand */
-	hudMesh(): VoxelMesh | TriangleMesh {
-		const heldItem = this.equipmentWeapon();
-		if (!heldItem) {
-			return this.world.game.render.assets.fist;
-		} else {
-			return heldItem.mesh();
-		}
+		return this.world.game.render.assets.player;
 	}
 }

@@ -10,7 +10,7 @@ import { AssetList } from "./asset";
 import { DecalMesh } from "./meshes/decalMesh/decalMesh";
 import { ParticleMesh } from "./meshes/particleMesh/particleMesh";
 import { allTexturesLoaded } from "./texture";
-import { ScreenShakeSystem } from "./screenShake";
+import { Camera } from "./camera";
 import { WorldRenderer } from "./worldRenderer";
 import {
 	isClient,
@@ -20,10 +20,8 @@ import {
 } from "../util/compat";
 import { Div } from "../ui/utils";
 
-const transPos = new Float32Array([0, 0, 0]);
 const projectionMatrix = mat4.create();
 const viewMatrix = mat4.create();
-const modelViewMatrix = mat4.create();
 
 export class RenderManager {
 	game: Game;
@@ -46,8 +44,7 @@ export class RenderManager {
 	assets: AssetList;
 	decals: DecalMesh;
 	particle: ParticleMesh;
-	cam: Entity;
-	shake: ScreenShakeSystem;
+	camera: Camera;
 	world: WorldRenderer;
 
 	setPlatformDefaults() {
@@ -73,7 +70,6 @@ export class RenderManager {
 	constructor(game: Game, cam: Entity) {
 		this.game = game;
 		this.setPlatformDefaults();
-		this.cam = cam;
 		this.canvas = isClient() ? document.createElement("canvas") : mockCanvas();
 		this.canvas.classList.add("wolkenwelten-canvas");
 		this.canvasWrapper = Div({ class: "wolkenwelten-canvas-wrapper" });
@@ -90,7 +86,7 @@ export class RenderManager {
 		this.gl = gl;
 		this.initGLContext();
 		this.assets = new AssetList(game, gl);
-		this.shake = new ScreenShakeSystem();
+		this.camera = new Camera(cam);
 		this.world = new WorldRenderer(this);
 		this.decals = new DecalMesh(this);
 		this.particle = new ParticleMesh(this);
@@ -131,7 +127,6 @@ export class RenderManager {
 			return;
 		}
 		this.updateFOV();
-		this.shake.update();
 		mat4.perspective(
 			projectionMatrix,
 			(this.fov * Math.PI) / 180,
@@ -139,62 +134,15 @@ export class RenderManager {
 			0.1,
 			512.0,
 		);
-
-		mat4.identity(viewMatrix);
-		mat4.rotateX(viewMatrix, viewMatrix, -this.cam.pitch);
-		mat4.rotateY(viewMatrix, viewMatrix, -this.cam.yaw);
-		const shakeOff = this.shake.getCamOffset(this.game.ticks);
-		transPos[0] = -this.cam.x + shakeOff[0];
-		transPos[1] = -(this.cam.y + this.cam.camOffY()) + shakeOff[1];
-		transPos[2] = -this.cam.z + shakeOff[2];
-		mat4.translate(viewMatrix, viewMatrix, transPos);
+		this.camera.update();
+		this.camera.calcViewMatrix(this.game.ticks, viewMatrix);
 
 		this.gl.enable(this.gl.BLEND);
-		this.world.draw(projectionMatrix, viewMatrix, this.cam);
+		this.world.draw(projectionMatrix, viewMatrix, this.camera.entityToFollow);
 		mat4.multiply(viewMatrix, projectionMatrix, viewMatrix);
 		this.decals.draw(viewMatrix);
 		this.gl.disable(this.gl.BLEND);
-
 		this.particle.draw(viewMatrix);
-		this.drawHud(projectionMatrix);
-	}
-
-	drawHUDWeapon(projectionMatrix: mat4) {
-		mat4.identity(modelViewMatrix);
-		let r = Math.PI * -0.04;
-		let rt = 0;
-		if (this.game.player.hitAnimation >= 0) {
-			const t = (this.frames - this.game.player.hitAnimation) / 20.0;
-			if (t > 1) {
-				this.game.player.hitAnimation = -1;
-			} else {
-				rt = t * Math.PI;
-				const rMax =
-					this.game.player.equipmentWeapon() === undefined ? 0.125 : 0.4;
-				r = Math.PI * (0.1 - Math.sin(t * Math.PI) * rMax);
-			}
-		}
-		const player = this.game.player;
-		const viewBob = Math.sin(player.walkCycleCounter) * 0.02;
-		const viewBobH = Math.sin(player.walkCycleCounter * 0.5) * 0.03;
-		const jumpOff = player.jumpAnimeFactor * -0.2;
-		const rl = Math.sin(rt);
-		const mesh = this.game.player.hudMesh();
-		const shakeOff = this.shake.getCamOffset(this.game.ticks);
-		transPos[0] =
-			0.6 - rl * 0.2 + viewBobH + player.inertiaX * 0.5 - shakeOff[0];
-		transPos[1] = -0.6 + rl * 0.2 + viewBob + jumpOff - shakeOff[1];
-		transPos[2] = -0.5 - rl * 0.25 + player.inertiaZ * 0.5 - shakeOff[2];
-		mat4.translate(modelViewMatrix, modelViewMatrix, transPos);
-		mat4.rotateX(modelViewMatrix, modelViewMatrix, r);
-		mat4.multiply(modelViewMatrix, projectionMatrix, modelViewMatrix);
-
-		mesh.draw(modelViewMatrix, 1.0);
-	}
-
-	drawHud(projectionMatrix: mat4) {
-		this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
-		this.drawHUDWeapon(projectionMatrix);
 	}
 
 	resize() {

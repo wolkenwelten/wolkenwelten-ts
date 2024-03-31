@@ -41,10 +41,6 @@ export class Entity {
 
 	cooldown(ticks: number) {}
 
-	camOffY() {
-		return 0;
-	}
-
 	destroy() {
 		this.destroyed = true;
 		this.world.removeEntity(this);
@@ -84,6 +80,10 @@ export class Entity {
 			this.world.isSolid(this.x, this.y, this.z) ||
 			this.world.isSolid(this.x, this.y - 0.3, this.z)
 		);
+	}
+
+	getVelocity() {
+		return Math.cbrt(this.vx * this.vx + this.vy * this.vy + this.vz * this.vz);
 	}
 
 	onDeath() {}

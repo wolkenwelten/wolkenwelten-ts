@@ -39,7 +39,7 @@ export class FireBreath extends Rune {
 		if (firesSpawned === 0) {
 			return;
 		}
-		this.world.game.render.shake.add(1);
+		this.world.game.render.camera.shake(1);
 		e.cooldown(64);
 		e.hitAnimation = this.world.game.render.frames;
 	}

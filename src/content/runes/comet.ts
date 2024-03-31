@@ -125,7 +125,7 @@ export class CometEntity extends Entity {
 				this.source?.doDamage(e, dmg * dmg);
 			}
 			if (e === this.world.game.player) {
-				this.world.game.render.shake.add(Math.max(0, 27 - dd) * 3);
+				this.world.game.render.camera.shake(Math.max(0, 27 - dd) * 3);
 			}
 		}
 	}
