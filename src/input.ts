@@ -122,7 +122,10 @@ export class InputManager {
 				"mousemove",
 				(e) => {
 					if (document.pointerLockElement) {
-						that.game.render.camera.rotate(e.movementX * -0.001, e.movementY * -0.001);
+						that.game.render.camera.rotate(
+							e.movementX * -0.001,
+							e.movementY * -0.001,
+						);
 					}
 				},
 				false,
@@ -224,7 +227,10 @@ export class InputManager {
 							gamepad.axes[3] * gamepad.axes[3],
 					);
 					if (len > 0.16) {
-						this.game.render.camera.rotate(gamepad.axes[2] * -0.01, gamepad.axes[3] * -0.01);
+						this.game.render.camera.rotate(
+							gamepad.axes[2] * -0.01,
+							gamepad.axes[3] * -0.01,
+						);
 					}
 				}
 				if (gamepad.buttons[0]?.pressed) {
@@ -296,7 +302,11 @@ export class InputManager {
 			player.fly(movement.x * speed, movement.y * speed, movement.z * speed);
 		} else {
 			const speed = movement.sprint ? 0.3 : 0.2;
-			this.game.render.camera.moveEntity(movement.x * speed, movement.y * speed, movement.z * speed);
+			this.game.render.camera.moveEntity(
+				movement.x * speed,
+				movement.y * speed,
+				movement.z * speed,
+			);
 		}
 
 		for (let i = 0; i < 10; i++) {

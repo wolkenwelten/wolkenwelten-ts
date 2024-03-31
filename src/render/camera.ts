@@ -7,20 +7,20 @@ import { Entity } from "../world/entity/entity";
 
 const transPos = new Float32Array([0, 0, 0]);
 
-const closestRadian = (from: number, to:number) => {
-	const a = to - Math.PI*2;
-	const b = to + Math.PI*2;
+const closestRadian = (from: number, to: number) => {
+	const a = to - Math.PI * 2;
+	const b = to + Math.PI * 2;
 	const ad = Math.abs(from - a);
 	const bd = Math.abs(from - b);
 	const td = Math.abs(from - to);
-	if((ad < bd) && (ad < td)){
+	if (ad < bd && ad < td) {
 		return a;
 	}
-	if((bd < ad) && (bd < td)){
+	if (bd < ad && bd < td) {
 		return b;
 	}
 	return to;
-}
+};
 
 export class Camera {
 	private shakeIntensity = 0;
@@ -53,11 +53,11 @@ export class Camera {
 	}
 
 	update() {
-		if(this.yaw > Math.PI*2){
-			this.yaw -= Math.PI*2;
+		if (this.yaw > Math.PI * 2) {
+			this.yaw -= Math.PI * 2;
 		}
-		if(this.yaw < 0){
-			this.yaw += Math.PI*2;
+		if (this.yaw < 0) {
+			this.yaw += Math.PI * 2;
 		}
 		this.shakeIntensity -= 0.04;
 		if (this.shakeIntensity < 0) {
@@ -70,14 +70,14 @@ export class Camera {
 
 	moveEntity(ox: number, oy: number, oz: number) {
 		let s = 0;
-		if(ox || oz){
+		if (ox || oz) {
 			const p = Math.atan2(oz, -ox) + Math.PI / 2;
 			const goal = closestRadian(this.entityToFollow.yaw, p + this.yaw);
 			this.entityToFollow.yaw = this.entityToFollow.yaw * 0.7 + goal * 0.3;
 			s = -0.3;
 		}
 
-		this.entityToFollow.move(0,oy,s);
+		this.entityToFollow.move(0, oy, s);
 	}
 
 	getCamOffset(ticks: number): [number, number, number] {
