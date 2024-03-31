@@ -501,7 +501,7 @@ export class Character extends Being {
 		const alpha = Math.min(1, Math.max(0, renderDistance - d) / 8);
 
 		let headPitch = this.walkAnimationFactor * 0.025;
-		let bodyPitch = 0;
+		let bodyPitch = this.walkAnimationFactor * -0.035;
 		let leftArmPitch = this.walkAnimationFactor * 0.7;
 		let rightArmPitch = this.walkAnimationFactor * -0.7;
 		let rightLegPitch = this.walkAnimationFactor * 0.6;
