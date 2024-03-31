@@ -32,14 +32,12 @@ export class Character extends Being {
 	movementY = 0;
 	movementZ = 0;
 	lastAction = 0;
-	miningCooldownUntil = 0;
 	hitAnimation = -100;
 	walkCycleCounter = 0;
 	nextStepSound = 0;
 	isWalking = false;
 	walkAnimationFactor = 0;
 
-	jumpAnimeFactor = 0;
 	inertiaX = 0;
 	inertiaZ = 0;
 
@@ -253,8 +251,6 @@ export class Character extends Being {
 		const oldVy = this.vy;
 		const oldVz = this.vz;
 
-		this.jumpAnimeFactor = Math.max(0, this.jumpAnimeFactor * 0.97);
-
 		if (underwater) {
 			this.vy *= 0.98;
 			this.vx *= 0.99;
@@ -262,11 +258,9 @@ export class Character extends Being {
 		} else if (this.movementY > 0 && this.mayJump()) {
 			this.vy = 0.15;
 			//this.world.game.render.particle.fxJump(this.x, this.y - 0.5, this.z);
-			this.jumpAnimeFactor = 1;
 		}
 		if (this.movementY > 0 && this.maySwim() && Math.abs(this.vy) < 0.07) {
 			this.vy = 0.06;
-			this.jumpAnimeFactor = 0.5;
 		}
 
 		if (this.isSolidPillar(this.x - 0.4, this.y - 0.8, this.z)) {
@@ -401,7 +395,6 @@ export class Character extends Being {
 		this.world.game.render.canvasWrapper.classList.remove("fx-damage");
 		this.world.game.render.canvasWrapper.getBoundingClientRect();
 		this.world.game.render.canvasWrapper.classList.add("fx-damage");
-		this.miningCooldownUntil = this.world.game.ticks + 10;
 		this.world.game.audio.play("ungh", 0.2);
 	}
 
@@ -418,12 +411,11 @@ export class Character extends Being {
 		const item = this.equipmentWeapon();
 
 		this.hitAnimation = this.world.game.render.frames;
-		const hit = this.attack();
-		const cooldownDur = item ? item.attackCooldown(this) : 80;
+		const hit = this.attack(1.8);
+		const cooldownDur = item ? item.attackCooldown(this) : 100;
 		this.cooldown(cooldownDur);
 		if (hit) {
 			this.world.game.audio.play("punch");
-			this.miningCooldownUntil = this.world.game.ticks + cooldownDur;
 
 			if (item) {
 				item.onAttackWith(this);
@@ -431,6 +423,10 @@ export class Character extends Being {
 		} else {
 			this.world.game.audio.play("punchMiss");
 		}
+		const px = this.x + Math.cos(-this.yaw - Math.PI/2);
+		const py = this.y - 0.9;
+		const pz = this.z + Math.sin(-this.yaw - Math.PI/2);
+		this.world.game.render.particle.fxStrike(px,py,pz);
 	}
 
 	equipmentWeapon() {
@@ -504,6 +500,32 @@ export class Character extends Being {
 		const renderDistance = this.world.game.render.renderDistance;
 		const alpha = Math.min(1, Math.max(0, renderDistance - d) / 8);
 
+		let headPitch = this.walkAnimationFactor * 0.025;
+		let bodyPitch = 0;
+		let leftArmPitch = this.walkAnimationFactor * 0.4;
+		let rightArmPitch = this.walkAnimationFactor * -0.4;
+		let rightLegPitch = this.walkAnimationFactor * -0.2;
+		let leftLegPitch = this.walkAnimationFactor * 0.2;
+		if(this.hitAnimation + 100 > this.world.game.render.frames){
+			const t = this.hitAnimation + 100 - this.world.game.render.frames;
+			rightArmPitch = (t / 100) * 1.5;
+			rightArmPitch *= rightArmPitch;
+			leftArmPitch = rightArmPitch * -0.5;
+
+			leftLegPitch += rightArmPitch * 0.1;
+			rightLegPitch += rightArmPitch * -0.1;
+			headPitch += rightArmPitch * 0.15;
+		}
+
+		const {
+			playerHead,
+			playerTorso,
+			playerLeftArm,
+			playerLeftLeg,
+			playerRightArm,
+			playerRightLeg,
+		} = this.world.game.render.assets;
+
 		this.drawBodyPart(
 			projectionMatrix,
 			viewMatrix,
@@ -511,8 +533,8 @@ export class Character extends Being {
 			0,
 			-0.175,
 			0.05,
-			this.walkAnimationFactor * 0.025,
-			this.world.game.render.assets.playerHead,
+			headPitch,
+			playerHead,
 		);
 		this.drawBodyPart(
 			projectionMatrix,
@@ -521,8 +543,8 @@ export class Character extends Being {
 			0,
 			-0.9,
 			-0.0125,
-			0,
-			this.world.game.render.assets.playerTorso,
+			bodyPitch,
+			playerTorso,
 		);
 		this.drawBodyPart(
 			projectionMatrix,
@@ -531,8 +553,8 @@ export class Character extends Being {
 			-0.275,
 			-0.625,
 			0,
-			this.walkAnimationFactor * 0.4,
-			this.world.game.render.assets.playerRightArm,
+			leftArmPitch,
+			playerLeftArm,
 			0,
 			-0.225,
 			0,
@@ -544,8 +566,8 @@ export class Character extends Being {
 			0.275,
 			-0.625,
 			0,
-			this.walkAnimationFactor * -0.4,
-			this.world.game.render.assets.playerLeftArm,
+			rightArmPitch,
+			playerRightArm,
 			0,
 			-0.225,
 			0,
@@ -557,8 +579,8 @@ export class Character extends Being {
 			-0.15,
 			-1.25,
 			0,
-			this.walkAnimationFactor * -0.2,
-			this.world.game.render.assets.playerRightLeg,
+			rightLegPitch,
+			playerRightLeg,
 			0,
 			-0.2,
 			0,
@@ -570,8 +592,8 @@ export class Character extends Being {
 			0.15,
 			-1.25,
 			0,
-			this.walkAnimationFactor * 0.2,
-			this.world.game.render.assets.playerLeftLeg,
+			leftLegPitch,
+			playerLeftLeg,
 			0,
 			-0.2,
 			0,

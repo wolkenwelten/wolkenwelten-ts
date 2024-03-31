@@ -22,7 +22,7 @@ export class FireBreath extends Rune {
 			i++;
 			const b = e.world.getBlock(x, y, z);
 			if (!b) {
-				if (i > 6) {
+				if (i > 4) {
 					e.world.fire.add(x, y, z, 4096);
 					firesSpawned++;
 					e.world.game.audio.playAtPosition("bomb", 0.1, [x, y, z]);
@@ -30,7 +30,7 @@ export class FireBreath extends Rune {
 			} else {
 				return false;
 			}
-			if (i > 24) {
+			if (i > 16) {
 				return false;
 			} else {
 				return true;
