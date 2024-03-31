@@ -309,7 +309,7 @@ export class InputManager {
 				movement.x,
 				movement.y,
 				movement.z,
-				speed
+				speed,
 			);
 		}
 

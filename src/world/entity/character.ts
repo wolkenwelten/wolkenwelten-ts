@@ -470,8 +470,8 @@ export class Character extends Being {
 	drawTorso(projectionMatrix: mat4, viewMatrix: mat4, cam: Entity, alpha = 1) {
 		mat4.identity(modelViewMatrix);
 		transPos[0] = this.x;
-		transPos[1] = this.y-0.725;
-		transPos[2] = this.z-0.025;
+		transPos[1] = this.y - 0.725;
+		transPos[2] = this.z - 0.025;
 		mat4.translate(modelViewMatrix, modelViewMatrix, transPos);
 		mat4.rotateY(modelViewMatrix, modelViewMatrix, this.yaw);
 		mat4.rotateX(modelViewMatrix, modelViewMatrix, this.pitch);
