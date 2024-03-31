@@ -2,7 +2,6 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import type { Game } from "../game";
-import { Crosshair } from "./components/crosshair";
 import { ChatPanel } from "./components/chatPanel";
 import { HealthBar } from "./components/health/healthBar";
 import { FpsCounter } from "./components/fpsCounter";
