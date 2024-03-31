@@ -68,13 +68,13 @@ export class Camera {
 		this.distance = this.distance * 0.96 + goalDistance * 0.04;
 	}
 
-	moveEntity(ox: number, oy: number, oz: number) {
+	moveEntity(ox: number, oy: number, oz: number, speed: number) {
 		let s = 0;
 		if (ox || oz) {
 			const p = Math.atan2(oz, -ox) + Math.PI / 2;
 			const goal = closestRadian(this.entityToFollow.yaw, p + this.yaw);
 			this.entityToFollow.yaw = this.entityToFollow.yaw * 0.7 + goal * 0.3;
-			s = -0.3;
+			s = -speed;
 		}
 
 		this.entityToFollow.move(0, oy, s);

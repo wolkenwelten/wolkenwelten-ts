@@ -182,7 +182,7 @@ export class InputManager {
 	}
 
 	update() {
-		const movement = { x: 0, y: 0, z: 0, sprint: true };
+		const movement = { x: 0, y: 0, z: 0, sprint: false };
 		const actions = { primary: false, secondary: false };
 
 		if (this.keyStates.has("KeyW")) {
@@ -202,6 +202,9 @@ export class InputManager {
 		}
 		if (this.keyStates.has("KeyR")) {
 			movement.y = 1;
+		}
+		if (this.keyStates.has("ShiftLeft")) {
+			movement.sprint = true;
 		}
 		if (this.keyStates.has("Space")) {
 			movement.y = 1;
@@ -301,11 +304,12 @@ export class InputManager {
 			const speed = movement.sprint ? 1.5 : 0.3;
 			player.fly(movement.x * speed, movement.y * speed, movement.z * speed);
 		} else {
-			const speed = movement.sprint ? 0.3 : 0.2;
+			const speed = movement.sprint ? 0.35 : 0.25;
 			this.game.render.camera.moveEntity(
-				movement.x * speed,
-				movement.y * speed,
-				movement.z * speed,
+				movement.x,
+				movement.y,
+				movement.z,
+				speed
 			);
 		}
 

@@ -454,30 +454,46 @@ export class Character extends Being {
 		return null;
 	}
 
-	/* Since right now WW is only singleplayer we can ignore this method */
-	draw(projectionMatrix: mat4, viewMatrix: mat4, cam: Entity) {
-		this.world.game.render.decals.addShadow(this.x, this.y, this.z, 1);
-
+	drawHead(projectionMatrix: mat4, viewMatrix: mat4, cam: Entity, alpha = 1) {
 		mat4.identity(modelViewMatrix);
 		transPos[0] = this.x;
 		transPos[1] = this.y;
 		transPos[2] = this.z;
 		mat4.translate(modelViewMatrix, modelViewMatrix, transPos);
-
 		mat4.rotateY(modelViewMatrix, modelViewMatrix, this.yaw);
 		mat4.rotateX(modelViewMatrix, modelViewMatrix, this.pitch);
 		mat4.mul(modelViewMatrix, viewMatrix, modelViewMatrix);
 		mat4.mul(modelViewMatrix, projectionMatrix, modelViewMatrix);
+		this.world.game.render.assets.playerHead.draw(modelViewMatrix, alpha);
+	}
+
+	drawTorso(projectionMatrix: mat4, viewMatrix: mat4, cam: Entity, alpha = 1) {
+		mat4.identity(modelViewMatrix);
+		transPos[0] = this.x;
+		transPos[1] = this.y-0.725;
+		transPos[2] = this.z-0.025;
+		mat4.translate(modelViewMatrix, modelViewMatrix, transPos);
+		mat4.rotateY(modelViewMatrix, modelViewMatrix, this.yaw);
+		mat4.rotateX(modelViewMatrix, modelViewMatrix, this.pitch);
+		mat4.mul(modelViewMatrix, viewMatrix, modelViewMatrix);
+		mat4.mul(modelViewMatrix, projectionMatrix, modelViewMatrix);
+		this.world.game.render.assets.playerTorso.draw(modelViewMatrix, alpha);
+	}
+
+	draw(projectionMatrix: mat4, viewMatrix: mat4, cam: Entity) {
+		this.world.game.render.decals.addShadow(this.x, this.y, this.z, 1);
 		const dx = this.x - cam.x;
 		const dy = this.y - cam.y;
 		const dz = this.z - cam.z;
-		const d = Math.sqrt(dx * dx + dy * dy + dz * dz);
+		const d = Math.cbrt(dx * dx + dy * dy + dz * dz);
 		const renderDistance = this.world.game.render.renderDistance;
 		const alpha = Math.min(1, Math.max(0, renderDistance - d) / 8);
-		this.mesh().draw(modelViewMatrix, alpha);
+
+		this.drawHead(projectionMatrix, viewMatrix, cam, alpha);
+		this.drawTorso(projectionMatrix, viewMatrix, cam, alpha);
 	}
 
 	mesh(): VoxelMesh {
-		return this.world.game.render.assets.player;
+		return this.world.game.render.assets.playerHead;
 	}
 }

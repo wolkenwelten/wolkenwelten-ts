@@ -3,7 +3,13 @@
  */
 import voxelBagFile from "../../assets/vox/bag.vox?url";
 import voxelTestOutlineFile from "../../assets/vox/testOutline.vox?url";
-import voxelPlayerFile from "../../assets/vox/player/head.vox?url";
+
+import voxelPlayerHeadFile from "../../assets/vox/player/head.vox?url";
+import voxelPlayerTorsoFile from "../../assets/vox/player/torso.vox?url";
+import voxelPlayerLeftLegFile from "../../assets/vox/player/left_leg.vox?url";
+import voxelPlayerRightLegFile from "../../assets/vox/player/right_leg.vox?url";
+import voxelPlayerLeftArmFile from "../../assets/vox/player/left_arm.vox?url";
+import voxelPlayerRightArmFile from "../../assets/vox/player/right_arm.vox?url";
 
 import type { Game } from "../game";
 import { BlockMesh } from "./meshes/blockMesh/blockMesh";
@@ -21,8 +27,14 @@ export class AssetList {
 
 	bag: VoxelMesh;
 	test: VoxelMesh;
-	player: VoxelMesh;
 	blockType: TriangleMesh[] = [];
+
+	playerHead: VoxelMesh;
+	playerTorso: VoxelMesh;
+	playerLeftLeg: VoxelMesh;
+	playerRightLeg: VoxelMesh;
+	playerLeftArm: VoxelMesh;
+	playerRightArm: VoxelMesh;
 
 	generateBlockTypeMeshes() {
 		this.blockType.length = 0;
@@ -67,7 +79,12 @@ export class AssetList {
 
 		this.bag = VoxelMesh.fromVoxFile(voxelBagFile);
 		this.test = VoxelMesh.fromVoxFile(voxelTestOutlineFile);
-		this.player = VoxelMesh.fromVoxFile(voxelPlayerFile);
+		this.playerHead = VoxelMesh.fromVoxFile(voxelPlayerHeadFile);
+		this.playerTorso = VoxelMesh.fromVoxFile(voxelPlayerTorsoFile);
+		this.playerLeftArm = VoxelMesh.fromVoxFile(voxelPlayerLeftArmFile);
+		this.playerRightArm = VoxelMesh.fromVoxFile(voxelPlayerRightArmFile);
+		this.playerLeftLeg = VoxelMesh.fromVoxFile(voxelPlayerLeftLegFile);
+		this.playerRightLeg = VoxelMesh.fromVoxFile(voxelPlayerRightLegFile);
 		this.generateBlockTypeMeshes();
 	}
 }
