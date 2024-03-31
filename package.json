@@ -16,8 +16,7 @@
     "preview": "vite preview",
     "format": "npx @biomejs/biome format --write ./src",
     "optimize": "node scripts/optimizeAssets.js",
-    "zip": "npm run build && zip -r ld-itch-compatible.zip dist/",
-    "prepare": "husky"
+    "zip": "npm run build && zip -r ld-itch-compatible.zip dist/"
   },
   "devDependencies": {
     "@biomejs/biome": "latest",
