@@ -1,7 +1,7 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { mat4, vec4 } from "gl-matrix";
+import { mat4 } from "gl-matrix";
 import { PerlinNoise } from "../util/noise";
 import { Entity } from "../world/entity/entity";
 
@@ -108,5 +108,14 @@ export class Camera {
 		transPos[1] = -this.entityToFollow.y + shakeOff[1];
 		transPos[2] = -this.entityToFollow.z + shakeOff[2];
 		mat4.translate(viewMatrix, viewMatrix, transPos);
+		const cx =
+			Math.cos(-this.yaw + Math.PI / 2) * this.distance * Math.cos(-this.pitch);
+		const cy = Math.sin(-this.pitch) * this.distance;
+		const cz =
+			Math.sin(-this.yaw + Math.PI / 2) * this.distance * Math.cos(-this.pitch);
+		this.x = this.entityToFollow.x + cx;
+		this.y = this.entityToFollow.y + cy;
+		this.z = this.entityToFollow.z + cz;
+		//this.entityToFollow.world.game.render.particle.fxStrike(this.x, this.y, this.z);
 	}
 }

@@ -6,6 +6,7 @@ import { mat4 } from "gl-matrix";
 import type { TriangleMesh } from "../../render/meshes/triangleMesh/triangleMesh";
 import type { VoxelMesh } from "../../render/meshes/voxelMesh/voxelMesh";
 import type { World } from "../world";
+import type { Position } from "../../util/math";
 import { StatusEffect } from "../statusEffects/statusEffect";
 
 let entityCounter = 0;
@@ -187,7 +188,7 @@ export class Entity {
 		return this.world.game.render.assets.bag;
 	}
 
-	draw(projectionMatrix: mat4, viewMatrix: mat4, cam: Entity) {
+	draw(projectionMatrix: mat4, viewMatrix: mat4, cam: Position) {
 		if (this.destroyed) {
 			return;
 		}

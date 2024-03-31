@@ -20,6 +20,16 @@ export const radianDifference = (α: number, β: number) => {
 
 export const easeInSine = (x: number): number =>
 	1 - Math.cos((x * Math.PI) / 2);
+
 export const easeOutSine = (x: number): number => Math.sin((x * Math.PI) / 2);
+
 export const easeInOutSine = (x: number): number =>
 	-(Math.cos(Math.PI * x) - 1) / 2;
+
+export interface Position {
+	x: number;
+	y: number;
+	z: number;
+	yaw: number;
+	pitch: number;
+}

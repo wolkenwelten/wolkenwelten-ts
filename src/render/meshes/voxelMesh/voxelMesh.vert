@@ -15,16 +15,16 @@ flat out vec4 rgba;
 
 void main(){
 	lowp float light_raw = float(side_and_light >> 4) * (1.0 / 16.0);
-    lowp float light_value = light_raw * light_raw;
+	lowp float light_value = light_raw * light_raw;
 	light_color = vec3(light_value, light_value, light_value);
 
-    rgba = texture(cur_tex, vec2(float(texture_index) * (1.0/256.0),0));
+	rgba = texture(cur_tex, vec2(float(texture_index) * (1.0/256.0),0));
 
-    /* To determine the position we multiply by our MVP matrix after adding
-     | our transPos uniform value, this is done so that our position within
-     | a chunk can fit in 5-bits, without this step we would need 16-bit
-     | values, per axis...
-     */
-    vec3 npos = vec3(pos) + trans_pos;
+	/* To determine the position we multiply by our MVP matrix after adding
+	 | our transPos uniform value, this is done so that our position within
+	 | a chunk can fit in 5-bits, without this step we would need 16-bit
+	 | values, per axis...
+	 */
+	vec3 npos = vec3(pos) + trans_pos;
 	gl_Position = mat_mvp * ((vec4(npos, 1.0) * vec4(1.0/32.0, 1.0/32.0, 1.0/32.0, 1.0)) - vec4(0.5,0.5,0.5,0.0));
 }

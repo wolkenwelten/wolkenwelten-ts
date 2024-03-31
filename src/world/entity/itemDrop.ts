@@ -8,6 +8,7 @@ import type { VoxelMesh } from "../../render/meshes/voxelMesh/voxelMesh";
 import type { Item } from "../item/item";
 import type { World } from "../world";
 import type { Character } from "./character";
+import type { Position } from "../../util/math";
 import { Entity } from "./entity";
 
 const transPos = new Float32Array([0, 0, 0]);
@@ -98,7 +99,7 @@ export class ItemDrop extends Entity {
 		}
 	}
 
-	draw(projectionMatrix: mat4, viewMatrix: mat4, cam: Entity) {
+	draw(projectionMatrix: mat4, viewMatrix: mat4, cam: Position) {
 		if (this.destroyed) {
 			return;
 		}

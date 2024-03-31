@@ -4,7 +4,7 @@
 import { mat4 } from "gl-matrix";
 
 import type { RenderManager } from "../render/render";
-import type { Entity } from "../world/entity/entity";
+import type { Position } from "../util/math";
 import { coordinateToWorldKey } from "../world/world";
 import { Frustum } from "./frustum";
 import { BlockMesh } from "./meshes/blockMesh/blockMesh";
@@ -91,7 +91,7 @@ export class WorldRenderer {
 		);
 	}
 
-	draw(projectionMatrix: mat4, viewMatrix: mat4, cam: Entity) {
+	draw(projectionMatrix: mat4, viewMatrix: mat4, cam: Position) {
 		const cx = cam.x & ~31;
 		const cy = cam.y & ~31;
 		const cz = cam.z & ~31;

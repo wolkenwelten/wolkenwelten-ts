@@ -3,16 +3,16 @@
  */
 import { mat4 } from "gl-matrix";
 
-import type { TriangleMesh } from "../../render/meshes/triangleMesh/triangleMesh";
 import type { VoxelMesh } from "../../render/meshes/voxelMesh/voxelMesh";
 import type { Entity } from "./entity";
 import type { World } from "../world";
+import type { Position } from "../../util/math";
 import { Being } from "./being";
 import { ItemDrop } from "./itemDrop";
 import { Inventory } from "../item/inventory";
 import { Item, MaybeItem } from "../item/item";
 
-const CHARACTER_ACCELERATION = 0.05;
+const CHARACTER_ACCELERATION = 0.06;
 const CHARACTER_STOP_RATE = CHARACTER_ACCELERATION * 3.0;
 
 const transPos = new Float32Array([0, 0, 0]);
@@ -36,6 +36,8 @@ export class Character extends Being {
 	hitAnimation = -100;
 	walkCycleCounter = 0;
 	nextStepSound = 0;
+	isWalking = false;
+	walkAnimationFactor = 0;
 
 	jumpAnimeFactor = 0;
 	inertiaX = 0;
@@ -140,13 +142,11 @@ export class Character extends Being {
 
 		if (ox === 0 && oz === 0) {
 			this.movementX = this.movementZ = 0;
+			this.isWalking = false;
 		} else {
-			if (oz > 0) {
-				oz *= 0.5; // Slow down backwards movement
-			}
-			ox *= 0.75; // Slow down strafing somewhat
 			this.movementX = ox * Math.cos(-this.yaw) + oz * Math.sin(this.yaw);
 			this.movementZ = ox * Math.sin(-this.yaw) + oz * Math.cos(this.yaw);
+			this.isWalking = true;
 		}
 		this.movementY = oy > 0 ? 1 : 0;
 	}
@@ -207,6 +207,13 @@ export class Character extends Being {
 			this.y += this.movementY;
 			this.z += this.movementZ;
 			return;
+		}
+
+		if (!this.isWalking) {
+			this.walkAnimationFactor = this.walkAnimationFactor * 0.9;
+		} else {
+			const p = ((this.world.game.ticks / 20) & 1) * 2 - 1;
+			this.walkAnimationFactor = this.walkAnimationFactor * 0.9 + p * 0.1;
 		}
 
 		this.pitch = 0;
@@ -454,7 +461,19 @@ export class Character extends Being {
 		return null;
 	}
 
-	drawHead(projectionMatrix: mat4, viewMatrix: mat4, cam: Entity, alpha = 1) {
+	drawBodyPart(
+		projectionMatrix: mat4,
+		viewMatrix: mat4,
+		alpha: number,
+		x: number,
+		y: number,
+		z: number,
+		pitch: number,
+		mesh: VoxelMesh,
+		bx = 0,
+		by = 0,
+		bz = 0,
+	) {
 		mat4.identity(modelViewMatrix);
 		transPos[0] = this.x;
 		transPos[1] = this.y;
@@ -462,26 +481,22 @@ export class Character extends Being {
 		mat4.translate(modelViewMatrix, modelViewMatrix, transPos);
 		mat4.rotateY(modelViewMatrix, modelViewMatrix, this.yaw);
 		mat4.rotateX(modelViewMatrix, modelViewMatrix, this.pitch);
-		mat4.mul(modelViewMatrix, viewMatrix, modelViewMatrix);
-		mat4.mul(modelViewMatrix, projectionMatrix, modelViewMatrix);
-		this.world.game.render.assets.playerHead.draw(modelViewMatrix, alpha);
-	}
-
-	drawTorso(projectionMatrix: mat4, viewMatrix: mat4, cam: Entity, alpha = 1) {
-		mat4.identity(modelViewMatrix);
-		transPos[0] = this.x;
-		transPos[1] = this.y - 0.725;
-		transPos[2] = this.z - 0.025;
+		transPos[0] = x;
+		transPos[1] = y;
+		transPos[2] = z;
 		mat4.translate(modelViewMatrix, modelViewMatrix, transPos);
-		mat4.rotateY(modelViewMatrix, modelViewMatrix, this.yaw);
-		mat4.rotateX(modelViewMatrix, modelViewMatrix, this.pitch);
+		mat4.rotateX(modelViewMatrix, modelViewMatrix, pitch);
+		transPos[0] = bx;
+		transPos[1] = by;
+		transPos[2] = bz;
+		mat4.translate(modelViewMatrix, modelViewMatrix, transPos);
 		mat4.mul(modelViewMatrix, viewMatrix, modelViewMatrix);
 		mat4.mul(modelViewMatrix, projectionMatrix, modelViewMatrix);
-		this.world.game.render.assets.playerTorso.draw(modelViewMatrix, alpha);
+		mesh.draw(modelViewMatrix, alpha);
 	}
 
-	draw(projectionMatrix: mat4, viewMatrix: mat4, cam: Entity) {
-		this.world.game.render.decals.addShadow(this.x, this.y, this.z, 1);
+	draw(projectionMatrix: mat4, viewMatrix: mat4, cam: Position) {
+		this.world.game.render.decals.addShadow(this.x, this.y, this.z, 0.75);
 		const dx = this.x - cam.x;
 		const dy = this.y - cam.y;
 		const dz = this.z - cam.z;
@@ -489,8 +504,78 @@ export class Character extends Being {
 		const renderDistance = this.world.game.render.renderDistance;
 		const alpha = Math.min(1, Math.max(0, renderDistance - d) / 8);
 
-		this.drawHead(projectionMatrix, viewMatrix, cam, alpha);
-		this.drawTorso(projectionMatrix, viewMatrix, cam, alpha);
+		this.drawBodyPart(
+			projectionMatrix,
+			viewMatrix,
+			alpha,
+			0,
+			-0.175,
+			0.05,
+			this.walkAnimationFactor * 0.025,
+			this.world.game.render.assets.playerHead,
+		);
+		this.drawBodyPart(
+			projectionMatrix,
+			viewMatrix,
+			alpha,
+			0,
+			-0.9,
+			-0.0125,
+			0,
+			this.world.game.render.assets.playerTorso,
+		);
+		this.drawBodyPart(
+			projectionMatrix,
+			viewMatrix,
+			alpha,
+			-0.275,
+			-0.625,
+			0,
+			this.walkAnimationFactor * 0.4,
+			this.world.game.render.assets.playerRightArm,
+			0,
+			-0.225,
+			0,
+		);
+		this.drawBodyPart(
+			projectionMatrix,
+			viewMatrix,
+			alpha,
+			0.275,
+			-0.625,
+			0,
+			this.walkAnimationFactor * -0.4,
+			this.world.game.render.assets.playerLeftArm,
+			0,
+			-0.225,
+			0,
+		);
+		this.drawBodyPart(
+			projectionMatrix,
+			viewMatrix,
+			alpha,
+			-0.15,
+			-1.25,
+			0,
+			this.walkAnimationFactor * -0.2,
+			this.world.game.render.assets.playerRightLeg,
+			0,
+			-0.2,
+			0,
+		);
+		this.drawBodyPart(
+			projectionMatrix,
+			viewMatrix,
+			alpha,
+			0.15,
+			-1.25,
+			0,
+			this.walkAnimationFactor * 0.2,
+			this.world.game.render.assets.playerLeftLeg,
+			0,
+			-0.2,
+			0,
+		);
 	}
 
 	mesh(): VoxelMesh {

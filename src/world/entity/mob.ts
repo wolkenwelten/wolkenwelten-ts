@@ -5,6 +5,7 @@ import { mat4 } from "gl-matrix";
 
 import type { World } from "../world";
 import type { Entity } from "./entity";
+import type { Position } from "../../util/math";
 import { Being } from "./being";
 
 const modelViewMatrix = mat4.create();
@@ -42,7 +43,7 @@ export class Mob extends Being {
 		super(world, x, y, z);
 	}
 
-	draw(projectionMatrix: mat4, viewMatrix: mat4, cam: Entity) {
+	draw(projectionMatrix: mat4, viewMatrix: mat4, cam: Position) {
 		if (this.destroyed) {
 			return;
 		}

@@ -138,7 +138,7 @@ export class RenderManager {
 		this.camera.calcViewMatrix(this.game.ticks, viewMatrix);
 
 		this.gl.enable(this.gl.BLEND);
-		this.world.draw(projectionMatrix, viewMatrix, this.camera.entityToFollow);
+		this.world.draw(projectionMatrix, viewMatrix, this.camera);
 		mat4.multiply(viewMatrix, projectionMatrix, viewMatrix);
 		this.decals.draw(viewMatrix);
 		this.gl.disable(this.gl.BLEND);
