@@ -110,22 +110,30 @@ export class Entity {
 	}
 
 	/* Get a velocity vector for the direction the Entity is facing */
-	direction(ox = 0, oy = 0, oz = 1, vel = 1, pitchDelta = 0): [number, number, number] {
+	direction(
+		ox = 0,
+		oy = 0,
+		oz = 1,
+		vel = 1,
+		pitchDelta = 0,
+	): [number, number, number] {
 		const pitch = this.pitch + pitchDelta;
 		const nox =
-			(ox * Math.cos(-this.yaw) + oz * Math.sin(this.yaw)) *
-			Math.cos(-pitch);
+			(ox * Math.cos(-this.yaw) + oz * Math.sin(this.yaw)) * Math.cos(-pitch);
 		const noy = oy + oz * Math.sin(-pitch);
 		const noz =
-			(ox * Math.sin(-this.yaw) + oz * Math.cos(this.yaw)) *
-			Math.cos(-pitch);
+			(ox * Math.sin(-this.yaw) + oz * Math.cos(this.yaw)) * Math.cos(-pitch);
 		return [nox * vel, noy * vel, noz * vel];
 	}
 
 	/* Cast a ray into the direction the Entity is facing and return the world coordinates of either the block, or
 	 * the location immediatly in front of the block (useful when placing blocks)
 	 */
-	raycast(returnFront = false, pitchDelta = 0, maxSteps = 1024): [number, number, number] | null {
+	raycast(
+		returnFront = false,
+		pitchDelta = 0,
+		maxSteps = 1024,
+	): [number, number, number] | null {
 		const [dx, dy, dz] = this.direction(0, 0, -1, 0.0625, pitchDelta);
 		let x = this.x;
 		let y = this.y;

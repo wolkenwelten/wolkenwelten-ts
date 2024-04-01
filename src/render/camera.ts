@@ -50,7 +50,7 @@ export class Camera {
 			this.shakeIntensity = 0;
 		}
 		const v = this.entityToFollow.getVelocity();
-		const goalDistance = 2.5 + Math.max(0, Math.min((v*4) * (v*4), 4));
+		const goalDistance = 2.5 + Math.max(0, Math.min(v * 4 * (v * 4), 4));
 		this.distance = this.distance * 0.96 + goalDistance * 0.04;
 	}
 

@@ -20,7 +20,7 @@ export class EarthBullet extends Rune {
 
 	bulletEntity?: EarthBulletEntity;
 
-	grabBlock(e: Character, x:number, y:number, z:number) {
+	grabBlock(e: Character, x: number, y: number, z: number) {
 		const blockType = e.world.getBlock(x, y, z);
 		if (blockType === undefined) {
 			return;
@@ -50,8 +50,8 @@ export class EarthBullet extends Rune {
 		if (this.bulletEntity) {
 			return;
 		}
-		for(let i = 0;i<12;i++){
-			const pitchDelta = ((i/2) * Math.PI * 0.05) * ((i&1) * 2 - 1);
+		for (let i = 0; i < 12; i++) {
+			const pitchDelta = (i / 2) * Math.PI * 0.05 * ((i & 1) * 2 - 1);
 			const ray = e.raycast(false, pitchDelta, 64);
 			if (!ray) {
 				continue;
@@ -71,7 +71,7 @@ export class EarthBullet extends Rune {
 			const dz = z + 0.5 - e.z;
 			const dd = dx * dx + dy * dy + dz * dz;
 			if (dd < this.range * this.range) {
-				this.grabBlock(e,x,y,z);
+				this.grabBlock(e, x, y, z);
 				return;
 			}
 		}

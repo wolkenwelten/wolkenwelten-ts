@@ -311,6 +311,7 @@ export class InputManager {
 				movement.z,
 				speed,
 			);
+			this.game.player.isSprinting = movement.sprint;
 		}
 
 		for (let i = 0; i < 10; i++) {

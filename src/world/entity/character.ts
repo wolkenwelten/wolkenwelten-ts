@@ -36,6 +36,7 @@ export class Character extends Being {
 	walkCycleCounter = 0;
 	nextStepSound = 0;
 	isWalking = false;
+	isSprinting = false;
 	walkAnimationFactor = 0;
 
 	inertiaX = 0;
@@ -210,7 +211,8 @@ export class Character extends Being {
 		if (!this.isWalking) {
 			this.walkAnimationFactor = this.walkAnimationFactor * 0.9;
 		} else {
-			const p = ((this.world.game.ticks / 20) & 1) * 2 - 1;
+			const p =
+				((this.world.game.ticks / (this.isSprinting ? 12 : 24)) & 1) * 2 - 1;
 			this.walkAnimationFactor = this.walkAnimationFactor * 0.9 + p * 0.1;
 		}
 
@@ -506,6 +508,7 @@ export class Character extends Being {
 		let rightArmPitch = this.walkAnimationFactor * -0.7;
 		let rightLegPitch = this.walkAnimationFactor * 0.6;
 		let leftLegPitch = this.walkAnimationFactor * -0.6;
+
 		if (this.hitAnimation + 100 > this.world.game.render.frames) {
 			const t = this.hitAnimation + 100 - this.world.game.render.frames;
 			rightArmPitch = (t / 100) * 1.5;
