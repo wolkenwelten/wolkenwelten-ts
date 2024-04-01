@@ -4,23 +4,9 @@
 import { mat4 } from "gl-matrix";
 import { PerlinNoise } from "../util/noise";
 import { Entity } from "../world/entity/entity";
+import { closestRadian } from "../util/math";
 
 const transPos = new Float32Array([0, 0, 0]);
-
-const closestRadian = (from: number, to: number) => {
-	const a = to - Math.PI * 2;
-	const b = to + Math.PI * 2;
-	const ad = Math.abs(from - a);
-	const bd = Math.abs(from - b);
-	const td = Math.abs(from - to);
-	if (ad < bd && ad < td) {
-		return a;
-	}
-	if (bd < ad && bd < td) {
-		return b;
-	}
-	return to;
-};
 
 export class Camera {
 	private shakeIntensity = 0;
@@ -64,7 +50,7 @@ export class Camera {
 			this.shakeIntensity = 0;
 		}
 		const v = this.entityToFollow.getVelocity();
-		const goalDistance = 2.5 + Math.max(0, Math.min(v * 3, 2));
+		const goalDistance = 2.5 + Math.max(0, Math.min((v*4) * (v*4), 4));
 		this.distance = this.distance * 0.96 + goalDistance * 0.04;
 	}
 

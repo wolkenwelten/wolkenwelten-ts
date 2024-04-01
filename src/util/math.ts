@@ -18,6 +18,21 @@ export const radianDifference = (α: number, β: number) => {
 	return diff < -Math.PI ? diff + Math.PI : diff;
 };
 
+export const closestRadian = (from: number, to: number) => {
+	const a = to - Math.PI * 2;
+	const b = to + Math.PI * 2;
+	const ad = Math.abs(from - a);
+	const bd = Math.abs(from - b);
+	const td = Math.abs(from - to);
+	if (ad < bd && ad < td) {
+		return a;
+	}
+	if (bd < ad && bd < td) {
+		return b;
+	}
+	return to;
+};
+
 export const easeInSine = (x: number): number =>
 	1 - Math.cos((x * Math.PI) / 2);
 
