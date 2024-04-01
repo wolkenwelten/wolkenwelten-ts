@@ -20,27 +20,9 @@ export class EarthBullet extends Rune {
 
 	bulletEntity?: EarthBulletEntity;
 
-	use(e: Character) {
-		if (e.isOnCooldown()) {
-			return;
-		}
-		if (this.bulletEntity) {
-			return;
-		}
-		const ray = e.raycast(false);
-		if (!ray) {
-			return;
-		}
-		const [x, y, z] = ray;
+	grabBlock(e: Character, x:number, y:number, z:number) {
 		const blockType = e.world.getBlock(x, y, z);
 		if (blockType === undefined) {
-			return;
-		}
-		const dx = x + 0.5 - e.x;
-		const dy = y + 0.5 - e.y;
-		const dz = z + 0.5 - e.z;
-		const dd = dx * dx + dy * dy + dz * dz;
-		if (dd > this.range * this.range) {
 			return;
 		}
 		const bt = this.world.blocks[blockType];
@@ -59,6 +41,40 @@ export class EarthBullet extends Rune {
 
 		e.cooldown(32);
 		e.hitAnimation = this.world.game.render.frames;
+	}
+
+	use(e: Character) {
+		if (e.isOnCooldown()) {
+			return;
+		}
+		if (this.bulletEntity) {
+			return;
+		}
+		for(let i = 0;i<12;i++){
+			const pitchDelta = ((i/2) * Math.PI * 0.05) * ((i&1) * 2 - 1);
+			const ray = e.raycast(false, pitchDelta, 64);
+			if (!ray) {
+				continue;
+			}
+			const [x, y, z] = ray;
+			const blockType = e.world.getBlock(x, y, z);
+			if (blockType === undefined) {
+				continue;
+			}
+			const bt = this.world.blocks[blockType];
+			if (bt.miningCat !== "Pickaxe") {
+				continue;
+			}
+
+			const dx = x + 0.5 - e.x;
+			const dy = y + 0.5 - e.y;
+			const dz = z + 0.5 - e.z;
+			const dd = dx * dx + dy * dy + dz * dz;
+			if (dd < this.range * this.range) {
+				this.grabBlock(e,x,y,z);
+				return;
+			}
+		}
 	}
 
 	useRelease(e: Character) {
