@@ -186,14 +186,15 @@ export class ParticleMesh {
 	}
 
 	fxJump(x: number, y: number, z: number) {
-		for (let i = 0; i < 96; i++) {
-			const ox = Math.random() - 0.5;
-			const oz = Math.random() - 0.5;
-			const cx = x + ox * 0.1;
+		for (let i = 0; i < 32; i++) {
+			const r = Math.random() * Math.PI * 2;
+			const ox = Math.cos(r) * 0.2;
+			const oz = Math.sin(r) * 0.2;
+			const cx = x + ox;
 			const cy = y - 0.5;
-			const cz = z + oz * 0.1;
+			const cz = z + oz;
 			const cs = 48 + ((Math.random() * 24) | 0);
-			let cc = 0xff80c0e0;
+			let cc = 0xffc0f0e0;
 			cc |= (Math.random() * 32) | 0;
 			cc |= ((Math.random() * 16) | 0) << 8;
 			cc |= ((Math.random() * 16) | 0) << 16;

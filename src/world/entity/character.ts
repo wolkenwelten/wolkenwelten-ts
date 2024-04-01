@@ -38,6 +38,8 @@ export class Character extends Being {
 	isWalking = false;
 	isSprinting = false;
 	walkAnimationFactor = 0;
+	jumpStart = -1;
+	yStretch = 1;
 
 	inertiaX = 0;
 	inertiaZ = 0;
@@ -238,6 +240,11 @@ export class Character extends Being {
 		if (!this.mayJump()) {
 			speed *= 0.8; // Slow down player movement changes during jumps
 			accel *= 0.4;
+			if(this.jumpStart < 0){
+				this.jumpStart = this.world.game.ticks - 1;
+			}
+		} else {
+			this.jumpStart = -1;
 		}
 		if (underwater) {
 			speed *= 0.5; // Slow down player movement while underwater
@@ -259,7 +266,8 @@ export class Character extends Being {
 			this.vz *= 0.99;
 		} else if (this.movementY > 0 && this.mayJump()) {
 			this.vy = 0.15;
-			//this.world.game.render.particle.fxJump(this.x, this.y - 0.5, this.z);
+			this.jumpStart = this.world.game.ticks;
+			this.world.game.render.particle.fxJump(this.x, this.y - 0.5, this.z);
 		}
 		if (this.movementY > 0 && this.maySwim() && Math.abs(this.vy) < 0.07) {
 			this.vy = 0.06;
@@ -493,6 +501,18 @@ export class Character extends Being {
 		mesh.draw(modelViewMatrix, alpha);
 	}
 
+	private updateYStretch() {
+		if(this.jumpStart == this.world.game.ticks){
+			this.yStretch = 0.75;
+		} else {
+			if(this.mayJump()){
+				this.yStretch = this.yStretch * 0.95 + 1 * 0.05;
+			} else {
+				this.yStretch = this.yStretch * 0.98 + 1.15 * 0.02;
+			}
+		}
+	}
+
 	draw(projectionMatrix: mat4, viewMatrix: mat4, cam: Position) {
 		this.world.game.render.decals.addShadow(this.x, this.y, this.z, 0.75);
 		const dx = this.x - cam.x;
@@ -528,13 +548,15 @@ export class Character extends Being {
 			playerRightArm,
 			playerRightLeg,
 		} = this.world.game.render.assets;
+		this.updateYStretch();
+		const yStretch = this.yStretch;
 
 		this.drawBodyPart(
 			projectionMatrix,
 			viewMatrix,
 			alpha,
 			0,
-			-0.175,
+			-0.175 * yStretch,
 			0.05,
 			headPitch,
 			playerHead,
@@ -544,7 +566,7 @@ export class Character extends Being {
 			viewMatrix,
 			alpha,
 			0,
-			-0.9,
+			-0.9 * yStretch,
 			-0.0125,
 			bodyPitch,
 			playerTorso,
@@ -554,7 +576,7 @@ export class Character extends Being {
 			viewMatrix,
 			alpha,
 			-0.275,
-			-0.625,
+			-0.625 * yStretch,
 			0,
 			leftArmPitch,
 			playerLeftArm,
@@ -567,7 +589,7 @@ export class Character extends Being {
 			viewMatrix,
 			alpha,
 			0.275,
-			-0.625,
+			-0.625 * yStretch,
 			0,
 			rightArmPitch,
 			playerRightArm,
@@ -580,7 +602,7 @@ export class Character extends Being {
 			viewMatrix,
 			alpha,
 			0.125,
-			-1.25,
+			-1.25 * yStretch,
 			0,
 			rightLegPitch,
 			playerRightLeg,
@@ -593,7 +615,7 @@ export class Character extends Being {
 			viewMatrix,
 			alpha,
 			-0.125,
-			-1.25,
+			-1.25 * yStretch,
 			0,
 			leftLegPitch,
 			playerLeftLeg,
