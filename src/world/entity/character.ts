@@ -240,7 +240,7 @@ export class Character extends Being {
 		if (!this.mayJump()) {
 			speed *= 0.8; // Slow down player movement changes during jumps
 			accel *= 0.4;
-			if(this.jumpStart < 0){
+			if (this.jumpStart < 0) {
 				this.jumpStart = this.world.game.ticks - 1;
 			}
 		} else {
@@ -367,15 +367,19 @@ export class Character extends Being {
 		}
 
 		const br = radius * 0.4;
-		for(let cx = Math.floor(x - br); cx < Math.ceil(x + br); cx++){
-			for(let cy = Math.floor(y - br - 0.5); cy < Math.ceil(y + br - 0.5); cy++){
-				for(let cz = Math.floor(z - br); cz < Math.ceil(z + br); cz++){
-					const b = this.world.getBlock(cx,cy,cz);
-					if(b){
+		for (let cx = Math.floor(x - br); cx < Math.ceil(x + br); cx++) {
+			for (
+				let cy = Math.floor(y - br - 0.5);
+				cy < Math.ceil(y + br - 0.5);
+				cy++
+			) {
+				for (let cz = Math.floor(z - br); cz < Math.ceil(z + br); cz++) {
+					const b = this.world.getBlock(cx, cy, cz);
+					if (b) {
 						const bt = this.world.blocks[b];
-						if(bt.health < 200){
-							this.world.setBlock(cx,cy,cz,0);
-							this.world.game.render.particle.fxBlockBreak(cx,cy,cz,bt);
+						if (bt.health < 200) {
+							this.world.setBlock(cx, cy, cz, 0);
+							this.world.game.render.particle.fxBlockBreak(cx, cy, cz, bt);
 						}
 					}
 				}
@@ -520,10 +524,10 @@ export class Character extends Being {
 	}
 
 	private updateYStretch() {
-		if(this.jumpStart == this.world.game.ticks){
+		if (this.jumpStart == this.world.game.ticks) {
 			this.yStretch = 0.75;
 		} else {
-			if(this.mayJump()){
+			if (this.mayJump()) {
 				this.yStretch = this.yStretch * 0.95 + 1 * 0.05;
 			} else {
 				this.yStretch = this.yStretch * 0.98 + 1.15 * 0.02;

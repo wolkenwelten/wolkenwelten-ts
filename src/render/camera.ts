@@ -27,7 +27,10 @@ export class Camera {
 
 	rotate(yaw: number, pitch: number) {
 		this.yaw = this.yaw + yaw;
-		this.pitch = Math.max(Math.PI * -0.4, Math.min(Math.PI * 0.4, this.pitch + pitch));
+		this.pitch = Math.max(
+			Math.PI * -0.4,
+			Math.min(Math.PI * 0.4, this.pitch + pitch),
+		);
 	}
 
 	shake(intensity: number) {
