@@ -366,9 +366,9 @@ export class Character extends Being {
 			}
 		}
 
-		const br = radius * 0.5;
+		const br = radius * 0.4;
 		for(let cx = Math.floor(x - br); cx < Math.ceil(x + br); cx++){
-			for(let cy = Math.floor(y - br); cy < Math.ceil(y + br); cy++){
+			for(let cy = Math.floor(y - br - 0.5); cy < Math.ceil(y + br - 0.5); cy++){
 				for(let cz = Math.floor(z - br); cz < Math.ceil(z + br); cz++){
 					const b = this.world.getBlock(cx,cy,cz);
 					if(b){
