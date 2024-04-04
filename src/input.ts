@@ -304,7 +304,7 @@ export class InputManager {
 			const speed = movement.sprint ? 1.5 : 0.3;
 			player.fly(movement.x * speed, movement.y * speed, movement.z * speed);
 		} else {
-			const speed = movement.sprint ? 0.35 : 0.25;
+			const speed = movement.sprint ? 0.4 : 0.3;
 			this.game.render.camera.moveEntity(
 				movement.x,
 				movement.y,
