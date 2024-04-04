@@ -474,6 +474,7 @@ export class Character extends Being {
 		x: number,
 		y: number,
 		z: number,
+		yaw: number,
 		pitch: number,
 		mesh: VoxelMesh,
 		bx = 0,
@@ -491,6 +492,7 @@ export class Character extends Being {
 		transPos[1] = y;
 		transPos[2] = z;
 		mat4.translate(modelViewMatrix, modelViewMatrix, transPos);
+		mat4.rotateY(modelViewMatrix, modelViewMatrix, yaw);
 		mat4.rotateX(modelViewMatrix, modelViewMatrix, pitch);
 		transPos[0] = bx;
 		transPos[1] = by;
@@ -513,6 +515,10 @@ export class Character extends Being {
 		}
 	}
 
+	calcHeadYaw(cam: Position): number {
+		return 0;
+	}
+
 	draw(projectionMatrix: mat4, viewMatrix: mat4, cam: Position) {
 		this.world.game.render.decals.addShadow(this.x, this.y, this.z, 0.75);
 		const dx = this.x - cam.x;
@@ -522,7 +528,8 @@ export class Character extends Being {
 		const renderDistance = this.world.game.render.renderDistance;
 		const alpha = Math.min(1, Math.max(0, renderDistance - d) / 8);
 
-		let headPitch = this.walkAnimationFactor * 0.025;
+		const headYaw = this.calcHeadYaw(cam);
+		let headPitch = this.walkAnimationFactor * 0.025 + cam.pitch * 0.25;
 		let bodyPitch = this.walkAnimationFactor * -0.035;
 		let leftArmPitch = this.walkAnimationFactor * 0.7;
 		let rightArmPitch = this.walkAnimationFactor * -0.7;
@@ -558,6 +565,7 @@ export class Character extends Being {
 			0,
 			-0.175 * yStretch,
 			0.05,
+			headYaw,
 			headPitch,
 			playerHead,
 		);
@@ -568,6 +576,7 @@ export class Character extends Being {
 			0,
 			-0.95 * yStretch,
 			-0.0125,
+			0,
 			bodyPitch,
 			playerTorso,
 		);
@@ -577,6 +586,7 @@ export class Character extends Being {
 			alpha,
 			-0.45,
 			-0.625 * yStretch,
+			0,
 			0,
 			leftArmPitch,
 			playerLeftArm,
@@ -591,6 +601,7 @@ export class Character extends Being {
 			0.45,
 			-0.625 * yStretch,
 			0,
+			0,
 			rightArmPitch,
 			playerRightArm,
 			0,
@@ -604,6 +615,7 @@ export class Character extends Being {
 			0.125,
 			-1.35 * yStretch,
 			0,
+			0,
 			rightLegPitch,
 			playerRightLeg,
 			0,
@@ -616,6 +628,7 @@ export class Character extends Being {
 			alpha,
 			-0.125,
 			-1.35 * yStretch,
+			0,
 			0,
 			leftLegPitch,
 			playerLeftLeg,
