@@ -366,6 +366,22 @@ export class Character extends Being {
 			}
 		}
 
+		const br = radius * 0.5;
+		for(let cx = Math.floor(x - br); cx < Math.ceil(x + br); cx++){
+			for(let cy = Math.floor(y - br); cy < Math.ceil(y + br); cy++){
+				for(let cz = Math.floor(z - br); cz < Math.ceil(z + br); cz++){
+					const b = this.world.getBlock(cx,cy,cz);
+					if(b){
+						const bt = this.world.blocks[b];
+						if(bt.health < 200){
+							this.world.setBlock(cx,cy,cz,0);
+							this.world.game.render.particle.fxBlockBreak(cx,cy,cz,bt);
+						}
+					}
+				}
+			}
+		}
+
 		const srr = (radius + 0.4) * (radius + 0.4);
 		for (let cxo = -1; cxo < 2; cxo++) {
 			for (let cyo = -1; cyo < 2; cyo++) {
