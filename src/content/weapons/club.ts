@@ -8,16 +8,16 @@ import type { Entity } from '../../world/entity/entity';
 import { Item } from '../../world/item/item';
 
 export class Club extends Item {
-    isWeapon = true;
-    name = 'Club';
-    icon = itemIcon;
-    meshUrl = meshUrl;
+	isWeapon = true;
+	name = 'Club';
+	icon = itemIcon;
+	meshUrl = meshUrl;
 
-    attackDamage(e: Entity): number {
-        return 5;
-    }
+	attackDamage(e: Entity): number {
+		return 5;
+	}
 
-    attackCooldown(e: Entity): number {
-        return 70;
-    }
+	attackCooldown(e: Entity): number {
+		return 70;
+	}
 }

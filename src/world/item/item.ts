@@ -13,69 +13,69 @@ export type MaybeItem = Item | undefined;
 type ItemConstructor = new (world: World, amount: number) => Item;
 
 export class Item {
-    id: number;
-    icon = '';
-    meshUrl = '';
-    name = '';
-    world: World;
-    destroyed = false;
-    amount = 1;
-    stackSize = 1;
+	id: number;
+	icon = '';
+	meshUrl = '';
+	name = '';
+	world: World;
+	destroyed = false;
+	amount = 1;
+	stackSize = 1;
 
-    isWeapon = false;
+	isWeapon = false;
 
-    static registry: Map<string, ItemConstructor> = new Map();
-    static register(name: string, con: ItemConstructor) {
-        this.registry.set(name, con);
-    }
+	static registry: Map<string, ItemConstructor> = new Map();
+	static register(name: string, con: ItemConstructor) {
+		this.registry.set(name, con);
+	}
 
-    static create(name: string, world: World, amount = 1) {
-        const con = this.registry.get(name);
-        if (con) {
-            return new con(world, amount);
-        } else {
-            throw new Error(`Unknown Item ${name}`);
-        }
-    }
+	static create(name: string, world: World, amount = 1) {
+		const con = this.registry.get(name);
+		if (con) {
+			return new con(world, amount);
+		} else {
+			throw new Error(`Unknown Item ${name}`);
+		}
+	}
 
-    constructor(world: World, amount = 1) {
-        this.id = ++idCounter;
-        this.amount = amount;
-        this.world = world;
-    }
+	constructor(world: World, amount = 1) {
+		this.id = ++idCounter;
+		this.amount = amount;
+		this.world = world;
+	}
 
-    clone(): Item {
-        return new (this as any).__proto__.constructor(this.world, this.amount);
-    }
+	clone(): Item {
+		return new (this as any).__proto__.constructor(this.world, this.amount);
+	}
 
-    destroy() {
-        this.destroyed = true;
-    }
+	destroy() {
+		this.destroyed = true;
+	}
 
-    mesh(): TriangleMesh | VoxelMesh {
-        return (
-            this.world.game.render.assets.get(this.meshUrl) ||
-            this.world.game.render.assets.bag
-        );
-    }
+	mesh(): TriangleMesh | VoxelMesh {
+		return (
+			this.world.game.render.assets.get(this.meshUrl) ||
+			this.world.game.render.assets.bag
+		);
+	}
 
-    use(e: Character) {
-        e.strike();
-    }
+	use(e: Character) {
+		e.strike();
+	}
 
-    useRelease(e: Character) {}
+	useRelease(e: Character) {}
 
-    attackDamage(e: Entity): number {
-        return 0;
-    }
+	attackDamage(e: Entity): number {
+		return 0;
+	}
 
-    attackCooldown(e: Entity): number {
-        return 100;
-    }
+	attackCooldown(e: Entity): number {
+		return 100;
+	}
 
-    onAttackWith(e: Character) {}
+	onAttackWith(e: Character) {}
 
-    mayStackWith(other: Item): boolean {
-        return this.constructor === other.constructor;
-    }
+	mayStackWith(other: Item): boolean {
+		return this.constructor === other.constructor;
+	}
 }

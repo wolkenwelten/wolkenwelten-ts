@@ -6,27 +6,27 @@ import type { WSPlayerUpdate } from '../network';
 import { Character } from '../world/entity/character';
 
 export class ClientEntry {
-    id: number;
-    name = '';
+	id: number;
+	name = '';
 
-    char: Character;
+	char: Character;
 
-    constructor(game: Game, id: number) {
-        this.id = id;
-        this.char = new Character(game.world, 0, 0, 0, 0, 0);
-    }
+	constructor(game: Game, id: number) {
+		this.id = id;
+		this.char = new Character(game.world, 0, 0, 0, 0, 0);
+	}
 
-    update(msg: WSPlayerUpdate) {
-        this.name = msg.playerName;
+	update(msg: WSPlayerUpdate) {
+		this.name = msg.playerName;
 
-        this.char.x = msg.x;
-        this.char.y = msg.y;
-        this.char.z = msg.z;
+		this.char.x = msg.x;
+		this.char.y = msg.y;
+		this.char.z = msg.z;
 
-        this.char.yaw = msg.yaw;
-        this.char.pitch = msg.pitch;
+		this.char.yaw = msg.yaw;
+		this.char.pitch = msg.pitch;
 
-        this.char.health = msg.health;
-        this.char.maxHealth = msg.maxHealth;
-    }
+		this.char.health = msg.health;
+		this.char.maxHealth = msg.maxHealth;
+	}
 }

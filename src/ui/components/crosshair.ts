@@ -5,9 +5,9 @@ import { Div } from '../utils';
 import styles from './crosshair.module.css';
 
 export class Crosshair {
-    div: HTMLElement;
+	div: HTMLElement;
 
-    constructor(parent: HTMLElement) {
-        parent.appendChild((this.div = Div({ class: styles.crosshair })));
-    }
+	constructor(parent: HTMLElement) {
+		parent.appendChild((this.div = Div({ class: styles.crosshair })));
+	}
 }

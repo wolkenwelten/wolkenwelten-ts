@@ -6,13 +6,13 @@ import { Div } from '../utils';
 import styles from './fpsCounter.module.css';
 
 export class FpsCounter {
-    div: HTMLElement;
+	div: HTMLElement;
 
-    constructor(parent: HTMLElement, game: Game) {
-        const div = Div({ class: styles.fps });
-        setInterval(() => {
-            div.innerText = `FPS: ${game.render.fps}`;
-        }, 1000);
-        parent.appendChild((this.div = div));
-    }
+	constructor(parent: HTMLElement, game: Game) {
+		const div = Div({ class: styles.fps });
+		setInterval(() => {
+			div.innerText = `FPS: ${game.render.fps}`;
+		}, 1000);
+		parent.appendChild((this.div = div));
+	}
 }

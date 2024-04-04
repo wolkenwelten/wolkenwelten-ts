@@ -8,15 +8,15 @@ import type { Entity } from '../../world/entity/entity';
 import { StaticObject } from '../../world/chunk/staticObject';
 
 export class StaticShell extends StaticObject {
-    mesh(): VoxelMesh {
-        return this.chunk.world.game.render.assets.get(meshUrl);
-    }
+	mesh(): VoxelMesh {
+		return this.chunk.world.game.render.assets.get(meshUrl);
+	}
 
-    onAttacked(perpetrator?: Entity) {
-        this.destroy();
-    }
+	onAttacked(perpetrator?: Entity) {
+		this.destroy();
+	}
 
-    transOff(): [number, number, number] {
-        return [0.5 - 6 / 32, 1 / 32, 0.5 + 4 / 32];
-    }
+	transOff(): [number, number, number] {
+		return [0.5 - 6 / 32, 1 / 32, 0.5 + 4 / 32];
+	}
 }

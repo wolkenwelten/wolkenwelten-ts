@@ -5,86 +5,86 @@
 import type { Character } from './world/entity/character';
 
 export interface WSMessage {
-    T: string;
+	T: string;
 }
 
 export interface WSHelloMessage extends WSMessage {
-    T: 'hello';
-    playerID: number;
+	T: 'hello';
+	playerID: number;
 }
 
 export interface WSChatMessage extends WSMessage {
-    T: 'msg';
-    playerID: number;
-    msg: string;
+	T: 'msg';
+	playerID: number;
+	msg: string;
 }
 
 export interface WSNameChange extends WSMessage {
-    T: 'nameChange';
-    playerID: number;
-    newName: string;
+	T: 'nameChange';
+	playerID: number;
+	newName: string;
 }
 
 export interface WSPlayerUpdate extends WSMessage {
-    T: 'playerUpdate';
+	T: 'playerUpdate';
 
-    playerID: number;
-    playerName: string;
+	playerID: number;
+	playerName: string;
 
-    x: number;
-    y: number;
-    z: number;
+	x: number;
+	y: number;
+	z: number;
 
-    yaw: number;
-    pitch: number;
+	yaw: number;
+	pitch: number;
 
-    health: number;
-    maxHealth: number;
+	health: number;
+	maxHealth: number;
 }
 
 export class NetworkManager {
-    queue: WSMessage[] = [];
-    id = 0;
+	queue: WSMessage[] = [];
+	id = 0;
 
-    send(msg: WSMessage) {
-        this.queue.push(msg);
-    }
+	send(msg: WSMessage) {
+		this.queue.push(msg);
+	}
 
-    sendChat(msg: string) {
-        const m: WSChatMessage = {
-            T: 'msg',
-            msg,
-            playerID: this.id,
-        };
-        this.send(m);
-    }
+	sendChat(msg: string) {
+		const m: WSChatMessage = {
+			T: 'msg',
+			msg,
+			playerID: this.id,
+		};
+		this.send(m);
+	}
 
-    sendNameChange(newName: string) {
-        const msg: WSNameChange = {
-            T: 'nameChange',
-            newName,
-            playerID: this.id,
-        };
-        this.send(msg);
-    }
+	sendNameChange(newName: string) {
+		const msg: WSNameChange = {
+			T: 'nameChange',
+			newName,
+			playerID: this.id,
+		};
+		this.send(msg);
+	}
 
-    sendPlayerUpdate(playerName: string, player: Character) {
-        const msg: WSPlayerUpdate = {
-            T: 'playerUpdate',
+	sendPlayerUpdate(playerName: string, player: Character) {
+		const msg: WSPlayerUpdate = {
+			T: 'playerUpdate',
 
-            playerID: this.id,
-            playerName,
+			playerID: this.id,
+			playerName,
 
-            x: player.x,
-            y: player.y,
-            z: player.z,
+			x: player.x,
+			y: player.y,
+			z: player.z,
 
-            yaw: player.yaw,
-            pitch: player.pitch,
+			yaw: player.yaw,
+			pitch: player.pitch,
 
-            health: player.health,
-            maxHealth: player.maxHealth,
-        };
-        this.send(msg);
-    }
+			health: player.health,
+			maxHealth: player.maxHealth,
+		};
+		this.send(msg);
+	}
 }
