@@ -123,10 +123,13 @@ export class VoxelMesh {
 	updateShort(vertices: Uint8Array, elementCount: number) {
 		const gl = VoxelMesh.gl;
 		this.vertCount = elementCount;
-		this.vertices = vertices.slice();
 		gl.bindVertexArray(this.vao);
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
-		gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+		gl.bufferData(
+			gl.ARRAY_BUFFER,
+			vertices.slice(0, elementCount * 5),
+			gl.STATIC_DRAW,
+		);
 		gl.enableVertexAttribArray(0);
 		gl.enableVertexAttribArray(1);
 		gl.enableVertexAttribArray(2);
