@@ -1,13 +1,14 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { AudioManager } from "./audio";
-import { BenchmarkManager } from "./benchmark";
+
 import { registerAudioContent } from "./content/audioContent";
 import { registerBlockTypes } from "./content/blockTypes";
 import { registerItems } from "./content/itemContent";
 import { registerStaticObjects } from "./content/staticObjects";
-import { initWorldgen } from "./content/worldgen/assets";
+
+import { AudioManager } from "./audio";
+import { BenchmarkManager } from "./benchmark";
 import { InputManager } from "./input";
 import { Options } from "./options";
 import { PersistenceManager } from "./persistence";
@@ -20,6 +21,7 @@ import { Mob } from "./world/entity/mob";
 import { Item } from "./world/item/item";
 import { World } from "./world/world";
 import { NetworkManager } from "./network";
+import { FloatingIslandsWorldGen } from "./content/floatingIslandsWorldGen";
 
 export interface GameConfig {
 	parent: HTMLElement;
@@ -76,7 +78,7 @@ export class Game {
 		this.persistence = new PersistenceManager(this);
 		this.audio = new AudioManager();
 
-		this.addContent();
+		this.registerContent();
 
 		this.ui = new UIManager(this);
 		this.render = new RenderManager(this, this.player);
@@ -86,7 +88,7 @@ export class Game {
 		setTimeout(this.init.bind(this), 0);
 	}
 
-	addContent() {
+	registerContent() {
 		registerAudioContent(this.audio);
 		registerItems();
 		registerBlockTypes(this.world);
@@ -94,7 +96,8 @@ export class Game {
 	}
 
 	async init() {
-		const worldgenHandler = await initWorldgen();
+		const worldgenHandler = new FloatingIslandsWorldGen("asdqwe");
+		await worldgenHandler.init();
 		this.world.worldgenHandler = worldgenHandler;
 		this.ready = true;
 	}

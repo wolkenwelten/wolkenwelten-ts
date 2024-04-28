@@ -4,9 +4,9 @@
 import { registerBlockTypes } from "../content/blockTypes";
 import type { Game } from "../game";
 import type { Entity } from "./entity/entity";
+import type { WorldGen } from "./worldGen";
 import profiler from "../profiler";
 import { FireSystem } from "./fireSystem";
-import { LCG } from "../util/prng";
 import { BlockType } from "./blockType";
 import { Chunk } from "./chunk/chunk";
 import { DangerZone } from "./chunk/dangerZone";
@@ -25,35 +25,33 @@ export class World {
 	game: Game;
 	blocks: BlockType[] = [];
 	blockTextureUrl = "";
-	lootRNG: LCG;
-	worldgenHandler: (chunk: Chunk) => void;
+	worldgenHandler?: WorldGen;
 
 	constructor(game: Game) {
 		this.seed = 1234;
 		this.game = game;
 		this.fire = new FireSystem(this);
 		this.dangerZone = new DangerZone(this);
-		this.worldgenHandler = (chunk: Chunk) => {
-			chunk.setSphereUnsafe(16, 16, 16, 7, 3);
-		};
 		registerBlockTypes(this);
-		this.lootRNG = new LCG(new Date().toISOString());
 	}
 
 	worldgen(chunk: Chunk): Chunk {
+		if (!this.worldgenHandler) {
+			throw new Error("Missing WorldGen");
+		}
 		const start = performance.now();
-		this.worldgenHandler(chunk);
+		this.worldgenHandler.genChunk(chunk);
 		profiler.add("worldgen", start, performance.now());
 		return chunk;
 	}
 
-	addBlockType = (longName: string, name?: string): BlockType => {
+	addBlockType(longName: string, name?: string): BlockType {
 		const id = this.blocks.length;
 		const ret = new BlockType(id, longName, name);
 		this.blocks[id] = ret;
 		this.game.blocks[name || longName] = id;
 		return ret;
-	};
+	}
 
 	setBlock(x: number, y: number, z: number, block: number) {
 		this.getOrGenChunk(x, y, z)?.setBlock(x, y, z, block);
