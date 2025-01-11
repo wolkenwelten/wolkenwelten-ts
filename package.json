@@ -31,7 +31,7 @@
     "gl-matrix": "latest",
     "howler": "latest",
     "tsx": "latest",
-    "vox-reader": "latest",
+    "vox-reader": "2.1.2",
     "ws": "latest"
   }
 }
