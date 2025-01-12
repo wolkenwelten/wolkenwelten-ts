@@ -55,6 +55,9 @@ export class InputManager {
 			}
 			that.game.player.noClip = !that.game.player.noClip;
 		});
+		this.keyPushHandler.set("ShiftLeft", () => {
+			that.game.player.dash();
+		});
 		this.keyPushHandler.set("Tab", () => {
 			if (document.pointerLockElement) {
 				document.exitPointerLock();
@@ -307,14 +310,12 @@ export class InputManager {
 			const speed = movement.sprint ? 1.5 : 0.3;
 			player.fly(movement.x * speed, movement.y * speed, movement.z * speed);
 		} else {
-			const speed = movement.sprint ? 0.4 : 0.3;
 			this.game.render.camera.moveEntity(
 				movement.x,
 				movement.y,
 				movement.z,
-				speed,
+				0.4,
 			);
-			this.game.player.isSprinting = movement.sprint;
 		}
 
 		for (let i = 0; i < 10; i++) {

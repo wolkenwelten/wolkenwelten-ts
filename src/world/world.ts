@@ -35,12 +35,12 @@ export class World {
 		registerBlockTypes(this);
 	}
 
-	async worldgen(): Promise<void> {
+	worldgen() {
 		if (!this.worldgenHandler) {
 			throw new Error("Missing WorldGen");
 		}
 		const start = performance.now();
-		await this.worldgenHandler.preGen(this);
+		this.worldgenHandler.preGen(this);
 		profiler.add("worldgenPreGen", start, performance.now());
 	}
 

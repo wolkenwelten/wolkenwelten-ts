@@ -186,22 +186,59 @@ export class ParticleMesh {
 	}
 
 	fxJump(x: number, y: number, z: number) {
-		for (let i = 0; i < 32; i++) {
+		for (let i = 0; i < 64; i++) {
 			const r = Math.random() * Math.PI * 2;
 			const ox = Math.cos(r) * 0.2;
 			const oz = Math.sin(r) * 0.2;
 			const cx = x + ox;
 			const cy = y - 0.5;
 			const cz = z + oz;
+			const cs = 72 + ((Math.random() * 24) | 0);
+			let cc = 0xffc0f0e0;
+			cc |= (Math.random() * 32) | 0;
+			cc |= ((Math.random() * 16) | 0) << 8;
+			cc |= ((Math.random() * 16) | 0) << 16;
+			const vx = ox * 0.3;
+			const vy = (Math.random() - 0.5) * 0.005;
+			const vz = oz * 0.3;
+			const vs = -2;
+			this.add(cx, cy, cz, cs, cc, vx, vy, vz, vs, 0, -0.001, 0, 0);
+		}
+	}
+
+	fxTrail(x: number, y: number, z: number, v: number) {
+		v = Math.min(v, 2);
+		for (let i = 0; i < 4; i++) {
+			const cx = x + (Math.random() - 0.5) * 0.2 * v;
+			const cy = y + (Math.random() - 0.5) * 0.2 * v;
+			const cz = z + (Math.random() - 0.5) * 0.2 * v;
+			const cs = 32 + ((Math.random() * 24) | 0);
+			let cc = 0xffc0f0e0;
+			cc |= (Math.random() * 32) | 0;
+			cc |= ((Math.random() * 16) | 0) << 8;
+			cc |= ((Math.random() * 16) | 0) << 16;
+			const vx = (Math.random() - 0.5) * 0.002 * v;
+			const vy = (Math.random() - 0.5) * 0.002 * v;
+			const vz = (Math.random() - 0.5) * 0.002 * v;
+			const vs = -0.5;
+			this.add(cx, cy, cz, cs, cc, vx, vy, vz, vs, 0, -0.0003, 0, 0);
+		}
+	}
+
+	fxDash(x: number, y: number, z: number) {
+		for (let i = 0; i < 128; i++) {
+			const cx = x + (Math.random() - 0.5);
+			const cy = y + (Math.random() - 0.5);
+			const cz = z + (Math.random() - 0.5);
 			const cs = 48 + ((Math.random() * 24) | 0);
 			let cc = 0xffc0f0e0;
 			cc |= (Math.random() * 32) | 0;
 			cc |= ((Math.random() * 16) | 0) << 8;
 			cc |= ((Math.random() * 16) | 0) << 16;
-			const vx = ox * 0.2;
-			const vy = (Math.random() - 0.5) * 0.002;
-			const vz = oz * 0.2;
-			const vs = -2;
+			const vx = (Math.random() - 0.5) * 0.1;
+			const vy = (Math.random() - 0.5) * 0.1;
+			const vz = (Math.random() - 0.5) * 0.1;
+			const vs = -1;
 			this.add(cx, cy, cz, cs, cc, vx, vy, vz, vs, 0, -0.001, 0, 0);
 		}
 	}

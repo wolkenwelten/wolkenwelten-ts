@@ -63,7 +63,7 @@ export class RenderManager {
 
 		if (isFirefox || isSafari || isMobile || isARM) {
 			// Reduce default renderDistance due to performance issues
-			this.renderDistance = 160;
+			this.renderDistance = 128;
 		}
 	}
 

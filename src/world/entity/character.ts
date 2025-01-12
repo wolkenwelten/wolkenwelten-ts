@@ -31,6 +31,7 @@ export class Character extends Being {
 	nextStepSound = 0;
 	isWalking = false;
 	isSprinting = false;
+	mayDash = false;
 	walkAnimationFactor = 0;
 	jumpStart = -1;
 	yStretch = 1;
@@ -46,6 +47,11 @@ export class Character extends Being {
 
 	equipment: Inventory;
 	inventory: Inventory;
+
+	maxAirActions = 3;
+	remainingAirActions = this.maxAirActions;
+
+	justJumped = false;
 
 	/* Simple cheat, can be run from the browser console by typing `wolkenwelten.player.getGoodStuff();` */
 	getGoodStuff() {
@@ -90,6 +96,9 @@ export class Character extends Being {
 			this.getGoodStuff();
 		});
 		//}
+
+		this.remainingAirActions = this.maxAirActions;
+		this.justJumped = false;
 	}
 
 	constructor(
@@ -128,6 +137,22 @@ export class Character extends Being {
 		this.damage(-rawAmount);
 	}
 
+	dash() {
+		if (this.mayJump() || this.remainingAirActions > 0) {
+			if (!this.mayJump()) {
+				this.remainingAirActions--;
+			}
+			this.isSprinting = true;
+			this.mayDash = false;
+			const dashSpeed = 0.75;
+			this.world.game.render.particle.fxDash(this.x, this.y - 0.5, this.z);
+			const vx = Math.cos(-this.yaw - Math.PI / 2) * dashSpeed;
+			const vz = Math.sin(-this.yaw - Math.PI / 2) * dashSpeed;
+			this.vx = vx;
+			this.vz = vz;
+		}
+	}
+
 	/* Walk/Run according to the direction of the Entity, ignores pitch */
 	move(ox: number, oy: number, oz: number) {
 		this.inertiaX = this.inertiaX * 0.97 + ox * -0.03;
@@ -142,6 +167,22 @@ export class Character extends Being {
 			this.isWalking = true;
 		}
 		this.movementY = oy > 0 ? 1 : 0;
+
+		if (this.movementY === 0) {
+			this.justJumped = false;
+		}
+
+		if (this.movementY > 0 && !this.justJumped) {
+			if (this.mayJump() || this.remainingAirActions > 0) {
+				if (!this.mayJump()) {
+					this.remainingAirActions--;
+				}
+				this.vy = 0.2;
+				this.jumpStart = this.world.game.ticks;
+				this.justJumped = true;
+				this.world.game.render.particle.fxJump(this.x, this.y - 0.5, this.z);
+			}
+		}
 	}
 
 	/* Fly a player in a certain direction */
@@ -237,6 +278,8 @@ export class Character extends Being {
 			}
 		} else {
 			this.jumpStart = -1;
+			this.mayDash = true;
+			this.remainingAirActions = this.maxAirActions;
 		}
 		if (underwater) {
 			speed *= 0.5; // Slow down player movement while underwater
@@ -252,12 +295,18 @@ export class Character extends Being {
 		const oldVy = this.vy;
 		const oldVz = this.vz;
 
+		// Calculate overall velocity
+		const v = this.vx * this.vx + this.vz * this.vz + this.vy * this.vy;
+		if (v > 0.075) {
+			this.world.game.render.particle.fxTrail(this.x, this.y - 1, this.z, v * 8);
+		}
+
 		if (underwater) {
 			this.vy *= 0.98;
 			this.vx *= 0.99;
 			this.vz *= 0.99;
 		} else if (this.movementY > 0 && this.mayJump()) {
-			this.vy = 0.15;
+			this.vy = 0.25;
 			this.jumpStart = this.world.game.ticks;
 			this.world.game.render.particle.fxJump(this.x, this.y - 0.5, this.z);
 		}
