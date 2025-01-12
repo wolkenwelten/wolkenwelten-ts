@@ -19,7 +19,6 @@ import { LCG } from "../util/prng";
 import type { Chunk } from "../world/chunk/chunk";
 import type { World } from "../world/world";
 import type { Character } from "../world/entity/character";
-import type { StaticObject } from "../world/chunk/staticObject";
 
 export interface WorldGenAssetList {
 	bushA: WorldGenAsset;
@@ -59,7 +58,7 @@ export class FloatingIslandsWorldGen extends WorldGen {
 	}
 
 	spawnPos(_player: Character): [number, number, number] {
-		return [0, 40, 0];
+		return [4000, 1040, 4000];
 	}
 
 	mayGC(_chunk: Chunk): boolean {
@@ -198,7 +197,7 @@ export class FloatingIslandsWorldGen extends WorldGen {
 	}
 
 	islandStep(world: World, lcg: LCG, x: number, y: number, z: number, size: number, step: number) {
-		if (size < 8 || lcg.int(0, 4) < step) {
+		if (size < 8 || lcg.int(0, 5) < step) {
 			return;
 		}
 		for (let cx = x - size; cx < x + size; cx += 8){
@@ -227,7 +226,7 @@ export class FloatingIslandsWorldGen extends WorldGen {
 	preGen(world: World) {
 		const lcg = new LCG(world.seed);
 
-		this.islandStep(world, lcg, 0, 0, 0, 50, 0);
+		this.islandStep(world, lcg, 4000, 1000, 4000, 50, 0);
 	}
 
 	genChunk(_chunk: Chunk) {
