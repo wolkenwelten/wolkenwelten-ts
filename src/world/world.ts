@@ -53,7 +53,7 @@ export class World {
 	}
 
 	setBlock(x: number, y: number, z: number, block: number) {
-		this.getOrGenChunk(x, y, z)?.setBlock(x, y, z, block);
+		this.getOrGenChunk(x, y, z).setBlock(x, y, z, block);
 	}
 
 	getBlock(x: number, y: number, z: number): number | undefined {
@@ -92,7 +92,10 @@ export class World {
 		if (chunk) {
 			return chunk;
 		}
-		const newChunk = new Chunk(this, x, y, z);
+		const cx = x & ~0x1f;
+		const cy = y & ~0x1f;
+		const cz = z & ~0x1f;
+		const newChunk = new Chunk(this, cx, cy, cz);
 
 		if (!this.worldgenHandler) {
 			throw new Error("Missing WorldGen");

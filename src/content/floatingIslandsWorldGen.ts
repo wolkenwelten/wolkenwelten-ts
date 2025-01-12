@@ -68,12 +68,12 @@ export class FloatingIslandsWorldGen extends WorldGen {
 	}
 
 	preGen(world: World) {
-		const centerX = 50;
-		const centerY = 60;
-		const centerZ = 50;
+		const centerX = Math.floor(50 / 32) * 32;  // Align to chunk boundaries
+		const centerY = Math.floor(60 / 32) * 32;
+		const centerZ = Math.floor(50 / 32) * 32;
 		const radius = 80;
 
-		// Generate a modified sphere
+		// First pass: Generate the basic shape
 		for (let x = centerX - radius; x <= centerX + radius; x++) {
 			for (let y = centerY - radius; y <= centerY + radius; y++) {
 				for (let z = centerZ - radius; z <= centerZ + radius; z++) {
@@ -84,15 +84,27 @@ export class FloatingIslandsWorldGen extends WorldGen {
 						Math.pow((y - centerY) * yStretch, 2) +
 						Math.pow(z - centerZ, 2)
 					);
-					
+
 					// Add some vertical stretching to make it more pointy at bottom
-					const heightFactor = (y < centerY) ? 
+					const heightFactor = (y < centerY) ?
 						1.0 + (centerY - y) / 50 : // Gradually more pointy towards bottom
 						1.0;
-					
+
 					// If point is within modified radius, place a block
 					if (distance <= radius / heightFactor) {
 						world.setBlock(x, y, z, 1);
+					}
+				}
+			}
+		}
+
+		// Second pass: Convert top layer to grass
+		for (let x = centerX - radius; x <= centerX + radius; x++) {
+			for (let z = centerZ - radius; z <= centerZ + radius; z++) {
+				for (let y = centerY + radius; y >= centerY - radius; y--) {
+					if (world.getBlock(x, y, z) === 1) {
+						world.setBlock(x, y, z, 2);
+						break;
 					}
 				}
 			}
