@@ -12,8 +12,8 @@ import { ItemDrop } from "./itemDrop";
 import { Inventory } from "../item/inventory";
 import { Item, MaybeItem } from "../item/item";
 
-const CHARACTER_ACCELERATION = 0.06;
-const CHARACTER_STOP_RATE = CHARACTER_ACCELERATION * 3.0;
+const CHARACTER_ACCELERATION = 0.08;
+const CHARACTER_STOP_RATE = CHARACTER_ACCELERATION * 3.5;
 
 const transPos = new Float32Array([0, 0, 0]);
 const modelViewMatrix = mat4.create();
@@ -225,7 +225,7 @@ export class Character extends Being {
 			this.nextStepSound = this.walkCycleCounter + 6;
 			this.world.game.audio.play("step", 0.5);
 		}
-		let speed = 0.4;
+		let speed = 0.6;
 		let accel =
 			movementLength > 0.01 ? CHARACTER_ACCELERATION : CHARACTER_STOP_RATE;
 
