@@ -3,6 +3,7 @@
  */
 import readVox from "vox-reader";
 import type { Chunk } from "./chunk/chunk";
+import type { World } from "./world";
 import { isServer } from "../util/compat";
 
 export class WorldGenAsset {
@@ -64,15 +65,20 @@ export class WorldGenAsset {
 	}
 
 	blitUnsafe(out: Chunk, tx: number, ty: number, tz: number) {
-		let off = 0;
 		for (let x = 0; x < this.w; x++) {
 			const cx = x + tx;
+			if (cx < 0 || cx >= 32) continue;
 			for (let y = 0; y < this.h; y++) {
 				const cy = y + ty;
+				if (cy < 0 || cy >= 32) continue;
 				for (let z = 0; z < this.d; z++) {
-					const i = this.data[off++];
+					const cz = z + tz;
+					if (cz < 0 || cz >= 32) continue;
+					
+					// Calculate the buffer position dynamically
+					const off = y * this.w * this.d + z * this.w + x;
+					const i = this.data[off];
 					if (i) {
-						const cz = z + tz;
 						out.setBlockUnsafe(cx, cy, cz, this.palette[i - 1]);
 					}
 				}
@@ -83,6 +89,36 @@ export class WorldGenAsset {
 	blit(out: Chunk, x: number, y: number, z: number) {
 		this.blitUnsafe(out, x, y, z);
 		out.invalidate();
+	}
+
+	worldBlit(out: World, x: number, y: number, z: number) {
+		// Calculate the affected chunk coordinates
+		const startChunkX = Math.floor(x / 32);
+		const startChunkY = Math.floor(y / 32);
+		const startChunkZ = Math.floor(z / 32);
+		const endChunkX = Math.floor((x + this.w - 1) / 32);
+		const endChunkY = Math.floor((y + this.h - 1) / 32);
+		const endChunkZ = Math.floor((z + this.d - 1) / 32);
+
+		// Iterate through all affected chunks
+		for (let cx = startChunkX; cx <= endChunkX; cx++) {
+			for (let cy = startChunkY; cy <= endChunkY; cy++) {
+				for (let cz = startChunkZ; cz <= endChunkZ; cz++) {
+					// Get or create the chunk
+					const chunk = out.getChunk(cx * 32, cy * 32, cz * 32);
+					if (!chunk) continue;
+
+					// Calculate local coordinates within this chunk
+					const localX = x - (cx * 32);
+					const localY = y - (cy * 32);
+					const localZ = z - (cz * 32);
+
+					// Blit to this chunk
+					this.blitUnsafe(chunk, localX, localY, localZ);
+					chunk.invalidate();
+				}
+			}
+		}
 	}
 
 	fits(out: Chunk, x: number, y: number, z: number) {
