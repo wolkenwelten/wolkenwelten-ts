@@ -29,7 +29,7 @@ export class RenderManager {
 	canvasWrapper: HTMLElement;
 	gl: WebGL2RenderingContext;
 	fov = 90;
-	renderDistance = 160.0;
+	renderDistance = 256.0;
 	width = 640;
 	height = 480;
 	frames = 0;
@@ -63,7 +63,7 @@ export class RenderManager {
 
 		if (isFirefox || isSafari || isMobile || isARM) {
 			// Reduce default renderDistance due to performance issues
-			this.renderDistance = 96;
+			this.renderDistance = 160;
 		}
 	}
 

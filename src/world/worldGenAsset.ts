@@ -76,7 +76,7 @@ export class WorldGenAsset {
 					if (cz < 0 || cz >= 32) continue;
 					
 					// Calculate the buffer position dynamically
-					const off = y * this.w * this.d + z * this.w + x;
+					const off = z + y * this.d + x * this. d * this.h;
 					const i = this.data[off];
 					if (i) {
 						out.setBlockUnsafe(cx, cy, cz, this.palette[i - 1]);
@@ -93,19 +93,19 @@ export class WorldGenAsset {
 
 	worldBlit(out: World, x: number, y: number, z: number) {
 		// Calculate the affected chunk coordinates
-		const startChunkX = Math.floor(x / 32);
-		const startChunkY = Math.floor(y / 32);
-		const startChunkZ = Math.floor(z / 32);
-		const endChunkX = Math.floor((x + this.w - 1) / 32);
-		const endChunkY = Math.floor((y + this.h - 1) / 32);
-		const endChunkZ = Math.floor((z + this.d - 1) / 32);
+		const startChunkX = x >> 5;
+		const startChunkY = y >> 5;
+		const startChunkZ = z >> 5;
+		const endChunkX = (x + this.w - 1) >> 5;
+		const endChunkY = (y + this.h - 1) >> 5;
+		const endChunkZ = (z + this.d - 1) >> 5;
 
 		// Iterate through all affected chunks
 		for (let cx = startChunkX; cx <= endChunkX; cx++) {
 			for (let cy = startChunkY; cy <= endChunkY; cy++) {
 				for (let cz = startChunkZ; cz <= endChunkZ; cz++) {
 					// Get or create the chunk
-					const chunk = out.getChunk(cx * 32, cy * 32, cz * 32);
+					const chunk = out.getOrGenChunk(cx * 32, cy * 32, cz * 32);
 					if (!chunk) continue;
 
 					// Calculate local coordinates within this chunk

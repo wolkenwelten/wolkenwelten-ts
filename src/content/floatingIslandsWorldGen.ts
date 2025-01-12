@@ -59,7 +59,7 @@ export class FloatingIslandsWorldGen extends WorldGen {
 	}
 
 	spawnPos(_player: Character): [number, number, number] {
-		return [50, 140, 50];
+		return [0, 40, 0];
 	}
 
 	mayGC(_chunk: Chunk): boolean {
@@ -67,19 +67,12 @@ export class FloatingIslandsWorldGen extends WorldGen {
 		return false;
 	}
 
-	preGen(world: World) {
-		const centerX = Math.floor(50 / 32) * 32;
-		const centerY = Math.floor(60 / 32) * 32;
-		const centerZ = Math.floor(50 / 32) * 32;
-
-		// Initialize LCG with world seed for deterministic noise
-		const lcg = new LCG(world.seed);
-
-		const horizontalRadius = 70;
+	private floatingIsland(world: World, lcg: LCG, centerX: number, centerY: number, centerZ: number, size = 50) {
+		const horizontalRadius = size;
 		const verticalRadius = horizontalRadius / 4;  // Make it 4 times wider than tall
 
 		// First pass: Generate pointy stone core
-		const pointyHorizontalRadius = 70;
+		const pointyHorizontalRadius = size;
 		const pointyVerticalRadius = pointyHorizontalRadius * 1.2;
 		const pointyCenterY = centerY - 2; // Position it lower for the pointy bottom
 
@@ -91,7 +84,7 @@ export class FloatingIslandsWorldGen extends WorldGen {
 				);
 				
 				const baseLength = pointyVerticalRadius * (1 - (distFromCenter / pointyHorizontalRadius));
-				const noiseIntensity = 1.7; // Increased for more dramatic effect
+				const noiseIntensity = 1.4; // Increased for more dramatic effect
 				const lengthNoise = lcg.floatNOneToOne() * noiseIntensity;
 				const finalLength = Math.max(0, baseLength + lengthNoise);
 
@@ -127,20 +120,6 @@ export class FloatingIslandsWorldGen extends WorldGen {
 			}
 		}
 
-		// Third pass: Add noise to the top dirt layer
-		const noiseIntensity = 1.2; // Increased noise intensity
-		for (let x = centerX - horizontalRadius; x <= centerX + horizontalRadius; x++) {
-			for (let z = centerZ - horizontalRadius; z <= centerZ + horizontalRadius; z++) {
-				for (let y = centerY + verticalRadius; y >= centerY - verticalRadius; y--) {
-					if (world.getBlock(x, y, z) === 1) {
-						const noise = Math.floor(lcg.floatNOneToOne() * noiseIntensity);
-						world.setBlock(x, y + noise, z, 1);
-						break;
-					}
-				}
-			}
-		}
-
 		// Fourth pass: Convert top layer to grass
 		for (let x = centerX - horizontalRadius; x <= centerX + horizontalRadius; x++) {
 			for (let z = centerZ - horizontalRadius; z <= centerZ + horizontalRadius; z++) {
@@ -159,8 +138,8 @@ export class FloatingIslandsWorldGen extends WorldGen {
 		}
 
 		// Place assets on the grass - adjust step size for better distribution
-		for (let x = centerX - horizontalRadius + 2; x <= centerX + horizontalRadius - 2; x += 3) {
-			for (let z = centerZ - horizontalRadius + 2; z <= centerZ + horizontalRadius - 2; z += 3) {
+		for (let x = centerX - horizontalRadius + 4; x <= centerX + horizontalRadius - 4; x += 2) {
+			for (let z = centerZ - horizontalRadius + 4; z <= centerZ + horizontalRadius - 4; z += 2) {
 				// Find the top grass block
 				let foundSurface = false;
 				for (let y = centerY + verticalRadius + 5; y >= centerY - verticalRadius - 5; y--) {
@@ -184,28 +163,28 @@ export class FloatingIslandsWorldGen extends WorldGen {
 								// Choose a random asset type
 								const roll = lcg.float();
 								let asset: WorldGenAsset;
+								let oy = -1;
 								
 								if (roll < 0.3) {
 									// Trees (30% chance)
 									asset = lcg.bool() ? this.assets.treeA : 
 										   lcg.bool() ? this.assets.treeB : this.assets.treeC;
-								} else if (roll < 0.5) {
+										   oy = -4;
+								} else if (roll < 0.4) {
 									// Spruce (20% chance)
 									asset = this.assets.spruceA;
-								} else if (roll < 0.8) {
+								} else if (roll < 0.7) {
 									// Bushes (30% chance)
 									asset = lcg.bool() ? this.assets.bushA : 
 										   lcg.bool() ? this.assets.bushB : this.assets.bushC;
+									oy = 0;
 								} else {
 									// Rocks (20% chance)
 									asset = lcg.bool() ? this.assets.rockA : 
 										   lcg.bool() ? this.assets.rockB : this.assets.rockC;
 								}
 								
-								// Place the asset with slight random offset
-								const offsetX = Math.floor(lcg.floatNOneToOne() * 2);
-								const offsetZ = Math.floor(lcg.floatNOneToOne() * 2);
-								asset.worldBlit(world, x + offsetX, y + 1, z + offsetZ);
+								asset.worldBlit(world, x, y + oy, z);
 							}
 						}
 						break;
@@ -216,6 +195,39 @@ export class FloatingIslandsWorldGen extends WorldGen {
 				if (foundSurface) continue;
 			}
 		}
+	}
+
+	islandStep(world: World, lcg: LCG, x: number, y: number, z: number, size: number, step: number) {
+		if (size < 8 || lcg.int(0, 6) < step) {
+			return;
+		}
+		for (let cx = x - size; cx < x + size; cx += 8){
+			for (let cy = y - size; cy < y + size; cy += 8){
+				for (let cz = z - size; cz < z + size; cz += 8){
+					if (world.getBlock(cx,cy,cz)) {
+						return;
+					}
+				}
+			}
+		}
+
+		this.floatingIsland(world, lcg, x, y, z, size);
+
+		const l = (ox:number, oy:number, oz:number) => {
+			this.islandStep(world, lcg, ox + lcg.int(size * -0.1, size * 0.1), oy + lcg.int(size * -0.5, size * 0.5), oz + lcg.int(size * -0.1, size * 0.1), size + lcg.int(-20,10), step + 1);
+		}
+
+		
+		l(x + (size * 2 + size * 0.4), y, z);
+		l(x - (size * 2 + size * 0.4), y, z);
+		l(x, y, z + (size * 2 + size * 0.4));
+		l(x, y, z - (size * 2 + size * 0.4));
+	}
+
+	preGen(world: World) {
+		const lcg = new LCG(world.seed);
+
+		this.islandStep(world, lcg, 0, 0, 0, 50, 0);
 	}
 
 	genChunk(_chunk: Chunk) {
