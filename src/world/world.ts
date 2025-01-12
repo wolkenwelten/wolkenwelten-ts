@@ -35,14 +35,13 @@ export class World {
 		registerBlockTypes(this);
 	}
 
-	worldgen(chunk: Chunk): Chunk {
+	async worldgen(): Promise<void> {
 		if (!this.worldgenHandler) {
 			throw new Error("Missing WorldGen");
 		}
 		const start = performance.now();
-		this.worldgenHandler.genChunk(chunk);
-		profiler.add("worldgen", start, performance.now());
-		return chunk;
+		await this.worldgenHandler.preGen(this);
+		profiler.add("worldgenPreGen", start, performance.now());
 	}
 
 	addBlockType(longName: string, name?: string): BlockType {
@@ -93,13 +92,17 @@ export class World {
 		if (chunk) {
 			return chunk;
 		}
-		const newChunk = this.worldgen(new Chunk(this, x, y, z));
+		const newChunk = new Chunk(this, x, y, z);
+
+		if (!this.worldgenHandler) {
+			throw new Error("Missing WorldGen");
+		}
+		const start = performance.now();
+		this.worldgenHandler.genChunk(newChunk);
+		profiler.add("worldgen", start, performance.now());
+
 		this.chunks.set(key, newChunk);
 		return newChunk;
-	}
-
-	setChunk(x: number, y: number, z: number, chunk: Chunk) {
-		this.chunks.set(coordinateToWorldKey(x, y, z), chunk);
 	}
 
 	update() {
@@ -125,6 +128,9 @@ export class World {
 		const maxDistance =
 			this.game.render.renderDistance * this.game.render.renderDistance * 4;
 		for (const chunk of this.chunks.values()) {
+			if (!this.worldgenHandler?.mayGC(chunk)) {
+				continue;
+			}
 			if (chunk.gc(maxDistance, this.game.player)) {
 				const key = coordinateToWorldKey(chunk.x, chunk.y, chunk.z);
 				this.chunks.delete(key);

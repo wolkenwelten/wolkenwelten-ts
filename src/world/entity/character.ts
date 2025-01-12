@@ -22,12 +22,6 @@ const clamp = (x: number, min: number, max: number) =>
 	Math.min(Math.max(x, min), max);
 
 export class Character extends Being {
-	spawnX: number;
-	spawnY: number;
-	spawnZ: number;
-	spawnYaw: number;
-	spawnPitch: number;
-
 	movementX = 0;
 	movementY = 0;
 	movementZ = 0;
@@ -64,25 +58,33 @@ export class Character extends Being {
 		//this.equipment.items[0] = Item.create('club', this.world);
 	}
 
+	respawn() {
+		this.init();
+	}
+
 	/* Initialize an already existing Character, that way we can easily reuse the same object, */
 	init() {
-		this.x = this.spawnX;
-		this.y = this.spawnY;
-		this.z = this.spawnZ;
-		this.yaw = this.spawnYaw;
-		this.pitch = this.spawnPitch;
 		this.noClip = false;
 		this.isDead = false;
 		this.maxHealth = this.health = 24;
 		this.hitAnimation = -100;
 		this.lastAction = 0;
 		this.vx = this.vy = this.vz = 0;
+		this.movementX = this.movementY = this.movementZ = 0;
 
 		this?.world?.game?.render?.camera?.stop();
 		this.effects.clear();
 		this.inventory.clear();
 		this.equipment.clear();
 		this.inventory.select(0);
+
+		const [x, y, z] = this.world.worldgenHandler?.spawnPos(this) ?? [0, 0, 0];
+		this.x = x;
+		this.y = y;
+		this.z = z;
+		this.yaw = 0;
+		this.pitch = 0;
+
 		//if (this.world.game.options.startWithEquipment) {
 		setTimeout(() => {
 			this.getGoodStuff();
@@ -92,13 +94,8 @@ export class Character extends Being {
 
 	constructor(
 		world: World,
-		x: number,
-		y: number,
-		z: number,
-		yaw: number,
-		pitch: number,
 	) {
-		super(world, x, y, z);
+		super(world, 0, 0, 0);
 		this.inventory = new Inventory(10);
 		this.equipment = new Inventory(2);
 		this.equipment.mayPut = (index: number, item: Item): boolean => {
@@ -110,11 +107,6 @@ export class Character extends Being {
 			}
 		};
 		this.init();
-		this.spawnX = this.x = x;
-		this.spawnY = this.y = y;
-		this.spawnZ = this.z = z;
-		this.spawnYaw = this.yaw = yaw;
-		this.spawnPitch = this.pitch = pitch;
 	}
 
 	/* Damage a character by a certain value, will change in the future to take a Damage argument instead */

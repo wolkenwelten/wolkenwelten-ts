@@ -66,15 +66,7 @@ export class Game {
 		this.network = new NetworkManager();
 		this.benchmark = new BenchmarkManager(this);
 		this.world = new World(this);
-		this.player = new Character(
-			this.world,
-			2,
-			-1,
-			955,
-			Math.PI * 0.25,
-			-Math.PI / 18,
-		);
-		this.world.addEntity(this.player);
+		this.player = new Character(this.world);
 		this.persistence = new PersistenceManager(this);
 		this.audio = new AudioManager();
 
@@ -99,6 +91,8 @@ export class Game {
 		const worldgenHandler = new FloatingIslandsWorldGen("asdqwe");
 		await worldgenHandler.init();
 		this.world.worldgenHandler = worldgenHandler;
+		this.world.worldgen();
+		this.player.respawn();
 		this.ready = true;
 	}
 

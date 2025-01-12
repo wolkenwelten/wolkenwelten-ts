@@ -209,6 +209,9 @@ export class InputManager {
 		if (this.keyStates.has("Space")) {
 			movement.y = 1;
 		}
+		if (this.keyStates.has("KeyP")) {
+			this.game.player.respawn();
+		}
 
 		const player = this.game.player;
 

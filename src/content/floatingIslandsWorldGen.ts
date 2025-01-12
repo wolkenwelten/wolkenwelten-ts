@@ -17,7 +17,9 @@ import voxTreeC from "../../assets/wg/tree_c.vox?url";
 
 import { LCG } from "../util/prng";
 import type { Chunk } from "../world/chunk/chunk";
-import { StaticObject } from "../world/chunk/staticObject";
+import type { World } from "../world/world";
+import type { Character } from "../world/entity/character";
+import type { StaticObject } from "../world/chunk/staticObject";
 
 export interface WorldGenAssetList {
 	bushA: WorldGenAsset;
@@ -56,167 +58,48 @@ export class FloatingIslandsWorldGen extends WorldGen {
 		};
 	}
 
-	genChunk(chunk: Chunk) {
-		if (chunk.y < -512) {
-			chunk.setBox(0, 0, 0, 32, 32, 32, 3); // Just fill everything with stone for now
-		} else if (chunk.y < 512) {
-			this.worldgenSurface(chunk);
-		} else {
-			this.worldgenSky(chunk);
-		}
+	spawnPos(_player: Character): [number, number, number] {
+		return [50, 140, 50];
 	}
 
-	worldgenSky(chunk: Chunk) {
-		const rng = new LCG([chunk.x, chunk.y, chunk.z, chunk.world.seed]);
-		if (rng.bool(15)) {
-			chunk.setSphere(16, 16, 16, 8, 2);
-			chunk.setSphere(16, 15, 16, 8, 1);
-			chunk.setSphere(16, 12, 16, 7, 3);
-		}
+	mayGC(_chunk: Chunk): boolean {
+		// Todo: Determine whether the chunk is an empty sky chunk, then it may GC
+		return false;
 	}
 
-	grassHeight(x: number, z: number): number {
-		const d = Math.sqrt(x * x + z * z);
-		const deg = Math.atan2(x, z);
+	preGen(world: World) {
+		const centerX = 50;
+		const centerY = 60;
+		const centerZ = 50;
+		const radius = 80;
 
-		const dmy = Math.sin(deg) * 768.0;
-
-		let dy = Math.sin(deg * 35.0) * 16.0;
-		dy = dy + Math.sin(deg * 48.0) * 8.0;
-
-		let duy = Math.sin(deg * 61.0) * 4.0;
-		duy = duy + Math.sin(deg * 78.0) * 3.0;
-		duy = duy + Math.sin(deg * 98.0) * 2.0;
-
-		let y =
-			Math.min(900.0 - (d + dy + dmy), d + dy / 2.0 - (600.0 - 128.0 + duy)) /
-			16.0;
-		if (y > 24.0) {
-			y = 24.0 + (y - 24.0) * 23.45;
-		}
-		return Math.max(-28, y);
-	}
-
-	floodChunk(chunk: Chunk, maxY: number) {
-		const waterBlock = 24;
-		if (chunk.y > maxY) {
-			return;
-		}
-		for (let y = 0; y < 32; y++) {
-			if (y + chunk.y > maxY) {
-				break;
-			}
-			for (let x = 0; x < 32; x++) {
-				for (let z = 0; z < 32; z++) {
-					const b = chunk.getBlock(x, y, z);
-					if (b === 0) {
-						chunk.setBlockUnsafe(x, y, z, waterBlock);
+		// Generate a modified sphere
+		for (let x = centerX - radius; x <= centerX + radius; x++) {
+			for (let y = centerY - radius; y <= centerY + radius; y++) {
+				for (let z = centerZ - radius; z <= centerZ + radius; z++) {
+					// Calculate distance but modify Y to create the desired shape
+					const yStretch = (y > centerY) ? 1.2 : 0.7; // Flatten top, squeeze bottom
+					const distance = Math.sqrt(
+						Math.pow(x - centerX, 2) +
+						Math.pow((y - centerY) * yStretch, 2) +
+						Math.pow(z - centerZ, 2)
+					);
+					
+					// Add some vertical stretching to make it more pointy at bottom
+					const heightFactor = (y < centerY) ? 
+						1.0 + (centerY - y) / 50 : // Gradually more pointy towards bottom
+						1.0;
+					
+					// If point is within modified radius, place a block
+					if (distance <= radius / heightFactor) {
+						world.setBlock(x, y, z, 1);
 					}
 				}
 			}
 		}
 	}
 
-	worldgenSurface(chunk: Chunk) {
-		const assets = this.assets;
-		if (!assets) {
-			throw new Error(
-				"Can't generate chunks until WorldGen has been initialized",
-			);
-		}
-		const rng = new LCG([chunk.x, chunk.y, chunk.z, chunk.world.seed]);
-		for (let x = 0; x < 32; x++) {
-			for (let z = 0; z < 32; z++) {
-				const cx = chunk.x + x;
-				const cz = chunk.z + z;
-				const gh = this.grassHeight(cx, cz);
-				let endY = gh - chunk.y;
-				if (endY >= 0) {
-					if (gh < 1) {
-						chunk.setBoxUnsafe(x, 0, z, 1, Math.min(endY, 32), 1, 23);
-						if (gh < -6) {
-							if (rng.bool(31)) {
-								chunk.setBlockUnsafe(x, Math.floor(endY), z, 3);
-								if (rng.bool(31)) {
-									chunk.setBlockUnsafe(x, Math.floor(endY) + 1, z, 3);
-								}
-							}
-						}
-
-						if (gh > -3 && gh < 0 && endY < 32 && rng.bool(640)) {
-							StaticObject.create("shell", chunk, cx, gh + 1, cz);
-						} else if (gh > -3 && gh < 0 && endY < 32 && rng.bool(1240)) {
-							StaticObject.create("stick", chunk, cx, gh + 1, cz);
-						}
-					} else if (gh > 24) {
-						chunk.setBoxUnsafe(x, 0, z, 1, Math.min(endY, 32), 1, 3);
-					} else {
-						chunk.setBoxUnsafe(x, 0, z, 1, Math.min(endY, 32), 1, 1);
-						if (endY < 32) {
-							chunk.setBlockUnsafe(x, Math.floor(endY), z, 2);
-							if (gh > 2 && gh < 23) {
-								if (rng.bool(1725) && assets.bushA.fits(chunk, x, gh, z)) {
-									assets.bushA.blit(chunk, x, gh, z);
-								} else if (
-									rng.bool(1625) &&
-									assets.bushB.fits(chunk, x, gh, z)
-								) {
-									assets.bushB.blit(chunk, x, gh, z);
-								} else if (
-									rng.bool(1525) &&
-									assets.bushC.fits(chunk, x, gh, z)
-								) {
-									assets.bushC.blit(chunk, x, gh, z);
-								} else if (
-									rng.bool(1625) &&
-									assets.rockA.fits(chunk, x, gh, z)
-								) {
-									assets.rockA.blit(chunk, x, gh, z);
-								} else if (
-									rng.bool(1925) &&
-									assets.rockB.fits(chunk, x, gh, z)
-								) {
-									assets.rockB.blit(chunk, x, gh, z);
-								} else if (
-									rng.bool(1825) &&
-									assets.rockC.fits(chunk, x, gh, z)
-								) {
-									assets.rockC.blit(chunk, x, gh, z);
-								} else if (
-									rng.bool(620) &&
-									assets.treeA.fits(chunk, x, gh - 2, z)
-								) {
-									assets.treeA.blit(chunk, x, gh - 2, z);
-								} else if (
-									rng.bool(730) &&
-									assets.treeB.fits(chunk, x, gh - 2, z)
-								) {
-									assets.treeB.blit(chunk, x, gh - 2, z);
-								} else if (
-									rng.bool(630) &&
-									assets.treeC.fits(chunk, x, gh - 2, z)
-								) {
-									assets.treeC.blit(chunk, x, gh - 2, z);
-								} else if (
-									rng.bool(600) &&
-									assets.spruceA.fits(chunk, x, gh - 2, z)
-								) {
-									assets.spruceA.blit(chunk, x, gh - 2, z);
-								} else if (rng.bool(300)) {
-									StaticObject.create("stone", chunk, cx, gh + 1, cz);
-								} else if (rng.bool(300)) {
-									StaticObject.create("stick", chunk, cx, gh + 1, cz);
-								} else if (rng.bool(120)) {
-									StaticObject.create("flower", chunk, cx, gh + 1, cz);
-								} else if (rng.bool(40)) {
-									StaticObject.create("grass", chunk, cx, gh + 1, cz);
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		this.floodChunk(chunk, -3);
+	genChunk(_chunk: Chunk) {
+		// Empty, we just preGen everything!!!
 	}
 }
