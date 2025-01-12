@@ -198,7 +198,7 @@ export class FloatingIslandsWorldGen extends WorldGen {
 	}
 
 	islandStep(world: World, lcg: LCG, x: number, y: number, z: number, size: number, step: number) {
-		if (size < 8 || lcg.int(0, 6) < step) {
+		if (size < 8 || lcg.int(0, 4) < step) {
 			return;
 		}
 		for (let cx = x - size; cx < x + size; cx += 8){
