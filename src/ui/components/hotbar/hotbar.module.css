@@ -1,4 +1,4 @@
-div[paused='true'] .hotbar {
+div[paused="true"] .hotbar {
 	display: none;
 }
 

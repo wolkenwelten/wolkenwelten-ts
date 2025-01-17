@@ -58,7 +58,8 @@ export const meshgenVoxelMesh = (voxels: Uint8Array): [Uint8Array, number] => {
 	blockData.fill(0);
 	lightData.fill(15);
 	lightGenSimple(tmpSimpleLight, voxels);
-	blitChunkData(blockData, voxels, 1, 1, 1);
+	//localhost:3030/menu
+	http: blitChunkData(blockData, voxels, 1, 1, 1);
 	blitChunkData(lightData, tmpSimpleLight, 1, 1, 1);
 
 	const blocks = identityBlocks;

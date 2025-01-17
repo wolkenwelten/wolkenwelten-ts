@@ -101,9 +101,7 @@ export class Character extends Being {
 		this.justJumped = false;
 	}
 
-	constructor(
-		world: World,
-	) {
+	constructor(world: World) {
 		super(world, 0, 0, 0);
 		this.inventory = new Inventory(10);
 		this.equipment = new Inventory(2);
@@ -298,7 +296,12 @@ export class Character extends Being {
 		// Calculate overall velocity
 		const v = this.vx * this.vx + this.vz * this.vz + this.vy * this.vy;
 		if (v > 0.075) {
-			this.world.game.render.particle.fxTrail(this.x, this.y - 1, this.z, v * 8);
+			this.world.game.render.particle.fxTrail(
+				this.x,
+				this.y - 1,
+				this.z,
+				v * 8,
+			);
 		}
 
 		if (underwater) {

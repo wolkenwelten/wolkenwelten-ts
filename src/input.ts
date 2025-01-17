@@ -14,6 +14,7 @@ export class InputManager {
 	gamepads: Gamepad[] = [];
 	buttonCooldown: Map<number, number> = new Map();
 	hotbarKeys: string[] = [];
+	didDash = false;
 
 	constructor(game: Game) {
 		this.game = game;
@@ -54,9 +55,6 @@ export class InputManager {
 				return;
 			}
 			that.game.player.noClip = !that.game.player.noClip;
-		});
-		this.keyPushHandler.set("ShiftLeft", () => {
-			that.game.player.dash();
 		});
 		this.keyPushHandler.set("Tab", () => {
 			if (document.pointerLockElement) {
@@ -316,6 +314,13 @@ export class InputManager {
 				movement.z,
 				0.4,
 			);
+			if (!this.didDash && movement.sprint) {
+				this.didDash = true;
+				this.game.player.dash();
+			}
+		}
+		if (!movement.sprint) {
+			this.didDash = false;
 		}
 
 		for (let i = 0; i < 10; i++) {

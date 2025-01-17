@@ -66,23 +66,38 @@ export class FloatingIslandsWorldGen extends WorldGen {
 		return false;
 	}
 
-	private floatingIsland(world: World, lcg: LCG, centerX: number, centerY: number, centerZ: number, size = 50) {
+	private floatingIsland(
+		world: World,
+		lcg: LCG,
+		centerX: number,
+		centerY: number,
+		centerZ: number,
+		size = 50,
+	) {
 		const horizontalRadius = size;
-		const verticalRadius = horizontalRadius / 4;  // Make it 4 times wider than tall
+		const verticalRadius = horizontalRadius / 4; // Make it 4 times wider than tall
 
 		// First pass: Generate pointy stone core
 		const pointyHorizontalRadius = size;
 		const pointyVerticalRadius = pointyHorizontalRadius * 1.2;
 		const pointyCenterY = centerY - 2; // Position it lower for the pointy bottom
 
-		for (let x = centerX - pointyHorizontalRadius; x <= centerX + pointyHorizontalRadius; x++) {
-			for (let z = centerZ - pointyHorizontalRadius; z <= centerZ + pointyHorizontalRadius; z++) {
+		for (
+			let x = centerX - pointyHorizontalRadius;
+			x <= centerX + pointyHorizontalRadius;
+			x++
+		) {
+			for (
+				let z = centerZ - pointyHorizontalRadius;
+				z <= centerZ + pointyHorizontalRadius;
+				z++
+			) {
 				const distFromCenter = Math.sqrt(
-					Math.pow(x - centerX, 2) +
-					Math.pow(z - centerZ, 2)
+					Math.pow(x - centerX, 2) + Math.pow(z - centerZ, 2),
 				);
-				
-				const baseLength = pointyVerticalRadius * (1 - (distFromCenter / pointyHorizontalRadius));
+
+				const baseLength =
+					pointyVerticalRadius * (1 - distFromCenter / pointyHorizontalRadius);
 				const noiseIntensity = 1.4; // Increased for more dramatic effect
 				const lengthNoise = lcg.floatNOneToOne() * noiseIntensity;
 				const finalLength = Math.max(0, baseLength + lengthNoise);
@@ -91,8 +106,8 @@ export class FloatingIslandsWorldGen extends WorldGen {
 				for (let y = pointyCenterY; y >= pointyCenterY - finalLength; y--) {
 					const normalizedDist = Math.sqrt(
 						Math.pow((x - centerX) / pointyHorizontalRadius, 2) +
-						Math.pow((y - pointyCenterY) / pointyVerticalRadius, 2) +
-						Math.pow((z - centerZ) / pointyHorizontalRadius, 2)
+							Math.pow((y - pointyCenterY) / pointyVerticalRadius, 2) +
+							Math.pow((z - centerZ) / pointyHorizontalRadius, 2),
 					);
 
 					if (normalizedDist <= 1) {
@@ -103,13 +118,25 @@ export class FloatingIslandsWorldGen extends WorldGen {
 		}
 
 		// Second pass: Generate dirt layer
-		for (let x = centerX - horizontalRadius; x <= centerX + horizontalRadius; x++) {
-			for (let y = centerY - verticalRadius; y <= centerY + verticalRadius; y++) {
-				for (let z = centerZ - horizontalRadius; z <= centerZ + horizontalRadius; z++) {
+		for (
+			let x = centerX - horizontalRadius;
+			x <= centerX + horizontalRadius;
+			x++
+		) {
+			for (
+				let y = centerY - verticalRadius;
+				y <= centerY + verticalRadius;
+				y++
+			) {
+				for (
+					let z = centerZ - horizontalRadius;
+					z <= centerZ + horizontalRadius;
+					z++
+				) {
 					const normalizedDist = Math.sqrt(
 						Math.pow((x - centerX) / horizontalRadius, 2) +
-						Math.pow((y - centerY) / verticalRadius, 2) +
-						Math.pow((z - centerZ) / horizontalRadius, 2)
+							Math.pow((y - centerY) / verticalRadius, 2) +
+							Math.pow((z - centerZ) / horizontalRadius, 2),
 					);
 
 					if (normalizedDist <= 1) {
@@ -120,9 +147,21 @@ export class FloatingIslandsWorldGen extends WorldGen {
 		}
 
 		// Fourth pass: Convert top layer to grass
-		for (let x = centerX - horizontalRadius; x <= centerX + horizontalRadius; x++) {
-			for (let z = centerZ - horizontalRadius; z <= centerZ + horizontalRadius; z++) {
-				for (let y = centerY + verticalRadius; y >= centerY - verticalRadius; y--) {
+		for (
+			let x = centerX - horizontalRadius;
+			x <= centerX + horizontalRadius;
+			x++
+		) {
+			for (
+				let z = centerZ - horizontalRadius;
+				z <= centerZ + horizontalRadius;
+				z++
+			) {
+				for (
+					let y = centerY + verticalRadius;
+					y >= centerY - verticalRadius;
+					y--
+				) {
 					if (world.getBlock(x, y, z) === 1) {
 						world.setBlock(x, y, z, 2);
 						break;
@@ -137,14 +176,27 @@ export class FloatingIslandsWorldGen extends WorldGen {
 		}
 
 		// Place assets on the grass - adjust step size for better distribution
-		for (let x = centerX - horizontalRadius + 4; x <= centerX + horizontalRadius - 4; x += 2) {
-			for (let z = centerZ - horizontalRadius + 4; z <= centerZ + horizontalRadius - 4; z += 2) {
+		for (
+			let x = centerX - horizontalRadius + 4;
+			x <= centerX + horizontalRadius - 4;
+			x += 2
+		) {
+			for (
+				let z = centerZ - horizontalRadius + 4;
+				z <= centerZ + horizontalRadius - 4;
+				z += 2
+			) {
 				// Find the top grass block
 				let foundSurface = false;
-				for (let y = centerY + verticalRadius + 5; y >= centerY - verticalRadius - 5; y--) {
-					if (world.getBlock(x, y, z) === 2) { // If it's grass
+				for (
+					let y = centerY + verticalRadius + 5;
+					y >= centerY - verticalRadius - 5;
+					y--
+				) {
+					if (world.getBlock(x, y, z) === 2) {
+						// If it's grass
 						foundSurface = true;
-						
+
 						// Increase chance of placement and check surrounding area
 						if (lcg.float() > 0.9) {
 							// Make sure we have enough space (check a few blocks around)
@@ -163,47 +215,64 @@ export class FloatingIslandsWorldGen extends WorldGen {
 								const roll = lcg.float();
 								let asset: WorldGenAsset;
 								let oy = -1;
-								
+
 								if (roll < 0.3) {
 									// Trees (30% chance)
-									asset = lcg.bool() ? this.assets.treeA : 
-										   lcg.bool() ? this.assets.treeB : this.assets.treeC;
-										   oy = -4;
+									asset = lcg.bool()
+										? this.assets.treeA
+										: lcg.bool()
+											? this.assets.treeB
+											: this.assets.treeC;
+									oy = -4;
 								} else if (roll < 0.4) {
 									// Spruce (20% chance)
 									asset = this.assets.spruceA;
 								} else if (roll < 0.7) {
 									// Bushes (30% chance)
-									asset = lcg.bool() ? this.assets.bushA : 
-										   lcg.bool() ? this.assets.bushB : this.assets.bushC;
+									asset = lcg.bool()
+										? this.assets.bushA
+										: lcg.bool()
+											? this.assets.bushB
+											: this.assets.bushC;
 									oy = 0;
 								} else {
 									// Rocks (20% chance)
-									asset = lcg.bool() ? this.assets.rockA : 
-										   lcg.bool() ? this.assets.rockB : this.assets.rockC;
+									asset = lcg.bool()
+										? this.assets.rockA
+										: lcg.bool()
+											? this.assets.rockB
+											: this.assets.rockC;
 								}
-								
+
 								asset.worldBlit(world, x, y + oy, z);
 							}
 						}
 						break;
 					}
 				}
-				
+
 				// Skip rest of column if we found a surface
 				if (foundSurface) continue;
 			}
 		}
 	}
 
-	islandStep(world: World, lcg: LCG, x: number, y: number, z: number, size: number, step: number) {
+	islandStep(
+		world: World,
+		lcg: LCG,
+		x: number,
+		y: number,
+		z: number,
+		size: number,
+		step: number,
+	) {
 		if (size < 8 || lcg.int(0, 5) < step) {
 			return;
 		}
-		for (let cx = x - size; cx < x + size; cx += 8){
-			for (let cy = y - size; cy < y + size; cy += 8){
-				for (let cz = z - size; cz < z + size; cz += 8){
-					if (world.getBlock(cx,cy,cz)) {
+		for (let cx = x - size; cx < x + size; cx += 8) {
+			for (let cy = y - size; cy < y + size; cy += 8) {
+				for (let cz = z - size; cz < z + size; cz += 8) {
+					if (world.getBlock(cx, cy, cz)) {
 						return;
 					}
 				}
@@ -212,11 +281,18 @@ export class FloatingIslandsWorldGen extends WorldGen {
 
 		this.floatingIsland(world, lcg, x, y, z, size);
 
-		const l = (ox:number, oy:number, oz:number) => {
-			this.islandStep(world, lcg, ox + lcg.int(size * -0.1, size * 0.1), oy + lcg.int(size * -0.5, size * 0.5), oz + lcg.int(size * -0.1, size * 0.1), size + lcg.int(-20,10), step + 1);
-		}
+		const l = (ox: number, oy: number, oz: number) => {
+			this.islandStep(
+				world,
+				lcg,
+				ox + lcg.int(size * -0.1, size * 0.1),
+				oy + lcg.int(size * -0.5, size * 0.5),
+				oz + lcg.int(size * -0.1, size * 0.1),
+				size + lcg.int(-20, 10),
+				step + 1,
+			);
+		};
 
-		
 		l(x + (size * 2 + size * 0.4), y, z);
 		l(x - (size * 2 + size * 0.4), y, z);
 		l(x, y, z + (size * 2 + size * 0.4));

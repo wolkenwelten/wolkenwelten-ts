@@ -7,27 +7,27 @@
 }
 
 .heart::after {
-	content: '';
+	content: "";
 	display: inline-block;
 	width: 32px;
 	height: 32px;
 	position: relative;
-	background: url('../../../../assets/gfx/heart_0.png') no-repeat;
+	background: url("../../../../assets/gfx/heart_0.png") no-repeat;
 	background-size: contain;
 	z-index: 1;
 }
 
-.heart[hp-val='1']::after {
-	background-image: url('../../../../assets/gfx/heart_1.png');
+.heart[hp-val="1"]::after {
+	background-image: url("../../../../assets/gfx/heart_1.png");
 }
-.heart[hp-val='2']::after {
-	background-image: url('../../../../assets/gfx/heart_2.png');
+.heart[hp-val="2"]::after {
+	background-image: url("../../../../assets/gfx/heart_2.png");
 }
-.heart[hp-val='3']::after {
-	background-image: url('../../../../assets/gfx/heart_3.png');
+.heart[hp-val="3"]::after {
+	background-image: url("../../../../assets/gfx/heart_3.png");
 }
-.heart[hp-val='4']::after {
-	background-image: url('../../../../assets/gfx/heart_4.png');
+.heart[hp-val="4"]::after {
+	background-image: url("../../../../assets/gfx/heart_4.png");
 }
 
 /* The animation code */
@@ -43,8 +43,8 @@
 }
 
 .animate::before {
-	content: '';
-	background-image: url('../../../../assets/gfx/heart_1.png');
+	content: "";
+	background-image: url("../../../../assets/gfx/heart_1.png");
 	display: block;
 	position: absolute;
 	width: 32px;
@@ -60,14 +60,14 @@
 	animation-iteration-count: infinite;
 }
 
-.animate[hp-val='2']::before {
-	background-image: url('../../../../assets/gfx/heart_2.png');
+.animate[hp-val="2"]::before {
+	background-image: url("../../../../assets/gfx/heart_2.png");
 }
-.animate[hp-val='3']::before {
-	background-image: url('../../../../assets/gfx/heart_3.png');
+.animate[hp-val="3"]::before {
+	background-image: url("../../../../assets/gfx/heart_3.png");
 }
-.animate[hp-val='4']::before {
-	background-image: url('../../../../assets/gfx/heart_4.png');
+.animate[hp-val="4"]::before {
+	background-image: url("../../../../assets/gfx/heart_4.png");
 }
 
 .animate:first-child::before {

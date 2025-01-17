@@ -74,9 +74,9 @@ export class WorldGenAsset {
 				for (let z = 0; z < this.d; z++) {
 					const cz = z + tz;
 					if (cz < 0 || cz >= 32) continue;
-					
+
 					// Calculate the buffer position dynamically
-					const off = z + y * this.d + x * this. d * this.h;
+					const off = z + y * this.d + x * this.d * this.h;
 					const i = this.data[off];
 					if (i) {
 						out.setBlockUnsafe(cx, cy, cz, this.palette[i - 1]);
@@ -109,9 +109,9 @@ export class WorldGenAsset {
 					if (!chunk) continue;
 
 					// Calculate local coordinates within this chunk
-					const localX = x - (cx * 32);
-					const localY = y - (cy * 32);
-					const localZ = z - (cz * 32);
+					const localX = x - cx * 32;
+					const localY = y - cy * 32;
+					const localZ = z - cz * 32;
 
 					// Blit to this chunk
 					this.blitUnsafe(chunk, localX, localY, localZ);
