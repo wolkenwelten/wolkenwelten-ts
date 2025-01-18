@@ -5,9 +5,10 @@ import { mat4 } from "gl-matrix";
 
 import type { TriangleMesh } from "../../render/meshes/triangleMesh/triangleMesh";
 import type { VoxelMesh } from "../../render/meshes/voxelMesh/voxelMesh";
-import type { World } from "../world";
+import { type World } from "../world";
 import type { Position } from "../../util/math";
 import { StatusEffect } from "../statusEffects/statusEffect";
+import { GRAVITY } from "../../constants";
 
 let entityCounter = 0;
 const modelViewMatrix = mat4.create();
@@ -100,7 +101,7 @@ export class Entity {
 		this.x += this.vx;
 		this.y += this.vy;
 		this.z += this.vz;
-		this.vy -= 0.005;
+		this.vy -= GRAVITY;
 
 		if (this.collides()) {
 			this.vy = 0;

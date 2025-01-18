@@ -5,12 +5,13 @@ import { mat4 } from "gl-matrix";
 
 import type { VoxelMesh } from "../../render/meshes/voxelMesh/voxelMesh";
 import type { Entity } from "./entity";
-import type { World } from "../world";
+import { type World } from "../world";
 import type { Position } from "../../util/math";
 import { Being } from "./being";
 import { ItemDrop } from "./itemDrop";
 import { Inventory } from "../item/inventory";
 import { Item, MaybeItem } from "../item/item";
+import { GRAVITY } from "../../constants";
 
 const CHARACTER_ACCELERATION = 0.08;
 const CHARACTER_STOP_RATE = CHARACTER_ACCELERATION * 3.5;
@@ -148,6 +149,7 @@ export class Character extends Being {
 			const vz = Math.sin(-this.yaw - Math.PI / 2) * dashSpeed;
 			this.vx = vx;
 			this.vz = vz;
+			this.vy += 0.15;
 		}
 	}
 
@@ -288,7 +290,7 @@ export class Character extends Being {
 
 		this.vx = this.vx * (1.0 - accel) + this.movementX * speed * accel;
 		this.vz = this.vz * (1.0 - accel) + this.movementZ * speed * accel;
-		this.vy -= underwater ? 0.001 : 0.005;
+		this.vy -= underwater ? GRAVITY * 0.2 : GRAVITY;
 		const oldVx = this.vx;
 		const oldVy = this.vy;
 		const oldVz = this.vz;
