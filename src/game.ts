@@ -92,7 +92,13 @@ export class Game {
 		await worldgenHandler.init();
 		this.world.worldgenHandler = worldgenHandler;
 		this.world.worldgen();
-		this.player.respawn();
+		/*
+        this.player.respawn();
+        this.player.noClip = true;
+        this.player.x = 4050;
+        this.player.z = 3975;
+        this.player.y = 990;
+        */
 		this.ready = true;
 	}
 

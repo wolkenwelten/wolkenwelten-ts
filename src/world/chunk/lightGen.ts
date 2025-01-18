@@ -15,12 +15,11 @@ const light = new Uint8Array(32 * 32);
  * above, since there could be ~4 billion blocks above.
  */
 const sunlight = (out: Uint8Array, blocks: Uint8Array) => {
-	light.fill(15);
 	for (let y = 31; y >= 0; y--) {
 		for (let x = 0; x < 32; x++) {
 			let off = x * 32 * 32 + y * 32;
 			for (let z = 0; z < 32; z++) {
-				const l = blocks[off] === 0 ? Math.min(15, light[x * 32 + z] + 1) : 0;
+				const l = blocks[off] === 0 ? Math.min(20, light[x * 32 + z] + 1) : 0;
 				out[off++] = light[x * 32 + z] = l;
 			}
 		}
@@ -95,9 +94,19 @@ const lightBlur = (out: Uint8Array) => {
  * We can blur multiple simple lightmaps together to create a complex lightmap that
  * is used for lighting the world.
  */
-export const lightGenSimple = (out: Uint8Array, blocks: Uint8Array) => {
+const lightGenRun = (out: Uint8Array, blocks: Uint8Array) => {
 	const start = performance.now();
 	sunlight(out, blocks);
 	lightBlur(out);
 	profiler.add("lightGenSimple", start, performance.now());
+};
+
+export const lightGenSimple = (out: Uint8Array, blocks: Uint8Array) => {
+	light.fill(15);
+	lightGenRun(out, blocks);
+};
+
+export const lightGenChunk = (out: Uint8Array, blocks: Uint8Array) => {
+	light.fill(0);
+	lightGenRun(out, blocks);
 };

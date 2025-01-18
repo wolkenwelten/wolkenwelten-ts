@@ -1,11 +1,3 @@
-
-
-
-
-
-
-
-
 # WolkenWelten - TS
 
 ![Have a screenshot](https://github.com/wolkenwelten/wolkenwelten-screenshots/raw/main/2023-02-13.png)

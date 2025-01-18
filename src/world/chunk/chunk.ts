@@ -4,7 +4,7 @@
 import type { Entity } from "../entity/entity";
 import type { World } from "../world";
 import type { StaticObject } from "./staticObject";
-import { lightGenSimple } from "./lightGen";
+import { lightGenChunk } from "./lightGen";
 
 const coordinateToOffset = (x: number, y: number, z: number) =>
 	(Math.floor(x) & 0x1f) |
@@ -37,7 +37,7 @@ export class Chunk {
 		if (this.simpleLightLastUpdated >= this.lastUpdated) {
 			return;
 		}
-		lightGenSimple(this.simpleLight, this.blocks);
+		lightGenChunk(this.simpleLight, this.blocks);
 		this.simpleLightLastUpdated = this.lastUpdated;
 	}
 
