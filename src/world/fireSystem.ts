@@ -40,7 +40,7 @@ export class FireSystem {
 			this.fires.set(key, fire);
 		}
 		if (this.fires.size > MAX_FIRES) {
-			this.fires.delete(this.fires.keys().next().value);
+			this.fires.delete(this.fires.keys().next().value || 0);
 		}
 	}
 

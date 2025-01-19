@@ -13,7 +13,7 @@ export class ClientEntry {
 
 	constructor(game: Game, id: number) {
 		this.id = id;
-		this.char = new Character(game.world, 0, 0, 0, 0, 0);
+		this.char = new Character(game.world);
 	}
 
 	update(msg: WSPlayerUpdate) {
