@@ -54,6 +54,8 @@ export class Character extends Being {
 
 	justJumped = false;
 
+	hitAnimationCounter = 0;
+
 	/* Simple cheat, can be run from the browser console by typing `wolkenwelten.player.getGoodStuff();` */
 	getGoodStuff() {
 		this.inventory.add(Item.create("earthBullet", this.world));
@@ -416,7 +418,7 @@ export class Character extends Being {
 			}
 		}
 
-		const br = radius * 0.4;
+		const br = radius * 0.8;
 		for (let cx = Math.floor(x - br); cx < Math.ceil(x + br); cx++) {
 			for (
 				let cy = Math.floor(y - br - 0.5);
@@ -492,7 +494,14 @@ export class Character extends Being {
 
 		this.hitAnimation = this.world.game.render.frames;
 		const hit = this.attack(1.8);
-		const cooldownDur = item ? item.attackCooldown(this) : 100;
+		const cooldownDur = item ? item.attackCooldown(this) : 20;
+		this.hitAnimationCounter = (this.hitAnimationCounter + 1) & 1;
+
+		const cam = this.world.game.render.camera;
+		if (cam.entityToFollow === this) {
+			cam.shake(hit ? 0.3 : 0.15);
+		}
+
 		this.cooldown(cooldownDur);
 		if (hit) {
 			this.world.game.audio.play("punch");
@@ -608,15 +617,21 @@ export class Character extends Being {
 		let rightLegPitch = this.walkAnimationFactor * 1.6;
 		let leftLegPitch = this.walkAnimationFactor * -1.6;
 
-		if (this.hitAnimation + 100 > this.world.game.render.frames) {
-			const t = this.hitAnimation + 100 - this.world.game.render.frames;
-			rightArmPitch = (t / 100) * 1.5;
+		if (this.hitAnimation + 16 > this.world.game.render.frames) {
+			const t = this.hitAnimation + 16 - this.world.game.render.frames;
+			rightArmPitch = (t / 16) * 1.5;
 			rightArmPitch *= rightArmPitch;
 			leftArmPitch = rightArmPitch * -0.5;
 
 			leftLegPitch += rightArmPitch * 0.1;
 			rightLegPitch += rightArmPitch * -0.1;
 			headPitch += rightArmPitch * 0.15;
+
+			if (this.hitAnimationCounter === 1) {
+				const tmp = rightArmPitch;
+				rightArmPitch = leftArmPitch;
+				leftArmPitch = tmp;
+			}
 		}
 
 		const {

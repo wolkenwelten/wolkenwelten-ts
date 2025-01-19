@@ -125,7 +125,7 @@ export class VoxelMesh {
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
 		gl.bufferData(
 			gl.ARRAY_BUFFER,
-			vertices.slice(0, elementCount * 5),
+			vertices.slice(0, elementCount * 8),
 			gl.STATIC_DRAW,
 		);
 		gl.enableVertexAttribArray(0);

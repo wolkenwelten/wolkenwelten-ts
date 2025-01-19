@@ -19,6 +19,7 @@ import { LCG } from "../util/prng";
 import type { Chunk } from "../world/chunk/chunk";
 import type { World } from "../world/world";
 import type { Character } from "../world/entity/character";
+import { StaticObject } from "../world/chunk/staticObject";
 
 export interface WorldGenAssetList {
 	bushA: WorldGenAsset;
@@ -57,10 +58,6 @@ export class FloatingIslandsWorldGen extends WorldGen {
 		};
 	}
 
-	spawnPos(_player: Character): [number, number, number] {
-		return [4000, 1040, 4000];
-	}
-
 	mayGC(_chunk: Chunk): boolean {
 		// Todo: Determine whether the chunk is an empty sky chunk, then it may GC
 		return false;
@@ -82,6 +79,11 @@ export class FloatingIslandsWorldGen extends WorldGen {
 		const pointyVerticalRadius = pointyHorizontalRadius * 1.2;
 		const pointyCenterY = centerY - 2; // Position it lower for the pointy bottom
 
+		let hasTrees = lcg.bool();
+		let hasSpruce = lcg.bool();
+		let hasBushes = hasTrees || hasSpruce || lcg.bool();
+		let hasRocks = lcg.bool();
+
 		for (
 			let x = centerX - pointyHorizontalRadius;
 			x <= centerX + pointyHorizontalRadius;
@@ -97,7 +99,10 @@ export class FloatingIslandsWorldGen extends WorldGen {
 				);
 
 				const baseLength =
-					pointyVerticalRadius * (1 - distFromCenter / pointyHorizontalRadius);
+					pointyVerticalRadius *
+					(1 - distFromCenter / pointyHorizontalRadius) *
+					0.5;
+
 				const noiseIntensity = 1.4; // Increased for more dramatic effect
 				const lengthNoise = lcg.floatNOneToOne() * noiseIntensity;
 				const finalLength = Math.max(0, baseLength + lengthNoise);
@@ -198,7 +203,7 @@ export class FloatingIslandsWorldGen extends WorldGen {
 						foundSurface = true;
 
 						// Increase chance of placement and check surrounding area
-						if (lcg.float() > 0.9) {
+						if (lcg.float() > 0.96) {
 							// Make sure we have enough space (check a few blocks around)
 							let hasSpace = true;
 							for (let dx = -1; dx <= 1; dx++) {
@@ -213,30 +218,26 @@ export class FloatingIslandsWorldGen extends WorldGen {
 							if (hasSpace) {
 								// Choose a random asset type
 								const roll = lcg.float();
-								let asset: WorldGenAsset;
+								let asset: WorldGenAsset | undefined;
 								let oy = -1;
 
-								if (roll < 0.3) {
-									// Trees (30% chance)
+								if (hasTrees && roll < 0.2) {
 									asset = lcg.bool()
 										? this.assets.treeA
 										: lcg.bool()
 											? this.assets.treeB
 											: this.assets.treeC;
 									oy = -4;
-								} else if (roll < 0.4) {
-									// Spruce (20% chance)
+								} else if (hasSpruce && roll < 0.3) {
 									asset = this.assets.spruceA;
-								} else if (roll < 0.7) {
-									// Bushes (30% chance)
+								} else if (hasBushes && roll < 0.7) {
 									asset = lcg.bool()
 										? this.assets.bushA
 										: lcg.bool()
 											? this.assets.bushB
 											: this.assets.bushC;
 									oy = 0;
-								} else {
-									// Rocks (20% chance)
+								} else if (hasRocks && roll < 0.9) {
 									asset = lcg.bool()
 										? this.assets.rockA
 										: lcg.bool()
@@ -244,8 +245,37 @@ export class FloatingIslandsWorldGen extends WorldGen {
 											: this.assets.rockC;
 								}
 
-								asset.worldBlit(world, x, y + oy, z);
+								if (asset) {
+									asset.worldBlit(
+										world,
+										x - asset.w / 2,
+										y + oy,
+										z - asset.d / 2,
+									);
+								}
 							}
+						} else if (lcg.float() > 0.9) {
+							// Make sure we have enough space (check block above)
+							//if (world.getBlock(x, y + 1, z) === 0) {
+							// Choose what to place
+							const roll = lcg.float();
+							let type: string;
+
+							if (roll < 0.8) {
+								type = "grass";
+							} else if (roll < 0.9) {
+								type = "flower";
+							} else if (roll < 0.95) {
+								type = "stick";
+							} else {
+								type = "stone";
+							}
+
+							// Create the static object
+							y++;
+							const chunk = world.getOrGenChunk(x, y, z);
+							StaticObject.create(type, chunk, x | 0, y | 0, z | 0);
+							//}
 						}
 						break;
 					}
@@ -266,7 +296,7 @@ export class FloatingIslandsWorldGen extends WorldGen {
 		size: number,
 		step: number,
 	) {
-		if (size < 8 || lcg.int(0, 5) < step) {
+		if (size < 8 || lcg.int(0, 6) < step) {
 			return;
 		}
 		for (let cx = x - size; cx < x + size; cx += 8) {
@@ -299,10 +329,14 @@ export class FloatingIslandsWorldGen extends WorldGen {
 		l(x, y, z - (size * 2 + size * 0.4));
 	}
 
+	spawnPos(_player: Character): [number, number, number] {
+		return [1000, 1040, 1000];
+	}
+
 	preGen(world: World) {
 		const lcg = new LCG(world.seed);
 
-		this.islandStep(world, lcg, 4000, 1000, 4000, 50, 0);
+		this.islandStep(world, lcg, 1000, 1000, 1000, 50, 0);
 	}
 
 	genChunk(_chunk: Chunk) {
