@@ -52,6 +52,10 @@ export class Entity {
 		return this.world.isSolid(this.x, this.y - 1.7, this.z);
 	}
 
+	getSpeed(): number {
+		return Math.cbrt(this.vx * this.vx + this.vy * this.vy + this.vz * this.vz);
+	}
+
 	walkDirection(): [number, number] {
 		const x = Math.sin(this.yaw);
 		const z = Math.cos(this.yaw);

@@ -248,7 +248,11 @@ export class Character extends Being {
 		} else {
 			const p =
 				((this.world.game.ticks / (this.isSprinting ? 12 : 24)) & 1) * 2 - 1;
-			this.walkAnimationFactor = this.walkAnimationFactor * 0.9 + p * 0.1;
+			if (this.mayJump()) {
+				this.walkAnimationFactor = this.walkAnimationFactor * 0.9 + p * 0.1;
+			} else {
+				this.walkAnimationFactor = this.walkAnimationFactor * 0.97 + p * 0.03;
+			}
 		}
 
 		this.pitch = 0;
@@ -594,13 +598,15 @@ export class Character extends Being {
 		const renderDistance = this.world.game.render.renderDistance;
 		const alpha = Math.min(1, Math.max(0, renderDistance - d) / 8);
 
+		const speedPitch = Math.max(-0.2, this.getSpeed() * -0.5);
+
 		const headYaw = this.calcHeadYaw(cam);
-		let headPitch = this.walkAnimationFactor * 0.025 + cam.pitch * 0.25;
-		let bodyPitch = this.walkAnimationFactor * -0.035;
-		let leftArmPitch = this.walkAnimationFactor * 0.7;
-		let rightArmPitch = this.walkAnimationFactor * -0.7;
-		let rightLegPitch = this.walkAnimationFactor * 0.6;
-		let leftLegPitch = this.walkAnimationFactor * -0.6;
+		let headPitch = this.walkAnimationFactor * 0.1 + cam.pitch * 0.25;
+		let bodyPitch = this.walkAnimationFactor * -0.1 + speedPitch;
+		let leftArmPitch = this.walkAnimationFactor * 1.7;
+		let rightArmPitch = this.walkAnimationFactor * -1.7;
+		let rightLegPitch = this.walkAnimationFactor * 1.6;
+		let leftLegPitch = this.walkAnimationFactor * -1.6;
 
 		if (this.hitAnimation + 100 > this.world.game.render.frames) {
 			const t = this.hitAnimation + 100 - this.world.game.render.frames;
