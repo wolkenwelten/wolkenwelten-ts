@@ -3,7 +3,18 @@
  */
 import type { Game } from "./game";
 import { isClient } from "./util/compat";
+import { Character } from "./world/entity/character";
 import { Item } from "./world/item/item";
+
+export class ControlState {
+	x = 0;
+	y = 0;
+	z = 0;
+
+	sprint = false;
+	primary = false;
+	secondary = false;
+}
 
 export class InputManager {
 	game: Game;
@@ -182,165 +193,169 @@ export class InputManager {
 		return this.game.ui.inventory.active;
 	}
 
-	update() {
-		const movement = { x: 0, y: 0, z: 0, sprint: false };
-		const actions = { primary: false, secondary: false };
-
+	private updateKeyboard(state: ControlState) {
 		if (this.keyStates.has("KeyW")) {
-			movement.z = -1;
+			state.z = -1;
 		}
 		if (this.keyStates.has("KeyS")) {
-			movement.z = 1;
+			state.z = 1;
 		}
 		if (this.keyStates.has("KeyA")) {
-			movement.x = -1;
+			state.x = -1;
 		}
 		if (this.keyStates.has("KeyD")) {
-			movement.x = 1;
+			state.x = 1;
 		}
 		if (this.keyStates.has("KeyF")) {
-			movement.y = -1;
+			state.y = -1;
 		}
 		if (this.keyStates.has("KeyR")) {
-			movement.y = 1;
+			state.y = 1;
 		}
 		if (this.keyStates.has("ShiftLeft")) {
-			movement.sprint = true;
+			state.sprint = true;
 		}
 		if (this.keyStates.has("Space")) {
-			movement.y = 1;
+			state.y = 1;
 		}
 		if (this.keyStates.has("KeyP")) {
 			this.game.player.respawn();
 		}
-
-		const player = this.game.player;
-
-		for (const gamepad of navigator.getGamepads()) {
-			if (gamepad) {
-				if (gamepad.axes.length >= 2) {
-					const len = Math.sqrt(
-						gamepad.axes[0] * gamepad.axes[0] +
-							gamepad.axes[1] * gamepad.axes[1],
-					);
-					if (len > 0.16) {
-						movement.x = gamepad.axes[0];
-						movement.z = gamepad.axes[1];
-					}
-				}
-				if (gamepad.axes.length >= 4) {
-					const len = Math.sqrt(
-						gamepad.axes[2] * gamepad.axes[2] +
-							gamepad.axes[3] * gamepad.axes[3],
-					);
-					if (len > 0.16) {
-						this.game.render.camera.rotate(
-							gamepad.axes[2] * -0.01,
-							gamepad.axes[3] * -0.01,
-						);
-					}
-				}
-				if (gamepad.buttons[0]?.pressed) {
-					movement.y = 1;
-				}
-				if (gamepad.buttons[2]?.pressed) {
-					movement.y = -1;
-				}
-				if (gamepad.buttons[4]?.pressed || gamepad.buttons[5]?.pressed) {
-					movement.sprint = true;
-				}
-				if (gamepad.buttons[14]?.pressed) {
-					const key = gamepad.index | (4 << 8);
-					const cooldown = this.buttonCooldown.get(key) || 0;
-					if (cooldown < this.game.ticks) {
-						const newSelection =
-							(player.inventory.selection - 1) % player.inventory.items.length;
-						player.inventory.select(
-							newSelection >= 0
-								? newSelection
-								: player.inventory.items.length - newSelection - 2,
-						);
-						this.buttonCooldown.set(key, this.game.ticks + 20);
-					}
-				} else {
-					const key = gamepad.index | (4 << 8);
-					this.buttonCooldown.delete(key);
-				}
-				if (gamepad.buttons[15]?.pressed) {
-					const key = gamepad.index | (5 << 8);
-					const cooldown = this.buttonCooldown.get(key) || 0;
-					if (cooldown < this.game.ticks) {
-						const newSelection =
-							(player.inventory.selection + 1) % player.inventory.items.length;
-						player.inventory.select(
-							newSelection >= 0
-								? newSelection
-								: player.inventory.items.length - newSelection - 2,
-						);
-						this.buttonCooldown.set(key, this.game.ticks + 20);
-					}
-				} else {
-					const key = gamepad.index | (5 << 8);
-					this.buttonCooldown.delete(key);
-				}
-				if (gamepad.buttons[8]?.pressed) {
-					player.noClip = true;
-				}
-				if (gamepad.buttons[9]?.pressed) {
-					player.noClip = false;
-				}
-
-				if (gamepad.buttons[7]?.pressed) {
-					if (!gamepad.buttons[7].value || gamepad.buttons[7].value > 0.5) {
-						actions.primary = true;
-					}
-				}
-				if (gamepad.buttons[6]?.pressed) {
-					if (!gamepad.buttons[6].value || gamepad.buttons[6].value > 0.5) {
-						actions.secondary = true;
-					}
-				}
-				//console.log(gamepad.buttons.map((b,i) => b.pressed ? `${i}: ${b.value}` : '').join(' '));
-			}
-		}
-
-		if (player.noClip) {
-			const speed = movement.sprint ? 1.5 : 0.3;
-			player.fly(movement.x * speed, movement.y * speed, movement.z * speed);
-		} else {
-			this.game.render.camera.moveEntity(
-				movement.x,
-				movement.y,
-				movement.z,
-				0.4,
-			);
-			if (!this.didDash && movement.sprint) {
-				this.didDash = true;
-				this.game.player.dash();
-			}
-		}
-		if (!movement.sprint) {
-			this.didDash = false;
-		}
-
 		for (let i = 0; i < 10; i++) {
 			if (this.keyStates.has(this.hotbarKeys[i])) {
 				this.game.ui.hotbar.use(i);
 			}
 		}
+	}
 
+	private updateMouse(state: ControlState) {
 		if (this.mouseStates.has(0)) {
-			actions.primary = true;
+			state.primary = true;
 		}
 
 		if (this.mouseStates.has(2)) {
-			actions.secondary = true;
+			state.secondary = true;
+		}
+	}
+
+	private updateGamepad(
+		state: ControlState,
+		player: Character,
+		gamepad: Gamepad,
+	) {
+		if (gamepad.axes.length >= 2) {
+			const len = Math.sqrt(
+				gamepad.axes[0] * gamepad.axes[0] + gamepad.axes[1] * gamepad.axes[1],
+			);
+			if (len > 0.16) {
+				state.x = gamepad.axes[0];
+				state.z = gamepad.axes[1];
+			}
+		}
+		if (gamepad.axes.length >= 4) {
+			const len = Math.sqrt(
+				gamepad.axes[2] * gamepad.axes[2] + gamepad.axes[3] * gamepad.axes[3],
+			);
+			if (len > 0.16) {
+				this.game.render.camera.rotate(
+					gamepad.axes[2] * -0.01,
+					gamepad.axes[3] * -0.01,
+				);
+			}
+		}
+		if (gamepad.buttons[0]?.pressed) {
+			state.y = 1;
+		}
+		if (gamepad.buttons[2]?.pressed) {
+			state.y = -1;
+		}
+		if (gamepad.buttons[4]?.pressed || gamepad.buttons[5]?.pressed) {
+			state.sprint = true;
+		}
+		if (gamepad.buttons[14]?.pressed) {
+			const key = gamepad.index | (4 << 8);
+			const cooldown = this.buttonCooldown.get(key) || 0;
+			if (cooldown < this.game.ticks) {
+				const newSelection =
+					(player.inventory.selection - 1) % player.inventory.items.length;
+				player.inventory.select(
+					newSelection >= 0
+						? newSelection
+						: player.inventory.items.length - newSelection - 2,
+				);
+				this.buttonCooldown.set(key, this.game.ticks + 20);
+			}
+		} else {
+			const key = gamepad.index | (4 << 8);
+			this.buttonCooldown.delete(key);
+		}
+		if (gamepad.buttons[15]?.pressed) {
+			const key = gamepad.index | (5 << 8);
+			const cooldown = this.buttonCooldown.get(key) || 0;
+			if (cooldown < this.game.ticks) {
+				const newSelection =
+					(player.inventory.selection + 1) % player.inventory.items.length;
+				player.inventory.select(
+					newSelection >= 0
+						? newSelection
+						: player.inventory.items.length - newSelection - 2,
+				);
+				this.buttonCooldown.set(key, this.game.ticks + 20);
+			}
+		} else {
+			const key = gamepad.index | (5 << 8);
+			this.buttonCooldown.delete(key);
+		}
+		if (gamepad.buttons[8]?.pressed) {
+			player.noClip = true;
+		}
+		if (gamepad.buttons[9]?.pressed) {
+			player.noClip = false;
 		}
 
-		if (actions.primary) {
+		if (gamepad.buttons[7]?.pressed) {
+			if (!gamepad.buttons[7].value || gamepad.buttons[7].value > 0.5) {
+				state.primary = true;
+			}
+		}
+		if (gamepad.buttons[6]?.pressed) {
+			if (!gamepad.buttons[6].value || gamepad.buttons[6].value > 0.5) {
+				state.secondary = true;
+			}
+		}
+		//console.log(gamepad.buttons.map((b,i) => b.pressed ? `${i}: ${b.value}` : '').join(' '));
+	}
+
+	update() {
+		const state = new ControlState();
+		this.updateKeyboard(state);
+		this.updateMouse(state);
+
+		const player = this.game.player;
+
+		for (const gamepad of navigator.getGamepads()) {
+			if (gamepad) {
+				this.updateGamepad(state, player, gamepad);
+			}
+		}
+
+		if (player.noClip) {
+			const speed = state.sprint ? 1.5 : 0.3;
+			player.fly(state.x * speed, state.y * speed, state.z * speed);
+		} else {
+			this.game.render.camera.moveEntity(state.x, state.y, state.z, 0.4);
+			if (!this.didDash && state.sprint) {
+				this.didDash = true;
+				this.game.player.dash();
+			}
+		}
+		if (!state.sprint) {
+			this.didDash = false;
+		}
+		if (state.primary) {
 			this.game.player.primaryAction();
 		}
-		if (actions.secondary) {
+		if (state.secondary) {
 			this.game.player.secondaryAction();
 		}
 	}
