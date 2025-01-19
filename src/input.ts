@@ -311,11 +311,11 @@ export class InputManager {
 		}
 
 		if (gamepad.buttons[4]?.pressed) {
-			state.hotBar2 = true;
+			state.hotBar4 = true;
 		}
 
 		if (gamepad.buttons[5]?.pressed) {
-			state.hotBar4 = true;
+			state.hotBar2 = true;
 		}
 
 		if (gamepad.buttons[7]?.pressed) {
