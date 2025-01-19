@@ -275,7 +275,6 @@ export class FloatingIslandsWorldGen extends WorldGen {
 							y++;
 							const chunk = world.getOrGenChunk(x, y, z);
 							StaticObject.create(type, chunk, x | 0, y | 0, z | 0);
-							//}
 						}
 						break;
 					}
