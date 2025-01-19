@@ -177,7 +177,7 @@ export class Character extends Being {
 				if (!this.mayJump()) {
 					this.remainingAirActions--;
 				}
-				this.vy = 0.2;
+				this.vy = 0.3;
 				this.jumpStart = this.world.game.ticks;
 				this.justJumped = true;
 				this.world.game.render.particle.fxJump(this.x, this.y - 0.5, this.z);

@@ -14,6 +14,8 @@ export class ControlState {
 	sprint = false;
 	primary = false;
 	secondary = false;
+
+	usedGamepad = false;
 }
 
 export class InputManager {
@@ -250,6 +252,7 @@ export class InputManager {
 			if (len > 0.16) {
 				state.x = gamepad.axes[0];
 				state.z = gamepad.axes[1];
+				state.usedGamepad = true;
 			}
 		}
 		if (gamepad.axes.length >= 4) {
@@ -266,11 +269,11 @@ export class InputManager {
 		if (gamepad.buttons[0]?.pressed) {
 			state.y = 1;
 		}
-		if (gamepad.buttons[2]?.pressed) {
-			state.y = -1;
-		}
-		if (gamepad.buttons[4]?.pressed || gamepad.buttons[5]?.pressed) {
+		if (gamepad.buttons[1]?.pressed) {
 			state.sprint = true;
+		}
+		if (gamepad.buttons[2]?.pressed) {
+			state.primary = true;
 		}
 		if (gamepad.buttons[14]?.pressed) {
 			const key = gamepad.index | (4 << 8);
@@ -343,7 +346,13 @@ export class InputManager {
 			const speed = state.sprint ? 1.5 : 0.3;
 			player.fly(state.x * speed, state.y * speed, state.z * speed);
 		} else {
-			this.game.render.camera.moveEntity(state.x, state.y, state.z, 0.4);
+			this.game.render.camera.moveEntity(
+				state.x,
+				state.y,
+				state.z,
+				0.4,
+				state.usedGamepad,
+			);
 			if (!this.didDash && state.sprint) {
 				this.didDash = true;
 				this.game.player.dash();

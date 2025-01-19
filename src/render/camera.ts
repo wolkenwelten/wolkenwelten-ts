@@ -53,17 +53,28 @@ export class Camera {
 			this.shakeIntensity = 0;
 		}
 		const v = this.entityToFollow.getVelocity();
-		const goalDistance = 2.5 + Math.max(0, Math.min(v * 4 * (v * 4), 4));
-		this.distance = this.distance * 0.96 + goalDistance * 0.04;
+		const goalDistance = 6 + Math.max(0, Math.min(v * 6 * (v * 6), 4));
+		this.distance = this.distance * 0.98 + goalDistance * 0.02;
 	}
 
-	moveEntity(ox: number, oy: number, oz: number, speed: number) {
+	moveEntity(
+		ox: number,
+		oy: number,
+		oz: number,
+		speed: number,
+		rotateCam = false,
+	) {
 		let s = 0;
 		if (ox || oz) {
 			const p = Math.atan2(oz, -ox) + Math.PI / 2;
 			const goal = closestRadian(this.entityToFollow.yaw, p + this.yaw);
-			this.entityToFollow.yaw = this.entityToFollow.yaw * 0.7 + goal * 0.3;
+			const r = this.entityToFollow.mayJump() ? 0.75 : 0.97;
+			this.entityToFollow.yaw = this.entityToFollow.yaw * r + goal * (1 - r);
 			s = -speed;
+
+			if (rotateCam) {
+				this.yaw -= ox * 0.015;
+			}
 		}
 
 		this.entityToFollow.move(0, oy, s);

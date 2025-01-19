@@ -48,6 +48,10 @@ export class Entity {
 		this.world.removeEntity(this);
 	}
 
+	mayJump(): boolean {
+		return this.world.isSolid(this.x, this.y - 1.7, this.z);
+	}
+
 	walkDirection(): [number, number] {
 		const x = Math.sin(this.yaw);
 		const z = Math.cos(this.yaw);
