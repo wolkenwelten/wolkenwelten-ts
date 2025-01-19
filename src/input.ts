@@ -213,7 +213,7 @@ export class InputManager {
 		if (this.keyStates.has("KeyQ")) {
 			state.hotBar1 = true;
 		}
-		if (this.keyStates.has("Digt1")) {
+		if (this.keyStates.has("Digit1")) {
 			state.hotBar2 = true;
 		}
 		if (this.keyStates.has("KeyE")) {
