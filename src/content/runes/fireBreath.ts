@@ -20,9 +20,10 @@ export class FireBreath extends Rune {
 		let firesSpawned = 0;
 		e.stepIntoDirection((x, y, z) => {
 			i++;
-			const b = e.world.getBlock(x, y, z);
-			if (!b) {
-				if (i > 4) {
+			const b = e.world.getBlock(x, y, z) || 0;
+			const bt = e.world.blocks[b];
+			if (!b || bt.miningCat === "Axe") {
+				if (i > 3) {
 					e.world.fire.add(x, y, z, 4096);
 					firesSpawned++;
 					e.world.game.audio.playAtPosition("bomb", 0.1, [x, y, z]);
@@ -42,5 +43,9 @@ export class FireBreath extends Rune {
 		this.world.game.render.camera.shake(1);
 		e.cooldown(100);
 		e.hitAnimation = this.world.game.render.frames;
+		const [vx, vz] = e.walkDirection();
+		e.vy += 0.1;
+		e.vx += vx * 0.6;
+		e.vz += vz * 0.6;
 	}
 }

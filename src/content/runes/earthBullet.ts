@@ -52,7 +52,7 @@ export class EarthBullet extends Rune {
 		}
 		for (let i = 0; i < 12; i++) {
 			const pitchDelta = (i / 2) * Math.PI * 0.05 * ((i & 1) * 2 - 1);
-			const ray = e.raycast(false, pitchDelta, 64);
+			const ray = e.raycast(false, pitchDelta - 0.3, 64);
 			if (!ray) {
 				continue;
 			}

@@ -27,7 +27,7 @@ export class Comet extends Rune {
 		const frame = e.world.game.render.frames;
 		const decals = e.world.game.render.decals;
 		if (this.lastUseFrameCount !== frame) {
-			const ray = e.raycast(false);
+			const ray = e.raycast(false, -0.2);
 			if (ray) {
 				const [x, y, z] = ray;
 				const dx = x - e.x;
@@ -37,7 +37,11 @@ export class Comet extends Rune {
 				if (dd > this.range * this.range) {
 					return;
 				}
-				decals.addBlock(x, y, z, 0, 2);
+				for (let ox = -4; ox < 5; ox++) {
+					for (let oz = -4; oz < 5; oz++) {
+						decals.addBlock(x + ox, y, z + oz, 0, 2);
+					}
+				}
 				this.lastUseFrameCount = frame;
 			}
 		}
@@ -47,7 +51,12 @@ export class Comet extends Rune {
 		if (e.isOnCooldown()) {
 			return;
 		}
-		const ray = e.raycast(false);
+		if (this.lastUseFrameCount < 0) {
+			return;
+		}
+		this.lastUseFrameCount = -1;
+
+		const ray = e.raycast(false, -0.2);
 		if (ray) {
 			const [x, y, z] = ray;
 			const dx = x - e.x;
@@ -57,10 +66,10 @@ export class Comet extends Rune {
 			if (dd > this.range * this.range) {
 				return;
 			}
-			for (let i = 0; i < 12; i++) {
+			for (let i = 0; i < 48; i++) {
 				const comet = new CometEntity(e.world, 4, e);
 				const ox = (Math.random() - 0.5) * 6;
-				const oy = Math.random() * 24;
+				const oy = Math.random() * 192;
 				const oz = (Math.random() - 0.5) * 6;
 				comet.x = x + 1 + ox;
 				comet.y = y + 96 + oy;

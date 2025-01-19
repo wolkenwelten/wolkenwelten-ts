@@ -30,7 +30,7 @@ export class EarthWall extends Rune {
 	private lastUseFrameCount = -1;
 
 	private getWallSelection(e: Character) {
-		const ray = e.raycast(false);
+		const ray = e.raycast(false, -0.5);
 		if (!ray) {
 			return [];
 		}
@@ -111,6 +111,7 @@ export class EarthWall extends Rune {
 		if (e.isOnCooldown()) {
 			return;
 		}
+
 		const frame = e.world.game.render.frames;
 		const decals = e.world.game.render.decals;
 		if (this.lastUseFrameCount !== frame) {
@@ -131,6 +132,12 @@ export class EarthWall extends Rune {
 		if (selection.length === 0) {
 			return;
 		}
+
+		if (this.lastUseFrameCount < 0) {
+			return;
+		}
+		this.lastUseFrameCount = -1;
+
 		for (const b of selection) {
 			this.world.setBlock(b.from[0], b.from[1], b.from[2], 0);
 			this.world.dangerZone.add(
@@ -222,7 +229,7 @@ export class EarthWallBlock extends Entity {
 
 	update() {
 		super.update();
-		const t = easeOutSine(++this.ticksActive * 0.025);
+		const t = easeOutSine(++this.ticksActive * 0.05);
 		this.pitch = t * Math.PI;
 		if (t >= 0.99) {
 			this.world.setBlock(this.to[0], this.to[1], this.to[2], this.blockType);

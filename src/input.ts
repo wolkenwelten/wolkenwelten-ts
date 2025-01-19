@@ -16,6 +16,11 @@ export class ControlState {
 	secondary = false;
 
 	usedGamepad = false;
+
+	hotBar1 = false;
+	hotBar2 = false;
+	hotBar3 = false;
+	hotBar4 = false;
 }
 
 export class InputManager {
@@ -28,6 +33,7 @@ export class InputManager {
 	buttonCooldown: Map<number, number> = new Map();
 	hotbarKeys: string[] = [];
 	didDash = false;
+	lastState: ControlState = new ControlState();
 
 	constructor(game: Game) {
 		this.game = game;
@@ -85,26 +91,6 @@ export class InputManager {
 				that.game.ui.chat.show();
 			}
 		});
-
-		for (let i = 0; i < 10; i++) {
-			const hotbarKey = `Digit${(i + 1) % 10}`;
-			this.hotbarKeys[i] = hotbarKey;
-			this.keyPushHandler.set(hotbarKey, () => {
-				const item = that.game.player.inventory.items[i];
-				if (item === undefined) {
-					return;
-				}
-				item.use(that.game.player);
-			});
-
-			this.keyReleaseHandler.set(hotbarKey, () => {
-				const item = that.game.player.inventory.items[i];
-				if (item === undefined) {
-					return;
-				}
-				item.useRelease(that.game.player);
-			});
-		}
 
 		if (isClient()) {
 			that.game.render.canvasWrapper.addEventListener(
@@ -223,10 +209,18 @@ export class InputManager {
 		if (this.keyStates.has("KeyP")) {
 			this.game.player.respawn();
 		}
-		for (let i = 0; i < 10; i++) {
-			if (this.keyStates.has(this.hotbarKeys[i])) {
-				this.game.ui.hotbar.use(i);
-			}
+
+		if (this.keyStates.has("KeyQ")) {
+			state.hotBar1 = true;
+		}
+		if (this.keyStates.has("Digt1")) {
+			state.hotBar2 = true;
+		}
+		if (this.keyStates.has("KeyE")) {
+			state.hotBar3 = true;
+		}
+		if (this.keyStates.has("Digit3")) {
+			state.hotBar4 = true;
 		}
 	}
 
@@ -316,17 +310,33 @@ export class InputManager {
 			player.noClip = false;
 		}
 
+		if (gamepad.buttons[4]?.pressed) {
+			state.hotBar2 = true;
+		}
+
+		if (gamepad.buttons[5]?.pressed) {
+			state.hotBar4 = true;
+		}
+
 		if (gamepad.buttons[7]?.pressed) {
-			if (!gamepad.buttons[7].value || gamepad.buttons[7].value > 0.5) {
-				state.primary = true;
+			if (!gamepad.buttons[7].value || gamepad.buttons[7].value > 0.3) {
+				state.hotBar1 = true;
 			}
 		}
 		if (gamepad.buttons[6]?.pressed) {
-			if (!gamepad.buttons[6].value || gamepad.buttons[6].value > 0.5) {
-				state.secondary = true;
+			if (!gamepad.buttons[6].value || gamepad.buttons[6].value > 0.3) {
+				state.hotBar3 = true;
 			}
 		}
 		//console.log(gamepad.buttons.map((b,i) => b.pressed ? `${i}: ${b.value}` : '').join(' '));
+	}
+
+	private hotBarUse(i: number) {
+		this.game.player.inventory.items[i]?.use(this.game.player);
+	}
+
+	private hotBarRelease(i: number) {
+		this.game.player.inventory.items[i]?.useRelease(this.game.player);
 	}
 
 	update() {
@@ -367,5 +377,33 @@ export class InputManager {
 		if (state.secondary) {
 			this.game.player.secondaryAction();
 		}
+
+		if (state.hotBar1) {
+			this.hotBarUse(0);
+		}
+		if (state.hotBar2) {
+			this.hotBarUse(1);
+		}
+		if (state.hotBar3) {
+			this.hotBarUse(2);
+		}
+		if (state.hotBar4) {
+			this.hotBarUse(3);
+		}
+
+		if (!state.hotBar1) {
+			this.hotBarRelease(0);
+		}
+		if (!state.hotBar2) {
+			this.hotBarRelease(1);
+		}
+		if (!state.hotBar3) {
+			this.hotBarRelease(2);
+		}
+		if (!state.hotBar4) {
+			this.hotBarRelease(3);
+		}
+
+		this.lastState = state;
 	}
 }

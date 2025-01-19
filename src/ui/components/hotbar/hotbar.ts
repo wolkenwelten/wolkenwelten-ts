@@ -9,6 +9,8 @@ import styles from "./hotbar.module.css";
 
 export type HotbarEntryValue = Item | undefined;
 
+const SLOT_KEYS = ["Q", "1", "E", "3"];
+
 export class HotbarEntry {
 	i: number;
 	slot: HTMLElement;
@@ -23,7 +25,7 @@ export class HotbarEntry {
 			(this.slot = Div({
 				class: styles.hotbarSlot,
 				attributes: {
-					"slot-index": String((i + 1) % 10),
+					"slot-index": SLOT_KEYS[i],
 				},
 				onMousedown: (e) => e.stopPropagation(),
 				onClick: this.click.bind(this),
@@ -72,7 +74,7 @@ export class Hotbar {
 
 	constructor(parent: HTMLElement, game: Game) {
 		this.div = Div({ class: styles.hotbar });
-		for (let i = 0; i < 10; i++) {
+		for (let i = 0; i < 4; i++) {
 			this.entries[i] = new HotbarEntry(this.div, game, i);
 		}
 		parent.appendChild(this.div);
