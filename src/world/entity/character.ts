@@ -44,6 +44,9 @@ export class Character extends Being {
 	maxHealth = 24;
 	isDead = false;
 
+	repulsionMultiplier = 1;
+	lastRepulsionMultiplierIncrease = -1;
+
 	weight = 70;
 
 	equipment: Inventory;
@@ -78,6 +81,7 @@ export class Character extends Being {
 		this.lastAction = 0;
 		this.vx = this.vy = this.vz = 0;
 		this.movementX = this.movementY = this.movementZ = 0;
+		this.repulsionMultiplier = 1;
 
 		this?.world?.game?.render?.camera?.stop();
 		this.effects.clear();
@@ -119,15 +123,13 @@ export class Character extends Being {
 
 	/* Damage a character by a certain value, will change in the future to take a Damage argument instead */
 	damage(rawAmount: number) {
-		this.health = Math.min(
-			this.maxHealth,
-			Math.max(0, this.health - rawAmount),
-		);
-		if (this.health <= 0) {
-			if (!this.isDead) {
-				this.isDead = true;
-				this.onDeath();
-			}
+		this.repulsionMultiplier += rawAmount * 0.05;
+		this.lastRepulsionMultiplierIncrease = this.world.game.ticks;
+	}
+
+	private autoDecreaseRepulsionMultiplier() {
+		if (this.lastRepulsionMultiplierIncrease < this.world.game.ticks - 500) {
+			this.repulsionMultiplier = Math.max(1, this.repulsionMultiplier - 0.0001);
 		}
 	}
 
@@ -370,6 +372,7 @@ export class Character extends Being {
 			this.vz *= v;
 		}
 		super.update();
+		this.autoDecreaseRepulsionMultiplier();
 
 		this.x += this.vx;
 		this.y += this.vy;

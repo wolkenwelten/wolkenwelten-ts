@@ -20,6 +20,11 @@ export class Sky {
 
 	draw(p: mat4, v: mat4) {
 		mat4.multiply(mvp, p, v);
+		const gl = this.renderer.gl;
+		gl.disable(gl.DEPTH_TEST);
+		gl.depthMask(false);
 		this.mesh.draw(mvp);
+		gl.depthMask(true);
+		gl.enable(gl.DEPTH_TEST);
 	}
 }

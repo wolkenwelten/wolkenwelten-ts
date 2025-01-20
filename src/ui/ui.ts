@@ -11,6 +11,7 @@ import { PlayerModal } from "./components/playerModal/playerModal";
 import { SystemLog } from "./components/systemLog";
 import { IconManager } from "./icon";
 import { isClient, mockElement } from "../util/compat";
+import { RepulsionMultiplier } from "./components/repulsionMultiplier";
 
 export class UIManager {
 	game: Game;
@@ -24,6 +25,7 @@ export class UIManager {
 	log: SystemLog;
 	introWindow: IntroWindow;
 	chat: ChatPanel;
+	repulsionMultiplier: RepulsionMultiplier;
 
 	rootHasPaused = false;
 
@@ -44,6 +46,7 @@ export class UIManager {
 		this.hotbar = new Hotbar(this.uiWrapper, game);
 		this.introWindow = new IntroWindow(this.uiWrapper, game);
 		this.chat = new ChatPanel(this.uiWrapper, game);
+		this.repulsionMultiplier = new RepulsionMultiplier(this.uiWrapper, game);
 	}
 
 	updateInventory(i = -1) {
@@ -64,5 +67,6 @@ export class UIManager {
 		}
 		this.hotbar.update();
 		this.healthBar.update(this.game.player.health, this.game.player.maxHealth);
+		this.repulsionMultiplier.update();
 	}
 }

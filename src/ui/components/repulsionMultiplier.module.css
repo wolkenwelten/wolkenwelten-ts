@@ -1,0 +1,8 @@
+.repulsion {
+	position: absolute;
+	top: 8px;
+	left: 8px;
+	color: white;
+	font-size: 2.4rem;
+	font-family: system-ui, sans-serif;
+}

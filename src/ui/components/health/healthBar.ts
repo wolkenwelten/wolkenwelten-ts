@@ -21,6 +21,7 @@ export class HealthBar {
 	}
 
 	update(health: number, maxHealth: number) {
+		return;
 		if (this.maxHealth !== maxHealth) {
 			const heartCount = Math.ceil(maxHealth / 4);
 			for (let i = this.hearts.length; i < heartCount; i++) {
