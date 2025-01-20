@@ -235,6 +235,10 @@ export class Character extends Being {
 			return;
 		}
 
+		if (this.y < 800) {
+			this.die();
+		}
+
 		if (this.noClip) {
 			this.vx = this.vy = this.vz = 0;
 			this.x += this.movementX;

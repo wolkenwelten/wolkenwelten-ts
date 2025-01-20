@@ -36,9 +36,13 @@ export abstract class Being extends Entity {
 			Math.min(this.health - rawAmount, this.maxHealth),
 		);
 		if (this.health <= 0) {
-			this.isDead = true;
-			this.onDeath();
+			this.die();
 		}
+	}
+
+	die() {
+		this.isDead = true;
+		this.onDeath();
 	}
 
 	heal(rawAmount: number): void {
