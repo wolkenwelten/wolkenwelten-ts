@@ -87,7 +87,7 @@ export class EarthBullet extends Rune {
 		const dz = e.z - this.bulletEntity.z;
 		const d = Math.sqrt(dx * dx + dy * dy + dz * dz);
 		const vel = Math.max(0.1, Math.min(0.5, 1 - d * 0.1));
-		const [vx, vy, vz] = e.direction(0, 0, -2, vel);
+		const [vx, vy, vz] = e.direction(0, 0.2, -2, vel);
 		this.bulletEntity.shotX = this.bulletEntity.vx = vx;
 		this.bulletEntity.shotY = this.bulletEntity.vy = vy;
 		this.bulletEntity.shotZ = this.bulletEntity.vz = vz;
