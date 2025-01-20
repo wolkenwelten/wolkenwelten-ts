@@ -188,7 +188,7 @@ export class EarthBulletEntity extends Entity {
 			const dy = goalY - this.y;
 			const dz = goalZ - this.z;
 			const dd = dx * dx + dy * dy + dz * dz;
-			const vmax = dd * 0.02;
+			const vmax = dd * 0.2;
 
 			const dn = Math.max(Math.abs(dx), Math.abs(dy), Math.abs(dz));
 			this.vx += (dx / dn) * 0.02;
