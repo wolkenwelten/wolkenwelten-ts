@@ -135,6 +135,24 @@ export class Entity {
 		return [nox * vel, noy * vel, noz * vel];
 	}
 
+	dircast(range: number, maxYOffset = 4): [number, number, number] {
+		const [dx, dy, dz] = this.direction(0, 0, -1, 1.0 / 4.0);
+		let x = this.x;
+		let y = this.y;
+		let z = this.z;
+
+		x = Math.floor(x + dx * range * 4);
+		y = Math.floor(y + dy * range * 4);
+		z = Math.floor(z + dz * range * 4);
+
+		for (let yOff = maxYOffset - 1; yOff > -maxYOffset; yOff--) {
+			if (this.world.isSolid(x, y + yOff, z)) {
+				return [x, y + yOff, z];
+			}
+		}
+		return [x, y, z];
+	}
+
 	/* Cast a ray into the direction the Entity is facing and return the world coordinates of either the block, or
 	 * the location immediatly in front of the block (useful when placing blocks)
 	 */

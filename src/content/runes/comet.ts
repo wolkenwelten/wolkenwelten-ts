@@ -18,32 +18,28 @@ export class Comet extends Rune {
 	meshUrl = meshUrl;
 
 	private lastUseFrameCount = -1;
-	range = 12;
+	range = 14;
+
+	private raycast(e: Character) {
+		return e.dircast(this.range, 4);
+	}
 
 	use(e: Character) {
 		if (e.isOnCooldown()) {
 			return;
 		}
+
 		const frame = e.world.game.render.frames;
-		const decals = e.world.game.render.decals;
 		if (this.lastUseFrameCount !== frame) {
-			const ray = e.raycast(false, -0.2);
-			if (ray) {
-				const [x, y, z] = ray;
-				const dx = x - e.x;
-				const dy = y - e.y;
-				const dz = z - e.z;
-				const dd = dx * dx + dy * dy + dz * dz;
-				if (dd > this.range * this.range) {
-					return;
+			const [x, y, z] = this.raycast(e);
+
+			const decals = e.world.game.render.decals;
+			for (let ox = -4; ox < 5; ox++) {
+				for (let oz = -4; oz < 5; oz++) {
+					decals.addBlock(x + ox, y, z + oz, 0, 2);
 				}
-				for (let ox = -4; ox < 5; ox++) {
-					for (let oz = -4; oz < 5; oz++) {
-						decals.addBlock(x + ox, y, z + oz, 0, 2);
-					}
-				}
-				this.lastUseFrameCount = frame;
 			}
+			this.lastUseFrameCount = frame;
 		}
 	}
 
@@ -56,28 +52,18 @@ export class Comet extends Rune {
 		}
 		this.lastUseFrameCount = -1;
 
-		const ray = e.raycast(false, -0.2);
-		if (ray) {
-			const [x, y, z] = ray;
-			const dx = x - e.x;
-			const dy = y - e.y;
-			const dz = z - e.z;
-			const dd = dx * dx + dy * dy + dz * dz;
-			if (dd > this.range * this.range) {
-				return;
-			}
-			for (let i = 0; i < 48; i++) {
-				const comet = new CometEntity(e.world, 4, e);
-				const ox = (Math.random() - 0.5) * 6;
-				const oy = Math.random() * 192;
-				const oz = (Math.random() - 0.5) * 6;
-				comet.x = x + 1 + ox;
-				comet.y = y + 96 + oy;
-				comet.z = z + 1 + oz;
-				comet.vy = -1;
-				comet.vx = (Math.random() - 0.5) * 0.1;
-				comet.vz = (Math.random() - 0.5) * 0.1;
-			}
+		const [x, y, z] = this.raycast(e);
+		for (let i = 0; i < 48; i++) {
+			const comet = new CometEntity(e.world, 4, e);
+			const ox = (Math.random() - 0.5) * 6;
+			const oy = Math.random() * 256;
+			const oz = (Math.random() - 0.5) * 6;
+			comet.x = x + 1 + ox;
+			comet.y = y + 96 + oy;
+			comet.z = z + 1 + oz;
+			comet.vy = -1;
+			comet.vx = (Math.random() - 0.5) * 0.05;
+			comet.vz = (Math.random() - 0.5) * 0.05;
 		}
 		e.cooldown(128);
 	}

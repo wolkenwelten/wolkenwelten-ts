@@ -257,11 +257,7 @@ export class Texture {
 				this.gl.TEXTURE_MIN_FILTER,
 				this.gl.NEAREST_MIPMAP_LINEAR,
 			);
-			this.gl.texParameteri(
-				target,
-				this.gl.TEXTURE_MAG_FILTER,
-				this.gl.NEAREST_MIPMAP_LINEAR,
-			);
+			this.gl.texParameteri(target, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
 		} else {
 			this.gl.texParameteri(target, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
 			this.gl.texParameteri(target, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);

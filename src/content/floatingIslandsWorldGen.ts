@@ -221,14 +221,14 @@ export class FloatingIslandsWorldGen extends WorldGen {
 								let asset: WorldGenAsset | undefined;
 								let oy = -1;
 
-								if (hasTrees && roll < 0.2) {
+								if (hasTrees && roll < 0.05) {
 									asset = lcg.bool()
 										? this.assets.treeA
 										: lcg.bool()
 											? this.assets.treeB
 											: this.assets.treeC;
 									oy = -4;
-								} else if (hasSpruce && roll < 0.3) {
+								} else if (hasSpruce && roll < 0.1) {
 									asset = this.assets.spruceA;
 								} else if (hasBushes && roll < 0.7) {
 									asset = lcg.bool()

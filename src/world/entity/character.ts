@@ -128,6 +128,9 @@ export class Character extends Being {
 	}
 
 	private autoDecreaseRepulsionMultiplier() {
+		if (this.repulsionMultiplier === 1) {
+			return;
+		}
 		if (this.lastRepulsionMultiplierIncrease < this.world.game.ticks - 500) {
 			this.repulsionMultiplier = Math.max(1, this.repulsionMultiplier - 0.0001);
 		}
