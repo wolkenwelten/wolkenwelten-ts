@@ -26,6 +26,7 @@ export class World {
 	blocks: BlockType[] = [];
 	blockTextureUrl = "";
 	worldgenHandler?: WorldGen;
+	bottomOfTheWorld = 0;
 
 	constructor(game: Game) {
 		this.seed = 1234;

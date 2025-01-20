@@ -240,7 +240,7 @@ export class Character extends Being {
 			return;
 		}
 
-		if (this.y < 800) {
+		if (this.y < this.world.bottomOfTheWorld) {
 			this.die();
 		}
 
