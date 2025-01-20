@@ -18,6 +18,7 @@ export class Texture {
 	readonly texture: WebGLTexture;
 	readonly type: "2D" | "2DArray" | "LUT";
 	readonly gl: WebGL2RenderingContext;
+	linearInterpolation = false;
 	hasMipmap = false;
 	colors: number[] = [];
 	dirtyLUT = false;
@@ -69,7 +70,11 @@ export class Texture {
 				gl.generateMipmap(gl.TEXTURE_2D);
 				that.hasMipmap = true;
 			}
-			that.nearest();
+			if (that.linearInterpolation) {
+				that.linear();
+			} else {
+				that.nearest();
+			}
 			that.clamp();
 			texturesLoaded++;
 		};
@@ -130,7 +135,11 @@ export class Texture {
 				gl.generateMipmap(gl.TEXTURE_2D_ARRAY);
 				that.hasMipmap = true;
 			}
-			that.nearest();
+			if (that.linearInterpolation) {
+				that.linear();
+			} else {
+				that.nearest();
+			}
 			that.repeat();
 		};
 		lastBoundTexture[activeTextureUnit] = this;
@@ -240,6 +249,7 @@ export class Texture {
 
 	linear() {
 		this.bind();
+		this.linearInterpolation = true;
 		const target = this.target();
 		if (this.hasMipmap) {
 			this.gl.texParameteri(

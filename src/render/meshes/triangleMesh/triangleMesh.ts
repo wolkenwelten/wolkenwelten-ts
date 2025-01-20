@@ -149,6 +149,45 @@ export class TriangleMesh {
 		}
 	}
 
+	addInverseSphere(radius: number = 100, segments: number = 12) {
+		// We'll use fewer segments since it's a sky sphere and doesn't need high detail
+		const latitudeBands = segments;
+		const longitudeBands = segments * 2;
+
+		for (let latNumber = 0; latNumber < latitudeBands; latNumber++) {
+			for (let longNumber = 0; longNumber < longitudeBands; longNumber++) {
+				// Calculate vertices for two triangles making up this quad
+				const positions = [
+					[latNumber, longNumber],
+					[latNumber, longNumber + 1],
+					[latNumber + 1, longNumber],
+					[latNumber + 1, longNumber],
+					[latNumber, longNumber + 1],
+					[latNumber + 1, longNumber + 1],
+				];
+
+				for (const [lat, long] of positions) {
+					const theta2 = (lat * Math.PI) / latitudeBands;
+					const phi2 = (long * 2 * Math.PI) / longitudeBands;
+
+					// Calculate vertex position (inverted for inside viewing)
+					const x = -radius * Math.sin(theta2) * Math.cos(phi2);
+					const y = -radius * Math.cos(theta2);
+					const z = -radius * Math.sin(theta2) * Math.sin(phi2);
+
+					// UV coordinates
+					const u = long / longitudeBands;
+					const v = lat / latitudeBands;
+
+					// Add vertex data (position, UV, and lightness)
+					this.vertices.push(x, y, z); // Position
+					this.vertices.push(u, v); // UV coordinates
+					this.vertices.push(1.0); // Lightness
+				}
+			}
+		}
+	}
+
 	finish() {
 		const gl = TriangleMesh.gl;
 

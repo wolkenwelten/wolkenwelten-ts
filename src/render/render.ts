@@ -19,6 +19,8 @@ import {
 	mockContextWebGL2,
 } from "../util/compat";
 import { Div } from "../ui/utils";
+import { TriangleMesh } from "./meshes/triangleMesh/triangleMesh";
+import { Sky } from "./sky";
 
 const projectionMatrix = mat4.create();
 const viewMatrix = mat4.create();
@@ -46,6 +48,7 @@ export class RenderManager {
 	particle: ParticleMesh;
 	camera: Camera;
 	world: WorldRenderer;
+	sky: Sky;
 
 	setPlatformDefaults() {
 		if (isServer()) {
@@ -90,7 +93,7 @@ export class RenderManager {
 		this.world = new WorldRenderer(this);
 		this.decals = new DecalMesh(this);
 		this.particle = new ParticleMesh(this);
-
+		this.sky = new Sky(this);
 		this.drawFrameClosure = this.drawFrame.bind(this);
 		this.generateMeshClosue = this.generateMesh.bind(this);
 		if (isClient()) {
@@ -135,14 +138,17 @@ export class RenderManager {
 			512.0,
 		);
 		this.camera.update();
+		this.camera.calcUntranslatedViewMatrix(viewMatrix);
+		this.sky.draw(projectionMatrix, viewMatrix);
 		this.camera.calcViewMatrix(this.game.ticks, viewMatrix);
 
 		this.gl.enable(this.gl.BLEND);
+
 		this.world.draw(projectionMatrix, viewMatrix, this.camera);
 		mat4.multiply(viewMatrix, projectionMatrix, viewMatrix);
 		this.decals.draw(viewMatrix);
-		this.gl.disable(this.gl.BLEND);
 		this.particle.draw(viewMatrix);
+		this.gl.disable(this.gl.BLEND);
 	}
 
 	resize() {

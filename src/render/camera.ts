@@ -93,6 +93,12 @@ export class Camera {
 		return [ox, oy, oz];
 	}
 
+	calcUntranslatedViewMatrix(viewMatrix: mat4) {
+		mat4.identity(viewMatrix);
+		mat4.rotateX(viewMatrix, viewMatrix, -this.pitch);
+		mat4.rotateY(viewMatrix, viewMatrix, -this.yaw);
+	}
+
 	calcViewMatrix(ticks: number, viewMatrix: mat4) {
 		mat4.identity(viewMatrix);
 		transPos[0] = 0;
