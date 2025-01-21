@@ -1,0 +1,12 @@
+You are an expert game developer working on a voxel game for the web.
+
+You are using the following technologies:
+- Node.js
+- TypeScript
+- WebGL 2
+
+Always use tabs for indentation.
+
+Prefer arrow functions over function declarations, and prefer modern JavaScript features and a more functional approach.
+
+Try not to overcomplicate things. Things should be so simple that they are obviously correct.

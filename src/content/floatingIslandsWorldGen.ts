@@ -295,7 +295,7 @@ export class FloatingIslandsWorldGen extends WorldGen {
 		size: number,
 		step: number,
 	) {
-		if (size < 8 || lcg.int(0, 6) < step) {
+		if (size < 5 || lcg.int(0, 6) < step) {
 			return;
 		}
 		for (let cx = x - size; cx < x + size; cx += 8) {
@@ -314,18 +314,35 @@ export class FloatingIslandsWorldGen extends WorldGen {
 			this.islandStep(
 				world,
 				lcg,
-				ox + lcg.int(size * -0.1, size * 0.1),
-				oy + lcg.int(size * -0.5, size * 0.5),
-				oz + lcg.int(size * -0.1, size * 0.1),
-				size + lcg.int(-20, 10),
+				ox + lcg.int(size * -0.2, size * 0.2),
+				oy + lcg.int(size * -0.3, size * 0.3),
+				oz + lcg.int(size * -0.2, size * 0.2),
+				size + lcg.int(-30, 30),
 				step + 1,
 			);
 		};
 
-		l(x + (size * 2 + size * 0.4), y, z);
-		l(x - (size * 2 + size * 0.4), y, z);
-		l(x, y, z + (size * 2 + size * 0.4));
-		l(x, y, z - (size * 2 + size * 0.4));
+		l(x + size * 2.2, y, z);
+		l(x - size * 2.2, y, z);
+		l(x, y, z + size * 2.2);
+		l(x, y, z - size * 2.2);
+
+		const ll = (ox: number, oy: number, oz: number) => {
+			this.islandStep(
+				world,
+				lcg,
+				ox + lcg.int(size * -0.1, size * 0.1),
+				oy + lcg.int(size * -0.1, size * 0.1),
+				oz + lcg.int(size * -0.1, size * 0.1),
+				size * 0.3 + lcg.int(-10, 10),
+				step + 1,
+			);
+		};
+
+		ll(x + size * 1.5, y, z + size * 1.5);
+		ll(x - size * 1.5, y, z - size * 1.5);
+		ll(x + size * 1.5, y, z - size * 1.5);
+		ll(x - size * 1.5, y, z + size * 1.5);
 	}
 
 	spawnPos(_player: Character): [number, number, number] {
