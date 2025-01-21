@@ -19,7 +19,6 @@ import {
 	mockContextWebGL2,
 } from "../util/compat";
 import { Div } from "../ui/utils";
-import { TriangleMesh } from "./meshes/triangleMesh/triangleMesh";
 import { Sky } from "./sky";
 
 const projectionMatrix = mat4.create();
