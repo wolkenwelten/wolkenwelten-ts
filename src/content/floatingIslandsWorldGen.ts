@@ -77,7 +77,7 @@ export class FloatingIslandsWorldGen extends WorldGen {
 		// First pass: Generate pointy stone core
 		const pointyHorizontalRadius = size;
 		const pointyVerticalRadius = pointyHorizontalRadius * 1.2;
-		const pointyCenterY = centerY - 2; // Position it lower for the pointy bottom
+		const pointyCenterY = centerY - 1; // Position it lower for the pointy bottom
 
 		let hasTrees = lcg.bool();
 		let hasSpruce = lcg.bool();
@@ -122,26 +122,21 @@ export class FloatingIslandsWorldGen extends WorldGen {
 			}
 		}
 
+		const dirtRadius = horizontalRadius * 1.1;
+		const dirtVerticalRadius = verticalRadius * 0.6;
+
 		// Second pass: Generate dirt layer
-		for (
-			let x = centerX - horizontalRadius;
-			x <= centerX + horizontalRadius;
-			x++
-		) {
+		for (let x = centerX - dirtRadius; x <= centerX + dirtRadius; x++) {
 			for (
-				let y = centerY - verticalRadius;
-				y <= centerY + verticalRadius;
+				let y = centerY - dirtVerticalRadius;
+				y <= centerY + dirtVerticalRadius;
 				y++
 			) {
-				for (
-					let z = centerZ - horizontalRadius;
-					z <= centerZ + horizontalRadius;
-					z++
-				) {
+				for (let z = centerZ - dirtRadius; z <= centerZ + dirtRadius; z++) {
 					const normalizedDist = Math.sqrt(
-						Math.pow((x - centerX) / horizontalRadius, 2) +
-							Math.pow((y - centerY) / verticalRadius, 2) +
-							Math.pow((z - centerZ) / horizontalRadius, 2),
+						Math.pow((x - centerX) / dirtRadius, 2) +
+							Math.pow((y - centerY) / dirtVerticalRadius, 2) +
+							Math.pow((z - centerZ) / dirtRadius, 2),
 					);
 
 					if (normalizedDist <= 1) {
@@ -152,19 +147,11 @@ export class FloatingIslandsWorldGen extends WorldGen {
 		}
 
 		// Fourth pass: Convert top layer to grass
-		for (
-			let x = centerX - horizontalRadius;
-			x <= centerX + horizontalRadius;
-			x++
-		) {
-			for (
-				let z = centerZ - horizontalRadius;
-				z <= centerZ + horizontalRadius;
-				z++
-			) {
+		for (let x = centerX - dirtRadius; x <= centerX + dirtRadius; x++) {
+			for (let z = centerZ - dirtRadius; z <= centerZ + dirtRadius; z++) {
 				for (
-					let y = centerY + verticalRadius;
-					y >= centerY - verticalRadius;
+					let y = centerY + dirtVerticalRadius;
+					y >= centerY - dirtVerticalRadius;
 					y--
 				) {
 					if (world.getBlock(x, y, z) === 1) {
