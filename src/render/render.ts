@@ -20,6 +20,7 @@ import {
 } from "../util/compat";
 import { Div } from "../ui/utils";
 import { Sky } from "./sky";
+import { CloudMesh } from "./meshes/cloudMesh/cloudMesh";
 
 const projectionMatrix = mat4.create();
 const viewMatrix = mat4.create();
@@ -48,6 +49,7 @@ export class RenderManager {
 	camera: Camera;
 	world: WorldRenderer;
 	sky: Sky;
+	clouds: CloudMesh;
 
 	setPlatformDefaults() {
 		if (isServer()) {
@@ -93,6 +95,7 @@ export class RenderManager {
 		this.decals = new DecalMesh(this);
 		this.particle = new ParticleMesh(this);
 		this.sky = new Sky(this);
+		this.clouds = new CloudMesh();
 		this.drawFrameClosure = this.drawFrame.bind(this);
 		this.generateMeshClosue = this.generateMesh.bind(this);
 		if (isClient()) {
@@ -142,6 +145,13 @@ export class RenderManager {
 		this.camera.calcViewMatrix(this.game.ticks, viewMatrix);
 
 		this.gl.enable(this.gl.BLEND);
+		this.clouds.drawLayers(
+			projectionMatrix,
+			viewMatrix,
+			this.game.player.x,
+			this.game.world.bottomOfTheWorld,
+			this.game.player.z,
+		);
 
 		this.world.draw(projectionMatrix, viewMatrix, this.camera);
 		mat4.multiply(viewMatrix, projectionMatrix, viewMatrix);

@@ -18,6 +18,7 @@ import { ParticleMesh } from "./meshes/particleMesh/particleMesh";
 import { TriangleMesh } from "./meshes/triangleMesh/triangleMesh";
 import { VoxelMesh } from "./meshes/voxelMesh/voxelMesh";
 import { Texture } from "./texture";
+import { CloudMesh } from "./meshes/cloudMesh/cloudMesh";
 
 export class AssetList {
 	game: Game;
@@ -72,6 +73,7 @@ export class AssetList {
 		this.game = game;
 		this.gl = gl;
 		BlockMesh.init(game, gl);
+		CloudMesh.init(gl);
 		DecalMesh.init(gl);
 		TriangleMesh.init(gl);
 		ParticleMesh.init(gl);

@@ -351,7 +351,7 @@ export class FloatingIslandsWorldGen extends WorldGen {
 
 	preGen(world: World) {
 		const lcg = new LCG(world.seed);
-		world.bottomOfTheWorld = 800;
+		world.bottomOfTheWorld = 900;
 
 		this.islandStep(world, lcg, 1000, 1000, 1000, 50, 0);
 	}

@@ -188,6 +188,42 @@ export class TriangleMesh {
 		}
 	}
 
+	addPlane(
+		width: number = 1,
+		height: number = 1,
+		segmentsX: number = 1,
+		segmentsZ: number = 1,
+	) {
+		const halfWidth = width / 2;
+		const halfHeight = height / 2;
+
+		for (let z = 0; z < segmentsZ; z++) {
+			for (let x = 0; x < segmentsX; x++) {
+				// Calculate vertex positions for this grid cell
+				const x1 = (x / segmentsX) * width - halfWidth;
+				const x2 = ((x + 1) / segmentsX) * width - halfWidth;
+				const z1 = (z / segmentsZ) * height - halfHeight;
+				const z2 = ((z + 1) / segmentsZ) * height - halfHeight;
+
+				// Calculate UV coordinates
+				const u1 = x / segmentsX;
+				const u2 = (x + 1) / segmentsX;
+				const v1 = z / segmentsZ;
+				const v2 = (z + 1) / segmentsZ;
+
+				// First triangle
+				this.vertices.push(x1, 0, z1, u1, v1, 1.0);
+				this.vertices.push(x2, 0, z1, u2, v1, 1.0);
+				this.vertices.push(x1, 0, z2, u1, v2, 1.0);
+
+				// Second triangle
+				this.vertices.push(x2, 0, z1, u2, v1, 1.0);
+				this.vertices.push(x2, 0, z2, u2, v2, 1.0);
+				this.vertices.push(x1, 0, z2, u1, v2, 1.0);
+			}
+		}
+	}
+
 	finish() {
 		const gl = TriangleMesh.gl;
 

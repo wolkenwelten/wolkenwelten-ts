@@ -19,6 +19,7 @@ export class Texture {
 	readonly type: "2D" | "2DArray" | "LUT";
 	readonly gl: WebGL2RenderingContext;
 	linearInterpolation = false;
+	doesRepeat = false;
 	hasMipmap = false;
 	colors: number[] = [];
 	dirtyLUT = false;
@@ -64,8 +65,6 @@ export class Texture {
 				image,
 			);
 
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 			if (isPowerOf2(image.width) && isPowerOf2(image.height)) {
 				gl.generateMipmap(gl.TEXTURE_2D);
 				that.hasMipmap = true;
@@ -75,7 +74,11 @@ export class Texture {
 			} else {
 				that.nearest();
 			}
-			that.clamp();
+			if (that.doesRepeat) {
+				that.repeat();
+			} else {
+				that.clamp();
+			}
 			texturesLoaded++;
 		};
 		lastBoundTexture[activeTextureUnit] = this;
@@ -244,6 +247,7 @@ export class Texture {
 		const target = this.target();
 		gl.texParameteri(target, gl.TEXTURE_WRAP_S, gl.REPEAT);
 		gl.texParameteri(target, gl.TEXTURE_WRAP_T, gl.REPEAT);
+		this.doesRepeat = true;
 		return this;
 	}
 

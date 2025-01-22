@@ -91,6 +91,17 @@ export class Shader {
 		return this;
 	}
 
+	uniform2f(name: string, x: number, y: number) {
+		const loc = this.uniforms.get(name);
+		if (!loc) {
+			throw new Error(
+				`No uniform location stored for '${name}' for shader '${this.name}'`,
+			);
+		}
+		this.gl.uniform2f(loc, x, y);
+		return this;
+	}
+
 	uniform3f(name: string, x: number, y: number, z: number) {
 		const loc = this.uniforms.get(name);
 		if (!loc) {

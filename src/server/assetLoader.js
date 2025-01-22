@@ -10,6 +10,7 @@ export async function load(url, context, nextLoad) {
 		checkUrl.endsWith(".css") ||
 		checkUrl.endsWith(".ogg") ||
 		checkUrl.endsWith(".png") ||
+		checkUrl.endsWith(".jpg") ||
 		checkUrl.endsWith(".vox") ||
 		checkUrl.endsWith(".vert") ||
 		checkUrl.endsWith(".frag")
