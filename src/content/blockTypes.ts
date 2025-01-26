@@ -102,7 +102,7 @@ export const blocks = {
 	oakLog: 21,
 	oakLeaves: 22,
 	sand: 23,
-	seaWater: 24,
+	water: 24,
 };
 
 export const registerBlockTypes = (world: World) => {
@@ -313,8 +313,8 @@ export const registerBlockTypes = (world: World) => {
 		.withMiningCat("Pickaxe")
 		.withBlockHealth(240).id;
 
-	blocks.seaWater = world
-		.addBlockType("Sea Water", "SeaWater")
+	blocks.water = world
+		.addBlockType("Water", "Water")
 		.withTexture(25)
 		.withColours(0x0036d4ff, 0x0000bdff)
 		.withLiquid()

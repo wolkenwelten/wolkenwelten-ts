@@ -45,6 +45,7 @@ export class DangerZone {
 		const bt = this.world.blocks[b];
 		if (bt.liquid) {
 			this.world.setBlock(toX, toY, toZ, b);
+			this.world.setBlock(fromX, fromY, fromZ, 0);
 			this.add(toX - 1, toY - 1, toZ - 1, 3, 3, 3);
 			return true;
 		} else {

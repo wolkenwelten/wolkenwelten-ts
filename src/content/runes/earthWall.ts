@@ -169,7 +169,6 @@ export class EarthWall extends Rune {
 			const e = new EarthWallBlock(this.world, b.block, b.from, b.to);
 			e.playSound("pock", 0.3);
 		}
-		this.world.dangerZone.update(); // This way staticMeshes will be turned into entities that will be thrown around in the next loop
 
 		for (const b of selection) {
 			for (const t of this.world.entities) {

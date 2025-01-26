@@ -114,7 +114,9 @@ export class World {
 				this.removeEntity(entity);
 			}
 		}
-		this.dangerZone.update();
+		if ((this.game.ticks & 0xf) === 0) {
+			this.dangerZone.update();
+		}
 		this.fire.update();
 	}
 

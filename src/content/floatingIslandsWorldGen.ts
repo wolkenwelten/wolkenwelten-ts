@@ -377,7 +377,7 @@ export class FloatingIslandsWorldGen extends WorldGen {
 						}
 
 						if (y > centerY - verticalRadius) {
-							world.setBlock(x, y, z, blocks.seaWater);
+							world.setBlock(x, y, z, blocks.water);
 						}
 					}
 				}
