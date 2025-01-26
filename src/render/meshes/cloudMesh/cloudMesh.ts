@@ -49,15 +49,11 @@ export class CloudMesh {
 		}
 		this.vao = vao;
 
-		//this.addPlane(512, 512, 8, 8);
-		this.addCircle(384, 24);
+		this.addCircle(512, 24);
 		this.finish();
 	}
 
 	private addCircle(radius = 256, segments = 32) {
-		// Center vertex
-		//this.vertices.push(0, 0, 0, 0.5, 0.5);
-
 		// Create vertices around the circle
 		for (let i = 0; i < segments; i++) {
 			const angle = (i / segments) * Math.PI * 2;
@@ -125,8 +121,8 @@ export class CloudMesh {
 		mat4.mul(mvp, viewMatrix, mvp);
 		mat4.mul(mvp, projectionMatrix, mvp);
 
-		const uoff = x / 384.0 / 2;
-		const voff = z / 384.0 / 2;
+		const uoff = x / 512.0 / 2;
+		const voff = z / 512.0 / 2;
 
 		CloudMesh.shader
 			.bind()

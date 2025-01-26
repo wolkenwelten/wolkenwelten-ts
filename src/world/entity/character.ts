@@ -96,11 +96,9 @@ export class Character extends Being {
 		this.yaw = 0;
 		this.pitch = 0;
 
-		//if (this.world.game.options.startWithEquipment) {
 		setTimeout(() => {
 			this.getGoodStuff();
 		});
-		//}
 
 		this.remainingAirActions = this.maxAirActions;
 		this.justJumped = false;

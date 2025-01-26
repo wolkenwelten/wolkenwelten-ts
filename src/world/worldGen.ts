@@ -12,8 +12,6 @@ export abstract class WorldGen {
 		this.seed = seed;
 	}
 
-	// Will be called before the first chunk will be generated to allow for
-	// loading external assets / pre-calculations
 	async init() {}
 
 	// Should return a valid spawn position for a player

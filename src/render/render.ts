@@ -66,7 +66,6 @@ export class RenderManager {
 			navigator.userAgent.match(/armhf/i);
 
 		if (isFirefox || isSafari || isMobile || isARM) {
-			// Reduce default renderDistance due to performance issues
 			this.renderDistance = 128;
 		}
 	}
