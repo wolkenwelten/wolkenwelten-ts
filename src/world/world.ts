@@ -1,7 +1,6 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { registerBlockTypes } from "../content/blockTypes";
 import type { Game } from "../game";
 import type { Entity } from "./entity/entity";
 import type { WorldGen } from "./worldGen";
@@ -33,7 +32,6 @@ export class World {
 		this.game = game;
 		this.fire = new FireSystem(this);
 		this.dangerZone = new DangerZone(this);
-		registerBlockTypes(this);
 	}
 
 	worldgen() {
