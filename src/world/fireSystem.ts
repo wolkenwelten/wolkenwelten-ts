@@ -221,7 +221,7 @@ export class BurningEffect extends StatusEffect {
 			e.damage(1);
 			this.lastDamageDealt += 40;
 		}
-		Fire.addParticle(e.world, e.x - 0.5, e.y - 0.5, e.z - 0.5, 4096);
+		Fire.addParticle(e.world, e.x - 0.5, e.y - 1, e.z - 0.5, 4096);
 
 		const wet = e.effects.get("Wet");
 		if (wet) {
