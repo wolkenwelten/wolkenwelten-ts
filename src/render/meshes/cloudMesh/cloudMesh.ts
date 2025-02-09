@@ -49,11 +49,11 @@ export class CloudMesh {
 		}
 		this.vao = vao;
 
-		this.addCircle(512, 24);
+		this.addCircle();
 		this.finish();
 	}
 
-	private addCircle(radius = 256, segments = 32) {
+	private addCircle(radius = 512, segments = 24) {
 		// Create vertices around the circle
 		for (let i = 0; i < segments; i++) {
 			const angle = (i / segments) * Math.PI * 2;
@@ -74,9 +74,9 @@ export class CloudMesh {
 			const v2 = (Math.sin(nextAngle) + 1) * 0.5;
 
 			// Create triangle
-			this.vertices.push(0, i * 0.1, 0, 0.5, 0.5); // Center
-			this.vertices.push(x2, i * 0.1, z2, u2, v2); // Next point
-			this.vertices.push(x1, i * 0.1, z1, u1, v1); // Current point
+			this.vertices.push(0, 0, 0, 0.5, 0.5); // Center
+			this.vertices.push(x2, 0, z2, u2, v2); // Next point
+			this.vertices.push(x1, 0, z1, u1, v1); // Current point
 		}
 	}
 
@@ -142,8 +142,9 @@ export class CloudMesh {
 		y: number,
 		z: number,
 	) {
-		this.draw(projectionMatrix, viewMatrix, x, y - 28, z, [0.8, 0.5, 0.7, 1]);
-		this.draw(projectionMatrix, viewMatrix, x, y - 26, z, [1, 0.8, 0.9, 0.9]);
-		this.draw(projectionMatrix, viewMatrix, x, y - 24, z, [1, 1, 1, 0.8]);
+		this.draw(projectionMatrix, viewMatrix, x, y - 30, z, [0.6, 0.2, 0.4, 1]);
+		this.draw(projectionMatrix, viewMatrix, x, y - 28, z, [0.8, 0.5, 0.7, 0.9]);
+		this.draw(projectionMatrix, viewMatrix, x, y - 26, z, [1, 0.8, 0.9, 0.8]);
+		this.draw(projectionMatrix, viewMatrix, x, y - 24, z, [1, 1, 1, 0.7]);
 	}
 }
