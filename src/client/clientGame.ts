@@ -7,6 +7,7 @@ import type {
 	WSChatMessage,
 	WSHelloMessage,
 	WSPlayerUpdate,
+	WSChunkUpdate,
 } from "../network";
 import { ClientEntry } from "./clientEntry";
 
@@ -25,6 +26,7 @@ export class ClientGame {
 
 	private addDefaultHandler() {
 		const game = this.game;
+
 		this.setHandler("msg", (raw: WSMessage) => {
 			const msg = raw as WSChatMessage;
 			game.ui.log.addEntry(msg.msg);
@@ -45,6 +47,14 @@ export class ClientGame {
 			} else {
 				cli.update(msg);
 			}
+		});
+
+		this.setHandler("chunkUpdate", (raw: WSMessage) => {
+			const msg = raw as WSChunkUpdate;
+			const chunk = game.world.getOrGenChunk(msg.x, msg.y, msg.z);
+			chunk.blocks = msg.blocks;
+			chunk.lastUpdated = msg.lastUpdated;
+			chunk.invalidate();
 		});
 	}
 

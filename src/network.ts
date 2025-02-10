@@ -42,6 +42,15 @@ export interface WSPlayerUpdate extends WSMessage {
 	maxHealth: number;
 }
 
+export interface WSChunkUpdate extends WSMessage {
+	T: "chunkUpdate";
+	x: number;
+	y: number;
+	z: number;
+	lastUpdated: number;
+	blocks: Uint8Array;
+}
+
 export class NetworkManager {
 	queue: WSMessage[] = [];
 	id = 0;
