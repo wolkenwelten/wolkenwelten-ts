@@ -5,6 +5,7 @@ import { WebSocket } from "ws";
 import type { Server } from "./server";
 import type { WSHelloMessage, WSMessage, WSPlayerUpdate } from "../network";
 import { handler } from "./handler";
+import { coordinateToWorldKey } from "../world/world";
 
 let idCounter = 0;
 export class ClientConnection {
@@ -23,6 +24,16 @@ export class ClientConnection {
 
 	health = 10;
 	maxHealth = 10;
+
+	chunkVersions = new Map<number, number>();
+
+	getChunkVersion(x: number, y: number, z: number): number {
+		return this.chunkVersions.get(coordinateToWorldKey(x, y, z)) || 0;
+	}
+
+	setChunkVersion(x: number, y: number, z: number, version: number) {
+		this.chunkVersions.set(coordinateToWorldKey(x, y, z), version);
+	}
 
 	getPlayerUpdateMsg(): WSPlayerUpdate {
 		return {

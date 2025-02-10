@@ -42,6 +42,13 @@ export interface WSPlayerUpdate extends WSMessage {
 	maxHealth: number;
 }
 
+export interface WSChunkDrop extends WSMessage {
+	T: "chunkDrop";
+	x: number;
+	y: number;
+	z: number;
+}
+
 export interface WSChunkUpdate extends WSMessage {
 	T: "chunkUpdate";
 	x: number;
@@ -93,6 +100,16 @@ export class NetworkManager {
 
 			health: player.health,
 			maxHealth: player.maxHealth,
+		};
+		this.send(msg);
+	}
+
+	sendChunkDrop(x: number, y: number, z: number) {
+		const msg: WSChunkDrop = {
+			T: "chunkDrop",
+			x,
+			y,
+			z,
 		};
 		this.send(msg);
 	}
