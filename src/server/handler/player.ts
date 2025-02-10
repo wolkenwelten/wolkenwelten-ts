@@ -51,18 +51,24 @@ addHandler("playerUpdate", (con, raw) => {
 		con.send(ccon.getPlayerUpdateMsg());
 	}
 
-	for (let ox = -1; ox <= 1; ox++) {
+	let updates = 0;
+	for (let ox = -3; ox <= 3; ox++) {
 		const x = con.x + ox * 32;
-		for (let oy = -1; oy <= 1; oy++) {
+		for (let oy = -3; oy <= 3; oy++) {
 			const y = con.y + oy * 32;
-			for (let oz = -1; oz <= 1; oz++) {
+			for (let oz = -3; oz <= 3; oz++) {
 				const z = con.z + oz * 32;
 				const chunk = con.server.game.world.getOrGenChunk(x, y, z);
 				if (clientUpdateChunk(con, chunk)) {
-					return;
+					if (++updates > 20) {
+						return;
+					}
 				}
 			}
 		}
+	}
+	if (updates > 0) {
+		console.log(`Sent ${updates} chunk updates`);
 	}
 });
 

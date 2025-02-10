@@ -9,6 +9,7 @@ import { FireSystem } from "./fireSystem";
 import { BlockType } from "./blockType";
 import { Chunk } from "./chunk/chunk";
 import { DangerZone } from "./chunk/dangerZone";
+import { isClient } from "../util/compat";
 
 export const coordinateToWorldKey = (x: number, y: number, z: number) =>
 	((Math.floor(x) >> 5) & 0xffff) +
@@ -39,8 +40,10 @@ export class World {
 			throw new Error("Missing WorldGen");
 		}
 		const start = performance.now();
-		this.worldgenHandler.preGen(this);
-		profiler.add("worldgenPreGen", start, performance.now());
+		if (!isClient()) {
+			this.worldgenHandler.preGen(this);
+			profiler.add("worldgenPreGen", start, performance.now());
+		}
 	}
 
 	addBlockType(longName: string, name?: string): BlockType {
@@ -96,12 +99,14 @@ export class World {
 		const cz = z & ~0x1f;
 		const newChunk = new Chunk(this, cx, cy, cz);
 
-		if (!this.worldgenHandler) {
-			throw new Error("Missing WorldGen");
+		if (!isClient()) {
+			if (!this.worldgenHandler) {
+				throw new Error("Missing WorldGen");
+			}
+			const start = performance.now();
+			this.worldgenHandler.genChunk(newChunk);
+			profiler.add("worldgen", start, performance.now());
 		}
-		const start = performance.now();
-		this.worldgenHandler.genChunk(newChunk);
-		profiler.add("worldgen", start, performance.now());
 
 		this.chunks.set(key, newChunk);
 		return newChunk;
