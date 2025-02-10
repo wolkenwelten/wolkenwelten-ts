@@ -30,12 +30,10 @@ export class WorldGenAsset {
 	static load(href: string, palette: number[]): Promise<WorldGenAsset> {
 		return new Promise((resolve) => {
 			setTimeout(async () => {
-				if (isServer()) {
-					// ToDo: Actually load the asset
-					resolve(new WorldGenAsset(0, 0, 0, new Uint8Array(0), []));
-					return;
-				}
-				const data = new Uint8Array(await (await fetch(href)).arrayBuffer());
+				const data = isServer()
+					? (href as unknown as Uint8Array)
+					: new Uint8Array(await (await fetch(href)).arrayBuffer());
+
 				const voxData = readVox(data);
 				const size = voxData.size;
 				if (

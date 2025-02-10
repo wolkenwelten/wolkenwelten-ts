@@ -16,9 +16,15 @@ export async function load(url, context, nextLoad) {
 		checkUrl.endsWith(".frag")
 	) {
 		const content = await readFile(new URL(url));
+		const source = checkUrl.endsWith(".vox")
+			? `export default new Uint8Array([${Array.from(content)
+					.map((x) => `${x}`)
+					.join(",")}]);`
+			: `export default ${JSON.stringify(content.toString())};`;
+
 		return {
 			format: "module",
-			source: `export default ${JSON.stringify(content.toString())};`,
+			source,
 			shortCircuit: true,
 		};
 	}
