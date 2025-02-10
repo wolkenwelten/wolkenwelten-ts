@@ -1,33 +1,7 @@
-import type { WSChunkUpdate, WSPlayerUpdate, WSChunkDrop } from "../../network";
-import { Chunk } from "../../world/chunk/chunk";
+import type { WSPlayerUpdate } from "../../network";
 import { ClientConnection } from "../connection";
 import { addHandler } from "./handler";
-
-const clientUpdateChunk = (con: ClientConnection, chunk: Chunk): boolean => {
-	const clientVersion = con.getChunkVersion(chunk.x, chunk.y, chunk.z);
-	const serverVersion = chunk.lastUpdated;
-
-	if (clientVersion == serverVersion) {
-		return false;
-	} else if (clientVersion > serverVersion) {
-		throw new Error(
-			"Client has a higher version than the server, this should never happen",
-		);
-	} else {
-		con.setChunkVersion(chunk.x, chunk.y, chunk.z, serverVersion);
-
-		const chunkUpdate: WSChunkUpdate = {
-			T: "chunkUpdate",
-			x: chunk.x,
-			y: chunk.y,
-			z: chunk.z,
-			lastUpdated: chunk.lastUpdated,
-			blocks: chunk.blocks,
-		};
-		con.send(chunkUpdate);
-		return true;
-	}
-};
+import { clientUpdateChunk } from "./chunk";
 
 const handlePlayerUpdate = (con: ClientConnection, msg: WSPlayerUpdate) => {
 	con.x = msg.x;
@@ -60,7 +34,7 @@ addHandler("playerUpdate", (con, raw) => {
 				const z = con.z + oz * 32;
 				const chunk = con.server.game.world.getOrGenChunk(x, y, z);
 				if (clientUpdateChunk(con, chunk)) {
-					if (++updates > 20) {
+					if (++updates > 60) {
 						return;
 					}
 				}
@@ -70,9 +44,4 @@ addHandler("playerUpdate", (con, raw) => {
 	if (updates > 0) {
 		console.log(`Sent ${updates} chunk updates`);
 	}
-});
-
-addHandler("chunkDrop", (con, raw) => {
-	const msg = raw as WSChunkDrop;
-	con.setChunkVersion(msg.x, msg.y, msg.z, 0);
 });

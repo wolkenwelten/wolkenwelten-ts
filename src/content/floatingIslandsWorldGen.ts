@@ -21,7 +21,6 @@ import { LCG } from "../util/prng";
 import type { Chunk } from "../world/chunk/chunk";
 import type { World } from "../world/world";
 import type { Character } from "../world/entity/character";
-import { StaticObject } from "../world/chunk/staticObject";
 import { blocks } from "./blockTypes";
 
 export interface WorldGenAssetList {
@@ -244,27 +243,6 @@ export class FloatingIslandsWorldGen extends WorldGen {
 									);
 								}
 							}
-						} else if (lcg.float() > 0.9) {
-							// Make sure we have enough space (check block above)
-							//if (world.getBlock(x, y + 1, z) === 0) {
-							// Choose what to place
-							const roll = lcg.float();
-							let type: string;
-
-							if (roll < 0.8) {
-								type = "grass";
-							} else if (roll < 0.9) {
-								type = "flower";
-							} else if (roll < 0.95) {
-								type = "stick";
-							} else {
-								type = "stone";
-							}
-
-							// Create the static object
-							y++;
-							const chunk = world.getOrGenChunk(x, y, z);
-							StaticObject.create(type, chunk, x | 0, y | 0, z | 0);
 						} else if (lcg.float() > 0.997) {
 							const distanceFromCenter = Math.sqrt(
 								Math.pow(x - centerX, 2) + Math.pow(z - centerZ, 2),
