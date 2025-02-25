@@ -3,7 +3,12 @@
  */
 import { WebSocket } from "ws";
 import type { Server } from "./server";
-import type { WSHelloMessage, WSMessage, WSPlayerUpdate } from "../network";
+import type {
+	WSHelloMessage,
+	WSMessage,
+	WSMultiMessage,
+	WSPlayerUpdate,
+} from "../network";
 import { handler } from "./handler";
 import { coordinateToWorldKey } from "../world/world";
 
@@ -14,6 +19,7 @@ export class ClientConnection {
 	id: number;
 	playerName = "";
 	server: Server;
+	queue: WSMessage[] = [];
 
 	x = 0;
 	y = 0;
@@ -24,6 +30,7 @@ export class ClientConnection {
 
 	health = 10;
 	maxHealth = 10;
+	updates = 0;
 
 	chunkVersions = new Map<number, number>();
 
@@ -63,7 +70,7 @@ export class ClientConnection {
 			T: "hello",
 			playerID: this.id,
 		};
-		this.send(helloMsg);
+		this.sendRaw(helloMsg);
 
 		socket.on("close", () => {
 			console.log(`Closing connection`);
@@ -72,7 +79,15 @@ export class ClientConnection {
 
 		socket.on("message", (msg) => {
 			try {
-				that.dispatch(JSON.parse(msg.toString()));
+				const raw = JSON.parse(msg.toString());
+				if (raw.T === "multi") {
+					const multi = raw as WSMultiMessage;
+					for (const call of multi.calls) {
+						that.dispatch(call);
+					}
+				} else {
+					that.dispatch(raw);
+				}
 			} catch (e) {
 				console.error(e);
 			}
@@ -85,6 +100,23 @@ export class ClientConnection {
 	}
 
 	send(msg: WSMessage) {
+		this.queue.push(msg);
+	}
+
+	sendRaw(msg: WSMessage) {
 		this.socket.send(JSON.stringify(msg));
+	}
+
+	transferQueue() {
+		if (this.queue.length === 0) {
+			return;
+		}
+
+		const msg: WSMultiMessage = {
+			T: "multi",
+			calls: this.queue,
+		};
+		this.sendRaw(msg);
+		this.queue.length = 0;
 	}
 }

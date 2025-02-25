@@ -27,6 +27,13 @@ export class Server {
 		this.wss = new WebSocketServer({ port: 8080 });
 		this.wss.on("connection", this.onConnect.bind(this));
 
+		const server = this;
+		setInterval(() => {
+			for (const con of server.sockets.values()) {
+				con.transferQueue();
+			}
+		}, 10);
+
 		console.log("Starting WolkenWelten Server on port 8080");
 	}
 }

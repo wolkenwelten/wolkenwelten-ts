@@ -20,13 +20,16 @@ export const clientUpdateChunk = (
 	} else {
 		con.setChunkVersion(chunk.x, chunk.y, chunk.z, serverVersion);
 
+		// Convert Uint8Array to base64 string
+		const blocks = Buffer.from(chunk.blocks).toString("base64");
+
 		const chunkUpdate: WSChunkUpdate = {
 			T: "chunkUpdate",
 			x: chunk.x,
 			y: chunk.y,
 			z: chunk.z,
 			lastUpdated: chunk.lastUpdated,
-			blocks: chunk.blocks,
+			blocks,
 		};
 		con.send(chunkUpdate);
 		return true;

@@ -8,6 +8,7 @@ import type {
 	WSHelloMessage,
 	WSPlayerUpdate,
 	WSChunkUpdate,
+	WSMultiMessage,
 } from "../network";
 import { ClientEntry } from "./clientEntry";
 
@@ -52,10 +53,18 @@ export class ClientGame {
 		this.setHandler("chunkUpdate", (raw: WSMessage) => {
 			const msg = raw as WSChunkUpdate;
 			const chunk = game.world.getOrGenChunk(msg.x, msg.y, msg.z);
-			chunk.blocks = msg.blocks;
+			// Decode base64 string back to Uint8Array
+			const blocks = new Uint8Array(
+				atob(msg.blocks)
+					.split("")
+					.map((c) => c.charCodeAt(0)),
+			);
+
+			chunk.blocks.set(blocks, 0);
 			chunk.lastUpdated = msg.lastUpdated;
 			chunk.loaded = true;
 			chunk.invalidate();
+			console.log("Chunk updated");
 		});
 	}
 
@@ -76,7 +85,14 @@ export class ClientGame {
 				console.error(msg);
 				throw new Error("Invalid message received");
 			}
-			that.dispatch(msg);
+			if (msg.T === "multi") {
+				const multi = msg as WSMultiMessage;
+				for (const call of multi.calls) {
+					that.dispatch(call);
+				}
+			} else {
+				that.dispatch(msg);
+			}
 		};
 		this.ws.onclose = () => {
 			that.ws = undefined;
@@ -107,9 +123,11 @@ export class ClientGame {
 			this.game.player,
 		);
 
-		for (const m of this.game.network.queue) {
-			this.ws.send(JSON.stringify(m));
-		}
+		const multi: WSMultiMessage = {
+			T: "multi",
+			calls: this.game.network.queue,
+		};
+		this.ws.send(JSON.stringify(multi));
 		this.game.network.queue.length = 0;
 	}
 }

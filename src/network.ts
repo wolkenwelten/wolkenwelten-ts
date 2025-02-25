@@ -8,6 +8,11 @@ export interface WSMessage {
 	T: string;
 }
 
+export interface WSMultiMessage extends WSMessage {
+	T: "multi";
+	calls: WSMessage[];
+}
+
 export interface WSHelloMessage extends WSMessage {
 	T: "hello";
 	playerID: number;
@@ -55,7 +60,7 @@ export interface WSChunkUpdate extends WSMessage {
 	y: number;
 	z: number;
 	lastUpdated: number;
-	blocks: Uint8Array;
+	blocks: string;
 }
 
 export class NetworkManager {
