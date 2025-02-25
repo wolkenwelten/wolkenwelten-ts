@@ -17,6 +17,7 @@ export class Chunk {
 	staticLastUpdated: number;
 	simpleLight: Uint8Array;
 	simpleLightLastUpdated = 0;
+	loaded = false;
 	x: number;
 	y: number;
 	z: number;

@@ -102,10 +102,14 @@ export class Entity {
 	heal(rawAmount: number) {}
 
 	update() {
-		if (this.noClip) {
+		if (this.noClip || this.destroyed) {
 			this.vx = this.vy = this.vz = 0;
 			return;
 		}
+		if (!this.world.isLoaded(this.x, this.y, this.z)) {
+			return;
+		}
+
 		this.x += this.vx;
 		this.y += this.vy;
 		this.z += this.vz;

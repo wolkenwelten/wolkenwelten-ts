@@ -54,6 +54,7 @@ export class ClientGame {
 			const chunk = game.world.getOrGenChunk(msg.x, msg.y, msg.z);
 			chunk.blocks = msg.blocks;
 			chunk.lastUpdated = msg.lastUpdated;
+			chunk.loaded = true;
 			chunk.invalidate();
 		});
 	}
