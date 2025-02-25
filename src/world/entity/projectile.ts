@@ -11,6 +11,7 @@ export class Projectile extends Entity {
 	source: Entity;
 	projectileMesh: TriangleMesh | VoxelMesh | null;
 	ttl = 128;
+	noClip = false;
 	onHit?: (e: Entity) => void;
 	onMiss?: () => void;
 	onUpdate?: () => void;
@@ -67,7 +68,7 @@ export class Projectile extends Entity {
 		super.update();
 		this.checkForEntityCollisions();
 		this.onUpdate && this.onUpdate();
-		if (this.collides()) {
+		if (!this.noClip && this.collides()) {
 			this.onMiss && this.onMiss();
 			this.destroy();
 		}

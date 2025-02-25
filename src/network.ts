@@ -71,6 +71,13 @@ export interface WSChunkUpdate extends WSMessage {
 	blocks: string;
 }
 
+export interface WSPlayerHit extends WSMessage {
+	T: "playerHit";
+	playerID: number;
+	radius: number;
+	damage: number;
+}
+
 export class NetworkManager {
 	queue: WSMessage[] = [];
 	id = 0;
@@ -134,6 +141,16 @@ export class NetworkManager {
 			x,
 			y,
 			z,
+		};
+		this.send(msg);
+	}
+
+	sendPlayerHit(radius: number, damage: number) {
+		const msg: WSPlayerHit = {
+			T: "playerHit",
+			playerID: this.id,
+			radius,
+			damage,
 		};
 		this.send(msg);
 	}

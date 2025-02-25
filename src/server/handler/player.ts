@@ -1,4 +1,4 @@
-import type { WSPlayerUpdate } from "../../network";
+import type { WSPlayerUpdate, WSPlayerHit } from "../../network";
 import { ClientConnection } from "../connection";
 import { addHandler } from "./handler";
 import { clientUpdateChunk } from "./chunk";
@@ -62,5 +62,17 @@ addHandler("playerUpdate", (con, raw) => {
 		chunkUpdateLoop(con, 5);
 	} else {
 		chunkUpdateLoop(con, 2);
+	}
+});
+
+addHandler("playerHit", (con, raw) => {
+	const msg = raw as WSPlayerHit;
+
+	// Relay hit to all other clients
+	for (const ccon of con.server.sockets.values()) {
+		if (ccon.id === con.id) {
+			continue;
+		}
+		ccon.send(msg);
 	}
 });

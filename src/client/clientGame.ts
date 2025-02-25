@@ -9,6 +9,7 @@ import type {
 	WSPlayerUpdate,
 	WSChunkUpdate,
 	WSMultiMessage,
+	WSPlayerHit,
 } from "../network";
 import { ClientEntry } from "./clientEntry";
 
@@ -65,6 +66,46 @@ export class ClientGame {
 			chunk.loaded = true;
 			chunk.invalidate();
 			console.log("Chunk updated");
+		});
+
+		this.setHandler("playerHit", (raw: WSMessage) => {
+			const msg = raw as WSPlayerHit;
+			const attacker = this.clients.get(msg.playerID);
+			if (!attacker) return;
+
+			// Start hit animation for the attacking player
+			attacker.char.hitAnimation = game.render.frames;
+			attacker.char.hitAnimationCounter =
+				(attacker.char.hitAnimationCounter + 1) & 1;
+
+			// Check if we (the local player) are in range and should take damage
+			const dx = game.player.x - attacker.char.x;
+			const dy = game.player.y - attacker.char.y;
+			const dz = game.player.z - attacker.char.z;
+			const dd = dx * dx + dy * dy + dz * dz;
+
+			if (dd <= msg.radius * msg.radius) {
+				game.player.damage(msg.damage);
+				game.player.onAttack(attacker.char);
+
+				// Calculate knockback direction and magnitude
+				const dist = Math.sqrt(dd);
+				if (dist > 0) {
+					// Normalize direction vector
+					const ndx = dx / dist;
+					const ndz = dz / dist;
+
+					// Base knockback + additional based on damage
+					const knockbackForce = 0.2 + msg.damage * 0.1;
+
+					// Apply horizontal knockback
+					game.player.vx += ndx * knockbackForce;
+					game.player.vz += ndz * knockbackForce;
+
+					// Add some vertical knockback for a more dramatic effect
+					game.player.vy += knockbackForce * 0.5;
+				}
+			}
 		});
 	}
 

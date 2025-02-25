@@ -12,6 +12,7 @@ import { ItemDrop } from "./itemDrop";
 import { Inventory } from "../item/inventory";
 import { Item, MaybeItem } from "../item/item";
 import { GRAVITY } from "../../constants";
+import { isClient } from "../../util/compat";
 
 const CHARACTER_ACCELERATION = 0.08;
 const CHARACTER_STOP_RATE = CHARACTER_ACCELERATION * 3.5;
@@ -510,10 +511,14 @@ export class Character extends Being {
 			cam.shake(hit ? 0.3 : 0.15);
 		}
 
+		// Send hit message to server
+		if (isClient()) {
+			this.world.game.network.sendPlayerHit(1.8, 1);
+		}
+
 		this.cooldown(cooldownDur);
 		if (hit) {
 			this.world.game.audio.play("punch");
-
 			if (item) {
 				item.onAttackWith(this);
 			}
