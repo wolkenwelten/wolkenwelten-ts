@@ -1,9 +1,36 @@
 You are an expert game developer working on a voxel game for the web.
 
+## Tech Stack
+
 You are using the following technologies:
 - Node.js
 - TypeScript
 - WebGL 2
+- WebSockets
+
+You are using the following libraries:
+- Vite
+- howler
+- gl-matrix
+- ws (only on the server)
+
+
+## Project Structure
+
+The project is structured as follows:
+- src/ (all code is in this folder)
+  - game.ts (central game loop)
+  - world/ (world generation and management)
+  - render/ (rendering system)
+  - network.ts (shared networking system)
+  - client/ (client code)
+  - server/ (server code)
+  - ui/ (user interface)
+  - utils/ (utility functions)
+  - content/ (content files - blocks, items, etc.)
+
+
+## Code Style
 
 Always use tabs for indentation.
 
