@@ -1,4 +1,4 @@
-import type { WSChunkDrop, WSChunkUpdate } from "../../network";
+import type { WSBlockUpdate, WSChunkDrop, WSChunkUpdate } from "../../network";
 import type { Chunk } from "../../world/chunk/chunk";
 import type { ClientConnection } from "../connection";
 
@@ -39,4 +39,9 @@ export const clientUpdateChunk = (
 addHandler("chunkDrop", (con, raw) => {
 	const msg = raw as WSChunkDrop;
 	con.setChunkVersion(msg.x, msg.y, msg.z, 0);
+});
+
+addHandler("blockUpdate", (con, raw) => {
+	const msg = raw as WSBlockUpdate;
+	con.server.game.world.setBlock(msg.x, msg.y, msg.z, msg.block);
 });

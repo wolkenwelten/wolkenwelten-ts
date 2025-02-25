@@ -24,6 +24,14 @@ export interface WSChatMessage extends WSMessage {
 	msg: string;
 }
 
+export interface WSBlockUpdate extends WSMessage {
+	T: "blockUpdate";
+	x: number;
+	y: number;
+	z: number;
+	block: number;
+}
+
 export interface WSNameChange extends WSMessage {
 	T: "nameChange";
 	playerID: number;
@@ -78,6 +86,17 @@ export class NetworkManager {
 			playerID: this.id,
 		};
 		this.send(m);
+	}
+
+	sendSetBlock(x: number, y: number, z: number, block: number) {
+		const msg: WSBlockUpdate = {
+			T: "blockUpdate",
+			x,
+			y,
+			z,
+			block,
+		};
+		this.send(msg);
 	}
 
 	sendNameChange(newName: string) {

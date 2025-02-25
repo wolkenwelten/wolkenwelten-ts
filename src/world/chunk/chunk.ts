@@ -54,6 +54,7 @@ export class Chunk {
 
 	setBlock(x: number, y: number, z: number, block: number) {
 		this.setBlockUnsafe(x, y, z, block);
+		this.lastUpdated = this.world.game.ticks;
 		this.world.invalidatePosition(x, y, z);
 	}
 

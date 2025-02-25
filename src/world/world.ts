@@ -55,7 +55,11 @@ export class World {
 	}
 
 	setBlock(x: number, y: number, z: number, block: number) {
-		this.getOrGenChunk(x, y, z).setBlock(x, y, z, block);
+		if (isClient()) {
+			this.game.network.sendSetBlock(x, y, z, block);
+		} else {
+			this.getOrGenChunk(x, y, z).setBlock(x, y, z, block);
+		}
 	}
 
 	getBlock(x: number, y: number, z: number): number | undefined {

@@ -32,6 +32,7 @@ export class Server {
 			for (const con of server.sockets.values()) {
 				con.transferQueue();
 			}
+			game.update();
 		}, 10);
 
 		console.log("Starting WolkenWelten Server on port 8080");
