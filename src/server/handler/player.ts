@@ -34,7 +34,7 @@ const chunkUpdateLoop = (con: ClientConnection, rMax: number) => {
 
 					const chunk = con.server.game.world.getOrGenChunk(x, y, z);
 					if (clientUpdateChunk(con, chunk)) {
-						if (++updates > 200) {
+						if (++updates > 20) {
 							break;
 						}
 					}

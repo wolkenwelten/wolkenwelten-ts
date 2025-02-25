@@ -11,7 +11,6 @@ import { AudioManager } from "./audio";
 import { BenchmarkManager } from "./benchmark";
 import { InputManager } from "./input";
 import { Options } from "./options";
-import { PersistenceManager } from "./persistence";
 import { ProfilingManager } from "./profiler";
 import { RenderManager } from "./render/render";
 import { UIManager } from "./ui/ui";
@@ -41,7 +40,6 @@ export class Game {
 	blocks: BlockTypeRegistry = {};
 	config: GameConfig;
 	input: InputManager;
-	persistence: PersistenceManager;
 	network: NetworkManager;
 	player: Character;
 	profiler: ProfilingManager;
@@ -67,7 +65,6 @@ export class Game {
 		this.benchmark = new BenchmarkManager(this);
 		this.world = new World(this);
 		this.player = new Character(this.world);
-		this.persistence = new PersistenceManager(this);
 		this.audio = new AudioManager();
 
 		this.registerContent();
