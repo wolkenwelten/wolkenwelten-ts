@@ -92,8 +92,19 @@ export class ClientNetwork {
 	constructor(client: ClientGame) {
 		this.client = client;
 		this.queue = new WSQueue();
+		this.addDefaultHandlers();
 		this.connect();
 		setInterval(this.transfer.bind(this), 8);
+	}
+
+	private addDefaultHandlers() {
+		this.queue.registerCallHandler("addLogEntry", async (args: unknown) => {
+			if (typeof args !== "string") {
+				throw new Error("Invalid log entry received");
+			}
+			const msg = args as string;
+			this.client.game.ui.log.addEntry(msg);
+		});
 	}
 
 	async getPlayerID(): Promise<number> {
@@ -102,5 +113,9 @@ export class ClientNetwork {
 			throw new Error("Invalid player ID received");
 		}
 		return val;
+	}
+
+	async addLogEntry(msg: string): Promise<void> {
+		await this.queue.call("addLogEntry", msg);
 	}
 }

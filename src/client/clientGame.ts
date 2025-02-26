@@ -13,7 +13,6 @@ import type {
 } from "../network";
 import { ClientEntry } from "./clientEntry";
 import { ClientNetwork } from "./clientNetwork";
-import "./clientHandler";
 
 export class ClientGame {
 	game: Game;
@@ -21,7 +20,7 @@ export class ClientGame {
 	private handler: Map<string, (msg: WSMessage) => void> = new Map();
 	clients: Map<number, ClientEntry> = new Map();
 
-	private readonly network: ClientNetwork;
+	readonly network: ClientNetwork;
 
 	constructor(game: Game) {
 		this.game = game;
@@ -33,6 +32,7 @@ export class ClientGame {
 
 	private addDefaultHandler() {
 		const game = this.game;
+		game.client = this;
 
 		this.setHandler("packet", () => {});
 

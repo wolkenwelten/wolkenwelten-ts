@@ -21,6 +21,7 @@ import { Item } from "./world/item/item";
 import { World } from "./world/world";
 import { NetworkManager } from "./network";
 import { FloatingIslandsWorldGen } from "./content/floatingIslandsWorldGen";
+import type { ClientGame } from "./client/clientGame";
 
 export interface GameConfig {
 	parent: HTMLElement;
@@ -38,6 +39,7 @@ export class Game {
 	audio: AudioManager;
 	benchmark: BenchmarkManager;
 	blocks: BlockTypeRegistry = {};
+	client?: ClientGame;
 	config: GameConfig;
 	input: InputManager;
 	network: NetworkManager;

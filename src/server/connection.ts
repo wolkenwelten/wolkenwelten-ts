@@ -108,6 +108,15 @@ export class ClientConnection {
 			console.log("getPlayerID", args, this.id);
 			return this.id;
 		});
+
+		this.q.registerCallHandler("addLogEntry", async (args: unknown) => {
+			const msg = this.playerName + ": " + args;
+			console.log(msg);
+			for (const client of this.server.sockets.values()) {
+				client.q.call("addLogEntry", msg);
+			}
+			return "";
+		});
 	}
 
 	dispatch(msg: any) {
@@ -135,7 +144,6 @@ export class ClientConnection {
 
 		if (!this.q.empty()) {
 			const packet = this.q.flush();
-			console.log("packet", packet);
 			this.socket.send(packet);
 		}
 	}

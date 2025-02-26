@@ -83,8 +83,8 @@ export class InputManager {
 		this.keyPushHandler.set("Enter", () => {
 			if (that.game.ui.chat.visible()) {
 				const msg = that.game.ui.chat.input.value.trim();
-				if (msg) {
-					that.game.network.sendChat(msg);
+				if (msg && that.game.client) {
+					that.game.client.network.addLogEntry(msg);
 				}
 				that.game.ui.chat.hide();
 			} else {
