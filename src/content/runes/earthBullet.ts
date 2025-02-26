@@ -81,7 +81,7 @@ export class EarthBullet extends Rune {
 		if (!this.bulletEntity) {
 			return;
 		}
-		this.bulletEntity.caster = undefined;
+		this.bulletEntity.ticksAlive = 1;
 		const dx = e.x - this.bulletEntity.x;
 		const dy = e.y - this.bulletEntity.y;
 		const dz = e.z - this.bulletEntity.z;
@@ -102,8 +102,7 @@ export class EarthBullet extends Rune {
 
 export class EarthBulletEntity extends Entity {
 	blockType: number;
-	caster?: Character;
-	source?: Character;
+	caster: Character;
 	ticksAlive = 0;
 	shotX = 0;
 	shotY = 0;
@@ -116,7 +115,6 @@ export class EarthBulletEntity extends Entity {
 		}
 		this.blockType = blockType;
 		this.caster = caster;
-		this.source = caster;
 		this.vy = 0.2;
 	}
 
@@ -150,7 +148,7 @@ export class EarthBulletEntity extends Entity {
 		for (const e of this.world.entities) {
 			if (
 				e === this ||
-				(this.ticksAlive < 16 && e === this.source) ||
+				(this.ticksAlive < 16 && e === this.caster) ||
 				e.destroyed
 			) {
 				continue;
@@ -167,7 +165,7 @@ export class EarthBulletEntity extends Entity {
 					2,
 					this.world.blocks[this.blockType].health * 0.05,
 				);
-				this.source?.doDamage(e, dmg);
+				this.caster.doDamage(e, dmg);
 				this.disintegrate();
 				this.playUnmovingSound("punch", 1);
 				this.destroy();
@@ -176,62 +174,70 @@ export class EarthBulletEntity extends Entity {
 		}
 	}
 
-	update() {
-		super.update();
-		if (this.caster) {
-			const [dirx, diry, dirz] = this.caster.direction(0, 0, -1, 1.5);
-			const goalX = this.caster.x + dirx;
-			const goalY = this.caster.y + diry;
-			const goalZ = this.caster.z + dirz;
+	updateHover() {
+		const [dirx, diry, dirz] = this.caster.direction(0, 0, -1, 1.5);
+		const goalX = this.caster.x + dirx;
+		const goalY = this.caster.y + diry;
+		const goalZ = this.caster.z + dirz;
 
-			const dx = goalX - this.x;
-			const dy = goalY - this.y;
-			const dz = goalZ - this.z;
-			const dd = dx * dx + dy * dy + dz * dz;
-			const vmax = dd * 0.2;
+		const dx = goalX - this.x;
+		const dy = goalY - this.y;
+		const dz = goalZ - this.z;
+		const dd = dx * dx + dy * dy + dz * dz;
+		const vmax = dd * 0.2;
 
-			const dn = Math.max(Math.abs(dx), Math.abs(dy), Math.abs(dz));
-			this.vx += (dx / dn) * 0.02;
-			this.vy += (dy / dn) * 0.04;
-			this.vz += (dz / dn) * 0.02;
-			if (this.vx > 0) {
-				this.vx = Math.min(vmax, this.vx);
-			} else {
-				this.vx = Math.max(-vmax, this.vx);
-			}
-			if (this.vy > 0) {
-				this.vy = Math.min(vmax, this.vy);
-			} else {
-				this.vy = Math.max(-vmax, this.vy);
-			}
-			if (this.vz > 0) {
-				this.vz = Math.min(vmax, this.vz);
-			} else {
-				this.vz = Math.max(-vmax, this.vz);
-			}
-
-			this.yaw = this.caster.yaw;
+		const dn = Math.max(Math.abs(dx), Math.abs(dy), Math.abs(dz));
+		this.vx += (dx / dn) * 0.02;
+		this.vy += (dy / dn) * 0.04;
+		this.vz += (dz / dn) * 0.02;
+		if (this.vx > 0) {
+			this.vx = Math.min(vmax, this.vx);
 		} else {
-			++this.ticksAlive;
-			this.world.game.render.particle.fxBlockMine(
+			this.vx = Math.max(-vmax, this.vx);
+		}
+		if (this.vy > 0) {
+			this.vy = Math.min(vmax, this.vy);
+		} else {
+			this.vy = Math.max(-vmax, this.vy);
+		}
+		if (this.vz > 0) {
+			this.vz = Math.min(vmax, this.vz);
+		} else {
+			this.vz = Math.max(-vmax, this.vz);
+		}
+
+		this.yaw = this.caster.yaw;
+	}
+
+	updateShot() {
+		++this.ticksAlive;
+		this.world.game.render.particle.fxBlockMine(
+			this.x - 0.5,
+			this.y - 0.5,
+			this.z - 0.5,
+			this.world.blocks[this.blockType],
+		);
+		if (this.collides()) {
+			this.world.game.render.particle.fxBlockBreak(
 				this.x - 0.5,
 				this.y - 0.5,
 				this.z - 0.5,
 				this.world.blocks[this.blockType],
 			);
-			if (this.collides()) {
-				this.world.game.render.particle.fxBlockBreak(
-					this.x - 0.5,
-					this.y - 0.5,
-					this.z - 0.5,
-					this.world.blocks[this.blockType],
-				);
-				this.disintegrate();
-				this.playUnmovingSound("punch", 1);
-				this.destroy();
-				return;
-			}
-			this.checkForEntityCollisions();
+			this.disintegrate();
+			this.playUnmovingSound("punch", 1);
+			this.destroy();
+			return;
+		}
+		this.checkForEntityCollisions();
+	}
+
+	update() {
+		super.update();
+		if (this.ticksAlive) {
+			this.updateShot();
+		} else {
+			this.updateHover();
 		}
 	}
 }

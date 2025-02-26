@@ -2,85 +2,20 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 
-import type { Character } from "./world/entity/character";
-
-export interface WSMessage {
-	T: string;
-}
-
-export interface WSMultiMessage extends WSMessage {
-	T: "multi";
-	calls: WSMessage[];
-}
-
-export interface WSHelloMessage extends WSMessage {
-	T: "hello";
-	playerID: number;
-}
-
-export interface WSChatMessage extends WSMessage {
-	T: "msg";
-	playerID: number;
-	msg: string;
-}
-
-export interface WSBlockUpdate extends WSMessage {
-	T: "blockUpdate";
-	x: number;
-	y: number;
-	z: number;
-	block: number;
-}
-
-export interface WSNameChange extends WSMessage {
-	T: "nameChange";
-	playerID: number;
-	newName: string;
-}
-
-export interface WSPlayerUpdate extends WSMessage {
-	T: "playerUpdate";
-
-	playerID: number;
-	playerName: string;
-
-	x: number;
-	y: number;
-	z: number;
-
-	yaw: number;
-	pitch: number;
-
-	health: number;
-	maxHealth: number;
-}
-
-export interface WSChunkDrop extends WSMessage {
-	T: "chunkDrop";
-	x: number;
-	y: number;
-	z: number;
-}
-
-export interface WSChunkUpdate extends WSMessage {
-	T: "chunkUpdate";
-	x: number;
-	y: number;
-	z: number;
-	lastUpdated: number;
-	blocks: string;
-}
-
-export interface WSPlayerHit extends WSMessage {
-	T: "playerHit";
-	playerID: number;
-	radius: number;
-	damage: number;
-}
+import type { Character } from "../world/entity/character";
+import type {
+	WSBlockUpdate,
+	WSChunkDrop,
+	WSNameChange,
+	WSChatMessage,
+	WSPlayerHit,
+	WSPlayerUpdate,
+	WSMessage,
+} from "./messages";
 
 export class NetworkManager {
-	queue: WSMessage[] = [];
 	id = 0;
+	queue: WSMessage[] = [];
 
 	send(msg: WSMessage) {
 		this.queue.push(msg);
