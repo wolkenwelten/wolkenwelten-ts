@@ -4,8 +4,6 @@
 import type { Game } from "../game";
 import type {
 	WSMessage,
-	WSChatMessage,
-	WSHelloMessage,
 	WSPlayerUpdate,
 	WSChunkUpdate,
 	WSMultiMessage,
@@ -28,6 +26,8 @@ export class ClientGame {
 		this.connect();
 		this.addDefaultHandler();
 		setInterval(this.transfer.bind(this), 8);
+
+		this.network.setPlayerName(this.game.options.playerName);
 	}
 
 	private addDefaultHandler() {
@@ -41,16 +41,6 @@ export class ClientGame {
 			for (const call of msg.calls) {
 				this.dispatch(call);
 			}
-		});
-
-		this.setHandler("msg", (raw: WSMessage) => {
-			const msg = raw as WSChatMessage;
-			game.ui.log.addEntry(msg.msg);
-		});
-
-		this.setHandler("hello", (raw: WSMessage) => {
-			const msg = raw as WSHelloMessage;
-			game.network.id = msg.playerID;
 		});
 
 		this.setHandler("playerUpdate", (raw: WSMessage) => {
@@ -79,7 +69,6 @@ export class ClientGame {
 			chunk.lastUpdated = msg.lastUpdated;
 			chunk.loaded = true;
 			chunk.invalidate();
-			console.log("Chunk updated");
 		});
 
 		this.setHandler("playerHit", (raw: WSMessage) => {
@@ -152,7 +141,6 @@ export class ClientGame {
 		this.ws.onclose = () => {
 			that.ws = undefined;
 		};
-		this.game.network.sendNameChange(this.game.options.playerName);
 	}
 
 	dispatch(msg: WSMessage) {

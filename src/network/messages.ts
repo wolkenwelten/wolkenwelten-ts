@@ -30,29 +30,12 @@ export interface WSMultiMessage extends WSMessage {
 	calls: WSMessage[];
 }
 
-export interface WSHelloMessage extends WSMessage {
-	T: "hello";
-	playerID: number;
-}
-
-export interface WSChatMessage extends WSMessage {
-	T: "msg";
-	playerID: number;
-	msg: string;
-}
-
 export interface WSBlockUpdate extends WSMessage {
 	T: "blockUpdate";
 	x: number;
 	y: number;
 	z: number;
 	block: number;
-}
-
-export interface WSNameChange extends WSMessage {
-	T: "nameChange";
-	playerID: number;
-	newName: string;
 }
 
 export interface WSPlayerUpdate extends WSMessage {

@@ -3,5 +3,4 @@
  */
 export * from "./handler";
 
-import "./chat";
 import "./player";

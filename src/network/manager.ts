@@ -6,8 +6,6 @@ import type { Character } from "../world/entity/character";
 import type {
 	WSBlockUpdate,
 	WSChunkDrop,
-	WSNameChange,
-	WSChatMessage,
 	WSPlayerHit,
 	WSPlayerUpdate,
 	WSMessage,
@@ -21,15 +19,6 @@ export class NetworkManager {
 		this.queue.push(msg);
 	}
 
-	sendChat(msg: string) {
-		const m: WSChatMessage = {
-			T: "msg",
-			msg,
-			playerID: this.id,
-		};
-		this.send(m);
-	}
-
 	sendSetBlock(x: number, y: number, z: number, block: number) {
 		const msg: WSBlockUpdate = {
 			T: "blockUpdate",
@@ -37,15 +26,6 @@ export class NetworkManager {
 			y,
 			z,
 			block,
-		};
-		this.send(msg);
-	}
-
-	sendNameChange(newName: string) {
-		const msg: WSNameChange = {
-			T: "nameChange",
-			newName,
-			playerID: this.id,
 		};
 		this.send(msg);
 	}

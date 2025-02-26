@@ -118,4 +118,8 @@ export class ClientNetwork {
 	async addLogEntry(msg: string): Promise<void> {
 		await this.queue.call("addLogEntry", msg);
 	}
+
+	async setPlayerName(name: string): Promise<void> {
+		await this.queue.call("setPlayerName", name);
+	}
 }

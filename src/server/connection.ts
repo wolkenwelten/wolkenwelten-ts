@@ -4,7 +4,6 @@
 import { WebSocket } from "ws";
 import type { Server } from "./server";
 import {
-	WSHelloMessage,
 	WSMessage,
 	WSMultiMessage,
 	WSPacket,
@@ -70,12 +69,6 @@ export class ClientConnection {
 		this.server = server;
 		const that = this;
 
-		const helloMsg: WSHelloMessage = {
-			T: "hello",
-			playerID: this.id,
-		};
-		this.sendRaw(helloMsg);
-
 		socket.on("close", () => {
 			console.log(`Closing connection`);
 			server.sockets.delete(that.id);
@@ -107,6 +100,19 @@ export class ClientConnection {
 		this.q.registerCallHandler("getPlayerID", async (args: unknown) => {
 			console.log("getPlayerID", args, this.id);
 			return this.id;
+		});
+
+		this.q.registerCallHandler("setPlayerName", async (args: unknown) => {
+			if (typeof args !== "string") {
+				throw new Error("Invalid player name received");
+			}
+			this.playerName = args as string;
+			const msg = this.playerName + " joined the game";
+			console.log(msg);
+			for (const client of this.server.sockets.values()) {
+				client.q.call("addLogEntry", msg);
+			}
+			return "";
 		});
 
 		this.q.registerCallHandler("addLogEntry", async (args: unknown) => {
