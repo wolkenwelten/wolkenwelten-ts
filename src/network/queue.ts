@@ -8,14 +8,18 @@ type PromiseHandler = {
 	reject: (reason?: unknown) => void;
 };
 
+export type CallHandler = (...args: unknown[]) => Promise<unknown>;
+
 export class WSQueue {
 	id = 0;
 	callQueue: WSCall[] = [];
 	replyQueue: WSReply[] = [];
-	callHandlers: Map<string, (...args: unknown[]) => Promise<unknown>> =
-		new Map();
-
+	callHandlers: Map<string, CallHandler> = new Map();
 	promises: Map<number, PromiseHandler> = new Map();
+
+	empty(): boolean {
+		return this.callQueue.length === 0 && this.replyQueue.length === 0;
+	}
 
 	call(T: string, ...args: unknown[]): Promise<unknown> {
 		const id = ++this.id;

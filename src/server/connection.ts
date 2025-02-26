@@ -3,11 +3,13 @@
  */
 import { WebSocket } from "ws";
 import type { Server } from "./server";
-import type {
+import {
 	WSHelloMessage,
 	WSMessage,
 	WSMultiMessage,
+	WSPacket,
 	WSPlayerUpdate,
+	WSQueue,
 } from "../network";
 import { handler } from "./handler";
 import { coordinateToWorldKey } from "../world/world";
@@ -33,6 +35,8 @@ export class ClientConnection {
 	updates = 0;
 
 	chunkVersions = new Map<number, number>();
+
+	q: WSQueue = new WSQueue();
 
 	getChunkVersion(x: number, y: number, z: number): number {
 		return this.chunkVersions.get(coordinateToWorldKey(x, y, z)) || 0;
@@ -80,7 +84,10 @@ export class ClientConnection {
 		socket.on("message", (msg) => {
 			try {
 				const raw = JSON.parse(msg.toString());
-				if (raw.T === "multi") {
+				if (raw.T === "packet") {
+					const packet = raw as WSPacket;
+					that.q.handlePacket(packet);
+				} else if (raw.T === "multi") {
 					const multi = raw as WSMultiMessage;
 					for (const call of multi.calls) {
 						that.dispatch(call);
@@ -91,6 +98,15 @@ export class ClientConnection {
 			} catch (e) {
 				console.error(e);
 			}
+		});
+
+		this.registerDefaultHandlers();
+	}
+
+	registerDefaultHandlers() {
+		this.q.registerCallHandler("getPlayerID", async (args: unknown) => {
+			console.log("getPlayerID", args, this.id);
+			return this.id;
 		});
 	}
 
@@ -108,15 +124,19 @@ export class ClientConnection {
 	}
 
 	transferQueue() {
-		if (this.queue.length === 0) {
-			return;
+		if (this.queue.length > 0) {
+			const msg: WSMultiMessage = {
+				T: "multi",
+				calls: this.queue,
+			};
+			this.sendRaw(msg);
+			this.queue.length = 0;
 		}
 
-		const msg: WSMultiMessage = {
-			T: "multi",
-			calls: this.queue,
-		};
-		this.sendRaw(msg);
-		this.queue.length = 0;
+		if (!this.q.empty()) {
+			const packet = this.q.flush();
+			console.log("packet", packet);
+			this.socket.send(packet);
+		}
 	}
 }

@@ -12,6 +12,8 @@ import type {
 	WSPlayerHit,
 } from "../network";
 import { ClientEntry } from "./clientEntry";
+import { ClientNetwork } from "./clientNetwork";
+import "./clientHandler";
 
 export class ClientGame {
 	game: Game;
@@ -19,8 +21,11 @@ export class ClientGame {
 	private handler: Map<string, (msg: WSMessage) => void> = new Map();
 	clients: Map<number, ClientEntry> = new Map();
 
+	private readonly network: ClientNetwork;
+
 	constructor(game: Game) {
 		this.game = game;
+		this.network = new ClientNetwork(this);
 		this.connect();
 		this.addDefaultHandler();
 		setInterval(this.transfer.bind(this), 8);
@@ -28,6 +33,15 @@ export class ClientGame {
 
 	private addDefaultHandler() {
 		const game = this.game;
+
+		this.setHandler("packet", () => {});
+
+		this.setHandler("multi", (raw: WSMessage) => {
+			const msg = raw as WSMultiMessage;
+			for (const call of msg.calls) {
+				this.dispatch(call);
+			}
+		});
 
 		this.setHandler("msg", (raw: WSMessage) => {
 			const msg = raw as WSChatMessage;
@@ -141,7 +155,7 @@ export class ClientGame {
 		this.game.network.sendNameChange(this.game.options.playerName);
 	}
 
-	private dispatch(msg: WSMessage) {
+	dispatch(msg: WSMessage) {
 		const handler = this.handler.get(msg.T);
 		if (!handler) {
 			console.error("Received unknown Message:");
