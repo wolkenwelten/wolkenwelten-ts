@@ -3,15 +3,9 @@
  */
 import { WebSocket } from "ws";
 import type { Server } from "./server";
-import {
-	WSMessage,
-	WSMultiMessage,
-	WSPacket,
-	WSPlayerUpdate,
-	WSQueue,
-} from "../network";
-import { handler } from "./handler";
+import { WSPacket, WSQueue } from "../network";
 import { coordinateToWorldKey } from "../world/world";
+import { Chunk } from "../world/chunk/chunk";
 
 let idCounter = 0;
 export class ClientConnection {
@@ -20,7 +14,6 @@ export class ClientConnection {
 	id: number;
 	playerName = "";
 	server: Server;
-	queue: WSMessage[] = [];
 
 	x = 0;
 	y = 0;
@@ -45,24 +38,6 @@ export class ClientConnection {
 		this.chunkVersions.set(coordinateToWorldKey(x, y, z), version);
 	}
 
-	getPlayerUpdateMsg(): WSPlayerUpdate {
-		return {
-			T: "playerUpdate",
-			playerID: this.id,
-			playerName: this.playerName,
-
-			x: this.x,
-			y: this.y,
-			z: this.z,
-
-			yaw: this.yaw,
-			pitch: this.pitch,
-
-			health: this.health,
-			maxHealth: this.maxHealth,
-		};
-	}
-
 	constructor(server: Server, socket: WebSocket) {
 		this.id = ++idCounter;
 		this.socket = socket;
@@ -80,13 +55,6 @@ export class ClientConnection {
 				if (raw.T === "packet") {
 					const packet = raw as WSPacket;
 					that.q.handlePacket(packet);
-				} else if (raw.T === "multi") {
-					const multi = raw as WSMultiMessage;
-					for (const call of multi.calls) {
-						that.dispatch(call);
-					}
-				} else {
-					that.dispatch(raw);
 				}
 			} catch (e) {
 				console.error(e);
@@ -123,31 +91,161 @@ export class ClientConnection {
 			}
 			return "";
 		});
+
+		this.q.registerCallHandler("playerUpdate", async (args: unknown) => {
+			if (typeof args !== "object") {
+				throw new Error("Invalid player update received");
+			}
+			const update = args as any;
+
+			this.x = update.x;
+			this.y = update.y;
+			this.z = update.z;
+
+			this.yaw = update.yaw;
+			this.pitch = update.pitch;
+
+			this.health = update.health;
+			this.maxHealth = update.maxHealth;
+
+			this.updateOtherPlayers();
+			this.updateChunkVersions();
+		});
+
+		this.q.registerCallHandler("chunkDrop", async (args: unknown) => {
+			if (typeof args !== "object") {
+				throw new Error("Invalid chunk drop received");
+			}
+			const drop = args as any;
+			this.server.game.world.setBlock(drop.x, drop.y, drop.z, 0);
+		});
+
+		this.q.registerCallHandler("blockUpdate", async (args: unknown) => {
+			if (typeof args !== "object") {
+				throw new Error("Invalid block update received");
+			}
+			const update = args as any;
+			this.server.game.world.setBlock(
+				update.x,
+				update.y,
+				update.z,
+				update.block,
+			);
+		});
+
+		this.q.registerCallHandler("playerHit", async (args: unknown) => {
+			if (typeof args !== "object") {
+				throw new Error("Invalid player hit received");
+			}
+			const hit = args as any;
+			for (const client of this.server.sockets.values()) {
+				if (client === this) {
+					continue;
+				}
+				client.q.call("playerHit", hit);
+			}
+		});
 	}
 
-	dispatch(msg: any) {
-		const fun = handler.get(msg.T) || console.error;
-		fun(this, msg);
+	clientUpdateChunk(chunk: Chunk): boolean {
+		const clientVersion = this.getChunkVersion(chunk.x, chunk.y, chunk.z);
+		const serverVersion = chunk.lastUpdated;
+
+		if (clientVersion == serverVersion) {
+			return false;
+		} else if (clientVersion > serverVersion) {
+			throw new Error(
+				"Client has a higher version than the server, this should never happen",
+			);
+		} else {
+			this.setChunkVersion(chunk.x, chunk.y, chunk.z, serverVersion);
+
+			// Convert Uint8Array to base64 string
+			const blocks = Buffer.from(chunk.blocks).toString("base64");
+
+			this.q.call("chunkUpdate", {
+				x: chunk.x,
+				y: chunk.y,
+				z: chunk.z,
+				lastUpdated: chunk.lastUpdated,
+				blocks,
+			});
+			return true;
+		}
 	}
 
-	send(msg: WSMessage) {
-		this.queue.push(msg);
+	chunkUpdateLoop(rMax: number) {
+		// Process chunks in a rough inside-out pattern
+		let updates = 0;
+		for (let r = 0; r <= rMax; r++) {
+			// radius from center
+			for (let ox = -r; ox <= r; ox++) {
+				for (let oy = -r; oy <= r; oy++) {
+					for (let oz = -r; oz <= r; oz++) {
+						// Only process blocks at current "shell" radius
+						if (
+							Math.abs(ox) !== r &&
+							Math.abs(oy) !== r &&
+							Math.abs(oz) !== r
+						) {
+							continue;
+						}
+
+						const x = this.x + ox * 32;
+						const y = this.y + oy * 32;
+						const z = this.z + oz * 32;
+
+						const chunk = this.server.game.world.getOrGenChunk(x, y, z);
+						if (this.clientUpdateChunk(chunk)) {
+							if (++updates > 20) {
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		if (updates > 0) {
+			console.log(`Sent ${updates} chunk updates`);
+		}
 	}
 
-	sendRaw(msg: WSMessage) {
-		this.socket.send(JSON.stringify(msg));
+	updateChunkVersions() {
+		if ((++this.updates & 0x1f) == 0) {
+			this.chunkUpdateLoop(5);
+		} else {
+			this.chunkUpdateLoop(2);
+		}
+	}
+
+	updateOtherPlayers() {
+		for (const client of this.server.sockets.values()) {
+			if (client === this) {
+				continue;
+			}
+			// Can be removed once we only use the queue
+			if (client.playerName === "") {
+				continue;
+			}
+
+			this.q.call("playerUpdate", {
+				id: client.id,
+				name: client.playerName,
+
+				x: client.x,
+				y: client.y,
+				z: client.z,
+				yaw: client.yaw,
+				pitch: client.pitch,
+
+				health: client.health,
+				maxHealth: client.maxHealth,
+			});
+		}
 	}
 
 	transferQueue() {
-		if (this.queue.length > 0) {
-			const msg: WSMultiMessage = {
-				T: "multi",
-				calls: this.queue,
-			};
-			this.sendRaw(msg);
-			this.queue.length = 0;
-		}
-
 		if (!this.q.empty()) {
 			const packet = this.q.flush();
 			this.socket.send(packet);

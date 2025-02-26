@@ -12,7 +12,6 @@ import { ItemDrop } from "./itemDrop";
 import { Inventory } from "../item/inventory";
 import { Item, MaybeItem } from "../item/item";
 import { GRAVITY } from "../../constants";
-import { isClient } from "../../util/compat";
 
 const CHARACTER_ACCELERATION = 0.08;
 const CHARACTER_STOP_RATE = CHARACTER_ACCELERATION * 3.5;
@@ -512,8 +511,8 @@ export class Character extends Being {
 		}
 
 		// Send hit message to server
-		if (isClient()) {
-			this.world.game.network.sendPlayerHit(1.8, 1);
+		if (this.world.game.client) {
+			this.world.game.client.network.playerHit(this.id, 1.8, 1);
 		}
 
 		this.cooldown(cooldownDur);

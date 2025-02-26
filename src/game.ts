@@ -19,7 +19,6 @@ import { StaticObject } from "./world/chunk/staticObject";
 import { Mob } from "./world/entity/mob";
 import { Item } from "./world/item/item";
 import { World } from "./world/world";
-import { NetworkManager } from "./network";
 import { FloatingIslandsWorldGen } from "./content/floatingIslandsWorldGen";
 import type { ClientGame } from "./client/clientGame";
 
@@ -42,7 +41,6 @@ export class Game {
 	client?: ClientGame;
 	config: GameConfig;
 	input: InputManager;
-	network: NetworkManager;
 	player: Character;
 	profiler: ProfilingManager;
 	render: RenderManager;
@@ -63,7 +61,6 @@ export class Game {
 		this.config = config;
 		this.options = new Options();
 		this.profiler = ProfilingManager.profiler();
-		this.network = new NetworkManager();
 		this.benchmark = new BenchmarkManager(this);
 		this.world = new World(this);
 		this.player = new Character(this.world);

@@ -4,18 +4,11 @@
 import type { Game } from "../game";
 import { WebSocketServer, WebSocket } from "ws";
 import { ClientConnection } from "./connection";
-import type { WSMessage } from "../network";
 
 export class Server {
 	game: Game;
 	wss: WebSocketServer;
 	sockets: Map<number, ClientConnection> = new Map();
-
-	sendAll(msg: WSMessage) {
-		for (const s of this.sockets.values()) {
-			s.send(msg);
-		}
-	}
 
 	onConnect(socket: WebSocket) {
 		const con = new ClientConnection(this, socket);

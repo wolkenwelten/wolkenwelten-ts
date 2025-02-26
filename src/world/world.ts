@@ -55,8 +55,8 @@ export class World {
 	}
 
 	setBlock(x: number, y: number, z: number, block: number) {
-		if (isClient()) {
-			this.game.network.sendSetBlock(x, y, z, block);
+		if (this.game.client) {
+			this.game.client.network.blockUpdate(x, y, z, block);
 		} else {
 			this.getOrGenChunk(x, y, z).setBlock(x, y, z, block);
 		}
@@ -149,7 +149,7 @@ export class World {
 				this.chunks.delete(key);
 
 				this.game.render.dropBlockMesh(chunk.x, chunk.y, chunk.z);
-				this.game.network.sendChunkDrop(chunk.x, chunk.y, chunk.z);
+				this.game.client?.network.chunkDrop(chunk.x, chunk.y, chunk.z);
 			}
 		}
 		const px = this.game.player.x;
