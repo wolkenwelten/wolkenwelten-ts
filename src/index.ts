@@ -16,11 +16,10 @@ const main = () => {
 	if (!parent) {
 		throw new Error("Can't find WolkenWelten parent element");
 	}
-	const game = new Game({
+	const game = new ClientGame({
 		parent: parent as HTMLElement,
 	});
-	const clientGame = new ClientGame(game);
-	window.wow = clientGame;
+	window.wow = game;
 	console.log(
 		"%cHello there,%c most of the game state is accessible as the 'wow' object, happy hacking! :3",
 		"color:green",

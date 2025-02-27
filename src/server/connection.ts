@@ -2,7 +2,7 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import { WebSocket } from "ws";
-import type { Server } from "./server";
+import type { ServerGame } from "./server";
 import { WSPacket, WSQueue } from "../network";
 import { coordinateToWorldKey } from "../world/world";
 import { Chunk } from "../world/chunk/chunk";
@@ -13,7 +13,7 @@ export class ClientConnection {
 
 	id: number;
 	playerName = "";
-	server: Server;
+	server: ServerGame;
 
 	x = 0;
 	y = 0;
@@ -38,7 +38,7 @@ export class ClientConnection {
 		this.chunkVersions.set(coordinateToWorldKey(x, y, z), version);
 	}
 
-	constructor(server: Server, socket: WebSocket) {
+	constructor(server: ServerGame, socket: WebSocket) {
 		this.id = ++idCounter;
 		this.socket = socket;
 		this.server = server;
@@ -117,7 +117,7 @@ export class ClientConnection {
 				throw new Error("Invalid chunk drop received");
 			}
 			const drop = args as any;
-			this.server.game.world.setBlock(drop.x, drop.y, drop.z, 0);
+			this.server.world.setBlock(drop.x, drop.y, drop.z, 0);
 		});
 
 		this.q.registerCallHandler("blockUpdate", async (args: unknown) => {
@@ -125,12 +125,7 @@ export class ClientConnection {
 				throw new Error("Invalid block update received");
 			}
 			const update = args as any;
-			this.server.game.world.setBlock(
-				update.x,
-				update.y,
-				update.z,
-				update.block,
-			);
+			this.server.world.setBlock(update.x, update.y, update.z, update.block);
 		});
 
 		this.q.registerCallHandler("playerHit", async (args: unknown) => {
@@ -195,7 +190,7 @@ export class ClientConnection {
 						const y = this.y + oy * 32;
 						const z = this.z + oz * 32;
 
-						const chunk = this.server.game.world.getOrGenChunk(x, y, z);
+						const chunk = this.server.world.getOrGenChunk(x, y, z);
 						if (this.clientUpdateChunk(chunk)) {
 							if (++updates > 20) {
 								break;

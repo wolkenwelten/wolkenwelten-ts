@@ -35,6 +35,9 @@ export class Game {
 	Mob: typeof Mob;
 	StaticObject: typeof StaticObject;
 
+	isClient = false;
+	isServer = false;
+
 	audio: AudioManager;
 	benchmark: BenchmarkManager;
 	blocks: BlockTypeRegistry = {};

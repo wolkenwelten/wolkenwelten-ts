@@ -1,12 +1,12 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import type { Game } from "../game";
+import { Game, GameConfig } from "../game";
 import { WebSocketServer, WebSocket } from "ws";
 import { ClientConnection } from "./connection";
 
-export class Server {
-	game: Game;
+export class ServerGame extends Game {
+	isServer = true;
 	wss: WebSocketServer;
 	sockets: Map<number, ClientConnection> = new Map();
 
@@ -15,8 +15,8 @@ export class Server {
 		this.sockets.set(con.id, con);
 	}
 
-	constructor(game: Game) {
-		this.game = game;
+	constructor(config: GameConfig) {
+		super(config);
 		this.wss = new WebSocketServer({ port: 8080 });
 		this.wss.on("connection", this.onConnect.bind(this));
 
@@ -25,7 +25,7 @@ export class Server {
 			for (const con of server.sockets.values()) {
 				con.transferQueue();
 			}
-			game.update();
+			this.update();
 		}, 10);
 
 		console.log("Starting WolkenWelten Server on port 8080");

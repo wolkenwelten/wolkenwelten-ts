@@ -10,7 +10,7 @@ export type ClientHandler = (game: ClientGame, args: unknown) => Promise<void>;
 export class ClientNetwork {
 	private ws?: WebSocket;
 	private readonly queue: WSQueue;
-	private readonly client: ClientGame;
+	private readonly game: ClientGame;
 	private readonly rawQueue: string[] = [];
 
 	private static readonly defaultHandlers: Map<string, ClientHandler> =
@@ -88,12 +88,12 @@ export class ClientNetwork {
 			return;
 		}
 
-		this.playerUpdate(this.client.game.player);
+		this.playerUpdate(this.game.player);
 		this.sendRaw(this.queue.flush());
 	}
 
 	constructor(client: ClientGame) {
-		this.client = client;
+		this.game = client;
 		this.queue = new WSQueue();
 		this.addDefaultHandlers();
 		this.connect();
@@ -106,7 +106,7 @@ export class ClientNetwork {
 				throw new Error("Invalid log entry received");
 			}
 			const msg = args as string;
-			this.client.game.ui.log.addEntry(msg);
+			this.game.ui.log.addEntry(msg);
 		});
 
 		this.queue.registerCallHandler("playerUpdate", async (args: unknown) => {
@@ -114,10 +114,10 @@ export class ClientNetwork {
 				throw new Error("Invalid player update received");
 			}
 			const o = args as any;
-			const cli = this.client.clients.get(o.id);
+			const cli = this.game.clients.get(o.id);
 			if (!cli) {
-				const cli = new ClientEntry(this.client.game, o.id);
-				this.client.clients.set(o.id, cli);
+				const cli = new ClientEntry(this.game, o.id);
+				this.game.clients.set(o.id, cli);
 				cli.update(o);
 			} else {
 				cli.update(o);
@@ -129,7 +129,7 @@ export class ClientNetwork {
 				throw new Error("Invalid chunk update received");
 			}
 			const msg = args as any;
-			const chunk = this.client.game.world.getOrGenChunk(msg.x, msg.y, msg.z);
+			const chunk = this.game.world.getOrGenChunk(msg.x, msg.y, msg.z);
 			// Decode base64 string back to Uint8Array
 			const blocks = new Uint8Array(
 				atob(msg.blocks)
@@ -148,10 +148,10 @@ export class ClientNetwork {
 				throw new Error("Invalid player hit received");
 			}
 			const msg = args as any;
-			const attacker = this.client.clients.get(msg.playerID);
+			const attacker = this.game.clients.get(msg.playerID);
 			if (!attacker) return;
 
-			const game = this.client.game;
+			const game = this.game;
 
 			// Start hit animation for the attacking player
 			attacker.char.hitAnimation = game.render.frames;
