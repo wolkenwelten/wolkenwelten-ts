@@ -2,7 +2,7 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import type { Game } from "./game";
-import { BlockMesh } from "./render/meshes/blockMesh/blockMesh";
+import { BlockMesh } from "./client/render/meshes/blockMesh/blockMesh";
 
 export class BenchmarkManager {
 	game: Game;

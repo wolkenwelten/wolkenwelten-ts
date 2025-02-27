@@ -9,11 +9,8 @@ import { registerStaticObjects } from "./content/staticObjects";
 
 import { AudioManager } from "./audio";
 import { BenchmarkManager } from "./benchmark";
-import { InputManager } from "./input";
 import { Options } from "./options";
 import { ProfilingManager } from "./profiler";
-import { RenderManager } from "./render/render";
-import { UIManager } from "./ui/ui";
 import { Character } from "./world/entity/character";
 import { StaticObject } from "./world/chunk/staticObject";
 import { Mob } from "./world/entity/mob";
@@ -43,11 +40,9 @@ export class Game {
 	blocks: BlockTypeRegistry = {};
 	client?: ClientGame;
 	config: GameConfig;
-	input: InputManager;
 	player: Character;
 	profiler: ProfilingManager;
-	render: RenderManager;
-	ui: UIManager;
+
 	options: Options;
 	world: World;
 
@@ -70,10 +65,6 @@ export class Game {
 		this.audio = new AudioManager();
 
 		this.registerContent();
-
-		this.ui = new UIManager(this);
-		this.render = new RenderManager(this, this.player);
-		this.input = new InputManager(this);
 
 		setInterval(this.gc.bind(this), 20000);
 		setTimeout(this.init.bind(this), 0);

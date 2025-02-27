@@ -1,8 +1,8 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import type { TriangleMesh } from "../../render/meshes/triangleMesh/triangleMesh";
-import type { VoxelMesh } from "../../render/meshes/voxelMesh/voxelMesh";
+import type { TriangleMesh } from "../../client/render/meshes/triangleMesh/triangleMesh";
+import type { VoxelMesh } from "../../client/render/meshes/voxelMesh/voxelMesh";
 import type { Entity } from "../entity/entity";
 import type { World } from "../world";
 import type { Character } from "../entity/character";

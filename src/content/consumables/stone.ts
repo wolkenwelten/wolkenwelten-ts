@@ -4,7 +4,7 @@
 import itemIcon from "../../../assets/gfx/items/stone.png";
 import meshUrl from "../../../assets/vox/items/stone.vox?url";
 
-import type { VoxelMesh } from "../../render/meshes/voxelMesh/voxelMesh";
+import type { VoxelMesh } from "../../client/render/meshes/voxelMesh/voxelMesh";
 import type { Entity } from "../../world/entity/entity";
 import { Character } from "../../world/entity/character";
 import { Being } from "../../world/entity/being";

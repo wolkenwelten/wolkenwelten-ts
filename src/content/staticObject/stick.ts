@@ -3,7 +3,7 @@
  */
 import meshUrl from "../../../assets/vox/staticStick.vox?url";
 
-import type { VoxelMesh } from "../../render/meshes/voxelMesh/voxelMesh";
+import type { VoxelMesh } from "../../client/render/meshes/voxelMesh/voxelMesh";
 import type { Entity } from "../../world/entity/entity";
 import { StaticObject } from "../../world/chunk/staticObject";
 

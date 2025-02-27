@@ -1,7 +1,7 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import type { VoxelMesh } from "../../render/meshes/voxelMesh/voxelMesh";
+import type { VoxelMesh } from "../../client/render/meshes/voxelMesh/voxelMesh";
 import type { Entity } from "../entity/entity";
 import type { Chunk } from "./chunk";
 

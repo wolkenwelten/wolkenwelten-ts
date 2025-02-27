@@ -3,8 +3,8 @@
  */
 import { mat4 } from "gl-matrix";
 
-import type { TriangleMesh } from "../../render/meshes/triangleMesh/triangleMesh";
-import type { VoxelMesh } from "../../render/meshes/voxelMesh/voxelMesh";
+import type { TriangleMesh } from "../../client/render/meshes/triangleMesh/triangleMesh";
+import type { VoxelMesh } from "../../client/render/meshes/voxelMesh/voxelMesh";
 import { type World } from "../world";
 import type { Position } from "../../util/math";
 import { StatusEffect } from "../statusEffects/statusEffect";

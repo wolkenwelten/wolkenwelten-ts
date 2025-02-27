@@ -5,7 +5,7 @@ import { ServerGame } from "./server";
 
 const main = () => {
 	const parent: unknown = null;
-	const game = new ServerGame({
+	new ServerGame({
 		parent: parent as HTMLElement,
 	});
 };

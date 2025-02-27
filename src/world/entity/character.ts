@@ -3,7 +3,7 @@
  */
 import { mat4 } from "gl-matrix";
 
-import type { VoxelMesh } from "../../render/meshes/voxelMesh/voxelMesh";
+import type { VoxelMesh } from "../../client/render/meshes/voxelMesh/voxelMesh";
 import type { Entity } from "./entity";
 import { type World } from "../world";
 import type { Position } from "../../util/math";
