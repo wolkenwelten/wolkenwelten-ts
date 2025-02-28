@@ -112,16 +112,21 @@ export class EarthWall extends Rune {
 			return;
 		}
 
-		const frame = e.world.game.render.frames;
-		const decals = e.world.game.render.decals;
+		const frame = e.world.game.render?.frames || 0;
 		if (this.lastUseFrameCount !== frame) {
 			const selection = this.getWallSelection(e);
 			if (selection.length === 0) {
 				return;
 			}
 			for (const b of selection) {
-				decals.addBlock(b.from[0], b.from[1], b.from[2], 0, 2);
-				decals.addBlock(b.to[0], b.to[1], b.to[2], 1, 2);
+				e.world.game.render?.decals.addBlock(
+					b.from[0],
+					b.from[1],
+					b.from[2],
+					0,
+					2,
+				);
+				e.world.game.render?.decals.addBlock(b.to[0], b.to[1], b.to[2], 1, 2);
 			}
 			this.lastUseFrameCount = frame;
 		}
@@ -210,7 +215,7 @@ export class EarthWallBlock extends Entity {
 		this.y = from[1] + 0.5;
 		this.z = from[2] + 0.5;
 		this.scale = 2;
-		this.world.game.render.particle.fxBlockBreak(
+		this.world.game.render?.particle.fxBlockBreak(
 			this.x - 0.5,
 			this.y - 0.5,
 			this.z - 0.5,
@@ -221,8 +226,9 @@ export class EarthWallBlock extends Entity {
 
 	mesh(): TriangleMesh | VoxelMesh | null {
 		return (
-			this.world.game.render.assets.blockType[this.blockType] ||
-			this.world.game.render.assets.bag
+			this.world.game.render?.assets.blockType[this.blockType] ||
+			this.world.game.render?.assets.bag ||
+			null
 		);
 	}
 
@@ -240,7 +246,7 @@ export class EarthWallBlock extends Entity {
 				3,
 				3,
 			);
-			this.world.game.render.particle.fxBlockBreak(
+			this.world.game.render?.particle.fxBlockBreak(
 				this.x - 0.5,
 				this.y - 0.5,
 				this.z - 0.5,

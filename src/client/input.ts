@@ -4,7 +4,7 @@
 import { isClient } from "../util/compat";
 import { Character } from "../world/entity/character";
 import { Item } from "../world/item/item";
-import { ClientGame } from "./clientGame";
+import type { ClientGame } from "./clientGame";
 
 export class ControlState {
 	x = 0;
@@ -83,54 +83,50 @@ export class InputManager {
 		this.keyPushHandler.set("Enter", () => {
 			if (that.game.ui.chat.visible()) {
 				const msg = that.game.ui.chat.input.value.trim();
-				if (msg && that.game.client) {
-					that.game.client.network.addLogEntry(msg);
-				}
+				that.game.network.addLogEntry(msg);
 				that.game.ui.chat.hide();
 			} else {
 				that.game.ui.chat.show();
 			}
 		});
 
-		if (isClient()) {
-			that.game.render.canvasWrapper.addEventListener(
-				"mousedown",
-				async (e) => {
-					if (!that.game.running || !that.game.ready) {
-						return;
-					}
-					if (that.game.ui.inventory.active) {
-						that.toggleInventory(true);
-					}
-					await that.requestFullscreenAndPointerLock();
-				},
-				false,
-			);
-			that.game.ui.rootElement.addEventListener("mousedown", (e) =>
-				that.mouseStates.add(e.button),
-			);
-			that.game.ui.rootElement.addEventListener("contextmenu", (e) => {
+		that.game.render.canvasWrapper.addEventListener(
+			"mousedown",
+			async (e) => {
 				if (!that.game.running || !that.game.ready) {
 					return;
 				}
-				e.preventDefault();
-			});
-			that.game.ui.rootElement.addEventListener("mouseup", (e) =>
-				that.mouseStates.delete(e.button),
-			);
-			that.game.ui.rootElement.addEventListener(
-				"mousemove",
-				(e) => {
-					if (document.pointerLockElement) {
-						that.game.render.camera.rotate(
-							e.movementX * -0.001,
-							e.movementY * -0.001,
-						);
-					}
-				},
-				false,
-			);
-		}
+				if (that.game.ui.inventory.active) {
+					that.toggleInventory(true);
+				}
+				await that.requestFullscreenAndPointerLock();
+			},
+			false,
+		);
+		that.game.ui.rootElement.addEventListener("mousedown", (e) =>
+			that.mouseStates.add(e.button),
+		);
+		that.game.ui.rootElement.addEventListener("contextmenu", (e) => {
+			if (!that.game.running || !that.game.ready) {
+				return;
+			}
+			e.preventDefault();
+		});
+		that.game.ui.rootElement.addEventListener("mouseup", (e) =>
+			that.mouseStates.delete(e.button),
+		);
+		that.game.ui.rootElement.addEventListener(
+			"mousemove",
+			(e) => {
+				if (document.pointerLockElement) {
+					that.game.render.camera.rotate(
+						e.movementX * -0.001,
+						e.movementY * -0.001,
+					);
+				}
+			},
+			false,
+		);
 	}
 
 	async requestFullscreenAndPointerLock() {

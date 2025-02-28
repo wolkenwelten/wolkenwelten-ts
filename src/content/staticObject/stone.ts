@@ -3,13 +3,12 @@
  */
 import meshUrl from "../../../assets/vox/stone.vox?url";
 
-import type { VoxelMesh } from "../../client/render/meshes/voxelMesh/voxelMesh";
 import type { Entity } from "../../world/entity/entity";
 import { StaticObject } from "../../world/chunk/staticObject";
 
 export class StaticStone extends StaticObject {
-	mesh(): VoxelMesh {
-		return this.chunk.world.game.render.assets.get(meshUrl);
+	mesh() {
+		return this.chunk.world.game.render?.assets.get(meshUrl) || null;
 	}
 
 	onAttacked(perpetrator?: Entity) {

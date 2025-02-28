@@ -200,7 +200,11 @@ export class WorldRenderer {
 				const blits: VoxelMeshBlit[] = [];
 				for (const s of mesh.chunk.static) {
 					const transOff = s.transOff();
-					const vertices = s.mesh().vertices;
+					const mesh = s.mesh();
+					if (!mesh) {
+						continue;
+					}
+					const vertices = mesh.vertices;
 					const x = (s.x - s.chunk.x + transOff[0]) * 32;
 					const y = (s.y - s.chunk.y + transOff[1]) * 32;
 					const z = (s.z - s.chunk.z + transOff[2]) * 32;

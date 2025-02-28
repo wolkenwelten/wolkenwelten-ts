@@ -1,16 +1,16 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import type { Game } from "../../game";
+import type { ClientGame } from "../../clientGame";
 import { Div } from "../utils";
 import styles from "./chatPanel.module.css";
 
 export class ChatPanel {
 	div: HTMLElement;
-	game: Game;
+	game: ClientGame;
 	input: HTMLInputElement;
 
-	constructor(parent: HTMLElement, game: Game) {
+	constructor(parent: HTMLElement, game: ClientGame) {
 		parent.appendChild((this.div = Div({ class: styles.chatPanel })));
 		this.game = game;
 		this.input = Div({

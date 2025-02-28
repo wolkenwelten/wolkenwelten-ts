@@ -2,12 +2,10 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 
-import { registerAudioContent } from "./content/audioContent";
 import { registerBlockTypes } from "./content/blockTypes";
 import { registerItems } from "./content/itemContent";
 import { registerStaticObjects } from "./content/staticObjects";
 
-import { AudioManager } from "./audio";
 import { BenchmarkManager } from "./benchmark";
 import { Options } from "./options";
 import { ProfilingManager } from "./profiler";
@@ -17,7 +15,8 @@ import { Mob } from "./world/entity/mob";
 import { Item } from "./world/item/item";
 import { World } from "./world/world";
 import { FloatingIslandsWorldGen } from "./content/floatingIslandsWorldGen";
-import type { ClientGame } from "./client/clientGame";
+import type { RenderManager } from "./client/render/render";
+import type { AudioManager } from "./client/audio";
 
 export interface GameConfig {
 	parent: HTMLElement;
@@ -34,20 +33,21 @@ export class Game {
 
 	isClient = false;
 	isServer = false;
+	readonly startTime = +Date.now();
 
-	audio: AudioManager;
-	benchmark: BenchmarkManager;
-	blocks: BlockTypeRegistry = {};
-	client?: ClientGame;
-	config: GameConfig;
+	readonly audio?: AudioManager;
+	readonly render?: RenderManager;
+
+	readonly benchmark: BenchmarkManager;
+	readonly blocks: BlockTypeRegistry = {};
+	readonly config: GameConfig;
+	readonly profiler: ProfilingManager;
+
+	readonly options: Options;
+	readonly world: World;
+
 	player: Character;
-	profiler: ProfilingManager;
-
-	options: Options;
-	world: World;
-
 	ticks = 1;
-	startTime = +Date.now();
 	ready = false;
 	running = false;
 
@@ -62,7 +62,6 @@ export class Game {
 		this.benchmark = new BenchmarkManager(this);
 		this.world = new World(this);
 		this.player = new Character(this.world);
-		this.audio = new AudioManager();
 
 		this.registerContent();
 
@@ -71,13 +70,14 @@ export class Game {
 	}
 
 	registerContent() {
-		registerAudioContent(this.audio);
 		registerItems();
 		registerBlockTypes(this.world);
 		registerStaticObjects();
 	}
 
 	async init() {
+		this.player.getGoodStuff();
+
 		const worldgenHandler = new FloatingIslandsWorldGen("asdqwe");
 		await worldgenHandler.init();
 		this.world.worldgenHandler = worldgenHandler;
@@ -100,7 +100,6 @@ export class Game {
 				break; // Don't block for too long
 			}
 		}
-		this.audio.update(this.player); // Update AudioEmitter positions in case Entities get destroyed
 	}
 
 	// Try and free some memory by discarding far away objects

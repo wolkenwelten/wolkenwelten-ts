@@ -5,8 +5,9 @@ import { mat4 } from "gl-matrix";
 
 import type { VoxelMesh } from "../../client/render/meshes/voxelMesh/voxelMesh";
 import type { Entity } from "./entity";
-import { type World } from "../world";
+import type { World } from "../world";
 import type { Position } from "../../util/math";
+import type { ClientGame } from "../../client/clientGame";
 import { Being } from "./being";
 import { ItemDrop } from "./itemDrop";
 import { Inventory } from "../item/inventory";
@@ -96,9 +97,7 @@ export class Character extends Being {
 		this.yaw = 0;
 		this.pitch = 0;
 
-		setTimeout(() => {
-			this.getGoodStuff();
-		});
+		setTimeout(this.getGoodStuff.bind(this), 0);
 
 		this.remainingAirActions = this.maxAirActions;
 		this.justJumped = false;
@@ -147,7 +146,7 @@ export class Character extends Being {
 			this.isSprinting = true;
 			this.mayDash = false;
 			const dashSpeed = 0.75;
-			this.world.game.render.particle.fxDash(this.x, this.y - 0.5, this.z);
+			this.world.game.render?.particle.fxDash(this.x, this.y - 0.5, this.z);
 			const vx = Math.cos(-this.yaw - Math.PI / 2) * dashSpeed;
 			const vz = Math.sin(-this.yaw - Math.PI / 2) * dashSpeed;
 			this.vx = vx;
@@ -183,7 +182,7 @@ export class Character extends Being {
 				this.vy = 0.3;
 				this.jumpStart = this.world.game.ticks;
 				this.justJumped = true;
-				this.world.game.render.particle.fxJump(this.x, this.y - 0.5, this.z);
+				this.world.game.render?.particle.fxJump(this.x, this.y - 0.5, this.z);
 			}
 		}
 	}
@@ -275,7 +274,7 @@ export class Character extends Being {
 		this.walkCycleCounter += Math.min(0.2, movementLength);
 		if (this.walkCycleCounter > this.nextStepSound && this.mayJump()) {
 			this.nextStepSound = this.walkCycleCounter + 6;
-			this.world.game.audio.play("step", 0.5);
+			this.world.game.audio?.play("step", 0.5);
 		}
 		let speed = 0.6;
 		let accel =
@@ -309,7 +308,7 @@ export class Character extends Being {
 		// Calculate overall velocity
 		const v = this.vx * this.vx + this.vz * this.vz + this.vy * this.vy;
 		if (v > 0.075) {
-			this.world.game.render.particle.fxTrail(
+			this.world.game.render?.particle.fxTrail(
 				this.x,
 				this.y - 1,
 				this.z,
@@ -324,7 +323,7 @@ export class Character extends Being {
 		} else if (this.movementY > 0 && this.mayJump()) {
 			this.vy = 0.25;
 			this.jumpStart = this.world.game.ticks;
-			this.world.game.render.particle.fxJump(this.x, this.y - 0.5, this.z);
+			this.world.game.render?.particle.fxJump(this.x, this.y - 0.5, this.z);
 		}
 		if (this.movementY > 0 && this.maySwim() && Math.abs(this.vy) < 0.07) {
 			this.vy = 0.06;
@@ -356,7 +355,7 @@ export class Character extends Being {
 		const dz = this.vz - oldVz;
 		const force = Math.sqrt(dx * dx + dy * dy + dz * dz);
 		if (force > 0.2) {
-			this.world.game.audio.play("stomp", 0.5);
+			this.world.game.audio?.play("stomp", 0.5);
 		}
 		if (force > 0.1) {
 			const amount = Math.floor(force * 2);
@@ -419,7 +418,7 @@ export class Character extends Being {
 					if (e instanceof Being) {
 						this.doDamage(e, weapon?.attackDamage(e) || 1);
 					}
-					this.world.game.render.particle.fxStrike(e.x, e.y, e.z);
+					this.world.game.render?.particle.fxStrike(e.x, e.y, e.z);
 				}
 			}
 		}
@@ -437,7 +436,7 @@ export class Character extends Being {
 						const bt = this.world.blocks[b];
 						if (bt.health < 200) {
 							this.world.setBlock(cx, cy, cz, 0);
-							this.world.game.render.particle.fxBlockBreak(cx, cy, cz, bt);
+							this.world.game.render?.particle.fxBlockBreak(cx, cy, cz, bt);
 						}
 					}
 				}
@@ -473,19 +472,19 @@ export class Character extends Being {
 
 	/* Callback function that gets called when this Character dies */
 	onDeath() {
-		this.world.game.audio.play("ungh", 0.2);
-		this.world.game.ui.hotbar.clear();
+		this.world.game.audio?.play("ungh", 0.2);
+		//this.world.game.ui.hotbar.clear();
 		this.init();
 	}
 
 	/* Callback function that gets called whenever this character is attacked */
 	onAttack(perpetrator: Entity): void {
 		if (this === this.world.game.player) {
-			this.world.game.render.canvasWrapper.classList.remove("fx-damage");
-			this.world.game.render.canvasWrapper.getBoundingClientRect();
-			this.world.game.render.canvasWrapper.classList.add("fx-damage");
+			this.world.game.render?.canvasWrapper.classList.remove("fx-damage");
+			this.world.game.render?.canvasWrapper.getBoundingClientRect();
+			this.world.game.render?.canvasWrapper.classList.add("fx-damage");
 		}
-		this.world.game.audio.play("ungh", 0.2);
+		this.world.game.audio?.play("ungh", 0.2);
 	}
 
 	/* Return true when the character shouldn't be able to do anything */
@@ -500,34 +499,35 @@ export class Character extends Being {
 		}
 		const item = this.equipmentWeapon();
 
-		this.hitAnimation = this.world.game.render.frames;
+		this.hitAnimation = this.world.game.render?.frames || 0;
 		const hit = this.attack(1.8);
 		const cooldownDur = item ? item.attackCooldown(this) : 20;
 		this.hitAnimationCounter = (this.hitAnimationCounter + 1) & 1;
 
-		const cam = this.world.game.render.camera;
-		if (cam.entityToFollow === this) {
+		const cam = this.world.game.render?.camera;
+		if (cam?.entityToFollow === this) {
 			cam.shake(hit ? 0.3 : 0.15);
 		}
 
 		// Send hit message to server
-		if (this.world.game.client) {
-			this.world.game.client.network.playerHit(this.id, 1.8, 1);
+		if (this.world.game.isClient) {
+			const game = this.world.game as ClientGame;
+			game.network.playerHit(this.id, 1.8, 1);
 		}
 
 		this.cooldown(cooldownDur);
 		if (hit) {
-			this.world.game.audio.play("punch");
+			this.world.game.audio?.play("punch");
 			if (item) {
 				item.onAttackWith(this);
 			}
 		} else {
-			this.world.game.audio.play("punchMiss");
+			this.world.game.audio?.play("punchMiss");
 		}
 		const px = this.x + Math.cos(-this.yaw - Math.PI / 2);
 		const py = this.y - 0.9;
 		const pz = this.z + Math.sin(-this.yaw - Math.PI / 2);
-		this.world.game.render.particle.fxStrike(px, py, pz);
+		this.world.game.render?.particle.fxStrike(px, py, pz);
 	}
 
 	equipmentWeapon() {
@@ -551,7 +551,7 @@ export class Character extends Being {
 	dropItem(item: MaybeItem): ItemDrop | null {
 		if (item) {
 			const drop = ItemDrop.fromItem(item, this);
-			this.hitAnimation = this.world.game.render.frames;
+			this.hitAnimation = this.world.game.render?.frames || 0;
 			this.inventory.updateAll();
 			return drop;
 		}
@@ -611,12 +611,15 @@ export class Character extends Being {
 	}
 
 	draw(projectionMatrix: mat4, viewMatrix: mat4, cam: Position) {
-		this.world.game.render.decals.addShadow(this.x, this.y, this.z, 0.75);
+		if (!this.world.game.render) {
+			return;
+		}
+		this.world.game.render?.decals.addShadow(this.x, this.y, this.z, 0.75);
 		const dx = this.x - cam.x;
 		const dy = this.y - cam.y;
 		const dz = this.z - cam.z;
 		const d = Math.cbrt(dx * dx + dy * dy + dz * dz);
-		const renderDistance = this.world.game.render.renderDistance;
+		const renderDistance = this.world.game.render?.renderDistance || 0;
 		const alpha = Math.min(1, Math.max(0, renderDistance - d) / 8);
 
 		const speedPitch = Math.max(-0.2, this.getSpeed() * -0.5);
@@ -629,8 +632,8 @@ export class Character extends Being {
 		let rightLegPitch = this.walkAnimationFactor * 1.6;
 		let leftLegPitch = this.walkAnimationFactor * -1.6;
 
-		if (this.hitAnimation + 16 > this.world.game.render.frames) {
-			const t = this.hitAnimation + 16 - this.world.game.render.frames;
+		if (this.hitAnimation + 16 > (this.world.game.render?.frames || 0)) {
+			const t = this.hitAnimation + 16 - (this.world.game.render?.frames || 0);
 			rightArmPitch = (t / 16) * 1.5;
 			rightArmPitch *= rightArmPitch;
 			leftArmPitch = rightArmPitch * -0.5;
@@ -737,7 +740,7 @@ export class Character extends Being {
 		);
 	}
 
-	mesh(): VoxelMesh {
-		return this.world.game.render.assets.playerHead;
+	mesh() {
+		return this.world.game.render?.assets.playerHead || null;
 	}
 }

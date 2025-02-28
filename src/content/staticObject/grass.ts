@@ -3,13 +3,12 @@
  */
 import meshUrl from "../../../assets/vox/grass.vox?url";
 
-import type { VoxelMesh } from "../../client/render/meshes/voxelMesh/voxelMesh";
 import type { Entity } from "../../world/entity/entity";
 import { StaticObject } from "../../world/chunk/staticObject";
 
 export class StaticGrass extends StaticObject {
-	mesh(): VoxelMesh {
-		return this.chunk.world.game.render.assets.get(meshUrl);
+	mesh() {
+		return this.chunk.world.game.render?.assets.get(meshUrl) || null;
 	}
 
 	transOff(): [number, number, number] {
@@ -17,8 +16,8 @@ export class StaticGrass extends StaticObject {
 	}
 
 	onAttacked(perpetrator?: Entity) {
-		this.chunk.world.game.audio.play("tock", 0.5);
-		this.chunk.world.game.render.particle.fxBlockBreak(
+		this.chunk.world.game.audio?.play("tock", 0.5);
+		this.chunk.world.game.render?.particle.fxBlockBreak(
 			this.x,
 			this.y,
 			this.z,

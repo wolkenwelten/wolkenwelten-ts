@@ -1,7 +1,7 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import type { Game } from "../../game";
+import type { ClientGame } from "../clientGame";
 import { ChatPanel } from "./components/chatPanel";
 import { HealthBar } from "./components/health/healthBar";
 import { FpsCounter } from "./components/fpsCounter";
@@ -13,7 +13,7 @@ import { IconManager } from "./icon";
 import { RepulsionMultiplier } from "./components/repulsionMultiplier";
 
 export class UIManager {
-	game: Game;
+	game: ClientGame;
 	rootElement: HTMLElement;
 	uiWrapper: HTMLElement;
 	inventory: PlayerModal;
@@ -28,7 +28,7 @@ export class UIManager {
 
 	rootHasPaused = false;
 
-	constructor(game: Game) {
+	constructor(game: ClientGame) {
 		this.game = game;
 		this.rootElement = game.config.parent;
 		this.rootElement.setAttribute("paused", "false");

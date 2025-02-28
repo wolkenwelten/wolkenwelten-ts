@@ -1,7 +1,7 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import type { Game } from "../../../game";
+import type { ClientGame } from "../../../clientGame";
 import { Div } from "../../utils";
 import styles from "./playerModal.module.css";
 import { SettingsWrap } from "./settingsWrap";
@@ -11,13 +11,13 @@ interface TabClass {
 }
 type TabConstructor<T extends TabClass> = new (
 	tab: HTMLElement,
-	game: Game,
+	game: ClientGame,
 ) => T;
 
 export class PlayerModal {
 	active = false;
 	div: HTMLElement;
-	game: Game;
+	game: ClientGame;
 	tabContent: HTMLElement;
 	tabBar: HTMLElement;
 
@@ -25,7 +25,7 @@ export class PlayerModal {
 	settings: SettingsWrap;
 
 	private initTab<T extends TabClass>(
-		game: Game,
+		game: ClientGame,
 		title: string,
 		constructor: TabConstructor<T>,
 		activeTab = false,
@@ -58,7 +58,7 @@ export class PlayerModal {
 		return o;
 	}
 
-	constructor(parent: HTMLElement, game: Game) {
+	constructor(parent: HTMLElement, game: ClientGame) {
 		this.game = game;
 		this.div = Div({
 			class: styles.modal,

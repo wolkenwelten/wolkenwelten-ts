@@ -1,15 +1,15 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import type { Game } from "../../game";
+import type { ClientGame } from "../../clientGame";
 import { Div } from "../utils";
 import styles from "./repulsionMultiplier.module.css";
 
 export class RepulsionMultiplier {
 	div: HTMLElement;
-	game: Game;
+	game: ClientGame;
 
-	constructor(parent: HTMLElement, game: Game) {
+	constructor(parent: HTMLElement, game: ClientGame) {
 		this.game = game;
 		parent.appendChild((this.div = Div({ class: styles.repulsion })));
 	}

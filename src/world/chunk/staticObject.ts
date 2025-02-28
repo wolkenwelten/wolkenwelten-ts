@@ -57,8 +57,8 @@ export class StaticObject {
 		this.chunk.staticDelete(this);
 	}
 
-	mesh(): VoxelMesh {
-		return this.chunk.world.game.render.assets.test;
+	mesh(): VoxelMesh | null {
+		return null;
 	}
 
 	transOff(): [number, number, number] {

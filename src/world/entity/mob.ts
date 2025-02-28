@@ -44,7 +44,7 @@ export class Mob extends Being {
 	}
 
 	draw(projectionMatrix: mat4, viewMatrix: mat4, cam: Position) {
-		if (this.destroyed) {
+		if (this.destroyed || !this.world.game.render) {
 			return;
 		}
 

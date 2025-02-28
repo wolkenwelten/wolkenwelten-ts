@@ -2,7 +2,7 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import { Howl, Howler } from "howler";
-import type { Entity } from "./world/entity/entity";
+import type { Entity } from "../world/entity/entity";
 
 export class AudioManager {
 	assets: Map<string, string> = new Map();

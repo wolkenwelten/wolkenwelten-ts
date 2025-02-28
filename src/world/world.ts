@@ -4,6 +4,7 @@
 import type { Game } from "../game";
 import type { Entity } from "./entity/entity";
 import type { WorldGen } from "./worldGen";
+import type { ClientGame } from "../client/clientGame";
 import profiler from "../profiler";
 import { FireSystem } from "./fireSystem";
 import { BlockType } from "./blockType";
@@ -55,8 +56,8 @@ export class World {
 	}
 
 	setBlock(x: number, y: number, z: number, block: number) {
-		if (this.game.client) {
-			this.game.client.network.blockUpdate(x, y, z, block);
+		if (this.game.isClient) {
+			(this.game as ClientGame).network.blockUpdate(x, y, z, block);
 		} else {
 			this.getOrGenChunk(x, y, z).setBlock(x, y, z, block);
 		}
@@ -139,7 +140,9 @@ export class World {
 
 	gc() {
 		const maxDistance =
-			this.game.render.renderDistance * this.game.render.renderDistance * 4;
+			(this.game.render?.renderDistance || 0) *
+			(this.game.render?.renderDistance || 0) *
+			4;
 		for (const chunk of this.chunks.values()) {
 			if (!this.worldgenHandler?.mayGC(chunk)) {
 				continue;
@@ -148,8 +151,14 @@ export class World {
 				const key = coordinateToWorldKey(chunk.x, chunk.y, chunk.z);
 				this.chunks.delete(key);
 
-				this.game.render.dropBlockMesh(chunk.x, chunk.y, chunk.z);
-				this.game.client?.network.chunkDrop(chunk.x, chunk.y, chunk.z);
+				this.game.render?.dropBlockMesh(chunk.x, chunk.y, chunk.z);
+				if (this.game.isClient) {
+					(this.game as ClientGame).network.chunkDrop(
+						chunk.x,
+						chunk.y,
+						chunk.z,
+					);
+				}
 			}
 		}
 		const px = this.game.player.x;

@@ -25,7 +25,7 @@ export class WetEffect extends StatusEffect {
 			const b = 0xf0 | (Math.random() * 16);
 			const a = 0xff;
 			const color = r | (g << 8) | (b << 16) | (a << 24);
-			world.game.render.particle.add(
+			world.game.render?.particle.add(
 				x + ox,
 				y + oy - 1,
 				z + oz,

@@ -225,18 +225,18 @@ export class Entity {
 	}
 
 	mesh(): TriangleMesh | VoxelMesh | null {
-		return this.world.game.render.assets.bag;
+		return this.world.game.render?.assets.bag || null;
 	}
 
 	draw(projectionMatrix: mat4, viewMatrix: mat4, cam: Position) {
-		if (this.destroyed) {
+		if (this.destroyed || !this.world.game.render) {
 			return;
 		}
 		const mesh = this.mesh();
 		if (!mesh) {
 			return;
 		}
-		this.world.game.render.decals.addShadow(this.x, this.y, this.z, 1);
+		this.world.game.render?.decals.addShadow(this.x, this.y, this.z, 1);
 
 		transPos[0] = this.x;
 		transPos[1] = this.y;
@@ -256,7 +256,7 @@ export class Entity {
 		const dy = this.y - cam.y;
 		const dz = this.z - cam.z;
 		const d = Math.sqrt(dx * dx + dy * dy + dz * dz);
-		const renderDistance = this.world.game.render.renderDistance;
+		const renderDistance = this.world.game.render?.renderDistance || 0;
 		const alpha = Math.min(1, Math.max(0, renderDistance - d) / 8);
 		mesh.draw(modelViewMatrix, alpha);
 	}
@@ -282,7 +282,7 @@ export class Entity {
 	}
 
 	playSound(name: string, volume = 1.0, stopWhenEntityDestroyed = false) {
-		this.world.game.audio.playFromEntity(
+		this.world.game.audio?.playFromEntity(
 			name,
 			volume,
 			this,
@@ -291,7 +291,7 @@ export class Entity {
 	}
 
 	playUnmovingSound(name: string, volume = 1.0) {
-		this.world.game.audio.playAtPosition(name, volume, [
+		this.world.game.audio?.playAtPosition(name, volume, [
 			this.x,
 			this.y,
 			this.z,

@@ -1,15 +1,15 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import type { Game } from "../../game";
+import type { ClientGame } from "../../clientGame";
 import { Div } from "../utils";
 import styles from "./introWindow.module.css";
 
 export class IntroWindow {
 	div: HTMLElement;
-	game: Game;
+	game: ClientGame;
 
-	constructor(parent: HTMLElement, game: Game) {
+	constructor(parent: HTMLElement, game: ClientGame) {
 		this.game = game;
 		this.div = Div({
 			class: styles.introWindow,

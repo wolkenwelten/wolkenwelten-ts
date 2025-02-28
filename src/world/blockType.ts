@@ -139,11 +139,11 @@ export class BlockType {
 	}
 
 	playPlaceSound(world: World) {
-		world.game.audio.play(this.placeSound);
+		world.game.audio?.play(this.placeSound);
 	}
 
 	playMineSound(world: World) {
-		world.game.audio.play(this.mineSound, 0.5);
+		world.game.audio?.play(this.mineSound, 0.5);
 	}
 
 	spawnMiningDrops(

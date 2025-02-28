@@ -4,6 +4,7 @@
 import { mat4 } from "gl-matrix";
 
 import type { Entity } from "../../world/entity/entity";
+import type { ClientGame } from "../clientGame";
 import { coordinateToWorldKey } from "../../world/world";
 import { AssetList } from "./asset";
 import { DecalMesh } from "./meshes/decalMesh/decalMesh";
@@ -14,7 +15,6 @@ import { WorldRenderer } from "./worldRenderer";
 import { Div } from "../ui/utils";
 import { Sky } from "./sky";
 import { CloudMesh } from "./meshes/cloudMesh/cloudMesh";
-import { ClientGame } from "../clientGame";
 
 const projectionMatrix = mat4.create();
 const viewMatrix = mat4.create();

@@ -29,14 +29,13 @@ export class Comet extends Rune {
 			return;
 		}
 
-		const frame = e.world.game.render.frames;
+		const frame = e.world.game.render?.frames || 0;
 		if (this.lastUseFrameCount !== frame) {
 			const [x, y, z] = this.raycast(e);
 
-			const decals = e.world.game.render.decals;
 			for (let ox = -4; ox < 5; ox++) {
 				for (let oz = -4; oz < 5; oz++) {
-					decals.addBlock(x + ox, y, z + oz, 0, 2);
+					e.world.game.render?.decals.addBlock(x + ox, y, z + oz, 0, 2);
 				}
 			}
 			this.lastUseFrameCount = frame;
@@ -86,8 +85,9 @@ export class CometEntity extends Entity {
 
 	mesh(): TriangleMesh | VoxelMesh | null {
 		return (
-			this.world.game.render.assets.blockType[this.blockType] ||
-			this.world.game.render.assets.bag
+			this.world.game.render?.assets.blockType[this.blockType] ||
+			this.world.game.render?.assets.bag ||
+			null
 		);
 	}
 
@@ -120,7 +120,7 @@ export class CometEntity extends Entity {
 				this.source?.doDamage(e, dmg * dmg);
 			}
 			if (e === this.world.game.player) {
-				this.world.game.render.camera.shake(Math.max(0, 27 - dd) * 3);
+				this.world.game.render?.camera.shake(Math.max(0, 27 - dd) * 3);
 			}
 		}
 	}

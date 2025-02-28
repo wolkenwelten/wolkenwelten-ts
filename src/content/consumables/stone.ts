@@ -27,7 +27,7 @@ export class Stone extends Item {
 			if (--this.amount <= 0) {
 				this.destroy();
 			}
-			user.hitAnimation = this.world.game.render.frames;
+			user.hitAnimation = this.world.game.render?.frames || 0;
 			user.inventory.updateAll();
 
 			const proj = new Projectile(user, 1.4);
@@ -38,7 +38,7 @@ export class Stone extends Item {
 				if (e instanceof Being) {
 					user.doDamage(e, 1);
 				}
-				this.world.game.render.particle.fxStrike(e.x, e.y, e.z);
+				this.world.game.render?.particle.fxStrike(e.x, e.y, e.z);
 				new ItemDrop(
 					this.world,
 					this.x,

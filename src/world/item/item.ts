@@ -52,10 +52,11 @@ export class Item {
 		this.destroyed = true;
 	}
 
-	mesh(): TriangleMesh | VoxelMesh {
+	mesh(): TriangleMesh | VoxelMesh | null {
 		return (
-			this.world.game.render.assets.get(this.meshUrl) ||
-			this.world.game.render.assets.bag
+			this.world.game.render?.assets.get(this.meshUrl) ||
+			this.world.game.render?.assets.bag ||
+			null
 		);
 	}
 

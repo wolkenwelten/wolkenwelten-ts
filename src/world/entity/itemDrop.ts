@@ -3,8 +3,6 @@
  */
 import { mat4 } from "gl-matrix";
 
-import type { TriangleMesh } from "../../client/render/meshes/triangleMesh/triangleMesh";
-import type { VoxelMesh } from "../../client/render/meshes/voxelMesh/voxelMesh";
 import type { Item } from "../item/item";
 import type { World } from "../world";
 import type { Character } from "./character";
@@ -37,8 +35,8 @@ export class ItemDrop extends Entity {
 		return drop;
 	}
 
-	mesh(): TriangleMesh | VoxelMesh {
-		return this.item.mesh();
+	mesh() {
+		return this.item.mesh() || null;
 	}
 
 	canCollect(player: Character): boolean {
@@ -68,7 +66,7 @@ export class ItemDrop extends Entity {
 		}
 
 		this.destroy();
-		this.world.game.audio.play("pock", 0.4);
+		this.world.game.audio?.play("pock", 0.4);
 	}
 
 	update() {
@@ -100,10 +98,14 @@ export class ItemDrop extends Entity {
 	}
 
 	draw(projectionMatrix: mat4, viewMatrix: mat4, cam: Position) {
-		if (this.destroyed) {
+		if (this.destroyed || !this.world.game.render) {
 			return;
 		}
 		this.world.game.render.decals.addShadow(this.x, this.y, this.z, 1);
+		const mesh = this.mesh();
+		if (!mesh) {
+			return;
+		}
 
 		mat4.identity(modelViewMatrix);
 		const yOff =
@@ -126,6 +128,6 @@ export class ItemDrop extends Entity {
 		const d = Math.sqrt(dx * dx + dy * dy + dz * dz);
 		const renderDistance = this.world.game.render.renderDistance;
 		const alpha = Math.min(1, Math.max(0, renderDistance - d) / 8);
-		this.mesh().draw(modelViewMatrix, alpha);
+		mesh.draw(modelViewMatrix, alpha);
 	}
 }

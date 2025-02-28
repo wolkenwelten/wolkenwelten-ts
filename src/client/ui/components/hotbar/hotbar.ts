@@ -1,8 +1,8 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import type { Game } from "../../../game";
-import { Item } from "../../../world/item/item";
+import type { ClientGame } from "../../../clientGame";
+import { Item } from "../../../../world/item/item";
 import { Div } from "../../utils";
 import { InventorySlotWidget } from "../item/inventorySlotWidget";
 import styles from "./hotbar.module.css";
@@ -15,10 +15,10 @@ export class HotbarEntry {
 	i: number;
 	slot: HTMLElement;
 	widget: InventorySlotWidget;
-	game: Game;
+	game: ClientGame;
 	value: HotbarEntryValue;
 
-	constructor(parent: HTMLElement, game: Game, i: number) {
+	constructor(parent: HTMLElement, game: ClientGame, i: number) {
 		this.i = i;
 		this.game = game;
 		parent.appendChild(
@@ -72,7 +72,7 @@ export class Hotbar {
 	div: HTMLElement;
 	entries: HotbarEntry[] = [];
 
-	constructor(parent: HTMLElement, game: Game) {
+	constructor(parent: HTMLElement, game: ClientGame) {
 		this.div = Div({ class: styles.hotbar });
 		for (let i = 0; i < 4; i++) {
 			this.entries[i] = new HotbarEntry(this.div, game, i);

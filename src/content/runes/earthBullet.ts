@@ -29,7 +29,7 @@ export class EarthBullet extends Rune {
 		if (bt.miningCat !== "Pickaxe") {
 			return;
 		}
-		this.world.game.render.particle.fxBlockBreak(x, y, z, bt);
+		this.world.game.render?.particle.fxBlockBreak(x, y, z, bt);
 		e.world.setBlock(x, y, z, 0);
 		this.world.dangerZone.add(x - 1, y - 1, z - 1, 3, 3, 3);
 		this.bulletEntity = new EarthBulletEntity(this.world, blockType, e);
@@ -40,7 +40,7 @@ export class EarthBullet extends Rune {
 		this.bulletEntity.playUnmovingSound("tock", 0.3);
 
 		e.cooldown(32);
-		e.hitAnimation = this.world.game.render.frames;
+		e.hitAnimation = this.world.game.render?.frames || 0;
 	}
 
 	use(e: Character) {
@@ -95,8 +95,8 @@ export class EarthBullet extends Rune {
 		this.bulletEntity = undefined;
 
 		e.cooldown(32);
-		e.hitAnimation = this.world.game.render.frames;
-		this.world.game.render.camera.shake(0.3);
+		e.hitAnimation = this.world.game.render?.frames || 0;
+		this.world.game.render?.camera.shake(0.3);
 	}
 }
 
@@ -120,18 +120,22 @@ export class EarthBulletEntity extends Entity {
 
 	mesh(): TriangleMesh | VoxelMesh | null {
 		return (
-			this.world.game.render.assets.blockType[this.blockType] ||
-			this.world.game.render.assets.bag
+			this.world.game.render?.assets.blockType[this.blockType] ||
+			this.world.game.render?.assets.bag ||
+			null
 		);
 	}
 
 	private disintegrate() {
 		const bt = this.world.blocks[this.blockType];
-		const particle = this.world.game.render.particle;
+		const particle = this.world.game.render?.particle;
 		const bx = this.x - 0.5;
 		const by = this.y - 0.5;
 		const bz = this.z - 0.5;
 
+		if (!particle) {
+			return;
+		}
 		for (let i = 0; i < 128; i++) {
 			const color = i < 64 ? bt.colorA : bt.colorB;
 			const x = bx + Math.random();
@@ -211,14 +215,14 @@ export class EarthBulletEntity extends Entity {
 
 	updateShot() {
 		++this.ticksAlive;
-		this.world.game.render.particle.fxBlockMine(
+		this.world.game.render?.particle.fxBlockMine(
 			this.x - 0.5,
 			this.y - 0.5,
 			this.z - 0.5,
 			this.world.blocks[this.blockType],
 		);
 		if (this.collides()) {
-			this.world.game.render.particle.fxBlockBreak(
+			this.world.game.render?.particle.fxBlockBreak(
 				this.x - 0.5,
 				this.y - 0.5,
 				this.z - 0.5,

@@ -26,7 +26,7 @@ export class FireBreath extends Rune {
 				if (i > 3) {
 					e.world.fire.add(x, y, z, 4096);
 					firesSpawned++;
-					e.world.game.audio.playAtPosition("bomb", 0.1, [x, y, z]);
+					e.world.game.audio?.playAtPosition("bomb", 0.1, [x, y, z]);
 				}
 			} else {
 				return false;
@@ -40,9 +40,9 @@ export class FireBreath extends Rune {
 		if (firesSpawned === 0) {
 			return;
 		}
-		this.world.game.render.camera.shake(1);
+		this.world.game.render?.camera.shake(1);
 		e.cooldown(100);
-		e.hitAnimation = this.world.game.render.frames;
+		e.hitAnimation = this.world.game.render?.frames || 0;
 		const [vx, vz] = e.walkDirection();
 		e.vy += 0.1;
 		e.vx += vx * 0.6;

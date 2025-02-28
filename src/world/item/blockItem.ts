@@ -1,8 +1,6 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import type { TriangleMesh } from "../../client/render/meshes/triangleMesh/triangleMesh";
-import type { VoxelMesh } from "../../client/render/meshes/voxelMesh/voxelMesh";
 import type { Entity } from "../entity/entity";
 import type { World } from "../world";
 import { Character } from "../entity/character";
@@ -23,10 +21,11 @@ export class BlockItem extends Item {
 		this.name = bt.longName || bt.name;
 	}
 
-	mesh(): TriangleMesh | VoxelMesh {
+	mesh() {
 		return (
-			this.world.game.render.assets.blockType[this.blockType] ||
-			this.world.game.render.assets.bag
+			this.world.game.render?.assets.blockType[this.blockType] ||
+			this.world.game.render?.assets.bag ||
+			null
 		);
 	}
 
@@ -56,7 +55,7 @@ export class BlockItem extends Item {
 
 		e.cooldown(32);
 		if (e instanceof Character) {
-			e.hitAnimation = this.world.game.render.frames;
+			e.hitAnimation = this.world.game.render?.frames || 0;
 			e.inventory.updateAll();
 		}
 		return;

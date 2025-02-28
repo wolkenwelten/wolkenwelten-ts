@@ -2,8 +2,8 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import type { Inventory } from "../../../../world/item/inventory";
+import type { ClientGame } from "../../../clientGame";
 import { Item } from "../../../../world/item/item";
-import { ClientGame } from "../../../clientGame";
 import { Div } from "../../utils";
 import styles from "./inventorySlotWidget.module.css";
 import { ItemWidget } from "./item";
