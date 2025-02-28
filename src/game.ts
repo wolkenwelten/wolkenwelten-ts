@@ -76,8 +76,6 @@ export class Game {
 	}
 
 	async init() {
-		this.player.getGoodStuff();
-
 		const worldgenHandler = new FloatingIslandsWorldGen("asdqwe");
 		await worldgenHandler.init();
 		this.world.worldgenHandler = worldgenHandler;

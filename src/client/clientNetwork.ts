@@ -227,12 +227,7 @@ export class ClientNetwork {
 		});
 	}
 
-	async blockUpdate(
-		x: number,
-		y: number,
-		z: number,
-		block: number,
-	): Promise<void> {
+	async blockUpdate(x: number, y: number, z: number, block: number) {
 		await this.queue.call("blockUpdate", {
 			x,
 			y,
@@ -241,11 +236,7 @@ export class ClientNetwork {
 		});
 	}
 
-	async playerHit(
-		playerID: number,
-		radius: number,
-		damage: number,
-	): Promise<void> {
+	async playerHit(playerID: number, radius: number, damage: number) {
 		await this.queue.call("playerHit", {
 			playerID,
 			radius,

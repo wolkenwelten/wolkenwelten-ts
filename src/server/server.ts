@@ -17,15 +17,16 @@ export class ServerGame extends Game {
 
 	constructor(config: GameConfig) {
 		super(config);
+		this.running = true;
 		this.wss = new WebSocketServer({ port: 8080 });
 		this.wss.on("connection", this.onConnect.bind(this));
 
 		const server = this;
 		setInterval(() => {
+			this.update();
 			for (const con of server.sockets.values()) {
 				con.transferQueue();
 			}
-			this.update();
 		}, 10);
 
 		console.log("Starting WolkenWelten Server on port 8080");
