@@ -6,4 +6,7 @@ export default defineConfig({
     sourcemap: true,
     assetsInlineLimit: 32768,
   },
+  server: {
+    host: true,
+  },
 });

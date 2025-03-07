@@ -40,5 +40,6 @@ export class ClientGame extends Game {
 			return;
 		}
 		this.audio.update(this.player); // Update AudioEmitter positions in case Entities get destroyed
+		this.network.update();
 	}
 }

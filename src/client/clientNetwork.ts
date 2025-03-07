@@ -38,10 +38,7 @@ export class ClientNetwork {
 			throw new Error("WebSocket not connected");
 		}
 
-		if (this.rawQueue.length <= 0) {
-			return;
-		}
-
+		this.playerUpdate(this.game.player);
 		for (const raw of this.rawQueue) {
 			this.ws.send(raw);
 		}
@@ -62,7 +59,7 @@ export class ClientNetwork {
 	}
 
 	private connect() {
-		this.ws = new WebSocket("ws://localhost:8080");
+		this.ws = new WebSocket(`ws://${window.location.hostname}:8080`);
 		this.ws.onmessage = this.onMessage.bind(this);
 		this.ws.onopen = this.onConnect.bind(this);
 		this.ws.onclose = this.close.bind(this);
@@ -88,8 +85,11 @@ export class ClientNetwork {
 			return;
 		}
 
-		this.playerUpdate(this.game.player);
 		this.sendRaw(this.queue.flush());
+	}
+
+	update() {
+		this.transfer();
 	}
 
 	constructor(client: ClientGame) {
