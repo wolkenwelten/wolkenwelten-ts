@@ -55,7 +55,7 @@ export class BlockItem extends Item {
 
 		e.cooldown(32);
 		if (e instanceof Character) {
-			e.hitAnimation = this.world.game.render?.frames || 0;
+			e.startAnimation();
 			e.inventory.updateAll();
 		}
 		return;

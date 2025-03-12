@@ -41,6 +41,8 @@ export class Entity {
 		world.addEntity(this);
 	}
 
+	startAnimation(_animation = 0) {}
+
 	cooldown(ticks: number) {}
 
 	destroy() {

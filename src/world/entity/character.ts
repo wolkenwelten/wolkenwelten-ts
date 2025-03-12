@@ -13,6 +13,7 @@ import { ItemDrop } from "./itemDrop";
 import { Inventory } from "../item/inventory";
 import { Item, MaybeItem } from "../item/item";
 import { GRAVITY } from "../../constants";
+import { PlayerUpdate } from "../../client/clientEntry";
 
 const CHARACTER_ACCELERATION = 0.08;
 const CHARACTER_STOP_RATE = CHARACTER_ACCELERATION * 3.5;
@@ -28,7 +29,7 @@ export class Character extends Being {
 	movementY = 0;
 	movementZ = 0;
 	lastAction = 0;
-	hitAnimation = -100;
+
 	walkCycleCounter = 0;
 	nextStepSound = 0;
 	isWalking = false;
@@ -58,7 +59,8 @@ export class Character extends Being {
 
 	justJumped = false;
 
-	hitAnimationCounter = 0;
+	private animation = 0;
+	private animationId = 0;
 
 	/* Simple cheat, can be run from the browser console by typing `wolkenwelten.player.getGoodStuff();` */
 	getGoodStuff() {
@@ -73,12 +75,46 @@ export class Character extends Being {
 		this.init();
 	}
 
+	startAnimation(_animationId = 0) {
+		this.animation = 64;
+		this.animationId = 1 - this.animationId;
+	}
+
+	updateMessage() {
+		return {
+			x: this.x,
+			y: this.y,
+			z: this.z,
+
+			yaw: this.yaw,
+			pitch: this.pitch,
+
+			health: this.health,
+			maxHealth: this.maxHealth,
+
+			animation: this.animation,
+			animationId: this.animationId,
+		};
+	}
+
+	networkUpdate(msg: PlayerUpdate) {
+		this.x = msg.x;
+		this.y = msg.y;
+		this.z = msg.z;
+		this.yaw = msg.yaw;
+		this.pitch = msg.pitch;
+		this.health = msg.health;
+		this.maxHealth = msg.maxHealth;
+		this.animation = msg.animation;
+		this.animationId = msg.animationId;
+	}
+
 	/* Initialize an already existing Character, that way we can easily reuse the same object, */
 	init() {
 		this.noClip = false;
 		this.isDead = false;
 		this.maxHealth = this.health = 24;
-		this.hitAnimation = -100;
+		this.animation = -100;
 		this.lastAction = 0;
 		this.vx = this.vy = this.vz = 0;
 		this.movementX = this.movementY = this.movementZ = 0;
@@ -377,6 +413,8 @@ export class Character extends Being {
 		this.x += this.vx;
 		this.y += this.vy;
 		this.z += this.vz;
+
+		this.animation = Math.max(0, Math.min(64, this.animation - 1));
 	}
 
 	cooldown(ticks: number) {
@@ -499,10 +537,10 @@ export class Character extends Being {
 		}
 		const item = this.equipmentWeapon();
 
-		this.hitAnimation = this.world.game.render?.frames || 0;
+		this.animation = this.world.game.render?.frames || 0;
 		const hit = this.attack(1.8);
 		const cooldownDur = item ? item.attackCooldown(this) : 20;
-		this.hitAnimationCounter = (this.hitAnimationCounter + 1) & 1;
+		this.animationId = (this.animationId + 1) & 1;
 
 		const cam = this.world.game.render?.camera;
 		if (cam?.entityToFollow === this) {
@@ -551,7 +589,7 @@ export class Character extends Being {
 	dropItem(item: MaybeItem): ItemDrop | null {
 		if (item) {
 			const drop = ItemDrop.fromItem(item, this);
-			this.hitAnimation = this.world.game.render?.frames || 0;
+			this.animation = this.world.game.render?.frames || 0;
 			this.inventory.updateAll();
 			return drop;
 		}
@@ -632,8 +670,9 @@ export class Character extends Being {
 		let rightLegPitch = this.walkAnimationFactor * 1.6;
 		let leftLegPitch = this.walkAnimationFactor * -1.6;
 
-		if (this.hitAnimation + 16 > (this.world.game.render?.frames || 0)) {
-			const t = this.hitAnimation + 16 - (this.world.game.render?.frames || 0);
+		if (this.animation > 0) {
+			const t = this.animation * (16 / 64);
+			console.log(t, this.animation);
 			rightArmPitch = (t / 16) * 1.5;
 			rightArmPitch *= rightArmPitch;
 			leftArmPitch = rightArmPitch * -0.5;
@@ -642,7 +681,7 @@ export class Character extends Being {
 			rightLegPitch += rightArmPitch * -0.1;
 			headPitch += rightArmPitch * 0.15;
 
-			if (this.hitAnimationCounter === 1) {
+			if (this.animationId === 1) {
 				const tmp = rightArmPitch;
 				rightArmPitch = leftArmPitch;
 				leftArmPitch = tmp;

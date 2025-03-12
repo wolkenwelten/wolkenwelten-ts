@@ -50,7 +50,6 @@ export class ClientNetwork {
 	}
 
 	private onMessage(ev: MessageEvent) {
-		console.log("onMessage", ev.data);
 		// Check if it's binary data
 		if (ev.data instanceof ArrayBuffer) {
 			this.onArrayBuffer(ev.data);
@@ -151,7 +150,6 @@ export class ClientNetwork {
 	}
 
 	private transfer() {
-		console.log("transferring");
 		if (!this.ws || this.ws.readyState !== this.ws.OPEN) {
 			return;
 		}
@@ -281,20 +279,7 @@ export class ClientNetwork {
 	}
 
 	async playerUpdate(player: Character): Promise<void> {
-		await this.queue.call("playerUpdate", {
-			x: player.x,
-			y: player.y,
-			z: player.z,
-
-			yaw: player.yaw,
-			pitch: player.pitch,
-
-			health: player.health,
-			maxHealth: player.maxHealth,
-
-			hitAnimation: player.hitAnimation,
-			hitAnimationCounter: player.hitAnimationCounter,
-		});
+		await this.queue.call("playerUpdate", player.updateMessage());
 	}
 
 	async chunkDrop(x: number, y: number, z: number): Promise<void> {

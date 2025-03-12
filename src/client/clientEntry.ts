@@ -17,6 +17,9 @@ export interface PlayerUpdate {
 
 	health: number;
 	maxHealth: number;
+
+	animation: number;
+	animationId: number;
 }
 
 export class ClientEntry {
@@ -33,14 +36,6 @@ export class ClientEntry {
 	update(msg: PlayerUpdate) {
 		this.name = msg.name;
 
-		this.char.x = msg.x;
-		this.char.y = msg.y;
-		this.char.z = msg.z;
-
-		this.char.yaw = msg.yaw;
-		this.char.pitch = msg.pitch;
-
-		this.char.health = msg.health;
-		this.char.maxHealth = msg.maxHealth;
+		this.char.networkUpdate(msg);
 	}
 }

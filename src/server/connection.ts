@@ -26,6 +26,9 @@ export class ClientConnection {
 	maxHealth = 10;
 	updates = 0;
 
+	animation = 0;
+	animationId = 0;
+
 	chunkVersions = new Map<number, number>();
 
 	q: WSQueue = new WSQueue();
@@ -107,6 +110,9 @@ export class ClientConnection {
 			this.health = update.health;
 			this.maxHealth = update.maxHealth;
 
+			this.animation = update.animation;
+			this.animationId = update.animationId;
+
 			this.updateOtherPlayers();
 			this.updateChunkVersions();
 		});
@@ -180,7 +186,6 @@ export class ClientConnection {
 	}
 
 	maybeUpdateChunk(ox: number, oy: number, oz: number): boolean {
-		console.log("maybeUpdateChunk", ox, oy, oz);
 		const x = this.x + ox * 32;
 		const y = this.y + oy * 32;
 		const z = this.z + oz * 32;
@@ -244,6 +249,9 @@ export class ClientConnection {
 
 				health: client.health,
 				maxHealth: client.maxHealth,
+
+				animation: client.animation,
+				animationId: client.animationId,
 			});
 		}
 	}

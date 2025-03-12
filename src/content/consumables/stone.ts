@@ -27,7 +27,7 @@ export class Stone extends Item {
 			if (--this.amount <= 0) {
 				this.destroy();
 			}
-			user.hitAnimation = this.world.game.render?.frames || 0;
+			user.startAnimation();
 			user.inventory.updateAll();
 
 			const proj = new Projectile(user, 1.4);

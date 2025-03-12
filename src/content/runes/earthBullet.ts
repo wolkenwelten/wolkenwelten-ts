@@ -40,7 +40,7 @@ export class EarthBullet extends Rune {
 		this.bulletEntity.playUnmovingSound("tock", 0.3);
 
 		e.cooldown(32);
-		e.hitAnimation = this.world.game.render?.frames || 0;
+		e.startAnimation();
 	}
 
 	use(e: Character) {
@@ -95,7 +95,7 @@ export class EarthBullet extends Rune {
 		this.bulletEntity = undefined;
 
 		e.cooldown(32);
-		e.hitAnimation = this.world.game.render?.frames || 0;
+		e.startAnimation();
 		this.world.game.render?.camera.shake(0.3);
 	}
 }
