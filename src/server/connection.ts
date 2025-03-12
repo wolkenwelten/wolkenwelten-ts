@@ -246,4 +246,15 @@ export class ClientConnection {
 			this.socket.send(packet);
 		}
 	}
+
+	broadcastPlayerList() {
+		const playerList = Array.from(this.server.sockets.values()).map(
+			(client) => ({
+				id: client.id,
+				name: client.playerName,
+			}),
+		);
+
+		this.q.call("playerList", playerList);
+	}
 }

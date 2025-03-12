@@ -176,7 +176,8 @@ export class ClientNetwork {
 					const ndz = dz / dist;
 
 					// Base knockback + additional based on damage
-					const knockbackForce = 0.2 + msg.damage * 0.1;
+					const knockbackForce =
+						0.2 + msg.damage * 0.1 * game.player.repulsionMultiplier;
 
 					// Apply horizontal knockback
 					game.player.vx += ndx * knockbackForce;
@@ -184,6 +185,28 @@ export class ClientNetwork {
 
 					// Add some vertical knockback for a more dramatic effect
 					game.player.vy += knockbackForce * 0.5;
+				}
+			}
+		});
+
+		this.queue.registerCallHandler("playerList", async (args: unknown) => {
+			if (!Array.isArray(args)) {
+				throw new Error("Invalid player list received");
+			}
+
+			const playerList = args as { id: number; name: string }[];
+			const validPlayerIds = new Set(playerList.map((player) => player.id));
+
+			// Check for players that need to be removed
+			for (const [id, client] of this.game.clients.entries()) {
+				if (!validPlayerIds.has(id)) {
+					// This player is no longer in the server's list, remove them
+					client.char.destroy();
+					this.game.clients.delete(id);
+					this.game.ui.log.addEntry(`${client.name} left the game`);
+					console.log(
+						`Removed player ${client.name} (ID: ${id}) based on playerList update`,
+					);
 				}
 			}
 		});
