@@ -180,31 +180,27 @@ export class ClientConnection {
 		}
 	}
 
+	maybeUpdateChunk(ox: number, oy: number, oz: number): boolean {
+		const x = this.x + ox * 32;
+		const y = this.y + oy * 32;
+		const z = this.z + oz * 32;
+
+		const chunk = this.server.world.getOrGenChunk(x, y, z);
+		return this.clientUpdateChunk(chunk);
+	}
+
 	chunkUpdateLoop(rMax: number) {
 		// Process chunks in a rough inside-out pattern
 		let updates = 0;
 		for (let r = 0; r <= rMax; r++) {
 			// radius from center
-			for (let ox = -r; ox <= r; ox++) {
-				for (let oy = -r; oy <= r; oy++) {
-					for (let oz = -r; oz <= r; oz++) {
-						// Only process blocks at current "shell" radius
-						if (
-							Math.abs(ox) !== r &&
-							Math.abs(oy) !== r &&
-							Math.abs(oz) !== r
-						) {
-							continue;
-						}
-
-						const x = this.x + ox * 32;
-						const y = this.y + oy * 32;
-						const z = this.z + oz * 32;
-
-						const chunk = this.server.world.getOrGenChunk(x, y, z);
-						if (this.clientUpdateChunk(chunk)) {
+			for (let ox = -r; ox <= r; ox += r * 2) {
+				for (let oy = -r; oy <= r; oy += r * 2) {
+					for (let oz = -r; oz <= r; oz += r * 2) {
+						if (this.maybeUpdateChunk(ox, oy, oz)) {
 							if (++updates > 10) {
-								break;
+								console.log(`Sent 10 chunk updates`);
+								return;
 							}
 						}
 					}
