@@ -11,6 +11,7 @@ export class ServerGame extends Game {
 	sockets: Map<number, ClientConnection> = new Map();
 
 	onConnect(socket: WebSocket) {
+		console.log("onConnect");
 		const con = new ClientConnection(this, socket);
 		this.sockets.set(con.id, con);
 	}
@@ -20,6 +21,13 @@ export class ServerGame extends Game {
 		this.running = true;
 		this.wss = new WebSocketServer({ port: 8080 });
 		this.wss.on("connection", this.onConnect.bind(this));
+		this.wss.on("error", (error) => {
+			console.error(`(╥﹏╥) WebSocketServer error:`, error);
+		});
+
+		this.wss.on("close", () => {
+			console.log(`(｡•́︿•̀｡) WebSocketServer closed`);
+		});
 
 		const server = this;
 		setInterval(() => {

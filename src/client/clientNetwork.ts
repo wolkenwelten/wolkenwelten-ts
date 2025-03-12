@@ -12,6 +12,9 @@ export class ClientNetwork {
 	private readonly queue: WSQueue;
 	private readonly game: ClientGame;
 	private readonly rawQueue: string[] = [];
+	private reconnectAttempts = 0;
+	private maxReconnectAttempts = 5;
+	private reconnectTimeout?: NodeJS.Timeout;
 
 	private static readonly defaultHandlers: Map<string, ClientHandler> =
 		new Map();
@@ -20,57 +23,55 @@ export class ClientNetwork {
 		this.defaultHandlers.set(T, handler);
 	}
 
-	private onMessage(ev: MessageEvent) {
-		// Check if it's binary data
-		if (ev.data instanceof ArrayBuffer) {
-			const view = new DataView(ev.data);
-			const messageType = view.getUint8(0);
+	private onArrayBuffer(data: ArrayBuffer) {
+		const view = new DataView(data);
+		const messageType = view.getUint8(0);
 
-			// Message type 1 = chunk update
-			if (messageType === 1) {
-				const x = view.getInt32(1, true);
-				const y = view.getInt32(5, true);
-				const z = view.getInt32(9, true);
-				const version = view.getUint32(13, true);
+		// Message type 1 = chunk update
+		if (messageType === 1) {
+			const x = view.getInt32(1, true);
+			const y = view.getInt32(5, true);
+			const z = view.getInt32(9, true);
+			const version = view.getUint32(13, true);
 
-				// Get the chunk data
-				const blocks = new Uint8Array(ev.data.slice(17));
+			// Get the chunk data
+			const blocks = new Uint8Array(data.slice(17));
 
-				// Update the chunk
-				const chunk = this.game.world.getOrGenChunk(x, y, z);
-				chunk.blocks.set(blocks, 0);
-				chunk.lastUpdated = version;
-				chunk.loaded = true;
-				chunk.invalidate();
+			// Update the chunk
+			const chunk = this.game.world.getOrGenChunk(x, y, z);
+			chunk.blocks.set(blocks, 0);
+			chunk.lastUpdated = version;
+			chunk.loaded = true;
+			chunk.invalidate();
 
-				return;
-			}
-			// Add more binary message types here if needed
-		} else if (ev.data instanceof Blob) {
-			// Handle Blob data by converting to ArrayBuffer first
-			ev.data.arrayBuffer().then((buffer) => {
-				// Create a new MessageEvent with the ArrayBuffer
-				const newEvent = { data: buffer } as MessageEvent;
-				this.onMessage(newEvent);
-			});
 			return;
 		}
+		// Add more binary message types here if needed
+	}
 
-		// Handle JSON messages as before
-		const raw = ev.data || "";
-		try {
-			const msg = JSON.parse(raw);
-			if (typeof msg.T !== "string") {
-				console.error(msg);
-				throw new Error("Invalid message received");
-			}
+	private onMessage(ev: MessageEvent) {
+		console.log("onMessage", ev.data);
+		// Check if it's binary data
+		if (ev.data instanceof ArrayBuffer) {
+			this.onArrayBuffer(ev.data);
+		} else if (ev.data instanceof Blob) {
+			// Handle Blob data by converting to ArrayBuffer first
+			ev.data.arrayBuffer().then((data) => this.onArrayBuffer(data));
+		} else {
+			// Handle JSON messages as before
+			const raw = ev.data || "";
+			try {
+				const msg = JSON.parse(raw);
+				if (typeof msg.T !== "string") {
+					console.error(msg);
+					throw new Error("Invalid message received");
+				}
 
-			if (msg.T === "packet") {
-				this.queue.handlePacket(msg as WSPacket);
-			}
-		} catch (e) {
-			// If it's not valid JSON and not a binary message we understand, log an error
-			if (!(ev.data instanceof ArrayBuffer) && !(ev.data instanceof Blob)) {
+				if (msg.T === "packet") {
+					this.queue.handlePacket(msg as WSPacket);
+				}
+			} catch (e) {
+				// If it's not valid JSON and not a binary message we understand, log an error
 				console.error("Invalid message format", e);
 			}
 		}
@@ -89,20 +90,46 @@ export class ClientNetwork {
 	}
 
 	private onConnect() {
+		console.log("(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧ Connected to server!");
+		this.reconnectAttempts = 0;
 		this.flushRawQueue();
 	}
 
-	private close() {
-		if (!this.ws) {
-			return;
+	private close(event?: CloseEvent | Event) {
+		console.log("(｡•́︿•̀｡) Connection closed, attempting reconnect...");
+		if (this.ws) {
+			this.ws.close();
+		}
+		this.ws = undefined;
+
+		// Clear any existing reconnect timeout
+		if (this.reconnectTimeout) {
+			clearTimeout(this.reconnectTimeout);
 		}
 
-		this.ws.close();
-		this.ws = undefined;
+		// Try to reconnect with exponential backoff
+		if (this.reconnectAttempts < this.maxReconnectAttempts) {
+			const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 10000);
+			console.log(
+				`(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧ Attempting reconnect in ${delay / 1000} seconds...`,
+			);
+
+			this.reconnectTimeout = setTimeout(() => {
+				console.log("(◕‿◕✿) Attempting to reconnect...");
+				this.reconnectAttempts++;
+				this.connect();
+			}, delay);
+		} else {
+			console.log("(╥﹏╥) Max reconnection attempts reached");
+			this.game.ui.log.addEntry("Lost connection to server (╥﹏╥)");
+		}
 	}
 
 	private connect() {
-		this.ws = new WebSocket(`ws://${window.location.hostname}:8080`);
+		const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+		const url = `${protocol}//${window.location.hostname}:8080`;
+		console.log("Connecting to", url);
+		this.ws = new WebSocket(url);
 		this.ws.onmessage = this.onMessage.bind(this);
 		this.ws.onopen = this.onConnect.bind(this);
 		this.ws.onclose = this.close.bind(this);
@@ -124,6 +151,7 @@ export class ClientNetwork {
 	}
 
 	private transfer() {
+		console.log("transferring");
 		if (!this.ws || this.ws.readyState !== this.ws.OPEN) {
 			return;
 		}
@@ -172,25 +200,25 @@ export class ClientNetwork {
 				throw new Error("Invalid player hit received");
 			}
 			const msg = args as any;
-			const attacker = this.game.clients.get(msg.playerID);
-			if (!attacker) return;
 
+			// Handle the attacker animation
+			const attackerId = msg.attackerId || msg.playerID; // For backward compatibility
+			const attacker = this.game.clients.get(attackerId);
+
+			// The rest of the existing code for handling damage to the local player
 			const game = this.game;
 
-			// Start hit animation for the attacking player
-			attacker.char.hitAnimation = game.render.frames;
-			attacker.char.hitAnimationCounter =
-				(attacker.char.hitAnimationCounter + 1) & 1;
-
 			// Check if we (the local player) are in range and should take damage
-			const dx = game.player.x - attacker.char.x;
-			const dy = game.player.y - attacker.char.y;
-			const dz = game.player.z - attacker.char.z;
+			const dx = game.player.x - (attacker?.char.x || 0);
+			const dy = game.player.y - (attacker?.char.y || 0);
+			const dz = game.player.z - (attacker?.char.z || 0);
 			const dd = dx * dx + dy * dy + dz * dz;
 
 			if (dd <= msg.radius * msg.radius) {
 				game.player.damage(msg.damage);
-				game.player.onAttack(attacker.char);
+				if (attacker) {
+					game.player.onAttack(attacker.char);
+				}
 
 				// Calculate knockback direction and magnitude
 				const dist = Math.sqrt(dd);
@@ -263,6 +291,9 @@ export class ClientNetwork {
 
 			health: player.health,
 			maxHealth: player.maxHealth,
+
+			hitAnimation: player.hitAnimation,
+			hitAnimationCounter: player.hitAnimationCounter,
 		});
 	}
 
@@ -284,6 +315,7 @@ export class ClientNetwork {
 	}
 
 	async playerHit(playerID: number, radius: number, damage: number) {
+		// Send to server
 		await this.queue.call("playerHit", {
 			playerID,
 			radius,

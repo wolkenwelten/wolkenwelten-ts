@@ -42,11 +42,10 @@ export class ClientConnection {
 		this.id = ++idCounter;
 		this.socket = socket;
 		this.server = server;
-		const that = this;
 
 		socket.on("close", () => {
 			console.log(`Closing connection`);
-			server.sockets.delete(that.id);
+			server.sockets.delete(this.id);
 		});
 
 		socket.on("message", (msg) => {
@@ -54,7 +53,7 @@ export class ClientConnection {
 				const raw = JSON.parse(msg.toString());
 				if (raw.T === "packet") {
 					const packet = raw as WSPacket;
-					that.q.handlePacket(packet);
+					this.q.handlePacket(packet);
 				}
 			} catch (e) {
 				console.error(e);
@@ -181,6 +180,7 @@ export class ClientConnection {
 	}
 
 	maybeUpdateChunk(ox: number, oy: number, oz: number): boolean {
+		console.log("maybeUpdateChunk", ox, oy, oz);
 		const x = this.x + ox * 32;
 		const y = this.y + oy * 32;
 		const z = this.z + oz * 32;
@@ -194,9 +194,10 @@ export class ClientConnection {
 		let updates = 0;
 		for (let r = 0; r <= rMax; r++) {
 			// radius from center
-			for (let ox = -r; ox <= r; ox += r * 2) {
-				for (let oy = -r; oy <= r; oy += r * 2) {
-					for (let oz = -r; oz <= r; oz += r * 2) {
+			const s = Math.max(1, r);
+			for (let ox = -r; ox <= r; ox += s) {
+				for (let oy = -r; oy <= r; oy += s) {
+					for (let oz = -r; oz <= r; oz += s) {
 						if (this.maybeUpdateChunk(ox, oy, oz)) {
 							if (++updates > 10) {
 								console.log(`Sent 10 chunk updates`);
