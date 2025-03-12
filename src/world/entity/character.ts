@@ -547,12 +547,6 @@ export class Character extends Being {
 			cam.shake(hit ? 0.3 : 0.15);
 		}
 
-		// Send hit message to server
-		if (this.world.game.isClient) {
-			const game = this.world.game as ClientGame;
-			game.network.playerHit(this.id, 1.8, 1);
-		}
-
 		this.cooldown(cooldownDur);
 		if (hit) {
 			this.world.game.audio?.play("punch");
@@ -566,6 +560,11 @@ export class Character extends Being {
 		const py = this.y - 0.9;
 		const pz = this.z + Math.sin(-this.yaw - Math.PI / 2);
 		this.world.game.render?.particle.fxStrike(px, py, pz);
+		// Send hit message to server
+		if (this.world.game.isClient) {
+			const game = this.world.game as ClientGame;
+			game.network.playerHit(this.id, 1.8, 1, px, py, pz);
+		}
 	}
 
 	equipmentWeapon() {

@@ -205,11 +205,12 @@ export class ClientNetwork {
 
 			// The rest of the existing code for handling damage to the local player
 			const game = this.game;
+			game.render?.particle.fxStrike(msg.px, msg.py, msg.pz);
 
 			// Check if we (the local player) are in range and should take damage
-			const dx = game.player.x - (attacker?.char.x || 0);
-			const dy = game.player.y - (attacker?.char.y || 0);
-			const dz = game.player.z - (attacker?.char.z || 0);
+			const dx = game.player.x - msg.px;
+			const dy = game.player.y - msg.py;
+			const dz = game.player.z - msg.pz;
 			const dd = dx * dx + dy * dy + dz * dz;
 
 			if (dd <= msg.radius * msg.radius) {
@@ -299,12 +300,22 @@ export class ClientNetwork {
 		});
 	}
 
-	async playerHit(playerID: number, radius: number, damage: number) {
+	async playerHit(
+		playerID: number,
+		radius: number,
+		damage: number,
+		px: number,
+		py: number,
+		pz: number,
+	) {
 		// Send to server
 		await this.queue.call("playerHit", {
 			playerID,
 			radius,
 			damage,
+			px,
+			py,
+			pz,
 		});
 	}
 }
