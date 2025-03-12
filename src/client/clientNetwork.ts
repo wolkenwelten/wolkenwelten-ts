@@ -21,15 +21,58 @@ export class ClientNetwork {
 	}
 
 	private onMessage(ev: MessageEvent) {
-		const raw = ev.data || "";
-		const msg = JSON.parse(raw);
-		if (typeof msg.T !== "string") {
-			console.error(msg);
-			throw new Error("Invalid message received");
+		// Check if it's binary data
+		if (ev.data instanceof ArrayBuffer) {
+			const view = new DataView(ev.data);
+			const messageType = view.getUint8(0);
+
+			// Message type 1 = chunk update
+			if (messageType === 1) {
+				const x = view.getInt32(1, true);
+				const y = view.getInt32(5, true);
+				const z = view.getInt32(9, true);
+				const version = view.getUint32(13, true);
+
+				// Get the chunk data
+				const blocks = new Uint8Array(ev.data.slice(17));
+
+				// Update the chunk
+				const chunk = this.game.world.getOrGenChunk(x, y, z);
+				chunk.blocks.set(blocks, 0);
+				chunk.lastUpdated = version;
+				chunk.loaded = true;
+				chunk.invalidate();
+
+				return;
+			}
+			// Add more binary message types here if needed
+		} else if (ev.data instanceof Blob) {
+			// Handle Blob data by converting to ArrayBuffer first
+			ev.data.arrayBuffer().then((buffer) => {
+				// Create a new MessageEvent with the ArrayBuffer
+				const newEvent = { data: buffer } as MessageEvent;
+				this.onMessage(newEvent);
+			});
+			return;
 		}
 
-		if (msg.T === "packet") {
-			this.queue.handlePacket(msg as WSPacket);
+		// Handle JSON messages as before
+		const raw = ev.data || "";
+		try {
+			const msg = JSON.parse(raw);
+			if (typeof msg.T !== "string") {
+				console.error(msg);
+				throw new Error("Invalid message received");
+			}
+
+			if (msg.T === "packet") {
+				this.queue.handlePacket(msg as WSPacket);
+			}
+		} catch (e) {
+			// If it's not valid JSON and not a binary message we understand, log an error
+			if (!(ev.data instanceof ArrayBuffer) && !(ev.data instanceof Blob)) {
+				console.error("Invalid message format", e);
+			}
 		}
 	}
 
@@ -122,25 +165,6 @@ export class ClientNetwork {
 			} else {
 				cli.update(o);
 			}
-		});
-
-		this.queue.registerCallHandler("chunkUpdate", async (args: unknown) => {
-			if (typeof args !== "object") {
-				throw new Error("Invalid chunk update received");
-			}
-			const msg = args as any;
-			const chunk = this.game.world.getOrGenChunk(msg.x, msg.y, msg.z);
-			// Decode base64 string back to Uint8Array
-			const blocks = new Uint8Array(
-				atob(msg.blocks)
-					.split("")
-					.map((c) => c.charCodeAt(0)),
-			);
-
-			chunk.blocks.set(blocks, 0);
-			chunk.lastUpdated = msg.lastUpdated;
-			chunk.loaded = true;
-			chunk.invalidate();
 		});
 
 		this.queue.registerCallHandler("playerHit", async (args: unknown) => {

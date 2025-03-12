@@ -155,16 +155,27 @@ export class ClientConnection {
 		} else {
 			this.setChunkVersion(chunk.x, chunk.y, chunk.z, serverVersion);
 
-			// Convert Uint8Array to base64 string
-			const blocks = Buffer.from(chunk.blocks).toString("base64");
+			// Create binary message for chunk update
+			// Format: [messageType(1), x(4), y(4), z(4), version(4), data(32*32*32)]
+			const buffer = new ArrayBuffer(17 + chunk.blocks.length);
+			const view = new DataView(buffer);
 
-			this.q.call("chunkUpdate", {
-				x: chunk.x,
-				y: chunk.y,
-				z: chunk.z,
-				lastUpdated: chunk.lastUpdated,
-				blocks,
-			});
+			// Message type 1 = chunk update
+			view.setUint8(0, 1);
+
+			// Chunk coordinates and version
+			view.setInt32(1, chunk.x, true);
+			view.setInt32(5, chunk.y, true);
+			view.setInt32(9, chunk.z, true);
+			view.setUint32(13, chunk.lastUpdated, true);
+
+			// Copy chunk data
+			const uint8View = new Uint8Array(buffer, 17);
+			uint8View.set(chunk.blocks);
+
+			// Send binary data directly
+			this.socket.send(buffer);
+
 			return true;
 		}
 	}
@@ -192,7 +203,7 @@ export class ClientConnection {
 
 						const chunk = this.server.world.getOrGenChunk(x, y, z);
 						if (this.clientUpdateChunk(chunk)) {
-							if (++updates > 20) {
+							if (++updates > 10) {
 								break;
 							}
 						}
@@ -255,6 +266,8 @@ export class ClientConnection {
 			}),
 		);
 
-		this.q.call("playerList", playerList);
+		for (const client of this.server.sockets.values()) {
+			client.q.call("playerList", playerList);
+		}
 	}
 }

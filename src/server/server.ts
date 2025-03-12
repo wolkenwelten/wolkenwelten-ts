@@ -29,12 +29,12 @@ export class ServerGame extends Game {
 			}
 		}, 10);
 
-		// Add this new interval to broadcast player list every second
+		// Add this new interval to broadcast player list
 		setInterval(() => {
 			for (const sock of this.sockets.values()) {
 				sock.broadcastPlayerList();
 			}
-		}, 1000);
+		}, 10000);
 
 		console.log("Starting WolkenWelten Server on port 8080");
 	}
