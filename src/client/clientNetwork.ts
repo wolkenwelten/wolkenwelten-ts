@@ -220,11 +220,15 @@ export class ClientNetwork {
 				}
 
 				// Calculate knockback direction and magnitude
-				const dist = Math.sqrt(dd);
+				const odx = game.player.x - msg.ox;
+				const ody = game.player.y - msg.oy;
+				const odz = game.player.z - msg.oz;
+				const odist = odx * odx + ody * ody + odz * odz;
+				const dist = Math.sqrt(odist);
 				if (dist > 0) {
 					// Normalize direction vector
-					const ndx = dx / dist;
-					const ndz = dz / dist;
+					const ndx = odx / dist;
+					const ndz = odz / dist;
 
 					// Base knockback + additional based on damage
 					const knockbackForce =
@@ -235,7 +239,7 @@ export class ClientNetwork {
 					game.player.vz += ndz * knockbackForce;
 
 					// Add some vertical knockback for a more dramatic effect
-					game.player.vy += knockbackForce * 0.5;
+					game.player.vy += knockbackForce * 0.2;
 				}
 			}
 		});
@@ -260,6 +264,21 @@ export class ClientNetwork {
 					);
 				}
 			}
+		});
+
+		this.queue.registerCallHandler("playerJump", async (args: unknown) => {
+			if (typeof args !== "object") {
+				throw new Error("Invalid player jump received");
+			}
+			const msg = args as any;
+
+			// Don't show particles for our own jumps
+			if (msg.playerId === this.game.player.id) {
+				return;
+			}
+
+			// Show jump particles at the specified location
+			this.game.render?.particle.fxJump(msg.x, msg.y, msg.z);
 		});
 	}
 
@@ -307,6 +326,9 @@ export class ClientNetwork {
 		px: number,
 		py: number,
 		pz: number,
+		ox: number,
+		oy: number,
+		oz: number,
 	) {
 		// Send to server
 		await this.queue.call("playerHit", {
@@ -316,6 +338,18 @@ export class ClientNetwork {
 			px,
 			py,
 			pz,
+			ox,
+			oy,
+			oz,
+		});
+	}
+
+	async playerJump(x: number, y: number, z: number): Promise<void> {
+		await this.queue.call("playerJump", {
+			playerId: this.game.player.id,
+			x,
+			y,
+			z,
 		});
 	}
 }

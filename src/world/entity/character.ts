@@ -219,6 +219,10 @@ export class Character extends Being {
 				this.jumpStart = this.world.game.ticks;
 				this.justJumped = true;
 				this.world.game.render?.particle.fxJump(this.x, this.y - 0.5, this.z);
+				if (this.world.game.isClient) {
+					const game = this.world.game as ClientGame;
+					game.network.playerJump(this.x, this.y, this.z);
+				}
 			}
 		}
 	}
@@ -563,7 +567,17 @@ export class Character extends Being {
 		// Send hit message to server
 		if (this.world.game.isClient) {
 			const game = this.world.game as ClientGame;
-			game.network.playerHit(this.id, 1.8, 1, px, py, pz);
+			game.network.playerHit(
+				this.id,
+				1.8,
+				4,
+				px,
+				py,
+				pz,
+				this.x,
+				this.y,
+				this.z,
+			);
 		}
 	}
 

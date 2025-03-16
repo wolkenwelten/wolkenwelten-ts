@@ -145,6 +145,21 @@ export class ClientConnection {
 				client.q.call("playerHit", hit);
 			}
 		});
+
+		this.q.registerCallHandler("playerJump", async (args: unknown) => {
+			if (typeof args !== "object") {
+				throw new Error("Invalid player jump received");
+			}
+			const jump = args as any;
+
+			// Broadcast to all other clients
+			for (const client of this.server.sockets.values()) {
+				if (client === this) {
+					continue;
+				}
+				client.q.call("playerJump", jump);
+			}
+		});
 	}
 
 	clientUpdateChunk(chunk: Chunk): boolean {
