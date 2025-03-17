@@ -16,6 +16,14 @@ export class ServerGame extends Game {
 		this.sockets.set(con.id, con);
 	}
 
+	broadcastSystems() {
+		const msg = this.world.fire.serialize();
+		console.log(msg);
+		for (const con of this.sockets.values()) {
+			con.q.call("fireUpdate", msg);
+		}
+	}
+
 	constructor(config: GameConfig) {
 		super(config);
 		this.running = true;
@@ -32,6 +40,7 @@ export class ServerGame extends Game {
 		const server = this;
 		setInterval(() => {
 			this.update();
+			this.broadcastSystems();
 			for (const con of server.sockets.values()) {
 				con.transferQueue();
 			}

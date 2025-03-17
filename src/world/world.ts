@@ -21,7 +21,7 @@ export class World {
 	chunks: Map<number, Chunk> = new Map();
 	fire: FireSystem;
 	dangerZone: DangerZone;
-	entities: Set<Entity> = new Set();
+	entities: Map<number, Entity> = new Map();
 	seed: number;
 	game: Game;
 	blocks: BlockType[] = [];
@@ -118,7 +118,7 @@ export class World {
 	}
 
 	update() {
-		for (const entity of this.entities) {
+		for (const entity of this.entities.values()) {
 			entity.update();
 			if (entity.destroyed) {
 				this.removeEntity(entity);
@@ -131,11 +131,11 @@ export class World {
 	}
 
 	addEntity(entity: Entity) {
-		this.entities.add(entity);
+		this.entities.set(entity.id, entity);
 	}
 
 	removeEntity(entity: Entity) {
-		this.entities.delete(entity);
+		this.entities.delete(entity.id);
 	}
 
 	gc() {
@@ -164,7 +164,7 @@ export class World {
 		const px = this.game.player.x;
 		const py = this.game.player.y;
 		const pz = this.game.player.z;
-		for (const e of this.entities) {
+		for (const e of this.entities.values()) {
 			const dx = px - e.x;
 			const dy = py - e.y;
 			const dz = pz - e.z;

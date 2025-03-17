@@ -2,6 +2,7 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 
+import type { ClientGame } from "../client/clientGame";
 import { Being as Entity } from "./entity/being";
 import { StatusEffect } from "./statusEffects/statusEffect";
 import type { World } from "./world";
@@ -31,6 +32,11 @@ export class FireSystem {
 	}
 
 	add(x: number, y: number, z: number, strength: number) {
+		if (this.world.game.isClient) {
+			const game = this.world.game as ClientGame;
+			game.network.fireAdd(x, y, z, strength);
+			return;
+		}
 		const key = coordinateToKey(x, y, z);
 		const fire = this.fires.get(key);
 		if (fire) {
@@ -44,6 +50,16 @@ export class FireSystem {
 		}
 	}
 
+	set(x: number, y: number, z: number, strength: number) {
+		const key = coordinateToKey(x, y, z);
+		const fire = this.fires.get(key);
+		if (fire) {
+			fire.strength = strength;
+		} else {
+			this.fires.set(key, new Fire(x, y, z, strength));
+		}
+	}
+
 	get(x: number, y: number, z: number): number {
 		const key = coordinateToKey(x, y, z);
 		return this.fires.get(key)?.strength || 0;
@@ -51,6 +67,27 @@ export class FireSystem {
 
 	queue(x: number, y: number, z: number, strength: number) {
 		this.fireQueue.push({ x, y, z, strength });
+	}
+
+	serialize() {
+		const fires = [];
+		for (const fire of this.fires.values()) {
+			fires.push({
+				x: fire.x,
+				y: fire.y,
+				z: fire.z,
+				strength: fire.strength,
+			});
+		}
+		return {
+			fires,
+		};
+	}
+
+	deserialize(data: any) {
+		for (const fire of data.fires) {
+			this.set(fire.x, fire.y, fire.z, fire.strength);
+		}
 	}
 
 	update() {

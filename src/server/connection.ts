@@ -160,6 +160,14 @@ export class ClientConnection {
 				client.q.call("playerJump", jump);
 			}
 		});
+
+		this.q.registerCallHandler("fireAdd", async (args: unknown) => {
+			if (typeof args !== "object") {
+				throw new Error("Invalid fire add received");
+			}
+			const add = args as any;
+			this.server.world.fire.add(add.x, add.y, add.z, add.strength);
+		});
 	}
 
 	clientUpdateChunk(chunk: Chunk): boolean {

@@ -8,12 +8,12 @@ import type { Entity } from "./entity";
 import type { World } from "../world";
 import type { Position } from "../../util/math";
 import type { ClientGame } from "../../client/clientGame";
+import type { PlayerUpdate } from "../../client/clientEntry";
 import { Being } from "./being";
 import { ItemDrop } from "./itemDrop";
 import { Inventory } from "../item/inventory";
 import { Item, MaybeItem } from "../item/item";
 import { GRAVITY } from "../../constants";
-import { PlayerUpdate } from "../../client/clientEntry";
 
 const CHARACTER_ACCELERATION = 0.08;
 const CHARACTER_STOP_RATE = CHARACTER_ACCELERATION * 3.5;
@@ -438,7 +438,7 @@ export class Character extends Being {
 		let hit = false;
 		const rr = radius * radius;
 		const weapon = this.equipmentWeapon();
-		for (const e of this.world.entities) {
+		for (const e of this.world.entities.values()) {
 			if (e === this || e instanceof ItemDrop) {
 				continue;
 			}
@@ -685,7 +685,6 @@ export class Character extends Being {
 
 		if (this.animation > 0) {
 			const t = this.animation * (16 / 64);
-			console.log(t, this.animation);
 			rightArmPitch = (t / 16) * 1.5;
 			rightArmPitch *= rightArmPitch;
 			leftArmPitch = rightArmPitch * -0.5;

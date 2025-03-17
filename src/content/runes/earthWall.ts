@@ -154,7 +154,7 @@ export class EarthWall extends Rune {
 				3,
 			);
 
-			for (const t of this.world.entities) {
+			for (const t of this.world.entities.values()) {
 				const dx = t.x - b.from[0];
 				const dy = t.y - (b.from[1] + 1);
 				const dz = t.z - b.from[2];
@@ -176,7 +176,7 @@ export class EarthWall extends Rune {
 		}
 
 		for (const b of selection) {
-			for (const t of this.world.entities) {
+			for (const t of this.world.entities.values()) {
 				const dx = t.x - b.from[0];
 				const dy = t.y - (b.from[1] + 1);
 				const dz = t.z - b.from[2];

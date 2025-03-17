@@ -41,6 +41,40 @@ export class Entity {
 		world.addEntity(this);
 	}
 
+	serialize() {
+		return {
+			id: this.id,
+			T: "Entity",
+
+			x: this.x,
+			y: this.y,
+			z: this.z,
+			vx: this.vx,
+			vy: this.vy,
+			vz: this.vz,
+			yaw: this.yaw,
+			pitch: this.pitch,
+			scale: this.scale,
+
+			noClip: this.noClip,
+			destroyed: this.destroyed,
+		};
+	}
+
+	deserialize(data: any) {
+		this.x = data.x;
+		this.y = data.y;
+		this.z = data.z;
+		this.vx = data.vx;
+		this.vy = data.vy;
+		this.vz = data.vz;
+		this.yaw = data.yaw;
+		this.pitch = data.pitch;
+		this.scale = data.scale;
+		this.noClip = data.noClip;
+		this.destroyed = data.destroyed;
+	}
+
 	startAnimation(_animation = 0) {}
 
 	cooldown(ticks: number) {}
@@ -267,7 +301,7 @@ export class Entity {
 		if ((this.id & 0xf) !== (this.world.game.ticks & 0xf)) {
 			return;
 		}
-		for (const e of this.world.entities) {
+		for (const e of this.world.entities.values()) {
 			if (e === this) {
 				continue;
 			}

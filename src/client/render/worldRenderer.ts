@@ -97,7 +97,7 @@ export class WorldRenderer {
 		const cz = cam.z & ~31;
 		const frustum = this.frustum;
 		frustum.build(projectionMatrix, viewMatrix);
-		for (const entity of this.renderer.game.world.entities) {
+		for (const entity of this.renderer.game.world.entities.values()) {
 			entity.draw(projectionMatrix, viewMatrix, cam);
 		}
 		BlockMesh.bindShaderAndTexture(

@@ -39,7 +39,7 @@ export class Projectile extends Entity {
 	}
 
 	private checkForEntityCollisions() {
-		for (const e of this.world.entities) {
+		for (const e of this.world.entities.values()) {
 			if (e === this || e === this.source || e.destroyed) {
 				continue;
 			}

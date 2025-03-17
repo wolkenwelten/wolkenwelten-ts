@@ -149,7 +149,7 @@ export class EarthBulletEntity extends Entity {
 	}
 
 	private checkForEntityCollisions() {
-		for (const e of this.world.entities) {
+		for (const e of this.world.entities.values()) {
 			if (
 				e === this ||
 				(this.ticksAlive < 16 && e === this.caster) ||
