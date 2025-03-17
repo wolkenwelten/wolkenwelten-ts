@@ -20,6 +20,7 @@ import type { AudioManager } from "./client/audio";
 
 export interface GameConfig {
 	parent: HTMLElement;
+	playerName?: string;
 }
 
 export interface BlockTypeRegistry {

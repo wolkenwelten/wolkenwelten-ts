@@ -13,6 +13,7 @@ WolkenWelten is a TypeScript-based voxel game engine that runs primarily in the 
      - World instance
      - All manager classes (Audio, Render, Network, UI, etc.)
      - Content registries (blocks, items, etc.)
+   - Implements garbage collection for optimized memory usage
 
 2. **World (src/world/world.ts)**
    - Manages chunk storage and entity tracking
@@ -39,7 +40,10 @@ WolkenWelten is a TypeScript-based voxel game engine that runs primarily in the 
      - `Being`: Base for living entities
      - `Character`: Player character with inventory and equipment
      - `Mob`: NPCs with AI capabilities
+     - `Projectile`: Base class for projectiles and spells
+     - `ItemDrop`: Represents items in the world
    - Handles physics, collision, and combat
+   - Supports attack callbacks and damage system
 
 5. **UI System (src/ui/)**
    - Component-based UI system using DOM elements
@@ -72,6 +76,21 @@ WolkenWelten is a TypeScript-based voxel game engine that runs primarily in the 
    - State-based input processing
    - Configurable control mapping
 
+9. **Audio System (src/client/audio/)**
+   - Positional audio for immersive sound effects
+   - Distance-based volume attenuation
+   - Support for ambient and action sounds
+   - Audio content registry for centralized management
+
+10. **Content System**
+    - Modular registration system for game content
+    - Support for:
+      - Block types with unique properties
+      - Items and inventory management
+      - Mobs and AI behaviors
+      - Runestones with elemental effects
+    - Allows for easy expansion of game content
+
 ## Technical Features
 
 1. **Mesh Generation**
@@ -79,18 +98,26 @@ WolkenWelten is a TypeScript-based voxel game engine that runs primarily in the 
    - Separate passes for solid and transparent blocks
    - Worker-based mesh generation to avoid frame drops
    - Ambient occlusion baked into vertex lighting
+   - Support for .vox model files for entities and objects
 
 2. **Rendering Pipeline**
    - Multi-pass rendering for transparency
    - Dynamic LOD system based on distance
    - Efficient texture atlas system using WebGL2 texture arrays
    - Frustum culling for optimal performance
+   - Camera effects including shake and underwater distortion
 
 3. **Performance Optimizations**
-   - Adaptive render distance based on platform capabilities
+   - Adaptive render distance based on platform capabilities (auto-detection for Firefox, Safari, mobile, and ARM devices)
    - Chunk mesh caching and reuse
    - Efficient memory management for block data
    - Background mesh generation
+   - Binary protocol for efficient chunk data transfer
+
+4. **Animation System**
+   - Character animation with articulated body parts
+   - Support for attack animations and movement
+   - Animation state synchronization over network
 
 ## Data Flow
 
@@ -111,5 +138,17 @@ WolkenWelten is a TypeScript-based voxel game engine that runs primarily in the 
    - Chunk visibility determination
    - Mesh updates for modified chunks
    - Multi-pass rendering (solid -> transparent)
+
+4. **Combat System**
+   - Attack detection and hitbox calculation
+   - Damage application and health management
+   - Elemental interactions between attacks
+   - Visual and audio feedback for combat events
+
+5. **Client-Server Communication**
+   - Binary protocol for efficient data transfer
+   - Player position and state updates
+   - Chunk data synchronization with version checking
+   - Entity state and animation synchronization
 
 This architecture provides a solid foundation for both single-player and multiplayer voxel gaming, with room for expansion through the modular content registration system.
