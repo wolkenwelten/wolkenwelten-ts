@@ -15,12 +15,7 @@ export class ServerGame extends Game {
 		this.sockets.set(con.id, con);
 	}
 
-	broadcastSystems() {
-		const msg = this.world.fire.serialize();
-		for (const con of this.sockets.values()) {
-			con.q.call("fireUpdate", msg);
-		}
-	}
+	broadcastSystems() {}
 
 	constructor(config: GameConfig) {
 		super(config);

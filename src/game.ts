@@ -3,16 +3,11 @@
  */
 
 import { registerBlockTypes } from "./content/blockTypes";
-import { registerItems } from "./content/itemContent";
-import { registerStaticObjects } from "./content/staticObjects";
 
 import { BenchmarkManager } from "./benchmark";
 import { Options } from "./options";
 import { ProfilingManager } from "./profiler";
 import { Character } from "./world/entity/character";
-import { StaticObject } from "./world/chunk/staticObject";
-import { Mob } from "./world/entity/mob";
-import { Item } from "./world/item/item";
 import { World } from "./world/world";
 import { FloatingIslandsWorldGen } from "./content/floatingIslandsWorldGen";
 import type { RenderManager } from "./client/render/render";
@@ -28,10 +23,6 @@ export interface BlockTypeRegistry {
 }
 
 export class Game {
-	Item: typeof Item;
-	Mob: typeof Mob;
-	StaticObject: typeof StaticObject;
-
 	isClient = false;
 	isServer = false;
 	readonly startTime = +Date.now();
@@ -53,10 +44,6 @@ export class Game {
 	running = false;
 
 	constructor(config: GameConfig) {
-		this.Item = Item;
-		this.Mob = Mob;
-		this.StaticObject = StaticObject;
-
 		this.config = config;
 		this.options = new Options();
 		this.profiler = ProfilingManager.profiler();
@@ -71,9 +58,7 @@ export class Game {
 	}
 
 	registerContent() {
-		registerItems();
 		registerBlockTypes(this.world);
-		registerStaticObjects();
 	}
 
 	async init() {

@@ -10,9 +10,6 @@ import type { Position } from "../../util/math";
 import type { ClientGame } from "../../client/clientGame";
 import type { PlayerUpdate } from "../../client/clientEntry";
 import { Being } from "./being";
-import { ItemDrop } from "./itemDrop";
-import { Inventory } from "../item/inventory";
-import { Item, MaybeItem } from "../item/item";
 import { GRAVITY } from "../../constants";
 
 const CHARACTER_ACCELERATION = 0.08;
@@ -51,9 +48,6 @@ export class Character extends Being {
 
 	weight = 70;
 
-	equipment: Inventory;
-	inventory: Inventory;
-
 	maxAirActions = 3;
 	remainingAirActions = this.maxAirActions;
 
@@ -61,14 +55,6 @@ export class Character extends Being {
 
 	private animation = 0;
 	private animationId = 0;
-
-	/* Simple cheat, can be run from the browser console by typing `wolkenwelten.player.getGoodStuff();` */
-	getGoodStuff() {
-		this.inventory.add(Item.create("earthBullet", this.world));
-		this.inventory.add(Item.create("earthWall", this.world));
-		this.inventory.add(Item.create("fireBreath", this.world));
-		this.inventory.add(Item.create("comet", this.world));
-	}
 
 	respawn() {
 		this.init();
@@ -120,10 +106,6 @@ export class Character extends Being {
 		this.repulsionMultiplier = 1;
 
 		this?.world?.game?.render?.camera?.stop();
-		this.effects.clear();
-		this.inventory.clear();
-		this.equipment.clear();
-		this.inventory.select(0);
 
 		const [x, y, z] = this.world.worldgenHandler?.spawnPos(this) ?? [0, 0, 0];
 		this.x = x;
@@ -132,24 +114,12 @@ export class Character extends Being {
 		this.yaw = 0;
 		this.pitch = 0;
 
-		setTimeout(this.getGoodStuff.bind(this), 0);
-
 		this.remainingAirActions = this.maxAirActions;
 		this.justJumped = false;
 	}
 
 	constructor(world: World) {
 		super(world, 0, 0, 0);
-		this.inventory = new Inventory(10);
-		this.equipment = new Inventory(2);
-		this.equipment.mayPut = (index: number, item: Item): boolean => {
-			switch (index) {
-				case 0:
-					return item.isWeapon;
-				default:
-					return false;
-			}
-		};
 		this.init();
 	}
 
@@ -272,6 +242,8 @@ export class Character extends Being {
 	}
 
 	update() {
+		this.beRepelledByEntities();
+
 		if (this.isDead) {
 			return;
 		}
@@ -410,7 +382,6 @@ export class Character extends Being {
 			this.vy *= v;
 			this.vz *= v;
 		}
-		super.update();
 		this.autoDecreaseRepulsionMultiplier();
 
 		this.x += this.vx;
@@ -436,9 +407,8 @@ export class Character extends Being {
 		const z = this.z + vz;
 		let hit = false;
 		const rr = radius * radius;
-		const weapon = this.equipmentWeapon();
 		for (const e of this.world.entities.values()) {
-			if (e === this || e instanceof ItemDrop) {
+			if (e === this) {
 				continue;
 			}
 			const dx = e.x - x;
@@ -457,7 +427,7 @@ export class Character extends Being {
 					e.vy += 0.02;
 					e.vz += ndz * 0.03;
 					if (e instanceof Being) {
-						this.doDamage(e, weapon?.attackDamage(e) || 1);
+						this.doDamage(e, 1);
 					}
 					this.world.game.render?.particle.fxStrike(e.x, e.y, e.z);
 				}
@@ -478,30 +448,6 @@ export class Character extends Being {
 						if (bt.health < 200) {
 							this.world.setBlock(cx, cy, cz, 0);
 							this.world.game.render?.particle.fxBlockBreak(cx, cy, cz, bt);
-						}
-					}
-				}
-			}
-		}
-
-		const srr = (radius + 0.4) * (radius + 0.4);
-		for (let cxo = -1; cxo < 2; cxo++) {
-			for (let cyo = -1; cyo < 2; cyo++) {
-				for (let czo = -1; czo < 2; czo++) {
-					const cx = x + cxo * 32;
-					const cy = y + cyo * 32;
-					const cz = z + czo * 32;
-					const c = this.world.getChunk(cx, cy, cz);
-					if (!c) {
-						continue;
-					}
-					for (const s of c.static) {
-						const dx = x - s.x;
-						const dy = y - s.y;
-						const dz = z - s.z;
-						const dd = dx * dx + dy * dy + dz * dz;
-						if (dd < srr) {
-							s.onAttacked(this);
 						}
 					}
 				}
@@ -538,11 +484,10 @@ export class Character extends Being {
 		if (this.world.game.ticks < this.lastAction) {
 			return;
 		}
-		const item = this.equipmentWeapon();
 
 		this.animation = this.world.game.render?.frames || 0;
 		const hit = this.attack(1.8);
-		const cooldownDur = item ? item.attackCooldown(this) : 20;
+		const cooldownDur = 20;
 		this.animationId = (this.animationId + 1) & 1;
 
 		const cam = this.world.game.render?.camera;
@@ -553,9 +498,6 @@ export class Character extends Being {
 		this.cooldown(cooldownDur);
 		if (hit) {
 			this.world.game.audio?.play("punch");
-			if (item) {
-				item.onAttackWith(this);
-			}
 		} else {
 			this.world.game.audio?.play("punchMiss");
 		}
@@ -580,33 +522,13 @@ export class Character extends Being {
 		}
 	}
 
-	equipmentWeapon() {
-		return this.equipment.items[0];
-	}
-
 	/* Use the current item or punch if we don't have anything equipped */
 	primaryAction() {
-		const item = this.equipmentWeapon();
-		if (item) {
-			item.use(this);
-		} else {
-			this.strike();
-		}
+		this.strike();
 	}
 
 	/* Use whatever skill is currently selected */
 	secondaryAction() {}
-
-	/* Drop the item in the argument in front of the player */
-	dropItem(item: MaybeItem): ItemDrop | null {
-		if (item) {
-			const drop = ItemDrop.fromItem(item, this);
-			this.animation = this.world.game.render?.frames || 0;
-			this.inventory.updateAll();
-			return drop;
-		}
-		return null;
-	}
 
 	drawBodyPart(
 		projectionMatrix: mat4,
@@ -656,7 +578,7 @@ export class Character extends Being {
 		}
 	}
 
-	calcHeadYaw(cam: Position): number {
+	calcHeadYaw(_cam: Position): number {
 		return 0;
 	}
 

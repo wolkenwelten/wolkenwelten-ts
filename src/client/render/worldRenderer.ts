@@ -9,7 +9,6 @@ import { coordinateToWorldKey } from "../../world/world";
 import { Frustum } from "./frustum";
 import { BlockMesh } from "./meshes/blockMesh/blockMesh";
 import { VoxelMesh } from "./meshes/voxelMesh/voxelMesh";
-import { VoxelMeshBlit } from "./meshes/voxelMesh/voxelMesh";
 
 type GeneratorQueueEntry = {
 	dd: number;
@@ -174,54 +173,5 @@ export class WorldRenderer {
 			drawCalls += mesh.drawFast(mask, alpha, 6);
 		}
 		this.renderer.game.profiler.addAmount("blockMeshDrawCalls", drawCalls);
-
-		let staticCalls = 0;
-
-		const mvp = this.mvp;
-		mat4.identity(mvp);
-		mat4.mul(mvp, viewMatrix, mvp);
-		mat4.mul(mvp, projectionMatrix, mvp);
-		for (const { mesh } of this.drawQueue) {
-			if (mesh.chunk.static.size === 0) {
-				continue;
-			}
-
-			const key = coordinateToWorldKey(
-				mesh.chunk.x,
-				mesh.chunk.y,
-				mesh.chunk.z,
-			);
-			let staticMesh = this.staticMeshes.get(key);
-			if (!staticMesh) {
-				staticMesh = new VoxelMesh();
-				this.staticMeshes.set(key, staticMesh);
-			}
-			if (staticMesh.lastUpdated < mesh.chunk.staticLastUpdated) {
-				const blits: VoxelMeshBlit[] = [];
-				for (const s of mesh.chunk.static) {
-					const transOff = s.transOff();
-					const mesh = s.mesh();
-					if (!mesh) {
-						continue;
-					}
-					const vertices = mesh.vertices;
-					const x = (s.x - s.chunk.x + transOff[0]) * 32;
-					const y = (s.y - s.chunk.y + transOff[1]) * 32;
-					const z = (s.z - s.chunk.z + transOff[2]) * 32;
-					blits.push({ vertices, x, y, z });
-				}
-				staticMesh.updateFromMultiple(blits, mesh.chunk.staticLastUpdated);
-			}
-			staticMesh.draw(
-				mvp,
-				1.0,
-				mesh.chunk.x * 32,
-				mesh.chunk.y * 32,
-				mesh.chunk.z * 32,
-			);
-			staticCalls++;
-		}
-
-		this.renderer.game.profiler.addAmount("staticMeshesDrawCalls", staticCalls);
 	}
 }

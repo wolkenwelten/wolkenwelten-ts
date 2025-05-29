@@ -3,9 +3,7 @@
  */
 import type { ClientGame } from "../clientGame";
 import { ChatPanel } from "./components/chatPanel";
-import { HealthBar } from "./components/health/healthBar";
 import { FpsCounter } from "./components/fpsCounter";
-import { Hotbar, HotbarEntryValue } from "./components/hotbar/hotbar";
 import { IntroWindow } from "./components/introWindow";
 import { PlayerModal } from "./components/playerModal/playerModal";
 import { SystemLog } from "./components/systemLog";
@@ -17,10 +15,7 @@ export class UIManager {
 	rootElement: HTMLElement;
 	uiWrapper: HTMLElement;
 	inventory: PlayerModal;
-	healthBar: HealthBar;
-	hotbar: Hotbar;
 	icon: IconManager;
-	heldItem: HotbarEntryValue;
 	log: SystemLog;
 	introWindow: IntroWindow;
 	chat: ChatPanel;
@@ -39,17 +34,11 @@ export class UIManager {
 		this.uiWrapper.id = "wolkenwelten-ui-root";
 		this.rootElement.append(this.uiWrapper);
 		new FpsCounter(this.uiWrapper, game);
-		this.healthBar = new HealthBar(this.uiWrapper, game);
 		this.log = new SystemLog(this.uiWrapper, game);
 		this.inventory = new PlayerModal(this.uiWrapper, game);
-		this.hotbar = new Hotbar(this.uiWrapper, game);
 		this.introWindow = new IntroWindow(this.uiWrapper, game);
 		this.chat = new ChatPanel(this.uiWrapper, game);
 		this.repulsionMultiplier = new RepulsionMultiplier(this.uiWrapper, game);
-	}
-
-	updateInventory(i = -1) {
-		this.inventory.update(i);
 	}
 
 	update() {
@@ -64,8 +53,6 @@ export class UIManager {
 				this.rootHasPaused = true;
 			}
 		}
-		this.hotbar.update();
-		this.healthBar.update(this.game.player.health, this.game.player.maxHealth);
 		this.repulsionMultiplier.update();
 	}
 }

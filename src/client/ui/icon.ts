@@ -59,7 +59,6 @@ export class IconManager {
 			for (let i = 0; i < blocks.length; i++) {
 				that.buildBlockTypeIcon(img, blocks[i]);
 			}
-			that.ui.game.player.inventory.updateAll();
 		};
 		img.src = this.ui.game.world.blockTextureUrl;
 	}

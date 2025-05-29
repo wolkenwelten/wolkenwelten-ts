@@ -3,7 +3,6 @@
  */
 import { isClient } from "../util/compat";
 import { Character } from "../world/entity/character";
-import { Item } from "../world/item/item";
 import type { ClientGame } from "./clientGame";
 
 export class ControlState {
@@ -61,10 +60,8 @@ export class InputManager {
 			if (!that.game.running || !that.game.ready) {
 				return;
 			}
-			that.toggleInventory();
 		});
 		this.keyPushHandler.set("Escape", () => {
-			that.closeInventory();
 			if (that.game.ui.chat.visible()) {
 				that.game.ui.chat.hide();
 			}
@@ -95,9 +92,6 @@ export class InputManager {
 			async (e) => {
 				if (!that.game.running || !that.game.ready) {
 					return;
-				}
-				if (that.game.ui.inventory.active) {
-					that.toggleInventory(true);
 				}
 				await that.requestFullscreenAndPointerLock();
 			},
@@ -140,41 +134,6 @@ export class InputManager {
 			this.game.player.cooldown(15);
 			await this.game.ui.rootElement.requestPointerLock();
 		}
-	}
-
-	closeInventory() {
-		if (this.isInventoryActive()) {
-			this.toggleInventory();
-		}
-	}
-
-	toggleInventory(dropHelItem = false) {
-		this.game.ui.inventory.toggle();
-		if (this.game.ui.inventory.active) {
-			if (document.pointerLockElement) {
-				document.exitPointerLock();
-			}
-		} else {
-			if (!document.pointerLockElement) {
-				this.game.player.cooldown(15);
-				this.game.ui.rootElement.requestPointerLock();
-			}
-			if (this.game.ui.heldItem) {
-				if (this.game.ui.heldItem instanceof Item) {
-					if (
-						dropHelItem ||
-						!this.game.player.inventory.add(this.game.ui.heldItem)
-					) {
-						this.game.player.dropItem(this.game.ui.heldItem);
-					}
-				}
-				this.game.ui.heldItem = undefined;
-			}
-		}
-	}
-
-	isInventoryActive() {
-		return this.game.ui.inventory.active;
 	}
 
 	private updateKeyboard(state: ControlState) {
@@ -269,13 +228,6 @@ export class InputManager {
 			const key = gamepad.index | (4 << 8);
 			const cooldown = this.buttonCooldown.get(key) || 0;
 			if (cooldown < this.game.ticks) {
-				const newSelection =
-					(player.inventory.selection - 1) % player.inventory.items.length;
-				player.inventory.select(
-					newSelection >= 0
-						? newSelection
-						: player.inventory.items.length - newSelection - 2,
-				);
 				this.buttonCooldown.set(key, this.game.ticks + 20);
 			}
 		} else {
@@ -286,13 +238,6 @@ export class InputManager {
 			const key = gamepad.index | (5 << 8);
 			const cooldown = this.buttonCooldown.get(key) || 0;
 			if (cooldown < this.game.ticks) {
-				const newSelection =
-					(player.inventory.selection + 1) % player.inventory.items.length;
-				player.inventory.select(
-					newSelection >= 0
-						? newSelection
-						: player.inventory.items.length - newSelection - 2,
-				);
 				this.buttonCooldown.set(key, this.game.ticks + 20);
 			}
 		} else {
@@ -325,14 +270,6 @@ export class InputManager {
 			}
 		}
 		//console.log(gamepad.buttons.map((b,i) => b.pressed ? `${i}: ${b.value}` : '').join(' '));
-	}
-
-	private hotBarUse(i: number) {
-		this.game.player.inventory.items[i]?.use(this.game.player);
-	}
-
-	private hotBarRelease(i: number) {
-		this.game.player.inventory.items[i]?.useRelease(this.game.player);
 	}
 
 	update() {
@@ -372,32 +309,6 @@ export class InputManager {
 		}
 		if (state.secondary) {
 			this.game.player.secondaryAction();
-		}
-
-		if (state.hotBar1) {
-			this.hotBarUse(0);
-		}
-		if (state.hotBar2) {
-			this.hotBarUse(1);
-		}
-		if (state.hotBar3) {
-			this.hotBarUse(2);
-		}
-		if (state.hotBar4) {
-			this.hotBarUse(3);
-		}
-
-		if (!state.hotBar1) {
-			this.hotBarRelease(0);
-		}
-		if (!state.hotBar2) {
-			this.hotBarRelease(1);
-		}
-		if (!state.hotBar3) {
-			this.hotBarRelease(2);
-		}
-		if (!state.hotBar4) {
-			this.hotBarRelease(3);
 		}
 
 		this.lastState = state;

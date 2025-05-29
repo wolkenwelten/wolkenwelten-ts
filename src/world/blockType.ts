@@ -2,9 +2,6 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import { abgrToRgba } from "../util/math";
-import { ItemDrop } from "./entity/itemDrop";
-import { BlockItem } from "./item/blockItem";
-import type { Item, MaybeItem } from "./item/item";
 import type { World } from "./world";
 
 export type MiningCat = "Pickaxe" | "Axe";
@@ -13,7 +10,6 @@ export type BlockTypeItemDropHandler = (
 	x: number,
 	y: number,
 	z: number,
-	tool: MaybeItem,
 ) => void;
 
 export class BlockType {
@@ -144,40 +140,6 @@ export class BlockType {
 
 	playMineSound(world: World) {
 		world.game.audio?.play(this.mineSound, 0.5);
-	}
-
-	spawnMiningDrops(
-		world: World,
-		x: number,
-		y: number,
-		z: number,
-		tool: MaybeItem,
-	) {
-		if (this.id === 0) {
-			return;
-		}
-		new ItemDrop(
-			world,
-			x + 0.5,
-			y + 0.4,
-			z + 0.5,
-			new BlockItem(world, this.id, 1),
-		);
-	}
-
-	static simpleHandler(item: Item): BlockTypeItemDropHandler {
-		return (world: World, x: number, y: number, z: number, tool: MaybeItem) => {
-			new ItemDrop(world, x + 0.5, y + 0.4, z + 0.5, item.clone());
-		};
-	}
-
-	withItemDropHandler(λ: BlockTypeItemDropHandler) {
-		this.spawnMiningDrops = λ;
-		return this;
-	}
-
-	withSimpleHandler(item: Item) {
-		return this.withItemDropHandler(BlockType.simpleHandler(item));
 	}
 
 	withMineSound(url: string) {

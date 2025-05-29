@@ -6,7 +6,6 @@ import type { Entity } from "./entity/entity";
 import type { WorldGen } from "./worldGen";
 import type { ClientGame } from "../client/clientGame";
 import profiler from "../profiler";
-import { FireSystem } from "./fireSystem";
 import { BlockType } from "./blockType";
 import { Chunk } from "./chunk/chunk";
 import { DangerZone } from "./chunk/dangerZone";
@@ -19,7 +18,6 @@ export const coordinateToWorldKey = (x: number, y: number, z: number) =>
 
 export class World {
 	chunks: Map<number, Chunk> = new Map();
-	fire: FireSystem;
 	dangerZone: DangerZone;
 	entities: Map<number, Entity> = new Map();
 	seed: number;
@@ -32,7 +30,6 @@ export class World {
 	constructor(game: Game) {
 		this.seed = 1234;
 		this.game = game;
-		this.fire = new FireSystem(this);
 		this.dangerZone = new DangerZone(this);
 	}
 
@@ -127,7 +124,6 @@ export class World {
 		if ((this.game.ticks & 0xf) === 0) {
 			this.dangerZone.update();
 		}
-		this.fire.update();
 	}
 
 	addEntity(entity: Entity) {

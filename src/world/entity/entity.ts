@@ -7,7 +7,6 @@ import type { TriangleMesh } from "../../client/render/meshes/triangleMesh/trian
 import type { VoxelMesh } from "../../client/render/meshes/voxelMesh/voxelMesh";
 import { type World } from "../world";
 import type { Position } from "../../util/math";
-import { StatusEffect } from "../statusEffects/statusEffect";
 import { GRAVITY } from "../../constants";
 
 let entityCounter = 0;
@@ -32,8 +31,6 @@ export class Entity {
 	world: World;
 	weight = 1; // Necessary for physics calculations
 	scale = 1;
-
-	effects: Map<string, StatusEffect> = new Map();
 
 	constructor(world: World) {
 		this.id = ++entityCounter;

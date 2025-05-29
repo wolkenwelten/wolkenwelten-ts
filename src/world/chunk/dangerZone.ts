@@ -53,22 +53,9 @@ export class DangerZone {
 		}
 	}
 
-	checkStaticMesh(x: number, y: number, z: number) {
-		const m = this.world.getChunk(x, y, z);
-		if (m) {
-			for (const sm of m.static) {
-				if (sm.x !== x || sm.y !== y || sm.z !== z) {
-					continue;
-				}
-				sm.onAttacked();
-			}
-		}
-	}
-
 	visit(x: number, y: number, z: number) {
 		const b = this.world.getBlock(x, y, z);
 		if (b === 0) {
-			this.checkStaticMesh(x, y + 1, z);
 			return (
 				this.maybeFlow(x, y + 1, z, x, y, z) ||
 				this.maybeFlow(x, y, z - 1, x, y, z) ||

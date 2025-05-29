@@ -3,7 +3,6 @@
  */
 import type { Entity } from "../entity/entity";
 import type { World } from "../world";
-import type { StaticObject } from "./staticObject";
 import { lightGenChunk } from "./lightGen";
 
 const coordinateToOffset = (x: number, y: number, z: number) =>
@@ -21,7 +20,6 @@ export class Chunk {
 	x: number;
 	y: number;
 	z: number;
-	static: Set<StaticObject> = new Set();
 	world: World;
 
 	constructor(world: World, x: number, y: number, z: number) {
@@ -161,15 +159,5 @@ export class Chunk {
 
 	invalidate() {
 		this.lastUpdated = this.world.game.ticks;
-	}
-
-	staticAdd(obj: StaticObject) {
-		this.staticLastUpdated = this.world.game.ticks;
-		this.static.add(obj);
-	}
-
-	staticDelete(obj: StaticObject) {
-		this.staticLastUpdated = this.world.game.ticks;
-		this.static.delete(obj);
 	}
 }

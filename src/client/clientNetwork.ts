@@ -280,14 +280,6 @@ export class ClientNetwork {
 			// Show jump particles at the specified location
 			this.game.render?.particle.fxJump(msg.x, msg.y, msg.z);
 		});
-
-		this.queue.registerCallHandler("fireUpdate", async (args: unknown) => {
-			if (typeof args !== "object") {
-				throw new Error("Invalid fire update received");
-			}
-			const msg = args as any;
-			this.game.world.fire.deserialize(msg);
-		});
 	}
 
 	async getPlayerID(): Promise<number> {

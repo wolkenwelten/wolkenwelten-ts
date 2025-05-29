@@ -4,78 +4,6 @@
 import blockTextureUrl from "../../assets/gfx/blocks.png";
 
 import type { World } from "../world/world";
-import { ItemDrop } from "../world/entity/itemDrop";
-import { BlockItem } from "../world/item/blockItem";
-import { Item, MaybeItem } from "../world/item/item";
-
-const leafDropHandler = (
-	world: World,
-	x: number,
-	y: number,
-	z: number,
-	tool: MaybeItem,
-) => {
-	const t = world.game.ticks & 7;
-	if (t < 3) {
-		new ItemDrop(world, x + 0.5, y + 0.4, z + 0.5, Item.create("stick", world));
-	}
-};
-
-const stoneDropHandler = (
-	world: World,
-	x: number,
-	y: number,
-	z: number,
-	tool: MaybeItem,
-) => {
-	new ItemDrop(
-		world,
-		x + 0.5,
-		y + 0.4,
-		z + 0.5,
-		Item.create("stone", world, 5),
-	);
-};
-
-const ironOreDropHandler = (
-	world: World,
-	x: number,
-	y: number,
-	z: number,
-	tool: MaybeItem,
-) => {
-	new ItemDrop(
-		world,
-		x + 0.4,
-		y + 0.4,
-		z + 0.4,
-		Item.create("stone", world, 2),
-	);
-	new ItemDrop(
-		world,
-		x + 0.6,
-		y + 0.4,
-		z + 0.6,
-		Item.create("ironOre", world, 3),
-	);
-};
-
-const coalDropHandler = (
-	world: World,
-	x: number,
-	y: number,
-	z: number,
-	tool: MaybeItem,
-) => {
-	new ItemDrop(
-		world,
-		x + 0.4,
-		y + 0.4,
-		z + 0.4,
-		Item.create("stone", world, 2),
-	);
-	new ItemDrop(world, x + 0.6, y + 0.4, z + 0.6, Item.create("coal", world, 3));
-};
 
 export const blocks = {
 	air: 0,
@@ -128,7 +56,6 @@ export const registerBlockTypes = (world: World) => {
 		.withFireDamage(70)
 		.withFireHealth(8192 * 2)
 		.withFireSpreadToChance(0.047)
-		.withSimpleHandler(new BlockItem(world, 1, 1))
 		.withBurnHandler((world, x, y, z) => {
 			world.setBlock(x, y, z, 1);
 		})
@@ -139,7 +66,6 @@ export const registerBlockTypes = (world: World) => {
 		.withTexture(2)
 		.withColours(0x5e5e5eff, 0x484848ff)
 		.withMiningCat("Pickaxe")
-		.withItemDropHandler(stoneDropHandler)
 		.withFireHealth(8192)
 		.withBlockHealth(800).id;
 
@@ -150,7 +76,6 @@ export const registerBlockTypes = (world: World) => {
 		.withMiningCat("Pickaxe")
 		.withFireDamage(72)
 		.withFireHealth(8192 * 16)
-		.withItemDropHandler(coalDropHandler)
 		.withBlockHealth(700).id;
 
 	blocks.spruceLog = world
@@ -169,7 +94,6 @@ export const registerBlockTypes = (world: World) => {
 		.withFireDamage(96)
 		.withFireHealth(8192 * 2)
 		.withMiningCat("Axe")
-		.withItemDropHandler(leafDropHandler)
 		.withBlockHealth(100).id;
 
 	blocks.dryGrass = world
@@ -181,7 +105,6 @@ export const registerBlockTypes = (world: World) => {
 		.withFireHealth(200)
 		.withColours(0x4b6411ff, 0x4f230aff)
 		.withMiningCat("Pickaxe")
-		.withSimpleHandler(new BlockItem(world, 1, 1))
 		.withBlockHealth(200).id;
 
 	blocks.roots = world
@@ -189,7 +112,6 @@ export const registerBlockTypes = (world: World) => {
 		.withTexture(7)
 		.withColours(0x3e3214ff, 0x29200dff)
 		.withMiningCat("Pickaxe")
-		.withSimpleHandler(new BlockItem(world, 1, 1))
 		.withBlockHealth(500).id;
 
 	blocks.obsidian = world
@@ -215,7 +137,6 @@ export const registerBlockTypes = (world: World) => {
 		.withFireDamage(80)
 		.withFireHealth(8192 * 2)
 		.withMiningCat("Axe")
-		.withItemDropHandler(leafDropHandler)
 		.withBlockHealth(100).id;
 
 	blocks.ironOre = world
@@ -223,7 +144,6 @@ export const registerBlockTypes = (world: World) => {
 		.withTexture(11)
 		.withColours(0x725b5bff, 0x5e5e5eff)
 		.withMiningCat("Pickaxe")
-		.withItemDropHandler(ironOreDropHandler)
 		.withBlockHealth(1000).id;
 
 	blocks.marbleBlock = world
@@ -255,7 +175,6 @@ export const registerBlockTypes = (world: World) => {
 		.withColours(0x023000ff, 0x326f1cff)
 		.withMiningCat("Axe")
 		.withFireDamage(96)
-		.withItemDropHandler(leafDropHandler)
 		.withBlockHealth(100).id;
 
 	blocks.boards = world
@@ -280,7 +199,6 @@ export const registerBlockTypes = (world: World) => {
 		.withMiningCat("Axe")
 		.withFireHealth(200)
 		.withFireDamage(96)
-		.withItemDropHandler(leafDropHandler)
 		.withBlockHealth(100).id;
 
 	blocks.birchLog = world
@@ -295,7 +213,6 @@ export const registerBlockTypes = (world: World) => {
 		.withTexture(21)
 		.withColours(0x274200ff, 0x183300ff)
 		.withMiningCat("Axe")
-		.withItemDropHandler(leafDropHandler)
 		.withBlockHealth(100).id;
 
 	blocks.dateBush = world
@@ -303,7 +220,6 @@ export const registerBlockTypes = (world: World) => {
 		.withTexture(23)
 		.withColours(0x4f3300ff, 0x948312ff)
 		.withMiningCat("Axe")
-		.withItemDropHandler(leafDropHandler)
 		.withBlockHealth(100).id;
 
 	blocks.sand = world
@@ -319,7 +235,6 @@ export const registerBlockTypes = (world: World) => {
 		.withColours(0x0036d4ff, 0x0000bdff)
 		.withLiquid()
 		.withSeeThrough()
-		.withItemDropHandler(() => {})
 		.withFireDamage(0)
 		.withFireHealth(10000)
 		.withBlockHealth(340).id;
