@@ -11,14 +11,12 @@ export class ServerGame extends Game {
 	sockets: Map<number, ClientConnection> = new Map();
 
 	onConnect(socket: WebSocket) {
-		console.log("onConnect");
 		const con = new ClientConnection(this, socket);
 		this.sockets.set(con.id, con);
 	}
 
 	broadcastSystems() {
 		const msg = this.world.fire.serialize();
-		console.log(msg);
 		for (const con of this.sockets.values()) {
 			con.q.call("fireUpdate", msg);
 		}

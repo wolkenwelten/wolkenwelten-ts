@@ -68,7 +68,6 @@ export class Character extends Being {
 		this.inventory.add(Item.create("earthWall", this.world));
 		this.inventory.add(Item.create("fireBreath", this.world));
 		this.inventory.add(Item.create("comet", this.world));
-		//this.equipment.items[0] = Item.create('club', this.world);
 	}
 
 	respawn() {

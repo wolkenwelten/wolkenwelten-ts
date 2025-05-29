@@ -2,7 +2,7 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import { WebSocket } from "ws";
-import type { ServerGame } from "./server";
+import type { ServerGame } from "./serverGame";
 import { WSPacket, WSQueue } from "../network";
 import { coordinateToWorldKey } from "../world/world";
 import { Chunk } from "../world/chunk/chunk";
