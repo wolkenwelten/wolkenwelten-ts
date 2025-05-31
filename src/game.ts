@@ -12,7 +12,6 @@ import { World } from "./world/world";
 import { FloatingIslandsWorldGen } from "./content/floatingIslandsWorldGen";
 import type { RenderManager } from "./client/render/render";
 import type { AudioManager } from "./client/audio";
-import { Entity } from "./world/entity/entity";
 
 export interface GameConfig {
 	parent: HTMLElement;

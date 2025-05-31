@@ -63,6 +63,9 @@ export class WorldRenderer {
 		if (!entry) {
 			return true;
 		}
+		if (!this.renderer.game.player) {
+			return true;
+		}
 		const player = this.renderer.game.player;
 		const { x, y, z } = entry;
 		const dmax = Math.min(

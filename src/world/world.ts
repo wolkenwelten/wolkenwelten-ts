@@ -135,6 +135,9 @@ export class World {
 	}
 
 	gc() {
+		if (!this.game.player) {
+			return;
+		}
 		const maxDistance =
 			(this.game.render?.renderDistance || 0) *
 			(this.game.render?.renderDistance || 0) *

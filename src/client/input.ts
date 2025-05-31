@@ -70,7 +70,9 @@ export class InputManager {
 			if (!that.game.running || !that.game.ready) {
 				return;
 			}
-			that.game.player.noClip = !that.game.player.noClip;
+			if (that.game.player) {
+				that.game.player.noClip = !that.game.player.noClip;
+			}
 		});
 		this.keyPushHandler.set("Tab", () => {
 			if (document.pointerLockElement) {
@@ -125,13 +127,13 @@ export class InputManager {
 
 	async requestFullscreenAndPointerLock() {
 		if (!document.fullscreenElement) {
-			this.game.player.cooldown(15);
+			this.game.player?.cooldown(15);
 			if (this.game.ui.rootElement.requestFullscreen) {
 				await this.game.ui.rootElement.requestFullscreen();
 			}
 		}
 		if (!document.pointerLockElement) {
-			this.game.player.cooldown(15);
+			this.game.player?.cooldown(15);
 			await this.game.ui.rootElement.requestPointerLock();
 		}
 	}
@@ -162,7 +164,7 @@ export class InputManager {
 			state.y = 1;
 		}
 		if (this.keyStates.has("KeyP")) {
-			this.game.player.respawn();
+			this.game.player?.respawn();
 		}
 
 		if (this.keyStates.has("KeyQ")) {
@@ -281,11 +283,14 @@ export class InputManager {
 
 		for (const gamepad of navigator.getGamepads()) {
 			if (gamepad) {
+				if (!player) {
+					continue;
+				}
 				this.updateGamepad(state, player, gamepad);
 			}
 		}
 
-		if (player.noClip) {
+		if (player?.noClip) {
 			const speed = state.sprint ? 1.5 : 0.3;
 			player.fly(state.x * speed, state.y * speed, state.z * speed);
 		} else {
@@ -298,17 +303,17 @@ export class InputManager {
 			);
 			if (!this.didDash && state.sprint) {
 				this.didDash = true;
-				this.game.player.dash();
+				player?.dash();
 			}
 		}
 		if (!state.sprint) {
 			this.didDash = false;
 		}
 		if (state.primary) {
-			this.game.player.primaryAction();
+			player?.primaryAction();
 		}
 		if (state.secondary) {
-			this.game.player.secondaryAction();
+			player?.secondaryAction();
 		}
 
 		this.lastState = state;
