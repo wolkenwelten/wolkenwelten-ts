@@ -69,6 +69,7 @@ export class Entity {
 	serialize() {
 		return {
 			id: this.id,
+			ownerID: this.ownerID,
 			T: this.T,
 
 			x: this.x,
@@ -87,6 +88,7 @@ export class Entity {
 	}
 
 	deserialize(data: any) {
+		this.ownerID = data.ownerID;
 		this.x = data.x;
 		this.y = data.y;
 		this.z = data.z;
