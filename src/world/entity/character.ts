@@ -482,7 +482,7 @@ export class Character extends Being {
 
 	/* Callback function that gets called whenever this character is attacked */
 	onAttack(perpetrator: Entity): void {
-		if (this === this.world.game.player) {
+		if (this === this.world.game?.player) {
 			this.world.game.render?.canvasWrapper.classList.remove("fx-damage");
 			this.world.game.render?.canvasWrapper.getBoundingClientRect();
 			this.world.game.render?.canvasWrapper.classList.add("fx-damage");

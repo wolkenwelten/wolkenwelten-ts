@@ -39,12 +39,11 @@ export class Game {
 	readonly options: Options;
 	readonly world: World;
 
-	Entity: typeof Entity;
-
-	player: Character;
 	ticks = 1;
 	ready = false;
 	running = false;
+
+	player?: Character;
 
 	constructor(config: GameConfig) {
 		this.config = config;
@@ -52,9 +51,6 @@ export class Game {
 		this.profiler = ProfilingManager.profiler();
 		this.benchmark = new BenchmarkManager(this);
 		this.world = new World(this);
-		this.player = new Character(this.world);
-
-		this.Entity = Entity;
 
 		this.registerContent();
 

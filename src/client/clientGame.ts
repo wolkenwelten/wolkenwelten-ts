@@ -9,6 +9,7 @@ import { ClientNetwork } from "./clientNetwork";
 import { InputManager } from "./input";
 import { AudioManager } from "./audio";
 import { registerAudioContent } from "../content/audioContent";
+import { Character } from "../world/entity/character";
 
 export class ClientGame extends Game {
 	clients: Map<number, ClientEntry> = new Map();
@@ -30,8 +31,14 @@ export class ClientGame extends Game {
 		this.network.setPlayerName(this.options.playerName);
 
 		this.ui = new UIManager(this);
-		this.render = new RenderManager(this, this.player);
+		this.render = new RenderManager(this);
 		this.input = new InputManager(this);
+	}
+
+	async init() {
+		await super.init();
+		this.player = new Character(this.world);
+		this.render.camera.entityToFollow = this.player;
 	}
 
 	update() {
@@ -39,7 +46,10 @@ export class ClientGame extends Game {
 		if (!this.ready || !this.running) {
 			return;
 		}
-		this.audio.update(this.player); // Update AudioEmitter positions in case Entities get destroyed
+		if (this.player) {
+			this.render.camera.entityToFollow = this.player;
+			this.audio.update(this.player); // Update AudioEmitter positions in case Entities get destroyed
+		}
 		this.network.update();
 	}
 }

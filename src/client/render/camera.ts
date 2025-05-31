@@ -17,12 +17,11 @@ export class Camera {
 	public y = 0;
 	public z = 0;
 
-	public readonly entityToFollow: Entity;
+	public entityToFollow?: Entity;
 	public distance = 2.5;
 
-	constructor(entityToFollow: Entity) {
+	constructor() {
 		this.noise = new PerlinNoise();
-		this.entityToFollow = entityToFollow;
 	}
 
 	rotate(yaw: number, pitch: number) {
@@ -52,7 +51,7 @@ export class Camera {
 		if (this.shakeIntensity < 0) {
 			this.shakeIntensity = 0;
 		}
-		const v = this.entityToFollow.getVelocity();
+		const v = this.entityToFollow?.getVelocity() || 0;
 		const goalDistance = 6 + Math.max(0, Math.min(v * 6 * (v * 6), 4));
 		this.distance = this.distance * 0.98 + goalDistance * 0.02;
 	}
@@ -65,6 +64,9 @@ export class Camera {
 		rotateCam = false,
 	) {
 		let s = 0;
+		if (!this.entityToFollow) {
+			return;
+		}
 		if (ox || oz) {
 			const p = Math.atan2(oz, -ox) + Math.PI / 2;
 			const goal = closestRadian(this.entityToFollow.yaw, p + this.yaw);
@@ -110,18 +112,18 @@ export class Camera {
 		mat4.rotateY(viewMatrix, viewMatrix, -this.yaw);
 
 		const shakeOff = this.getCamOffset(ticks);
-		transPos[0] = -this.entityToFollow.x + shakeOff[0];
-		transPos[1] = -this.entityToFollow.y + shakeOff[1];
-		transPos[2] = -this.entityToFollow.z + shakeOff[2];
+		transPos[0] = -(this.entityToFollow?.x || 0) + shakeOff[0];
+		transPos[1] = -(this.entityToFollow?.y || 0) + shakeOff[1];
+		transPos[2] = -(this.entityToFollow?.z || 0) + shakeOff[2];
 		mat4.translate(viewMatrix, viewMatrix, transPos);
 		const cx =
 			Math.cos(-this.yaw + Math.PI / 2) * this.distance * Math.cos(-this.pitch);
 		const cy = Math.sin(-this.pitch) * this.distance;
 		const cz =
 			Math.sin(-this.yaw + Math.PI / 2) * this.distance * Math.cos(-this.pitch);
-		this.x = this.entityToFollow.x + cx;
-		this.y = this.entityToFollow.y + cy;
-		this.z = this.entityToFollow.z + cz;
+		this.x = (this.entityToFollow?.x || 0) + cx;
+		this.y = (this.entityToFollow?.y || 0) + cy;
+		this.z = (this.entityToFollow?.z || 0) + cz;
 		//this.entityToFollow.world.game.render.particle.fxStrike(this.x, this.y, this.z);
 	}
 }

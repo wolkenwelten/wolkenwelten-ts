@@ -81,7 +81,9 @@ export class ClientNetwork {
 			throw new Error("WebSocket not connected");
 		}
 
-		this.playerUpdate(this.game.player);
+		if (this.game.player) {
+			this.playerUpdate(this.game.player);
+		}
 		for (const raw of this.rawQueue) {
 			this.ws.send(raw);
 		}
@@ -207,6 +209,10 @@ export class ClientNetwork {
 			const game = this.game;
 			game.render?.particle.fxStrike(msg.px, msg.py, msg.pz);
 
+			if (!game.player) {
+				return;
+			}
+
 			// Check if we (the local player) are in range and should take damage
 			const dx = game.player.x - msg.px;
 			const dy = game.player.y - msg.py;
@@ -271,6 +277,10 @@ export class ClientNetwork {
 				throw new Error("Invalid player jump received");
 			}
 			const msg = args as any;
+
+			if (!this.game.player) {
+				return;
+			}
 
 			// Don't show particles for our own jumps
 			if (msg.playerId === this.game.player.id) {
@@ -345,6 +355,10 @@ export class ClientNetwork {
 	}
 
 	async playerJump(x: number, y: number, z: number): Promise<void> {
+		if (!this.game.player) {
+			return;
+		}
+
 		await this.queue.call("playerJump", {
 			playerId: this.game.player.id,
 			x,

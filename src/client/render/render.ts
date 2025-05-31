@@ -3,7 +3,6 @@
  */
 import { mat4 } from "gl-matrix";
 
-import type { Entity } from "../../world/entity/entity";
 import type { ClientGame } from "../clientGame";
 import { coordinateToWorldKey } from "../../world/world";
 import { AssetList } from "./asset";
@@ -61,7 +60,7 @@ export class RenderManager {
 		}
 	}
 
-	constructor(game: ClientGame, cam: Entity) {
+	constructor(game: ClientGame) {
 		this.game = game;
 		this.setPlatformDefaults();
 		this.canvas = document.createElement("canvas");
@@ -78,7 +77,9 @@ export class RenderManager {
 		this.gl = gl;
 		this.initGLContext();
 		this.assets = new AssetList(game, gl);
-		this.camera = new Camera(cam);
+
+		this.camera = new Camera();
+
 		this.world = new WorldRenderer(this);
 		this.decals = new DecalMesh(this);
 		this.particle = new ParticleMesh(this);
@@ -129,9 +130,9 @@ export class RenderManager {
 		this.clouds.drawLayers(
 			projectionMatrix,
 			viewMatrix,
-			this.game.player.x,
+			this.game.player?.x || 0,
 			this.game.world.bottomOfTheWorld,
-			this.game.player.z,
+			this.game.player?.z || 0,
 		);
 
 		this.world.draw(projectionMatrix, viewMatrix, this.camera);
@@ -182,12 +183,12 @@ export class RenderManager {
 			setTimeout(this.generateMeshClosue, 0);
 		}
 		if (this.wasUnderwater) {
-			if (!this.game.player.isUnderwater()) {
+			if (!this.game.player?.isUnderwater()) {
 				this.wasUnderwater = false;
 				this.canvasWrapper.classList.remove("fx-underwater");
 			}
 		} else {
-			if (this.game.player.isUnderwater()) {
+			if (this.game.player?.isUnderwater()) {
 				this.wasUnderwater = true;
 				this.canvasWrapper.classList.add("fx-underwater");
 			}
