@@ -12,6 +12,7 @@ import { World } from "./world/world";
 import { FloatingIslandsWorldGen } from "./content/floatingIslandsWorldGen";
 import type { RenderManager } from "./client/render/render";
 import type { AudioManager } from "./client/audio";
+import { Entity } from "./world/entity/entity";
 
 export interface GameConfig {
 	parent: HTMLElement;
@@ -38,6 +39,8 @@ export class Game {
 	readonly options: Options;
 	readonly world: World;
 
+	Entity: typeof Entity;
+
 	player: Character;
 	ticks = 1;
 	ready = false;
@@ -50,6 +53,8 @@ export class Game {
 		this.benchmark = new BenchmarkManager(this);
 		this.world = new World(this);
 		this.player = new Character(this.world);
+
+		this.Entity = Entity;
 
 		this.registerContent();
 

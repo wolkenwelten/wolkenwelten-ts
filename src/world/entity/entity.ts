@@ -13,8 +13,20 @@ let entityCounter = 0;
 const modelViewMatrix = mat4.create();
 const transPos = new Float32Array([0, 0, 0]);
 
+const registeredEntities = new Map<string, new (world: World) => Entity>();
+
+export const registerEntity = (
+	T: string,
+	constructor: new (world: World) => Entity,
+) => {
+	Entity.registeredEntities.set(T, constructor);
+};
+
 export class Entity {
+	static readonly registeredEntities = registeredEntities;
+
 	id: number;
+	T = "Entity";
 
 	x = 0;
 	y = 0;
@@ -38,10 +50,20 @@ export class Entity {
 		world.addEntity(this);
 	}
 
+	static deserialize(world: World, data: any) {
+		const constructor = registeredEntities.get(data.T);
+		if (!constructor) {
+			throw new Error(`Unknown entity type: ${data.T}`);
+		}
+		const entity = new constructor(world);
+		entity.deserialize(data);
+		return entity;
+	}
+
 	serialize() {
 		return {
 			id: this.id,
-			T: "Entity",
+			T: this.T,
 
 			x: this.x,
 			y: this.y,
@@ -331,3 +353,4 @@ export class Entity {
 		]);
 	}
 }
+registerEntity("Entity", Entity);

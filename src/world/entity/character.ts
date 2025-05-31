@@ -4,7 +4,7 @@
 import { mat4 } from "gl-matrix";
 
 import type { VoxelMesh } from "../../client/render/meshes/voxelMesh/voxelMesh";
-import type { Entity } from "./entity";
+import { registerEntity, type Entity } from "./entity";
 import type { World } from "../world";
 import type { Position } from "../../util/math";
 import type { ClientGame } from "../../client/clientGame";
@@ -22,6 +22,8 @@ const clamp = (x: number, min: number, max: number) =>
 	Math.min(Math.max(x, min), max);
 
 export class Character extends Being {
+	T = "Character";
+
 	movementX = 0;
 	movementY = 0;
 	movementZ = 0;
@@ -63,6 +65,20 @@ export class Character extends Being {
 	startAnimation(_animationId = 0) {
 		this.animation = 64;
 		this.animationId = 1 - this.animationId;
+	}
+
+	serialize() {
+		return {
+			...super.serialize(),
+			animation: this.animation,
+			animationId: this.animationId,
+		};
+	}
+
+	deserialize(data: any) {
+		super.deserialize(data);
+		this.animation = data.animation;
+		this.animationId = data.animationId;
 	}
 
 	updateMessage() {
@@ -119,7 +135,7 @@ export class Character extends Being {
 	}
 
 	constructor(world: World) {
-		super(world, 0, 0, 0);
+		super(world);
 		this.init();
 	}
 
@@ -716,3 +732,4 @@ export class Character extends Being {
 		return this.world.game.render?.assets.playerHead || null;
 	}
 }
+registerEntity("Character", Character);

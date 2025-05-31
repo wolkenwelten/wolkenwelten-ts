@@ -5,16 +5,33 @@ import type { World } from "../world";
 import { Entity } from "./entity";
 
 export abstract class Being extends Entity {
+	T = "Being";
+
 	level = 0;
 	isDead = false;
 	health = 12;
 	maxHealth = 12;
 
-	constructor(world: World, x: number, y: number, z: number) {
+	serialize() {
+		return {
+			...super.serialize(),
+			level: this.level,
+			isDead: this.isDead,
+			health: this.health,
+			maxHealth: this.maxHealth,
+		};
+	}
+
+	deserialize(data: any) {
+		super.deserialize(data);
+		this.level = data.level;
+		this.isDead = data.isDead;
+		this.health = data.health;
+		this.maxHealth = data.maxHealth;
+	}
+
+	constructor(world: World) {
 		super(world);
-		this.x = x;
-		this.y = y;
-		this.z = z;
 	}
 
 	damage(rawAmount: number): void {
