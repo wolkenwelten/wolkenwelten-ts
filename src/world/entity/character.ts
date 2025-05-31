@@ -258,6 +258,10 @@ export class Character extends Being {
 	}
 
 	update() {
+		if (this.ownerID !== this.world.game.networkID) {
+			return;
+		}
+
 		this.beRepelledByEntities();
 
 		if (this.isDead) {

@@ -57,6 +57,9 @@ export abstract class Being extends Entity {
 	onAttack(perpetrator: Entity): void {}
 
 	update(): void {
+		if (this.ownerID !== this.world.game.networkID) {
+			return;
+		}
 		super.update();
 		this.beRepelledByEntities();
 	}

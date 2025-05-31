@@ -38,6 +38,7 @@ export class Game {
 	readonly options: Options;
 	readonly world: World;
 
+	networkID = 0;
 	ticks = 1;
 	ready = false;
 	running = false;

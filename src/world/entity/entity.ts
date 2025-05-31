@@ -30,6 +30,7 @@ export class Entity {
 	static readonly registeredEntities = registeredEntities;
 
 	id: number;
+	ownerID: number;
 	T = "Entity";
 
 	x = 0;
@@ -50,6 +51,7 @@ export class Entity {
 
 	constructor(world: World) {
 		this.id = ++entityCounter;
+		this.ownerID = world.game.networkID;
 		this.world = world;
 		world.addEntity(this);
 	}
@@ -164,6 +166,7 @@ export class Entity {
 		if (
 			this.noClip ||
 			this.destroyed ||
+			this.ownerID !== this.world.game.networkID ||
 			!this.world.isLoaded(this.x, this.y, this.z)
 		) {
 			return;

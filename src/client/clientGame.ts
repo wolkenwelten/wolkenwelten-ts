@@ -41,6 +41,7 @@ export class ClientGame extends Game {
 	}
 
 	setPlayerID(playerID: number) {
+		this.networkID = playerID;
 		setEntityCounter(playerID << 28);
 		this.player = new Character(this.world);
 		this.render.camera.entityToFollow = this.player;
