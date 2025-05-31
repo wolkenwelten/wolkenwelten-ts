@@ -10,6 +10,7 @@ import { InputManager } from "./input";
 import { AudioManager } from "./audio";
 import { registerAudioContent } from "../content/audioContent";
 import { Character } from "../world/entity/character";
+import { setEntityCounter } from "../world/entity/entity";
 
 export class ClientGame extends Game {
 	clients: Map<number, ClientEntry> = new Map();
@@ -37,6 +38,10 @@ export class ClientGame extends Game {
 
 	async init() {
 		await super.init();
+	}
+
+	setPlayerID(playerID: number) {
+		setEntityCounter(playerID << 28);
 		this.player = new Character(this.world);
 		this.render.camera.entityToFollow = this.player;
 	}

@@ -13,6 +13,10 @@ let entityCounter = 0;
 const modelViewMatrix = mat4.create();
 const transPos = new Float32Array([0, 0, 0]);
 
+export const setEntityCounter = (counter: number) => {
+	entityCounter = counter;
+};
+
 const registeredEntities = new Map<string, new (world: World) => Entity>();
 
 export const registerEntity = (

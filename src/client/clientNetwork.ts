@@ -92,6 +92,10 @@ export class ClientNetwork {
 
 	private onConnect() {
 		console.log("(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧ Connected to server!");
+		setTimeout(async () => {
+			const playerID = await this.getPlayerID();
+			this.game.setPlayerID(playerID);
+		}, 0);
 		this.reconnectAttempts = 0;
 		this.flushRawQueue();
 	}
