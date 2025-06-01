@@ -46,6 +46,18 @@ export class InputManager {
 			window.addEventListener("keydown", (e) => {
 				that.keyStates.add(e.code);
 				const handler = that.keyPushHandler.get(e.code);
+				if (that.game.ui.chat.visible()) {
+					if (e.code === "Enter") {
+						const msg = that.game.ui.chat.input.value.trim();
+						if (msg.length > 0) {
+							that.game.network.addLogEntry(msg);
+						}
+						that.game.ui.chat.hide();
+					} else if (e.code === "Escape") {
+						that.game.ui.chat.hide();
+					}
+					return;
+				}
 				if (handler) {
 					handler();
 				}
@@ -66,11 +78,6 @@ export class InputManager {
 				return;
 			}
 		});
-		this.keyPushHandler.set("Escape", () => {
-			if (that.game.ui.chat.visible()) {
-				that.game.ui.chat.hide();
-			}
-		});
 		this.keyPushHandler.set("KeyN", () => {
 			if (!that.game.running || !that.game.ready) {
 				return;
@@ -85,13 +92,7 @@ export class InputManager {
 			}
 		});
 		this.keyPushHandler.set("Enter", () => {
-			if (that.game.ui.chat.visible()) {
-				const msg = that.game.ui.chat.input.value.trim();
-				that.game.network.addLogEntry(msg);
-				that.game.ui.chat.hide();
-			} else {
-				that.game.ui.chat.show();
-			}
+			that.game.ui.chat.show();
 		});
 
 		that.game.render.canvasWrapper.addEventListener(
@@ -148,6 +149,9 @@ export class InputManager {
 	}
 
 	private updateKeyboard(state: ControlState) {
+		if (this.game.ui.chat.visible()) {
+			return;
+		}
 		if (this.keyStates.has("KeyW")) {
 			state.z = -1;
 		}
@@ -191,6 +195,9 @@ export class InputManager {
 	}
 
 	private updateMouse(state: ControlState) {
+		if (this.game.ui.chat.visible()) {
+			return;
+		}
 		if (this.mouseStates.has(0)) {
 			state.primary = true;
 		}
