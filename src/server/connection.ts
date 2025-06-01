@@ -41,7 +41,7 @@ export class ClientConnection {
 		this.chunkVersions.set(coordinateToWorldKey(x, y, z), version);
 	}
 
-	private close() {
+	public close() {
 		for (const entity of this.server.world.entities.values()) {
 			if (entity.ownerID === this.id) {
 				entity.destroy();
@@ -54,6 +54,11 @@ export class ClientConnection {
 		this.id = ++idCounter;
 		this.socket = socket;
 		this.server = server;
+
+		socket.on("error", (error) => {
+			console.error(`(╥﹏╥) WebSocket error:`, error);
+			this.close();
+		});
 
 		socket.on("close", () => {
 			console.log(`Closing connection`);

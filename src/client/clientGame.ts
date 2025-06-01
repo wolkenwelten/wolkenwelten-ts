@@ -12,18 +12,25 @@ import { registerAudioContent } from "../content/audioContent";
 import { Character } from "../world/entity/character";
 import { setEntityCounter } from "../world/entity/entity";
 
+export interface ClientGameConfig extends GameConfig {
+	parent: HTMLElement;
+	playerName?: string;
+}
+
 export class ClientGame extends Game {
 	clients: Map<number, ClientEntry> = new Map();
 	isClient = true;
 
 	readonly audio: AudioManager;
+	readonly config: ClientGameConfig;
 	readonly network: ClientNetwork;
 	readonly input: InputManager;
 	readonly render: RenderManager;
 	readonly ui: UIManager;
 
-	constructor(config: GameConfig) {
+	constructor(config: ClientGameConfig) {
 		super(config);
+		this.config = config;
 
 		this.audio = new AudioManager();
 		registerAudioContent(this.audio);

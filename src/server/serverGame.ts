@@ -1,15 +1,16 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import { Game, GameConfig } from "../game";
-import { WebSocketServer, WebSocket } from "ws";
+import { Game, type GameConfig } from "../game";
+import { type WebSocket } from "ws";
 import { ClientConnection } from "./connection";
 
 import "../world/entity/character";
 
+export interface ServerGameConfig extends GameConfig {}
+
 export class ServerGame extends Game {
 	isServer = true;
-	wss: WebSocketServer;
 	sockets: Map<number, ClientConnection> = new Map();
 
 	onConnect(socket: WebSocket) {
@@ -20,18 +21,9 @@ export class ServerGame extends Game {
 
 	broadcastSystems() {}
 
-	constructor(config: GameConfig) {
+	constructor(config: ServerGameConfig = {}) {
 		super(config);
 		this.running = true;
-		this.wss = new WebSocketServer({ port: 8080 });
-		this.wss.on("connection", this.onConnect.bind(this));
-		this.wss.on("error", (error) => {
-			console.error(`(╥﹏╥) WebSocketServer error:`, error);
-		});
-
-		this.wss.on("close", () => {
-			console.log(`(｡•́︿•̀｡) WebSocketServer closed`);
-		});
 
 		const server = this;
 		setInterval(() => {

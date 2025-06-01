@@ -1,13 +1,23 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
+import { WebSocketServer } from "ws";
 import { ServerGame } from "./serverGame";
 
 const main = async () => {
-	const parent: unknown = null;
-	const game = new ServerGame({
-		parent: parent as HTMLElement,
+	const game = new ServerGame();
+
+	const wss = new WebSocketServer({ port: 8080 });
+	const onConnect = game.onConnect.bind(game);
+	wss.on("connection", onConnect);
+	wss.on("error", (error) => {
+		console.error(`(╥﹏╥) WebSocketServer error:`, error);
 	});
+
+	wss.on("close", () => {
+		console.log(`(｡•́︿•̀｡) WebSocketServer closed`);
+	});
+
 	await game.init();
 };
-setTimeout(main, 0);
+main();
