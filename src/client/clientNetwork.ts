@@ -280,6 +280,11 @@ export class ClientNetwork {
 					// This player is no longer in the server's list, remove them
 					this.game.clients.delete(id);
 					this.game.ui.log.addEntry(`${client.name} left the game`);
+					for (const entity of this.game.world.entities.values()) {
+						if (entity.ownerID === id) {
+							entity.destroy();
+						}
+					}
 				}
 			}
 		});
