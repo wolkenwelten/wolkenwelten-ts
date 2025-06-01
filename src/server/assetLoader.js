@@ -10,10 +10,13 @@ export async function load(url, context, nextLoad) {
 		checkUrl.endsWith(".css") ||
 		checkUrl.endsWith(".ogg") ||
 		checkUrl.endsWith(".png") ||
+		checkUrl.endsWith(".webp") ||
+		checkUrl.endsWith(".svg") ||
 		checkUrl.endsWith(".jpg") ||
 		checkUrl.endsWith(".vox") ||
 		checkUrl.endsWith(".vert") ||
-		checkUrl.endsWith(".frag")
+		checkUrl.endsWith(".frag") ||
+		checkUrl.endsWith(".html")
 	) {
 		const content = await readFile(new URL(url));
 		const source = checkUrl.endsWith(".vox")

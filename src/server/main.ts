@@ -9,6 +9,7 @@ import config from "./config.js";
 import http from "http";
 import { startDevServer } from "./viteTemplate.js";
 import express from "express";
+import indexContent from "./indexContent.html?raw";
 
 const mainTemplate = new ViteTemplate("index");
 const gameTemplate = new ViteTemplate("game");
@@ -48,9 +49,7 @@ const main = async () => {
 				{
 					title: "WolkenWelten",
 				},
-				`<h1>WolkenWelten</h1>
-		<a href="/game">Join Game</a>
-		`,
+				indexContent,
 			),
 		);
 	});
