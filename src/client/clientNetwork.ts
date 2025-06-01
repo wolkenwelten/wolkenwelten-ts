@@ -140,7 +140,7 @@ export class ClientNetwork {
 
 	private connect() {
 		const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-		const url = `${protocol}//${window.location.hostname}:8080`;
+		const url = `${protocol}//${window.location.host}/ws`;
 		console.log("Connecting to", url);
 		this.ws = new WebSocket(url);
 		this.ws.onmessage = this.onMessage.bind(this);

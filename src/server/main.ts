@@ -7,7 +7,7 @@ import { ServerGame } from "./serverGame";
 const main = async () => {
 	const game = new ServerGame();
 
-	const wss = new WebSocketServer({ port: 8080 });
+	const wss = new WebSocketServer({ port: 8080, path: "/ws" });
 	const onConnect = game.onConnect.bind(game);
 	wss.on("connection", onConnect);
 	wss.on("error", (error) => {
