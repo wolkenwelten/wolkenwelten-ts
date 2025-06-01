@@ -5,6 +5,8 @@ import { Game, GameConfig } from "../game";
 import { WebSocketServer, WebSocket } from "ws";
 import { ClientConnection } from "./connection";
 
+import "../world/entity/character";
+
 export class ServerGame extends Game {
 	isServer = true;
 	wss: WebSocketServer;
@@ -13,6 +15,7 @@ export class ServerGame extends Game {
 	onConnect(socket: WebSocket) {
 		const con = new ClientConnection(this, socket);
 		this.sockets.set(con.id, con);
+		con.broadcastPlayerList();
 	}
 
 	broadcastSystems() {}

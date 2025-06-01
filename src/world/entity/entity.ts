@@ -17,11 +17,17 @@ export const setEntityCounter = (counter: number) => {
 	entityCounter = counter;
 };
 
-const registeredEntities = new Map<string, new (world: World) => Entity>();
+const registeredEntities = new Map<
+	string,
+	new (
+		world: World,
+		id?: number,
+	) => Entity
+>();
 
 export const registerEntity = (
 	T: string,
-	constructor: new (world: World) => Entity,
+	constructor: new (world: World, id?: number) => Entity,
 ) => {
 	Entity.registeredEntities.set(T, constructor);
 };
@@ -49,8 +55,8 @@ export class Entity {
 	weight = 1; // Necessary for physics calculations
 	scale = 1;
 
-	constructor(world: World) {
-		this.id = ++entityCounter;
+	constructor(world: World, id = 0) {
+		this.id = id || ++entityCounter;
 		this.ownerID = world.game.networkID;
 		this.world = world;
 		world.addEntity(this);
@@ -61,7 +67,7 @@ export class Entity {
 		if (!constructor) {
 			throw new Error(`Unknown entity type: ${data.T}`);
 		}
-		const entity = new constructor(world);
+		const entity = new constructor(world, data.id);
 		entity.deserialize(data);
 		return entity;
 	}
@@ -88,6 +94,7 @@ export class Entity {
 	}
 
 	deserialize(data: any) {
+		this.id = data.id;
 		this.ownerID = data.ownerID;
 		this.x = data.x;
 		this.y = data.y;

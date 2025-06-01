@@ -2,7 +2,6 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import { WSPacket, WSQueue } from "../network";
-import { Character } from "../world/entity/character";
 import { ClientEntry } from "./clientEntry";
 import type { ClientGame } from "./clientGame";
 export type ClientHandler = (game: ClientGame, args: unknown) => Promise<void>;
@@ -21,6 +20,17 @@ export class ClientNetwork {
 
 	static addDefaultHandler(T: string, handler: ClientHandler) {
 		this.defaultHandlers.set(T, handler);
+	}
+
+	private broadcastEntities() {
+		const entities = [];
+		for (const entity of this.game.world.entities.values()) {
+			if (entity.ownerID !== this.game.networkID) {
+				continue;
+			}
+			entities.push(entity.serialize());
+		}
+		this.queue.call("updateEntities", entities);
 	}
 
 	private onArrayBuffer(data: ArrayBuffer) {
@@ -81,9 +91,7 @@ export class ClientNetwork {
 			throw new Error("WebSocket not connected");
 		}
 
-		if (this.game.player) {
-			this.playerUpdate(this.game.player);
-		}
+		this.broadcastEntities();
 		for (const raw of this.rawQueue) {
 			this.ws.send(raw);
 		}
@@ -184,18 +192,13 @@ export class ClientNetwork {
 			this.game.ui.log.addEntry(msg);
 		});
 
-		this.queue.registerCallHandler("playerUpdate", async (args: unknown) => {
-			if (typeof args !== "object") {
-				throw new Error("Invalid player update received");
+		this.queue.registerCallHandler("updateEntities", async (args: unknown) => {
+			if (!Array.isArray(args)) {
+				throw new Error("Invalid entities received");
 			}
-			const o = args as any;
-			const cli = this.game.clients.get(o.id);
-			if (!cli) {
-				const cli = new ClientEntry(this.game, o.id);
-				this.game.clients.set(o.id, cli);
-				cli.update(o);
-			} else {
-				cli.update(o);
+			const entities = args as any[];
+			for (const e of entities) {
+				this.game.world.deserializeEntity(e);
 			}
 		});
 
@@ -226,7 +229,8 @@ export class ClientNetwork {
 			if (dd <= msg.radius * msg.radius) {
 				game.player.damage(msg.damage);
 				if (attacker) {
-					game.player.onAttack(attacker.char);
+					console.log("attacker", attacker);
+					//game.player.onAttack(attacker.char);
 				}
 
 				// Calculate knockback direction and magnitude
@@ -260,18 +264,22 @@ export class ClientNetwork {
 			}
 
 			const playerList = args as { id: number; name: string }[];
+			for (const player of playerList) {
+				let client = this.game.clients.get(player.id);
+				if (!client) {
+					client = new ClientEntry(this.game, player.id);
+					this.game.clients.set(player.id, client);
+				}
+				client.update(player);
+			}
 			const validPlayerIds = new Set(playerList.map((player) => player.id));
 
 			// Check for players that need to be removed
 			for (const [id, client] of this.game.clients.entries()) {
 				if (!validPlayerIds.has(id)) {
 					// This player is no longer in the server's list, remove them
-					client.char.destroy();
 					this.game.clients.delete(id);
 					this.game.ui.log.addEntry(`${client.name} left the game`);
-					console.log(
-						`Removed player ${client.name} (ID: ${id}) based on playerList update`,
-					);
 				}
 			}
 		});
@@ -310,10 +318,6 @@ export class ClientNetwork {
 
 	async setPlayerName(name: string): Promise<void> {
 		await this.queue.call("setPlayerName", name);
-	}
-
-	async playerUpdate(player: Character): Promise<void> {
-		await this.queue.call("playerUpdate", player.updateMessage());
 	}
 
 	async chunkDrop(x: number, y: number, z: number): Promise<void> {

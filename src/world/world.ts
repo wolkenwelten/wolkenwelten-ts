@@ -2,7 +2,7 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import type { Game } from "../game";
-import type { Entity } from "./entity/entity";
+import { Entity } from "./entity/entity";
 import type { WorldGen } from "./worldGen";
 import type { ClientGame } from "../client/clientGame";
 import profiler from "../profiler";
@@ -123,6 +123,16 @@ export class World {
 		}
 		if ((this.game.ticks & 0xf) === 0) {
 			this.dangerZone.update();
+		}
+	}
+
+	deserializeEntity(data: any) {
+		const oldEntity = this.entities.get(data.id);
+		if (oldEntity) {
+			oldEntity.deserialize(data);
+			return oldEntity;
+		} else {
+			return Entity.deserialize(this, data);
 		}
 	}
 

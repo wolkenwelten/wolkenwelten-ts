@@ -8,7 +8,6 @@ import { registerEntity, type Entity } from "./entity";
 import type { World } from "../world";
 import type { Position } from "../../util/math";
 import type { ClientGame } from "../../client/clientGame";
-import type { PlayerUpdate } from "../../client/clientEntry";
 import { Being } from "./being";
 import { GRAVITY } from "../../constants";
 
@@ -81,35 +80,6 @@ export class Character extends Being {
 		this.animationId = data.animationId;
 	}
 
-	updateMessage() {
-		return {
-			x: this.x,
-			y: this.y,
-			z: this.z,
-
-			yaw: this.yaw,
-			pitch: this.pitch,
-
-			health: this.health,
-			maxHealth: this.maxHealth,
-
-			animation: this.animation,
-			animationId: this.animationId,
-		};
-	}
-
-	networkUpdate(msg: PlayerUpdate) {
-		this.x = msg.x;
-		this.y = msg.y;
-		this.z = msg.z;
-		this.yaw = msg.yaw;
-		this.pitch = msg.pitch;
-		this.health = msg.health;
-		this.maxHealth = msg.maxHealth;
-		this.animation = msg.animation;
-		this.animationId = msg.animationId;
-	}
-
 	/* Initialize an already existing Character, that way we can easily reuse the same object, */
 	init() {
 		this.noClip = false;
@@ -134,8 +104,8 @@ export class Character extends Being {
 		this.justJumped = false;
 	}
 
-	constructor(world: World) {
-		super(world);
+	constructor(world: World, id?: number) {
+		super(world, id);
 		this.init();
 	}
 

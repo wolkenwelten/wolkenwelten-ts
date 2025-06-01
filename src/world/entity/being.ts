@@ -30,8 +30,8 @@ export abstract class Being extends Entity {
 		this.maxHealth = data.maxHealth;
 	}
 
-	constructor(world: World) {
-		super(world);
+	constructor(world: World, id?: number) {
+		super(world, id);
 	}
 
 	damage(rawAmount: number): void {

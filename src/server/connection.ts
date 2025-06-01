@@ -41,6 +41,15 @@ export class ClientConnection {
 		this.chunkVersions.set(coordinateToWorldKey(x, y, z), version);
 	}
 
+	private close() {
+		for (const entity of this.server.world.entities.values()) {
+			if (entity.ownerID === this.id) {
+				entity.destroy();
+			}
+		}
+		this.server.sockets.delete(this.id);
+	}
+
 	constructor(server: ServerGame, socket: WebSocket) {
 		this.id = ++idCounter;
 		this.socket = socket;
@@ -48,7 +57,7 @@ export class ClientConnection {
 
 		socket.on("close", () => {
 			console.log(`Closing connection`);
-			server.sockets.delete(this.id);
+			this.close();
 		});
 
 		socket.on("message", (msg) => {
@@ -66,10 +75,40 @@ export class ClientConnection {
 		this.registerDefaultHandlers();
 	}
 
+	private broadcastEntities() {
+		const entities = [];
+		for (const entity of this.server.world.entities.values()) {
+			if (entity.ownerID === this.id) {
+				continue;
+			}
+			entities.push(entity.serialize());
+		}
+		this.q.call("updateEntities", entities);
+	}
+
 	registerDefaultHandlers() {
 		this.q.registerCallHandler("getPlayerID", async (args: unknown) => {
 			console.log("getPlayerID", args, this.id);
 			return this.id;
+		});
+
+		this.q.registerCallHandler("updateEntities", async (args: unknown) => {
+			if (!Array.isArray(args)) {
+				throw new Error("Invalid entities received");
+			}
+			const entities = args as any[];
+			for (const e of entities) {
+				const entity = this.server.world.deserializeEntity(e);
+				if (entity && entity.ownerID === this.id && entity.T === "Character") {
+					this.x = entity.x;
+					this.y = entity.y;
+					this.z = entity.z;
+					this.yaw = entity.yaw;
+					this.pitch = entity.pitch;
+				}
+			}
+			this.broadcastEntities();
+			this.updateChunkVersions();
 		});
 
 		this.q.registerCallHandler("setPlayerName", async (args: unknown) => {
@@ -92,29 +131,6 @@ export class ClientConnection {
 				client.q.call("addLogEntry", msg);
 			}
 			return "";
-		});
-
-		this.q.registerCallHandler("playerUpdate", async (args: unknown) => {
-			if (typeof args !== "object") {
-				throw new Error("Invalid player update received");
-			}
-			const update = args as any;
-
-			this.x = update.x;
-			this.y = update.y;
-			this.z = update.z;
-
-			this.yaw = update.yaw;
-			this.pitch = update.pitch;
-
-			this.health = update.health;
-			this.maxHealth = update.maxHealth;
-
-			this.animation = update.animation;
-			this.animationId = update.animationId;
-
-			this.updateOtherPlayers();
-			this.updateChunkVersions();
 		});
 
 		this.q.registerCallHandler("chunkDrop", async (args: unknown) => {
@@ -219,8 +235,8 @@ export class ClientConnection {
 				for (let oy = -r; oy <= r; oy += s) {
 					for (let oz = -r; oz <= r; oz += s) {
 						if (this.maybeUpdateChunk(ox, oy, oz)) {
-							if (++updates > 10) {
-								console.log(`Sent 10 chunk updates`);
+							if (++updates > 16) {
+								console.log(`Sent 16 chunk updates`);
 								return;
 							}
 						}
@@ -235,39 +251,10 @@ export class ClientConnection {
 	}
 
 	updateChunkVersions() {
-		if ((++this.updates & 0x1f) == 0) {
-			this.chunkUpdateLoop(5);
+		if ((++this.updates & 0xf) == 0) {
+			this.chunkUpdateLoop(16);
 		} else {
-			this.chunkUpdateLoop(2);
-		}
-	}
-
-	updateOtherPlayers() {
-		for (const client of this.server.sockets.values()) {
-			if (client === this) {
-				continue;
-			}
-			// Can be removed once we only use the queue
-			if (client.playerName === "") {
-				continue;
-			}
-
-			this.q.call("playerUpdate", {
-				id: client.id,
-				name: client.playerName,
-
-				x: client.x,
-				y: client.y,
-				z: client.z,
-				yaw: client.yaw,
-				pitch: client.pitch,
-
-				health: client.health,
-				maxHealth: client.maxHealth,
-
-				animation: client.animation,
-				animationId: client.animationId,
-			});
+			this.chunkUpdateLoop(5);
 		}
 	}
 
