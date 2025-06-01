@@ -228,6 +228,17 @@ export class Character extends Being {
 	}
 
 	update() {
+		// Calculate overall velocity
+		const v = this.vx * this.vx + this.vz * this.vz + this.vy * this.vy;
+		if (v > 0.075) {
+			this.world.game.render?.particle.fxTrail(
+				this.x,
+				this.y - 1,
+				this.z,
+				v * 8,
+			);
+		}
+
 		if (this.ownerID !== this.world.game.networkID) {
 			return;
 		}
@@ -305,17 +316,6 @@ export class Character extends Being {
 		const oldVx = this.vx;
 		const oldVy = this.vy;
 		const oldVz = this.vz;
-
-		// Calculate overall velocity
-		const v = this.vx * this.vx + this.vz * this.vz + this.vy * this.vy;
-		if (v > 0.075) {
-			this.world.game.render?.particle.fxTrail(
-				this.x,
-				this.y - 1,
-				this.z,
-				v * 8,
-			);
-		}
 
 		if (underwater) {
 			this.vy *= 0.98;

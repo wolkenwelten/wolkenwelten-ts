@@ -180,7 +180,6 @@ export class ClientNetwork {
 		this.queue = new WSQueue();
 		this.addDefaultHandlers();
 		this.connect();
-		setInterval(this.transfer.bind(this), 8);
 	}
 
 	private addDefaultHandlers() {
