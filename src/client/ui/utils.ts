@@ -38,7 +38,12 @@ export const Div = (data: DivData) => {
 	for (const [k, v] of Object.entries(data)) {
 		switch (k) {
 			case "class":
-				ret.classList.add(v);
+				const classes = v.split(" ");
+				for (const c of classes) {
+					if (c) {
+						ret.classList.add(c);
+					}
+				}
 				break;
 			case "classes":
 				for (const c of v) {

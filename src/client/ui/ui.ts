@@ -9,6 +9,7 @@ import { PlayerModal } from "./components/playerModal/playerModal";
 import { SystemLog } from "./components/systemLog";
 import { IconManager } from "./icon";
 import { RepulsionMultiplier } from "./components/repulsionMultiplier";
+import { TouchControls } from "./components/touchControls";
 
 export class UIManager {
 	game: ClientGame;
@@ -20,6 +21,7 @@ export class UIManager {
 	introWindow: IntroWindow;
 	chat: ChatPanel;
 	repulsionMultiplier: RepulsionMultiplier;
+	touchControls: TouchControls;
 
 	rootHasPaused = false;
 
@@ -39,6 +41,7 @@ export class UIManager {
 		this.introWindow = new IntroWindow(this.uiWrapper, game);
 		this.chat = new ChatPanel(this.uiWrapper, game);
 		this.repulsionMultiplier = new RepulsionMultiplier(this.uiWrapper, game);
+		this.touchControls = new TouchControls(this.uiWrapper, game);
 	}
 
 	update() {
@@ -54,5 +57,6 @@ export class UIManager {
 			}
 		}
 		this.repulsionMultiplier.update();
+		this.touchControls.update();
 	}
 }

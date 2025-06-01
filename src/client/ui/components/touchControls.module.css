@@ -1,0 +1,124 @@
+.touchControlsContainer {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
+	z-index: 1000;
+	opacity: 0;
+	transition: opacity 0.3s ease;
+}
+
+.visible {
+	opacity: 1;
+}
+
+.joystickContainer {
+	position: absolute;
+	width: 150px;
+	height: 150px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.2);
+	border: 2px solid rgba(255, 255, 255, 0.4);
+	pointer-events: auto;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.leftJoystick {
+	bottom: 30px;
+	left: 30px;
+}
+
+.rightJoystick {
+	bottom: 30px;
+	right: 30px;
+}
+
+.joystickKnob {
+	width: 60px;
+	height: 60px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.5);
+	position: absolute;
+	transform: translate(-50%, -50%);
+}
+
+.actionButton {
+	position: absolute;
+	width: 70px;
+	height: 70px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.3);
+	border: 2px solid rgba(255, 255, 255, 0.5);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	color: white;
+	font-size: 1.2rem;
+	pointer-events: auto;
+}
+
+.primaryButton {
+	bottom: 120px;
+	right: 120px;
+}
+
+.secondaryButton {
+	bottom: 180px;
+	right: 60px;
+}
+
+.jumpButton {
+	bottom: 120px;
+	right: 250px;
+}
+
+.sprintButton {
+	bottom: 180px;
+	right: 190px;
+}
+
+.hotbarContainer {
+	position: absolute;
+	right: 250px;
+	bottom: 300px;
+}
+
+.hotbarButton {
+	position: absolute;
+	width: 60px;
+	height: 60px;
+	border-radius: 15px;
+	background: rgba(255, 255, 255, 0.3);
+	border: 2px solid rgba(255, 255, 255, 0.5);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	color: white;
+	font-size: 1.2rem;
+	pointer-events: auto;
+	transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.hotbarButton1 {
+	right: 300px;
+	bottom: 280px;
+}
+
+.hotbarButton2 {
+	right: 230px;
+	bottom: 320px;
+}
+
+.hotbarButton3 {
+	right: 230px;
+	bottom: 240px;
+}
+
+.hotbarButton4 {
+	right: 160px;
+	bottom: 280px;
+}

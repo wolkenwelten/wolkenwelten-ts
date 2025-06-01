@@ -33,10 +33,15 @@ export class InputManager {
 	hotbarKeys: string[] = [];
 	didDash = false;
 	lastState: ControlState = new ControlState();
+	touchState: ControlState | null = null;
+	isTouchDevice = false;
 
 	constructor(game: ClientGame) {
 		this.game = game;
 		const that = this;
+
+		this.isTouchDevice = this.detectTouchDevice();
+
 		if (isClient()) {
 			window.addEventListener("keydown", (e) => {
 				that.keyStates.add(e.code);
@@ -123,6 +128,10 @@ export class InputManager {
 			},
 			false,
 		);
+	}
+
+	private detectTouchDevice(): boolean {
+		return "ontouchstart" in window || navigator.maxTouchPoints > 0;
 	}
 
 	async requestFullscreenAndPointerLock() {
@@ -271,13 +280,34 @@ export class InputManager {
 				state.hotBar3 = true;
 			}
 		}
-		//console.log(gamepad.buttons.map((b,i) => b.pressed ? `${i}: ${b.value}` : '').join(' '));
+	}
+
+	private updateTouch(state: ControlState) {
+		if (!this.touchState) return;
+
+		if (this.touchState.usedGamepad) {
+			state.x = this.touchState.x;
+			state.z = this.touchState.z;
+			state.usedGamepad = true;
+		}
+
+		if (this.touchState.primary) state.primary = true;
+		if (this.touchState.secondary) state.secondary = true;
+		if (this.touchState.y > 0) state.y = this.touchState.y;
+		if (this.touchState.sprint) state.sprint = true;
+
+		if (this.touchState.hotBar1) state.hotBar1 = true;
+		if (this.touchState.hotBar2) state.hotBar2 = true;
+		if (this.touchState.hotBar3) state.hotBar3 = true;
+		if (this.touchState.hotBar4) state.hotBar4 = true;
 	}
 
 	update() {
 		const state = new ControlState();
 		this.updateKeyboard(state);
 		this.updateMouse(state);
+
+		this.updateTouch(state);
 
 		const player = this.game.player;
 
