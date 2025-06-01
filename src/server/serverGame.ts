@@ -4,6 +4,10 @@
 import { Game, type GameConfig } from "../game";
 import { type WebSocket } from "ws";
 import { ClientConnection } from "./connection";
+import { ViteTemplate } from "./viteTemplate";
+
+const mainTemplate = new ViteTemplate("index");
+const gameTemplate = new ViteTemplate("game");
 
 import "../world/entity/character";
 
@@ -40,7 +44,5 @@ export class ServerGame extends Game {
 				sock.broadcastPlayerList();
 			}
 		}, 10000);
-
-		console.log("Starting WolkenWelten Server on port 8080");
 	}
 }

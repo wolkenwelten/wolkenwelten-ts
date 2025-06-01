@@ -1,26 +1,24 @@
 {
 	"compilerOptions": {
-        "outDir": "./dist",
 		"target": "ES2020",
 		"experimentalDecorators": true,
 		"useDefineForClassFields": false,
 		"module": "ESNext",
-		"lib": ["ES2020", "DOM", "DOM.Iterable"],
+		"lib": ["ES2020"],
 		"skipLibCheck": true,
-		"esModuleInterop": true,
 
 		/* Bundler mode */
 		"moduleResolution": "bundler",
 		"allowImportingTsExtensions": true,
 		"resolveJsonModule": true,
-		//"isolatedModules": true,
-		"noEmit": true,
 
-        "plugins": [{ "name": "typescript-plugin-css-modules" }],
+		"noEmit": true,
 
 		/* Linting */
 		"strict": true,
-		"noFallthroughCasesInSwitch": true
+		"noFallthroughCasesInSwitch": true,
+
+		"types": ["node"]
 	},
-	"include": ["./src/**/*"]
+	"include": ["./main.ts"]
 }
