@@ -3,6 +3,36 @@
 	top: 8px;
 	left: 8px;
 	color: white;
-	font-size: 2.4rem;
+	font-size: 1.6rem;
 	font-family: system-ui, sans-serif;
+	background-color: rgba(0, 0, 0, 0.6);
+	border-radius: 0.8rem;
+	text-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
+	border: 2px solid rgba(255, 255, 255, 0.3);
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+	overflow: hidden;
+	width: 200px;
+	height: 36px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+}
+
+.repulsion::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: var(--fill-percent, 0%);
+	background: linear-gradient(90deg, #ff4d4d, #ffcc00, #00cc66);
+	z-index: 0;
+	transition: width 0.3s ease-out;
+}
+
+.repulsion::after {
+	content: "✨ " attr(data-value);
+	position: relative;
+	z-index: 1;
 }

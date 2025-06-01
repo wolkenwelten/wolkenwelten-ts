@@ -56,6 +56,7 @@ export class Character extends Being {
 
 	private animation = 0;
 	private animationId = 0;
+	knockoutTimer = 0;
 
 	respawn() {
 		this.init();
@@ -243,6 +244,8 @@ export class Character extends Being {
 			return;
 		}
 
+		this.knockoutTimer = Math.max(0, this.knockoutTimer - 1);
+
 		this.beRepelledByEntities();
 
 		if (this.isDead) {
@@ -308,6 +311,10 @@ export class Character extends Being {
 		}
 		if (this.lastAction > this.world.game.ticks) {
 			speed *= 0.5;
+		}
+
+		if (this.knockoutTimer > 0) {
+			speed *= 0.1;
 		}
 
 		this.vx = this.vx * (1.0 - accel) + this.movementX * speed * accel;
