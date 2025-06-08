@@ -44,7 +44,6 @@ export class InputManager {
 
 		if (isClient()) {
 			window.addEventListener("keydown", (e) => {
-				console.log(that.game.audio);
 				that.game.audio.maybeStartBGM();
 				that.keyStates.add(e.code);
 				const handler = that.keyPushHandler.get(e.code);
