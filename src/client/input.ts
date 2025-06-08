@@ -105,16 +105,6 @@ export class InputManager {
 			},
 			false,
 		);
-		that.game.render.canvasWrapper.addEventListener(
-			"touchstart",
-			async (e) => {
-				if (!that.game.running || !that.game.ready) {
-					return;
-				}
-				await that.requestFullscreenAndPointerLock();
-			},
-			false,
-		);
 		that.game.ui.rootElement.addEventListener("mousedown", (e) => {
 			that.mouseStates.add(e.button);
 			that.game.audio.maybeStartBGM();
