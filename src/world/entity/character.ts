@@ -106,6 +106,9 @@ export class Character extends Being {
 
 		this.remainingAirActions = this.maxAirActions;
 		this.justJumped = false;
+		this.lastAttackerId = 0;
+		this.lastAttackerCooldown = 0;
+		this.knockoutTimer = 0;
 	}
 
 	constructor(world: World, id?: number) {
