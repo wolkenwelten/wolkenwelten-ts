@@ -406,39 +406,12 @@ export class Character extends Being {
 		target.onAttack(this);
 	}
 
-	attack(radius = 1.6, damageCB?: (e: Entity) => void): boolean {
+	attack(radius = 1.6): boolean {
 		const [vx, vy, vz] = this.direction(0, 0, radius * -0.6);
 		const x = this.x + vx;
 		const y = this.y + vy;
 		const z = this.z + vz;
 		let hit = false;
-		const rr = radius * radius;
-		for (const e of this.world.entities.values()) {
-			if (e === this) {
-				continue;
-			}
-			const dx = e.x - x;
-			const dy = e.y - y;
-			const dz = e.z - z;
-			const dd = dx * dx + dy * dy + dz * dz;
-			if (dd < rr) {
-				hit = true;
-				if (damageCB) {
-					damageCB(e);
-				} else {
-					const dm = Math.max(Math.abs(dx), Math.abs(dz));
-					const ndx = dx / dm;
-					const ndz = dz / dm;
-					e.vx += ndx * 0.03;
-					e.vy += 0.02;
-					e.vz += ndz * 0.03;
-					if (e instanceof Being) {
-						this.doDamage(e, 1);
-					}
-					this.world.game.render?.particle.fxStrike(e.x, e.y, e.z);
-				}
-			}
-		}
 
 		const br = radius * 0.8;
 		for (let cx = Math.floor(x - br); cx < Math.ceil(x + br); cx++) {
@@ -520,10 +493,12 @@ export class Character extends Being {
 		// Send hit message to server
 		if (this.world.game.isClient) {
 			const game = this.world.game as ClientGame;
+			const radius = 1.8;
+			const damage = 6;
 			game.network.playerHit(
 				this.id,
-				1.8,
-				6,
+				radius,
+				damage,
 				px,
 				py,
 				pz,
