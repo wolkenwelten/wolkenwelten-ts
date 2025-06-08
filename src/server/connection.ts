@@ -15,6 +15,8 @@ export class ClientConnection {
 	id: number;
 	playerName = "";
 	playerStatus: PlayerStatus = "";
+	deaths = 0;
+	kills = 0;
 	server: ServerGame;
 
 	x = 0;
@@ -289,6 +291,8 @@ export class ClientConnection {
 				id: client.id,
 				name: client.playerName,
 				status: client.playerStatus,
+				deaths: client.deaths,
+				kills: client.kills,
 			}),
 		);
 

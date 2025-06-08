@@ -134,12 +134,11 @@ export class RenderManager {
 		this.sky.draw(projectionMatrix, viewMatrix);
 		this.camera.calcViewMatrix(this.game.ticks, viewMatrix);
 
-		// Draw world without blending first (solid objects)
-		this.world.draw(projectionMatrix, viewMatrix, this.camera);
-
 		// Now enable blending for transparent/alpha objects
 		this.gl.enable(this.gl.BLEND);
 		this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
+
+		this.world.draw(projectionMatrix, viewMatrix, this.camera);
 
 		// Draw clouds with blending
 		this.clouds.drawLayers(

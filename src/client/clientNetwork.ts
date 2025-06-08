@@ -2,7 +2,7 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import { WSPacket, WSQueue } from "../network";
-import { ClientEntry, PlayerStatus } from "./clientEntry";
+import { ClientEntry, PlayerStatus, PlayerUpdate } from "./clientEntry";
 import type { ClientGame } from "./clientGame";
 export type ClientHandler = (game: ClientGame, args: unknown) => Promise<void>;
 
@@ -273,11 +273,7 @@ export class ClientNetwork {
 				throw new Error("Invalid player list received");
 			}
 
-			const playerList = args as {
-				id: number;
-				name: string;
-				status: PlayerStatus;
-			}[];
+			const playerList = args as PlayerUpdate[];
 			for (const player of playerList) {
 				let client = this.game.clients.get(player.id);
 				if (!client) {

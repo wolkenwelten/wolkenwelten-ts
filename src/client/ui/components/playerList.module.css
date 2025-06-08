@@ -2,7 +2,7 @@
 	position: absolute;
 	top: 2rem;
 	right: 8px;
-	width: 120px;
+	width: 160px;
 	height: auto;
 	padding: 8px;
 	border-radius: 8px;
@@ -17,13 +17,22 @@
 	z-index: 10000;
 }
 
-.playerList .player {
+.player {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	margin-bottom: 4px;
 }
 
-.playerList .player .name {
+.name {
 	font-weight: bold;
+	width: 100%;
+}
+
+.kills {
+	white-space: nowrap;
+}
+
+.deaths {
+	white-space: nowrap;
 }

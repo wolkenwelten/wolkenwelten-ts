@@ -9,12 +9,16 @@ export interface PlayerUpdate {
 	id: number;
 	name: string;
 	status: PlayerStatus;
+	deaths: number;
+	kills: number;
 }
 
 export class ClientEntry {
 	id: number;
 	name = "";
 	status: PlayerStatus = "";
+	deaths = 0;
+	kills = 0;
 
 	constructor(game: Game, id: number) {
 		this.id = id;
@@ -23,5 +27,7 @@ export class ClientEntry {
 	update(msg: PlayerUpdate) {
 		this.name = msg.name;
 		this.status = msg.status;
+		this.deaths = msg.deaths;
+		this.kills = msg.kills;
 	}
 }

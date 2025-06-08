@@ -3,7 +3,7 @@
  */
 import { PlayerStatus } from "../../clientEntry";
 import type { ClientGame } from "../../clientGame";
-import { Div } from "../utils";
+import { Div, Span } from "../utils";
 import styles from "./playerList.module.css";
 
 export class PlayerList {
@@ -16,16 +16,21 @@ export class PlayerList {
 	}
 
 	update() {
-		const playerList = Array.from(this.game.clients.values()).map((client) => ({
-			id: client.id,
-			name: client.name,
-			status: client.status,
-		}));
+		const playerList = Array.from(this.game.clients.values());
+		playerList.sort((a, b) => b.kills - a.kills);
 
 		this.div.innerHTML = "";
 		for (const player of playerList) {
 			const playerDiv = Div({
-				text: `${this.getStatusIcon(player.status)}${player.name}`,
+				class: styles.player,
+				children: [
+					Span({
+						text: `${this.getStatusIcon(player.status)}${player.name} `,
+						class: styles.name,
+					}),
+					Span({ text: `[${player.kills} 💪]`, class: styles.kills }),
+					Span({ text: `[${player.deaths} 💀]`, class: styles.deaths }),
+				],
 			});
 			this.div.append(playerDiv);
 		}
