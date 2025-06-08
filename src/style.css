@@ -37,6 +37,10 @@ canvas.wolkenwelten-canvas {
 	background: radial-gradient(rgba(0, 0, 255, 0.4), rgba(0, 0, 48, 0.9));
 }
 
+#wolkenwelten-parent .fx-underground::before {
+	background: radial-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.9));
+}
+
 #wolkenwelten-parent .fx-inventory::before {
 	background: radial-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.9));
 }

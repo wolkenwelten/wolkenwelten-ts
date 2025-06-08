@@ -5,6 +5,7 @@ import { mat4 } from "gl-matrix";
 import { PerlinNoise } from "../../util/noise";
 import { Entity } from "../../world/entity/entity";
 import { closestRadian } from "../../util/math";
+import type { World } from "../../world/world";
 
 const transPos = new Float32Array([0, 0, 0]);
 
@@ -22,6 +23,14 @@ export class Camera {
 
 	constructor() {
 		this.noise = new PerlinNoise();
+	}
+
+	isUnderwater(world: World): boolean {
+		return world.isLiquid(this.x, this.y, this.z);
+	}
+
+	isUnderground(world: World): boolean {
+		return world.isSolid(this.x, this.y, this.z);
 	}
 
 	rotate(yaw: number, pitch: number) {

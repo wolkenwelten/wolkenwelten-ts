@@ -202,10 +202,6 @@ export class Character extends Being {
 		this.pitch = clamp(this.pitch + pitch, -Math.PI / 2, Math.PI / 2);
 	}
 
-	isUnderwater(): boolean {
-		return this.world.isLiquid(this.x, this.y, this.z);
-	}
-
 	mayJump(): boolean {
 		return this.world.isSolid(this.x, this.y - 1.7, this.z);
 	}

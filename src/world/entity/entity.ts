@@ -368,5 +368,9 @@ export class Entity {
 			this.z,
 		]);
 	}
+
+	isUnderwater(): boolean {
+		return this.world.isLiquid(this.x, this.y, this.z);
+	}
 }
 registerEntity("Entity", Entity);

@@ -36,6 +36,7 @@ export class RenderManager {
 	generateMeshClosue: () => void;
 	generateMeshClosureActive = false;
 	wasUnderwater = false;
+	wasUnderground = false;
 	renderSizeMultiplier = 1;
 
 	assets: AssetList;
@@ -257,14 +258,26 @@ export class RenderManager {
 			setTimeout(this.generateMeshClosue, 0);
 		}
 		if (this.wasUnderwater) {
-			if (!this.game.player?.isUnderwater()) {
+			if (!this.game.render.camera.isUnderwater(this.game.world)) {
 				this.wasUnderwater = false;
 				this.canvasWrapper.classList.remove("fx-underwater");
 			}
 		} else {
-			if (this.game.player?.isUnderwater()) {
+			if (this.game.render.camera.isUnderwater(this.game.world)) {
 				this.wasUnderwater = true;
 				this.canvasWrapper.classList.add("fx-underwater");
+			}
+		}
+
+		if (this.wasUnderground) {
+			if (!this.game.render.camera.isUnderground(this.game.world)) {
+				this.wasUnderground = false;
+				this.canvasWrapper.classList.remove("fx-underground");
+			}
+		} else {
+			if (this.game.render.camera.isUnderground(this.game.world)) {
+				this.wasUnderground = true;
+				this.canvasWrapper.classList.add("fx-underground");
 			}
 		}
 	}
