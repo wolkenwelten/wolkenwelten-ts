@@ -44,6 +44,9 @@ export class Character extends Being {
 	maxHealth = 24;
 	isDead = false;
 
+	lastAttackerId = 0;
+	lastAttackerCooldown = 0;
+
 	repulsionMultiplier = 1;
 	lastRepulsionMultiplierIncrease = -1;
 
@@ -305,6 +308,12 @@ export class Character extends Being {
 			this.jumpStart = -1;
 			this.mayDash = true;
 			this.remainingAirActions = this.maxAirActions;
+			if (this.lastAttackerCooldown > 0) {
+				this.lastAttackerCooldown--;
+			}
+		}
+		if (this.lastAttackerCooldown === 0 && this.lastAttackerId !== 0) {
+			this.lastAttackerId = 0;
 		}
 		if (underwater) {
 			speed *= 0.5; // Slow down player movement while underwater
@@ -458,6 +467,10 @@ export class Character extends Being {
 	/* Callback function that gets called when this Character dies */
 	onDeath() {
 		this.world.game.audio?.play("ungh", 0.2);
+		if (this.world.game.isClient) {
+			const game = this.world.game as any;
+			game.network.playerDeath(this.lastAttackerId);
+		}
 		//this.world.game.ui.hotbar.clear();
 		this.init();
 	}
@@ -516,6 +529,7 @@ export class Character extends Being {
 				this.x,
 				this.y,
 				this.z,
+				game.networkID,
 			);
 		}
 	}

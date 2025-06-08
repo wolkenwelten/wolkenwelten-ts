@@ -257,6 +257,11 @@ export class ClientNetwork {
 					game.player.vx += ndx * knockbackForce;
 					game.player.vz += ndz * knockbackForce;
 
+					if (msg.networkID !== 0) {
+						game.player.lastAttackerId = msg.networkID;
+						game.player.lastAttackerCooldown = 100;
+					}
+
 					// Add some vertical knockback for a more dramatic effect
 					game.player.vy += knockbackForce * 0.2;
 
@@ -362,6 +367,7 @@ export class ClientNetwork {
 		ox: number,
 		oy: number,
 		oz: number,
+		networkID: number,
 	) {
 		// Send to server
 		await this.queue.call("playerHit", {
@@ -374,7 +380,12 @@ export class ClientNetwork {
 			ox,
 			oy,
 			oz,
+			networkID,
 		});
+	}
+
+	async playerDeath(attackerId: number): Promise<void> {
+		await this.queue.call("playerDeath", attackerId);
 	}
 
 	async playerJump(x: number, y: number, z: number): Promise<void> {

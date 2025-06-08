@@ -182,6 +182,24 @@ export class ClientConnection {
 			}
 		});
 
+		this.q.registerCallHandler("playerDeath", async (args: unknown) => {
+			this.deaths++;
+			if (typeof args !== "number") {
+				throw new Error("Invalid player death received");
+			}
+			const attackerId = args as number;
+			if (attackerId !== 0) {
+				for (const client of this.server.sockets.values()) {
+					if (client.id === attackerId) {
+						client.kills++;
+					}
+				}
+			}
+			for (const client of this.server.sockets.values()) {
+				client.broadcastPlayerList();
+			}
+		});
+
 		this.q.registerCallHandler("playerJump", async (args: unknown) => {
 			if (typeof args !== "object") {
 				throw new Error("Invalid player jump received");
