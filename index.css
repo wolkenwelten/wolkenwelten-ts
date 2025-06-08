@@ -457,3 +457,30 @@ label {
   0%, 100% { transform: translateY(2px) rotate(-4deg); }
   50% { transform: translateY(-12px) rotate(8deg); }
 }
+
+.player-list {
+  background-color: rgba(255, 255, 255, 0.7);
+  border-left: 4px solid var(--color-primary);
+  padding: var(--space-md);
+  margin: var(--space-md) 0;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  margin: 0 auto;
+  max-width: 400px;
+  text-align: left;
+}
+
+.player-list h4 {
+  margin-bottom: var(--space-sm);
+}
+
+.player-list ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.player-list li {
+  padding: 0;
+  margin: 0;
+  margin-bottom: var(--space-xs);
+}

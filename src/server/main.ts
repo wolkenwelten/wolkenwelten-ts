@@ -44,12 +44,21 @@ const main = async () => {
 	}
 
 	app.get("/", (req, res) => {
+		const playerList = Array.from(game.sockets.values())
+			.map((socket) => {
+				return `<li>${socket.playerName}</li>`;
+			})
+			.join("");
+		const players = playerList
+			? `<div class="player-list"><h4>Players</h4><ul>${playerList}</ul></div>`
+			: "<div class='player-list'><h4>Nobody is playing right now (｡•́︿•̀｡)</h4></div>";
+		const content = indexContent.replace("<!--PLAYERS-->", players);
 		res.send(
 			mainTemplate.renderPage(
 				{
 					title: "WolkenWelten",
 				},
-				indexContent,
+				content,
 			),
 		);
 	});
