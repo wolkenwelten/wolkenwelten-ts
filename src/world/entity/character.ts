@@ -721,7 +721,17 @@ export class Character extends Being {
 		if (this.world.game.isClient) {
 			const game = this.world.game as any;
 			const client = game.clients.get(this.ownerID);
-			return client?.name || null;
+			if (client) {
+				let name = client.name;
+				if (client.status === "typing") {
+					name = "💬 " + name;
+				} else if (client.status === "afk") {
+					name = "💤 " + name;
+				} else if (client.status === "dead") {
+					name = "💀 " + name;
+				}
+				return name;
+			}
 		}
 
 		return null;

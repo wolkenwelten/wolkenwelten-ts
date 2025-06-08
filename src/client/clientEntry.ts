@@ -3,14 +3,18 @@
  */
 import type { Game } from "../game";
 
+export type PlayerStatus = "" | "dead" | "typing" | "afk";
+
 export interface PlayerUpdate {
 	id: number;
 	name: string;
+	status: PlayerStatus;
 }
 
 export class ClientEntry {
 	id: number;
 	name = "";
+	status: PlayerStatus = "";
 
 	constructor(game: Game, id: number) {
 		this.id = id;
@@ -18,5 +22,6 @@ export class ClientEntry {
 
 	update(msg: PlayerUpdate) {
 		this.name = msg.name;
+		this.status = msg.status;
 	}
 }

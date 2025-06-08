@@ -10,6 +10,7 @@ import { SystemLog } from "./components/systemLog";
 import { IconManager } from "./icon";
 import { RepulsionMultiplier } from "./components/repulsionMultiplier";
 import { TouchControls } from "./components/touchControls";
+import { PlayerList } from "./components/playerList";
 
 export class UIManager {
 	game: ClientGame;
@@ -22,6 +23,7 @@ export class UIManager {
 	chat: ChatPanel;
 	repulsionMultiplier: RepulsionMultiplier;
 	touchControls: TouchControls;
+	playerList: PlayerList;
 
 	rootHasPaused = false;
 
@@ -42,6 +44,7 @@ export class UIManager {
 		this.chat = new ChatPanel(this.uiWrapper, game);
 		this.repulsionMultiplier = new RepulsionMultiplier(this.uiWrapper, game);
 		this.touchControls = new TouchControls(this.uiWrapper, game);
+		this.playerList = new PlayerList(this.uiWrapper, game);
 	}
 
 	update() {
@@ -58,5 +61,6 @@ export class UIManager {
 		}
 		this.repulsionMultiplier.update();
 		this.touchControls.update();
+		this.playerList.update();
 	}
 }

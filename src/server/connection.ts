@@ -6,6 +6,7 @@ import type { ServerGame } from "./serverGame";
 import { WSPacket, WSQueue } from "../network";
 import { coordinateToWorldKey } from "../world/world";
 import { Chunk } from "../world/chunk/chunk";
+import type { PlayerStatus } from "../client/clientEntry";
 
 let idCounter = 0;
 export class ClientConnection {
@@ -13,6 +14,7 @@ export class ClientConnection {
 
 	id: number;
 	playerName = "";
+	playerStatus: PlayerStatus = "";
 	server: ServerGame;
 
 	x = 0;
@@ -114,6 +116,16 @@ export class ClientConnection {
 			}
 			this.broadcastEntities();
 			this.updateChunkVersions();
+		});
+
+		this.q.registerCallHandler("setPlayerStatus", async (args: unknown) => {
+			if (typeof args !== "string") {
+				throw new Error("Invalid player status received");
+			}
+			this.playerStatus = args as PlayerStatus;
+			for (const client of this.server.sockets.values()) {
+				client.broadcastPlayerList();
+			}
 		});
 
 		this.q.registerCallHandler("setPlayerName", async (args: unknown) => {
@@ -276,6 +288,7 @@ export class ClientConnection {
 			(client) => ({
 				id: client.id,
 				name: client.playerName,
+				status: client.playerStatus,
 			}),
 		);
 

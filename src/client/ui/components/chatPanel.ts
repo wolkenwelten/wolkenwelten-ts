@@ -24,11 +24,13 @@ export class ChatPanel {
 		this.input.value = "";
 		this.div.classList.add(styles.show);
 		this.input.focus();
+		this.game.network.playerStatus = "typing";
 	}
 
 	hide() {
 		this.div.classList.remove(styles.show);
 		this.game.ui.uiWrapper.focus();
+		this.game.network.playerStatus = "";
 	}
 
 	visible() {

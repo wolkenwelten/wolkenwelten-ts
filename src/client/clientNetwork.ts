@@ -2,7 +2,7 @@
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import { WSPacket, WSQueue } from "../network";
-import { ClientEntry } from "./clientEntry";
+import { ClientEntry, PlayerStatus } from "./clientEntry";
 import type { ClientGame } from "./clientGame";
 export type ClientHandler = (game: ClientGame, args: unknown) => Promise<void>;
 
@@ -14,6 +14,8 @@ export class ClientNetwork {
 	private reconnectAttempts = 0;
 	private maxReconnectAttempts = 5;
 	private reconnectTimeout?: NodeJS.Timeout;
+	public playerStatus: PlayerStatus = "";
+	private lastPlayerStatus: PlayerStatus = "";
 
 	private static readonly defaultHandlers: Map<string, ClientHandler> =
 		new Map();
@@ -92,6 +94,10 @@ export class ClientNetwork {
 		}
 
 		this.broadcastEntities();
+		if (this.playerStatus !== this.lastPlayerStatus) {
+			this.queue.call("setPlayerStatus", this.playerStatus);
+			this.lastPlayerStatus = this.playerStatus;
+		}
 		for (const raw of this.rawQueue) {
 			this.ws.send(raw);
 		}
@@ -267,7 +273,11 @@ export class ClientNetwork {
 				throw new Error("Invalid player list received");
 			}
 
-			const playerList = args as { id: number; name: string }[];
+			const playerList = args as {
+				id: number;
+				name: string;
+				status: PlayerStatus;
+			}[];
 			for (const player of playerList) {
 				let client = this.game.clients.get(player.id);
 				if (!client) {
