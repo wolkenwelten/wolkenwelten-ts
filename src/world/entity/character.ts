@@ -143,7 +143,7 @@ export class Character extends Being {
 			}
 			this.isSprinting = true;
 			this.mayDash = false;
-			const dashSpeed = 0.75;
+			const dashSpeed = this.knockoutTimer > 0 ? 0.25 : 0.75;
 			this.world.game.render?.particle.fxDash(this.x, this.y - 0.5, this.z);
 			const vx = Math.cos(-this.yaw - Math.PI / 2) * dashSpeed;
 			const vz = Math.sin(-this.yaw - Math.PI / 2) * dashSpeed;
@@ -177,7 +177,7 @@ export class Character extends Being {
 				if (!this.mayJump()) {
 					this.remainingAirActions--;
 				}
-				this.vy = 0.3;
+				this.vy = this.knockoutTimer > 0 ? 0.1 : 0.3;
 				this.jumpStart = this.world.game.ticks;
 				this.justJumped = true;
 				this.world.game.render?.particle.fxJump(this.x, this.y - 0.5, this.z);
