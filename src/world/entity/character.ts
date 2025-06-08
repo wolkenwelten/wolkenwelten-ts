@@ -314,7 +314,8 @@ export class Character extends Being {
 		}
 
 		if (this.knockoutTimer > 0) {
-			speed *= 0.1;
+			speed *= 0.2;
+			accel *= 0.2;
 		}
 
 		this.vx = this.vx * (1.0 - accel) + this.movementX * speed * accel;
@@ -508,7 +509,7 @@ export class Character extends Being {
 			game.network.playerHit(
 				this.id,
 				1.8,
-				4,
+				6,
 				px,
 				py,
 				pz,

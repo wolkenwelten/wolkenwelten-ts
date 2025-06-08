@@ -254,7 +254,10 @@ export class ClientNetwork {
 					// Add some vertical knockback for a more dramatic effect
 					game.player.vy += knockbackForce * 0.2;
 
-					game.player.knockoutTimer += game.player.repulsionMultiplier * 10;
+					game.player.knockoutTimer +=
+						game.player.repulsionMultiplier *
+						game.player.repulsionMultiplier *
+						25;
 				}
 			}
 		});
