@@ -75,13 +75,11 @@ export class InputManager {
 				}
 			});
 		}
-		this.keyPushHandler.set("KeyO", () => {
+		this.keyPushHandler.set("KeyN", () => {
 			if (!that.game.running || !that.game.ready) {
 				return;
 			}
-		});
-		this.keyPushHandler.set("KeyN", () => {
-			if (!that.game.running || !that.game.ready) {
+			if (!that.game.options.debug) {
 				return;
 			}
 			if (that.game.player) {
@@ -180,6 +178,9 @@ export class InputManager {
 			state.y = 1;
 		}
 		if (this.keyStates.has("KeyP")) {
+			if (!this.game.options.debug) {
+				return;
+			}
 			this.game.player?.respawn();
 		}
 

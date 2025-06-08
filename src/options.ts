@@ -26,6 +26,7 @@ export class Options {
 	noBGM = false;
 	startWithEquipment = false;
 	playerName: string;
+	debug = false;
 
 	private parseBoolean(def: boolean, paramValue: string | null): boolean {
 		if (paramValue === null) {
@@ -57,6 +58,7 @@ export class Options {
 	constructor() {
 		if (isClient()) {
 			const params = new URLSearchParams(window.location.search);
+			this.debug = window.location.hostname === "localhost";
 			this.skipMenu = window.location.hostname === "localhost";
 			this.skipMenu = this.parseBoolean(this.skipMenu, params.get("skipMenu"));
 			this.noBGM = this.parseBoolean(this.noBGM, params.get("noBGM"));
