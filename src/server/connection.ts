@@ -33,6 +33,8 @@ export class ClientConnection {
 	animation = 0;
 	animationId = 0;
 
+	updatesWithoutPackets = 0;
+
 	chunkVersions = new Map<number, number>();
 
 	q: WSQueue = new WSQueue();
@@ -71,6 +73,7 @@ export class ClientConnection {
 
 		socket.on("message", (msg) => {
 			try {
+				this.updatesWithoutPackets = 0;
 				const raw = JSON.parse(msg.toString());
 				if (raw.T === "packet") {
 					const packet = raw as WSPacket;

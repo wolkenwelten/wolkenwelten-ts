@@ -42,6 +42,9 @@ export class ServerGame extends Game {
 		setInterval(() => {
 			for (const sock of this.sockets.values()) {
 				sock.broadcastPlayerList();
+				if (++sock.updatesWithoutPackets > 3) {
+					sock.close();
+				}
 			}
 		}, 10000);
 	}
