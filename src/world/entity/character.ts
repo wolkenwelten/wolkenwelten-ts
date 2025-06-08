@@ -461,6 +461,7 @@ export class Character extends Being {
 				}
 			}
 		}
+		this.playUnmovingSound("punchMiss", 0.4);
 
 		return hit;
 	}

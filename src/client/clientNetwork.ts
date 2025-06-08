@@ -238,6 +238,8 @@ export class ClientNetwork {
 					//game.player.onAttack(attacker.char);
 				}
 
+				game.player.playSound("punch", 0.4);
+
 				// Calculate knockback direction and magnitude
 				const odx = game.player.x - msg.ox;
 				const ody = game.player.y - msg.oy;
@@ -271,6 +273,7 @@ export class ClientNetwork {
 						25;
 				}
 			}
+			game.audio.playAtPosition("punchMiss", 0.4, [msg.px, msg.py, msg.pz]);
 		});
 
 		this.queue.registerCallHandler("playerList", async (args: unknown) => {
