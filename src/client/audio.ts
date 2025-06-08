@@ -3,6 +3,7 @@
  */
 import { Howl, Howler } from "howler";
 import type { Entity } from "../world/entity/entity";
+import type { ClientGame } from "./clientGame";
 
 export class AudioManager {
 	assets: Map<string, string> = new Map();
@@ -59,7 +60,7 @@ export class AudioManager {
 	}
 
 	maybeStartBGM() {
-		if (this.bgm) {
+		if (this.bgm || this.game.options.noBGM) {
 			return;
 		}
 		const src = this.assets.get("bgm");
@@ -70,6 +71,8 @@ export class AudioManager {
 		this.bgm = new Howl({ src: [src], volume: 0.1, loop: true });
 		this.bgm.play();
 	}
+
+	constructor(private game: ClientGame) {}
 }
 
 export class AudioEmitter {

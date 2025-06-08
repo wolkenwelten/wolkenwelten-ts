@@ -32,7 +32,7 @@ export class ClientGame extends Game {
 		super(config);
 		this.config = config;
 
-		this.audio = new AudioManager();
+		this.audio = new AudioManager(this);
 		registerAudioContent(this.audio);
 
 		this.network = new ClientNetwork(this);

@@ -23,6 +23,7 @@ const getRandomPlayerName = () => {
 
 export class Options {
 	skipMenu = false;
+	noBGM = false;
 	startWithEquipment = false;
 	playerName: string;
 
@@ -58,6 +59,7 @@ export class Options {
 			const params = new URLSearchParams(window.location.search);
 			this.skipMenu = window.location.hostname === "localhost";
 			this.skipMenu = this.parseBoolean(this.skipMenu, params.get("skipMenu"));
+			this.noBGM = this.parseBoolean(this.noBGM, params.get("noBGM"));
 			this.startWithEquipment = this.parseBoolean(
 				this.startWithEquipment,
 				params.get("startWithEquipment"),
