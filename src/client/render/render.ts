@@ -14,6 +14,8 @@ import { WorldRenderer } from "./worldRenderer";
 import { Div } from "../ui/utils";
 import { Sky } from "./sky";
 import { CloudMesh } from "./meshes/cloudMesh/cloudMesh";
+import { TextRenderer } from "./textRenderer";
+import { Character } from "../../world/entity/character";
 
 const projectionMatrix = mat4.create();
 const viewMatrix = mat4.create();
@@ -43,6 +45,7 @@ export class RenderManager {
 	world: WorldRenderer;
 	sky: Sky;
 	clouds: CloudMesh;
+	textRenderer: TextRenderer;
 
 	setPlatformDefaults() {
 		const isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
@@ -85,6 +88,11 @@ export class RenderManager {
 		this.particle = new ParticleMesh(this);
 		this.sky = new Sky(this);
 		this.clouds = new CloudMesh();
+
+		// Initialize text renderer
+		TextRenderer.init(gl);
+		this.textRenderer = new TextRenderer();
+
 		this.drawFrameClosure = this.drawFrame.bind(this);
 		this.generateMeshClosue = this.generateMesh.bind(this);
 
@@ -126,7 +134,14 @@ export class RenderManager {
 		this.sky.draw(projectionMatrix, viewMatrix);
 		this.camera.calcViewMatrix(this.game.ticks, viewMatrix);
 
+		// Draw world without blending first (solid objects)
+		this.world.draw(projectionMatrix, viewMatrix, this.camera);
+
+		// Now enable blending for transparent/alpha objects
 		this.gl.enable(this.gl.BLEND);
+		this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
+
+		// Draw clouds with blending
 		this.clouds.drawLayers(
 			projectionMatrix,
 			viewMatrix,
@@ -135,11 +150,71 @@ export class RenderManager {
 			this.game.player?.z || 0,
 		);
 
-		this.world.draw(projectionMatrix, viewMatrix, this.camera);
-		mat4.multiply(viewMatrix, projectionMatrix, viewMatrix);
-		this.decals.draw(viewMatrix);
-		this.particle.draw(viewMatrix);
+		// Draw decals (shadows) after world but before UI elements
+		const mvp = mat4.create();
+		mat4.multiply(mvp, projectionMatrix, viewMatrix);
+		this.decals.draw(mvp);
+
+		// Draw particles
+		this.particle.draw(mvp);
+
+		// Draw player names last (as UI overlay, always visible)
+		this.drawPlayerNames(projectionMatrix, viewMatrix);
+
 		this.gl.disable(this.gl.BLEND);
+	}
+
+	private drawPlayerNames(projectionMatrix: mat4, viewMatrix: mat4) {
+		// Collect all characters and their names
+		for (const entity of this.game.world.entities.values()) {
+			if (entity.T === "Character") {
+				const character = entity as Character;
+				const playerName = character.getPlayerName();
+
+				if (playerName) {
+					// Calculate distance to player for distance-based effects
+					const cam = this.camera;
+					const dx = character.x - cam.x;
+					const dy = character.y - cam.y;
+					const dz = character.z - cam.z;
+					const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+					// Only show names within reasonable distance (about 50 blocks)
+					const maxNameDistance = 50;
+					if (distance > maxNameDistance) {
+						continue;
+					}
+
+					// Calculate name alpha based on distance
+					const renderDistance = this.renderDistance || 0;
+					const characterAlpha = Math.min(
+						1,
+						Math.max(0, renderDistance - distance) / 8,
+					);
+					const nameAlpha =
+						Math.min(1, Math.max(0, (maxNameDistance - distance) / 20)) *
+						characterAlpha;
+
+					// Scale text based on distance (but not too small)
+					const baseScale = 1.2;
+					const distanceScale = Math.max(0.8, Math.min(2.0, 20 / distance));
+					const finalScale = baseScale * distanceScale;
+
+					// Draw name above the player's head
+					const nameHeight = 0.9; // Height above character
+					this.textRenderer.drawTextBillboard(
+						projectionMatrix,
+						viewMatrix,
+						playerName,
+						character.x,
+						character.y + nameHeight,
+						character.z,
+						finalScale,
+						nameAlpha,
+					);
+				}
+			}
+		}
 	}
 
 	resize() {

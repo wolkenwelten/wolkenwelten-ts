@@ -125,6 +125,7 @@ export class ClientConnection {
 			console.log(msg);
 			for (const client of this.server.sockets.values()) {
 				client.q.call("addLogEntry", msg);
+				client.broadcastPlayerList();
 			}
 			return "";
 		});

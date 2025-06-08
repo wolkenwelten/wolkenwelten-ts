@@ -710,6 +710,23 @@ export class Character extends Being {
 		);
 	}
 
+	// Helper method to get player name - moved to a separate method for the render pipeline to use
+	getPlayerName(): string | null {
+		// Only show names for other players (not ourselves)
+		if (this === this.world.game.player) {
+			return null;
+		}
+
+		// Get player name from the client registry
+		if (this.world.game.isClient) {
+			const game = this.world.game as any;
+			const client = game.clients.get(this.ownerID);
+			return client?.name || null;
+		}
+
+		return null;
+	}
+
 	mesh() {
 		return this.world.game.render?.assets.playerHead || null;
 	}
