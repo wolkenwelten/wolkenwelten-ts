@@ -44,6 +44,8 @@ export class InputManager {
 
 		if (isClient()) {
 			window.addEventListener("keydown", (e) => {
+				console.log(that.game.audio);
+				that.game.audio.maybeStartBGM();
 				that.keyStates.add(e.code);
 				const handler = that.keyPushHandler.get(e.code);
 				if (that.game.ui.chat.visible()) {
@@ -63,6 +65,7 @@ export class InputManager {
 				}
 			});
 			window.addEventListener("keyup", (e) => {
+				that.game.audio.maybeStartBGM();
 				that.keyStates.delete(e.code);
 				if (!that.game.running || !that.game.ready) {
 					return;
@@ -105,9 +108,10 @@ export class InputManager {
 			},
 			false,
 		);
-		that.game.ui.rootElement.addEventListener("mousedown", (e) =>
-			that.mouseStates.add(e.button),
-		);
+		that.game.ui.rootElement.addEventListener("mousedown", (e) => {
+			that.mouseStates.add(e.button);
+			that.game.audio.maybeStartBGM();
+		});
 		that.game.ui.rootElement.addEventListener("contextmenu", (e) => {
 			if (!that.game.running || !that.game.ready) {
 				return;

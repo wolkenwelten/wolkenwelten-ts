@@ -7,6 +7,7 @@ import type { Entity } from "../world/entity/entity";
 export class AudioManager {
 	assets: Map<string, string> = new Map();
 	emitters: Set<AudioEmitter> = new Set();
+	bgm: Howl | null = null;
 
 	add(name: string, url: string) {
 		this.assets.set(name, url);
@@ -14,7 +15,9 @@ export class AudioManager {
 	}
 
 	play(name: string, volume = 1) {
-		this.emitters.add(new AudioEmitter(this, name, volume, [0, 0, 0]));
+		const emitter = new AudioEmitter(this, name, volume, [0, 0, 0]);
+		this.emitters.add(emitter);
+		return emitter;
 	}
 
 	playFromEntity(
@@ -23,13 +26,21 @@ export class AudioManager {
 		entity: Entity,
 		stopWhenEntityDestroyed = false,
 	) {
-		this.emitters.add(
-			new AudioEmitter(this, name, volume, entity, stopWhenEntityDestroyed),
+		const emitter = new AudioEmitter(
+			this,
+			name,
+			volume,
+			entity,
+			stopWhenEntityDestroyed,
 		);
+		this.emitters.add(emitter);
+		return emitter;
 	}
 
 	playAtPosition(name: string, volume = 1, position: [number, number, number]) {
-		this.emitters.add(new AudioEmitter(this, name, volume, position));
+		const emitter = new AudioEmitter(this, name, volume, position);
+		this.emitters.add(emitter);
+		return emitter;
 	}
 
 	update(listener: Entity) {
@@ -45,6 +56,19 @@ export class AudioManager {
 
 	setVolume(volume: number) {
 		Howler.volume(volume);
+	}
+
+	maybeStartBGM() {
+		if (this.bgm) {
+			return;
+		}
+		const src = this.assets.get("bgm");
+		if (!src) {
+			throw new Error("bgm not found");
+		}
+
+		this.bgm = new Howl({ src: [src], volume: 0.1, loop: true });
+		this.bgm.play();
 	}
 }
 

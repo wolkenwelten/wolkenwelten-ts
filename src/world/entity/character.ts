@@ -455,6 +455,7 @@ export class Character extends Being {
 						if (bt.health < 200) {
 							this.world.setBlock(cx, cy, cz, 0);
 							this.world.game.render?.particle.fxBlockBreak(cx, cy, cz, bt);
+							this.playUnmovingSound("tock", 0.1);
 						}
 					}
 				}
@@ -466,7 +467,7 @@ export class Character extends Being {
 
 	/* Callback function that gets called when this Character dies */
 	onDeath() {
-		this.world.game.audio?.play("ungh", 0.2);
+		this.playUnmovingSound("ungh", 0.2);
 		if (this.world.game.isClient) {
 			const game = this.world.game as any;
 			game.network.playerDeath(this.lastAttackerId);

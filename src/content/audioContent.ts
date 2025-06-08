@@ -10,6 +10,7 @@ import stepUrl from "../../assets/sfx/step.ogg?url";
 import stompUrl from "../../assets/sfx/stomp.ogg?url";
 import tockUrl from "../../assets/sfx/tock.ogg?url";
 import unghUrl from "../../assets/sfx/ungh.ogg?url";
+import bgmUrl from "../../assets/bgm/PixelShowdown.mp3?url";
 
 import type { AudioManager } from "../client/audio";
 import "../types";
@@ -24,4 +25,5 @@ export const registerAudioContent = (audio: AudioManager) => {
 	audio.add("punchMiss", punchMissUrl);
 	audio.add("bomb", bombUrl);
 	audio.add("projectile", projectileUrl);
+	audio.add("bgm", bgmUrl);
 };

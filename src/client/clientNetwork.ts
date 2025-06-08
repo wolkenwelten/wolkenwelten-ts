@@ -280,6 +280,9 @@ export class ClientNetwork {
 
 			const playerList = args as PlayerUpdate[];
 			for (const player of playerList) {
+				if (!player.name) {
+					continue;
+				}
 				let client = this.game.clients.get(player.id);
 				if (!client) {
 					client = new ClientEntry(this.game, player.id);
