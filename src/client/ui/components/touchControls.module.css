@@ -62,63 +62,21 @@
 }
 
 .primaryButton {
-	bottom: 120px;
-	right: 120px;
+	bottom: 190px;
+	right: 110px;
 }
 
 .secondaryButton {
-	bottom: 180px;
-	right: 60px;
+	bottom: 185px;
+	right: 20px;
 }
 
 .jumpButton {
-	bottom: 120px;
-	right: 250px;
+	bottom: 130px;
+	right: 185px;
 }
 
 .sprintButton {
-	bottom: 180px;
-	right: 190px;
-}
-
-.hotbarContainer {
-	position: absolute;
-	right: 250px;
-	bottom: 300px;
-}
-
-.hotbarButton {
-	position: absolute;
-	width: 60px;
-	height: 60px;
-	border-radius: 15px;
-	background: rgba(255, 255, 255, 0.3);
-	border: 2px solid rgba(255, 255, 255, 0.5);
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	color: white;
-	font-size: 1.2rem;
-	pointer-events: auto;
-	transition: transform 0.2s ease, background-color 0.2s ease;
-}
-
-.hotbarButton1 {
-	right: 300px;
-	bottom: 280px;
-}
-
-.hotbarButton2 {
-	right: 230px;
-	bottom: 320px;
-}
-
-.hotbarButton3 {
-	right: 230px;
-	bottom: 240px;
-}
-
-.hotbarButton4 {
-	right: 160px;
-	bottom: 280px;
+	bottom: 40px;
+	right: 196px;
 }

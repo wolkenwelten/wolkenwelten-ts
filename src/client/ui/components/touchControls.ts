@@ -16,8 +16,6 @@ export class TouchControls {
 	secondaryButton: HTMLElement;
 	jumpButton: HTMLElement;
 	sprintButton: HTMLElement;
-	hotbarContainer: HTMLElement;
-	hotbarButtons: HTMLElement[] = [];
 
 	game: ClientGame;
 	visible = false;
@@ -92,27 +90,6 @@ export class TouchControls {
 		});
 		this.sprintButton.textContent = "🏃";
 		this.container.appendChild(this.sprintButton);
-
-		// Create hotbar container (now just a wrapper)
-		this.hotbarContainer = Div({ class: styles.hotbarContainer });
-		this.container.appendChild(this.hotbarContainer);
-
-		// Create hotbar buttons in a circular layout
-		const buttonClasses = [
-			styles.hotbarButton1,
-			styles.hotbarButton2,
-			styles.hotbarButton3,
-			styles.hotbarButton4,
-		];
-
-		for (let i = 0; i < 4; i++) {
-			const button = Div({
-				class: `${styles.hotbarButton} ${buttonClasses[i]}`,
-			});
-			button.textContent = `${i + 1}`;
-			this.hotbarButtons.push(button);
-			this.container.appendChild(button); // Append directly to container instead of hotbarContainer
-		}
 
 		// Set initial position for joystick knobs
 		this.resetJoysticks();
@@ -215,21 +192,6 @@ export class TouchControls {
 			e.preventDefault();
 			this.sprintActive = false;
 			this.sprintButton.style.transform = "scale(1)";
-		});
-
-		// Hotbar buttons
-		this.hotbarButtons.forEach((button, index) => {
-			button.addEventListener("touchstart", (e) => {
-				e.preventDefault();
-				this.hotbarActiveIndex = index;
-				button.style.transform = "scale(0.9)";
-			});
-
-			button.addEventListener("touchend", (e) => {
-				e.preventDefault();
-				this.hotbarActiveIndex = -1;
-				button.style.transform = "scale(1)";
-			});
 		});
 	}
 
