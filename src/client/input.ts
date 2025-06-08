@@ -205,6 +205,9 @@ export class InputManager {
 		if (this.mouseStates.has(0)) {
 			state.primary = true;
 		}
+		if (this.mouseStates.has(1)) {
+			state.secondary = true;
+		}
 
 		if (this.mouseStates.has(2)) {
 			state.secondary = true;
@@ -245,6 +248,9 @@ export class InputManager {
 		}
 		if (gamepad.buttons[2]?.pressed) {
 			state.primary = true;
+		}
+		if (gamepad.buttons[3]?.pressed) {
+			state.secondary = true;
 		}
 		if (gamepad.buttons[14]?.pressed) {
 			const key = gamepad.index | (4 << 8);
@@ -306,11 +312,6 @@ export class InputManager {
 		if (this.touchState.secondary) state.secondary = true;
 		if (this.touchState.y > 0) state.y = this.touchState.y;
 		if (this.touchState.sprint) state.sprint = true;
-
-		if (this.touchState.hotBar1) state.hotBar1 = true;
-		if (this.touchState.hotBar2) state.hotBar2 = true;
-		if (this.touchState.hotBar3) state.hotBar3 = true;
-		if (this.touchState.hotBar4) state.hotBar4 = true;
 	}
 
 	update() {
@@ -354,7 +355,9 @@ export class InputManager {
 			player?.primaryAction();
 		}
 		if (state.secondary) {
-			player?.secondaryAction();
+			player?.startBlocking();
+		} else {
+			player?.stopBlocking();
 		}
 
 		this.lastState = state;

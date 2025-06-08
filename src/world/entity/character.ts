@@ -60,6 +60,7 @@ export class Character extends Being {
 	private animation = 0;
 	private animationId = 0;
 	knockoutTimer = 0;
+	blockStarted = -1;
 
 	respawn() {
 		this.init();
@@ -70,11 +71,28 @@ export class Character extends Being {
 		this.animationId = 1 - this.animationId;
 	}
 
+	startBlocking() {
+		if (this.blockStarted < 0) {
+			this.blockStarted = this.world.game.ticks;
+		}
+	}
+
+	stopBlocking() {
+		if (this.world.game.ticks - this.blockStarted > 24) {
+			this.blockStarted = -1;
+		}
+	}
+
+	isBlocking(): boolean {
+		return this.blockStarted > 0;
+	}
+
 	serialize() {
 		return {
 			...super.serialize(),
 			animation: this.animation,
 			animationId: this.animationId,
+			blockStarted: this.blockStarted,
 		};
 	}
 
@@ -82,6 +100,7 @@ export class Character extends Being {
 		super.deserialize(data);
 		this.animation = data.animation;
 		this.animationId = data.animationId;
+		this.blockStarted = data.blockStarted ?? -1;
 	}
 
 	/* Initialize an already existing Character, that way we can easily reuse the same object, */
@@ -118,7 +137,26 @@ export class Character extends Being {
 
 	/* Damage a character by a certain value, will change in the future to take a Damage argument instead */
 	damage(rawAmount: number) {
-		this.repulsionMultiplier += rawAmount * 0.05;
+		let actualAmount = rawAmount;
+		let knockbackMultiplier = 1;
+
+		// Check if player is blocking
+		if (this.isBlocking()) {
+			const ticksSinceBlockStart = this.world.game.ticks - this.blockStarted;
+
+			// Super block: just entered blocking mode (within first few ticks)
+			if (ticksSinceBlockStart <= 5) {
+				// TODO: Add additional super block features in the future
+				actualAmount = 0;
+				knockbackMultiplier = 0;
+			} else {
+				// Regular block: reduce damage by 60% and knockback by 90%
+				actualAmount *= 0.4; // 60% damage reduction
+				knockbackMultiplier = 0.1; // 90% knockback reduction
+			}
+		}
+
+		this.repulsionMultiplier += actualAmount * 0.05 * knockbackMultiplier;
 		this.lastRepulsionMultiplierIncrease = this.world.game.ticks;
 	}
 
@@ -138,6 +176,9 @@ export class Character extends Being {
 
 	dash() {
 		if (this.mayJump() || this.remainingAirActions > 0) {
+			if (this.isBlocking()) {
+				return;
+			}
 			if (!this.mayJump()) {
 				this.remainingAirActions--;
 			}
@@ -174,6 +215,9 @@ export class Character extends Being {
 
 		if (this.movementY > 0 && !this.justJumped) {
 			if (this.mayJump() || this.remainingAirActions > 0) {
+				if (this.isBlocking()) {
+					return;
+				}
 				if (!this.mayJump()) {
 					this.remainingAirActions--;
 				}
@@ -296,6 +340,11 @@ export class Character extends Being {
 		let speed = 0.6;
 		let accel =
 			movementLength > 0.01 ? CHARACTER_ACCELERATION : CHARACTER_STOP_RATE;
+
+		if (this.isBlocking()) {
+			speed *= 0.5;
+			accel *= 0.5;
+		}
 
 		if (!this.mayJump()) {
 			speed *= 0.8; // Slow down player movement changes during jumps
@@ -469,6 +518,9 @@ export class Character extends Being {
 		if (this.world.game.ticks < this.lastAction) {
 			return;
 		}
+		if (this.isBlocking()) {
+			return;
+		}
 
 		this.animation = this.world.game.render?.frames || 0;
 		const hit = this.attack(1.8);
@@ -589,14 +641,29 @@ export class Character extends Being {
 		let bodyPitch = this.walkAnimationFactor * -0.1 + speedPitch;
 		let leftArmPitch = this.walkAnimationFactor * 1.7;
 		let rightArmPitch = this.walkAnimationFactor * -1.7;
+		let leftArmYaw = 0;
+		let rightArmYaw = 0;
 		let rightLegPitch = this.walkAnimationFactor * 1.6;
 		let leftLegPitch = this.walkAnimationFactor * -1.6;
 
-		if (this.animation > 0) {
+		// Blocking animation - put arms up in defensive position
+		if (this.isBlocking()) {
+			const t =
+				Math.min(this.world.game.ticks - this.blockStarted, 8) * (1 / 8);
+
+			leftArmPitch = (2 + leftArmPitch * 0.1) * t + leftArmPitch * (1 - t); // Left arm up
+			leftArmYaw = -0.5 * t;
+			rightArmPitch = (2 + rightArmPitch * 0.1) * t + rightArmPitch * (1 - t); // Right arm up
+			rightArmYaw = 0.5 * t;
+			headPitch -= 0.3 * t; // Head slightly tilted back
+			bodyPitch += 0.1 * t; // Body slightly leaning back
+		} else if (this.animation > 0) {
 			const t = this.animation * (16 / 64);
 			rightArmPitch = (t / 16) * 1.5;
 			rightArmPitch *= rightArmPitch;
 			leftArmPitch = rightArmPitch * -0.5;
+			leftArmYaw = (t / 16) * -0.3;
+			rightArmYaw = leftArmYaw * -1;
 
 			leftLegPitch += rightArmPitch * 0.1;
 			rightLegPitch += rightArmPitch * -0.1;
@@ -649,7 +716,7 @@ export class Character extends Being {
 			-0.45,
 			-0.625 * yStretch,
 			0,
-			0,
+			leftArmYaw,
 			leftArmPitch,
 			playerLeftArm,
 			0,
@@ -663,7 +730,7 @@ export class Character extends Being {
 			0.45,
 			-0.625 * yStretch,
 			0,
-			0,
+			rightArmYaw,
 			rightArmPitch,
 			playerRightArm,
 			0,

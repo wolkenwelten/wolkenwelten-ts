@@ -232,13 +232,17 @@ export class ClientNetwork {
 			const dd = dx * dx + dy * dy + dz * dz;
 
 			if (dd <= msg.radius * msg.radius) {
-				game.player.damage(msg.damage);
-				if (attacker) {
-					console.log("attacker", attacker);
-					//game.player.onAttack(attacker.char);
+				let dmg = msg.damage;
+				if (game.player.isBlocking()) {
+					dmg *= 0.4;
 				}
 
-				game.player.playSound("punch", 0.4);
+				if (game.ticks - game.player.blockStarted < 8) {
+					// Super block
+					game.player.blockStarted = -1;
+					game.player.strike();
+					return;
+				}
 
 				// Calculate knockback direction and magnitude
 				const odx = game.player.x - msg.ox;
@@ -246,14 +250,27 @@ export class ClientNetwork {
 				const odz = game.player.z - msg.oz;
 				const odist = odx * odx + ody * ody + odz * odz;
 				const dist = Math.sqrt(odist);
+				game.player.damage(dmg);
+				if (attacker) {
+					console.log("attacker", attacker);
+					//game.player.onAttack(attacker.char);
+				}
+
+				game.player.playSound("punch", 0.4);
 				if (dist > 0) {
 					// Normalize direction vector
-					const ndx = odx / dist;
-					const ndz = odz / dist;
+					let ndx = odx / dist;
+					let ndz = odz / dist;
 
 					// Base knockback + additional based on damage
-					const knockbackForce =
+					let knockbackForce =
 						0.2 + msg.damage * 0.1 * game.player.repulsionMultiplier;
+
+					if (game.player.isBlocking()) {
+						ndx *= 0.1;
+						ndz *= 0.1;
+						knockbackForce *= 0.1;
+					}
 
 					// Apply horizontal knockback
 					game.player.vx += ndx * knockbackForce;
