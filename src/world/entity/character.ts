@@ -641,8 +641,8 @@ export class Character extends Being {
 		let bodyPitch = this.walkAnimationFactor * -0.1 + speedPitch;
 		let leftArmPitch = this.walkAnimationFactor * 1.7;
 		let rightArmPitch = this.walkAnimationFactor * -1.7;
-		let leftArmYaw = 0;
-		let rightArmYaw = 0;
+		let leftArmYaw = this.walkAnimationFactor * -0.3;
+		let rightArmYaw = this.walkAnimationFactor * -0.3;
 		let rightLegPitch = this.walkAnimationFactor * 1.6;
 		let leftLegPitch = this.walkAnimationFactor * -1.6;
 
