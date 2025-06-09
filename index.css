@@ -85,7 +85,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-  font-size: 3rem;
+  font-size: 5rem;
   margin-top: var(--space-xl);
   background: linear-gradient(to right, #ff9eb3, #ff7096);
   -webkit-background-clip: text;
@@ -405,10 +405,11 @@ label {
 }
 
 .hero-section h1 {
-  font-size: 3rem;
+  font-size: 5rem;
+  margin-top: 0;
   margin-bottom: var(--space-md);
   display: block;
-  background: linear-gradient(to right, #ff4081, #ff7e57);
+  background: linear-gradient(to bottom right, #ff4081, #ffae37);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
