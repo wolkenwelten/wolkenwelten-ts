@@ -22,6 +22,9 @@ export class Chunk {
 	z: number;
 	world: World;
 
+	lastEmptyCheck = -1;
+	lastEmptyCheckResult = true;
+
 	constructor(world: World, x: number, y: number, z: number) {
 		this.blocks = new Uint8Array(32 * 32 * 32);
 		this.simpleLight = new Uint8Array(32 * 32 * 32);
@@ -30,6 +33,21 @@ export class Chunk {
 		this.z = z;
 		this.world = world;
 		this.staticLastUpdated = this.lastUpdated = world.game.ticks;
+	}
+
+	isEmpty() {
+		if (this.lastEmptyCheck === this.lastUpdated) {
+			return this.lastEmptyCheckResult;
+		}
+		this.lastEmptyCheck = this.lastUpdated;
+		for (let i = 0; i < this.blocks.length; i++) {
+			if (this.blocks[i] !== 0) {
+				this.lastEmptyCheckResult = false;
+				return false;
+			}
+		}
+		this.lastEmptyCheckResult = true;
+		return true;
 	}
 
 	updateSimpleLight() {

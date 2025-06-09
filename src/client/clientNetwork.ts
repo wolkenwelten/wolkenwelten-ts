@@ -207,6 +207,20 @@ export class ClientNetwork {
 			}
 		});
 
+		this.queue.registerCallHandler("emptyChunk", async (args: unknown) => {
+			if (typeof args !== "object") {
+				throw new Error("Invalid empty chunk received");
+			}
+			const msg = args as any;
+			const chunk = this.game.world.getOrGenChunk(msg.x, msg.y, msg.z);
+			chunk.lastEmptyCheck = msg.version;
+			chunk.lastEmptyCheckResult = true;
+			chunk.blocks.fill(0);
+			chunk.lastUpdated = msg.version;
+			chunk.loaded = true;
+			chunk.invalidate();
+		});
+
 		this.queue.registerCallHandler("playerHit", async (args: unknown) => {
 			if (typeof args !== "object") {
 				throw new Error("Invalid player hit received");

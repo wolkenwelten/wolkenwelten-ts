@@ -233,6 +233,16 @@ export class ClientConnection {
 		} else {
 			this.setChunkVersion(chunk.x, chunk.y, chunk.z, serverVersion);
 
+			if (chunk.isEmpty()) {
+				this.q.call("emptyChunk", {
+					x: chunk.x,
+					y: chunk.y,
+					z: chunk.z,
+					version: chunk.lastUpdated,
+				});
+				return false;
+			}
+
 			// Create binary message for chunk update
 			// Format: [messageType(1), padding(3), x(4), y(4), z(4), version(4), data(32*32*32)]
 			const view = new DataView(this.chunkBuffer);
@@ -266,20 +276,17 @@ export class ClientConnection {
 		return this.clientUpdateChunk(chunk);
 	}
 
-	chunkUpdateLoop(rMax: number) {
+	chunkUpdateLoop(r: number) {
 		// Process chunks in a rough inside-out pattern
 		let updates = 0;
-		for (let r = 0; r <= rMax; r++) {
-			// radius from center
-			const s = Math.max(1, r);
-			for (let ox = -r; ox <= r; ox += s) {
-				for (let oy = -r; oy <= r; oy += s) {
-					for (let oz = -r; oz <= r; oz += s) {
-						if (this.maybeUpdateChunk(ox, oy, oz)) {
-							if (++updates > rMax * 4) {
-								console.log(`Sent ${updates} chunk updates`);
-								return;
-							}
+
+		for (let ox = -r; ox <= r; ox++) {
+			for (let oy = -r; oy <= r; oy++) {
+				for (let oz = -r; oz <= r; oz++) {
+					if (this.maybeUpdateChunk(ox, oy, oz)) {
+						if (++updates > 8) {
+							console.log(`Sent ${updates} chunk updates`);
+							return;
 						}
 					}
 				}
@@ -292,11 +299,8 @@ export class ClientConnection {
 	}
 
 	updateChunkVersions() {
-		if ((++this.updates & 0xf) == 0) {
-			this.chunkUpdateLoop(16);
-		} else {
-			this.chunkUpdateLoop(8);
-		}
+		this.chunkUpdateLoop(4);
+		this.chunkUpdateLoop(12);
 	}
 
 	transferQueue() {
