@@ -41,13 +41,13 @@ export class ClientNetwork {
 
 		// Message type 1 = chunk update
 		if (messageType === 1) {
-			const x = view.getInt32(1, true);
-			const y = view.getInt32(5, true);
-			const z = view.getInt32(9, true);
-			const version = view.getUint32(13, true);
+			const x = view.getInt32(4, true);
+			const y = view.getInt32(8, true);
+			const z = view.getInt32(12, true);
+			const version = view.getUint32(16, true);
 
 			// Get the chunk data
-			const blocks = new Uint8Array(data.slice(17));
+			const blocks = new Uint8Array(data.slice(20));
 
 			// Update the chunk
 			const chunk = this.game.world.getOrGenChunk(x, y, z);

@@ -36,6 +36,7 @@ export class ClientConnection {
 	updatesWithoutPackets = 0;
 
 	chunkVersions = new Map<number, number>();
+	private chunkBuffer = new ArrayBuffer(20 + 32 * 32 * 32);
 
 	q: WSQueue = new WSQueue();
 
@@ -233,25 +234,24 @@ export class ClientConnection {
 			this.setChunkVersion(chunk.x, chunk.y, chunk.z, serverVersion);
 
 			// Create binary message for chunk update
-			// Format: [messageType(1), x(4), y(4), z(4), version(4), data(32*32*32)]
-			const buffer = new ArrayBuffer(17 + chunk.blocks.length);
-			const view = new DataView(buffer);
+			// Format: [messageType(1), padding(3), x(4), y(4), z(4), version(4), data(32*32*32)]
+			const view = new DataView(this.chunkBuffer);
 
 			// Message type 1 = chunk update
 			view.setUint8(0, 1);
 
 			// Chunk coordinates and version
-			view.setInt32(1, chunk.x, true);
-			view.setInt32(5, chunk.y, true);
-			view.setInt32(9, chunk.z, true);
-			view.setUint32(13, chunk.lastUpdated, true);
+			view.setInt32(4, chunk.x, true);
+			view.setInt32(8, chunk.y, true);
+			view.setInt32(12, chunk.z, true);
+			view.setUint32(16, chunk.lastUpdated, true);
 
 			// Copy chunk data
-			const uint8View = new Uint8Array(buffer, 17);
+			const uint8View = new Uint8Array(this.chunkBuffer, 20);
 			uint8View.set(chunk.blocks);
 
 			// Send binary data directly
-			this.socket.send(buffer);
+			this.socket.send(this.chunkBuffer);
 
 			return true;
 		}
@@ -276,8 +276,8 @@ export class ClientConnection {
 				for (let oy = -r; oy <= r; oy += s) {
 					for (let oz = -r; oz <= r; oz += s) {
 						if (this.maybeUpdateChunk(ox, oy, oz)) {
-							if (++updates > 16) {
-								console.log(`Sent 16 chunk updates`);
+							if (++updates > rMax * 4) {
+								console.log(`Sent ${updates} chunk updates`);
 								return;
 							}
 						}
@@ -295,7 +295,7 @@ export class ClientConnection {
 		if ((++this.updates & 0xf) == 0) {
 			this.chunkUpdateLoop(16);
 		} else {
-			this.chunkUpdateLoop(5);
+			this.chunkUpdateLoop(8);
 		}
 	}
 
