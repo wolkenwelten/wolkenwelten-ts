@@ -16,8 +16,7 @@ export class RepulsionMultiplier {
 
 	update() {
 		const percent =
-			Math.round((this.game.player?.repulsionMultiplier || 0) * 1000 - 1000) /
-			10;
+			Math.round((this.game.player?.repulsionMultiplier || 0) * 1000) / 10;
 		this.div.setAttribute("data-value", `${percent}%`);
 		this.div.style.setProperty("--fill-percent", `${percent}%`);
 	}
