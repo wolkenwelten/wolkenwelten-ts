@@ -9,6 +9,20 @@
   <!--PLAYERS-->
 </div>
 
+<script defer>
+  const playerNameInput = document.querySelector("input[name='playerName']");
+  if (playerNameInput) {
+    playerNameInput.addEventListener("input", (e) => {
+      const value = e.target.value;
+      window.localStorage.setItem("playerName", value);
+    });
+    const playerName = window.localStorage.getItem("playerName");
+    if (playerName) {
+      playerNameInput.value = playerName;
+    }
+  }
+</script>
+
 <div class="container">
   <div class="grid">
     <div class="card">
