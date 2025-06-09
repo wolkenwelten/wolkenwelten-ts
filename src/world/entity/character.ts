@@ -289,6 +289,9 @@ export class Character extends Being {
 		if (this.ownerID !== this.world.game.networkID) {
 			return;
 		}
+		if (this.isInLoadingChunk()) {
+			return;
+		}
 
 		this.knockoutTimer = Math.max(0, this.knockoutTimer - 1);
 

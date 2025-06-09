@@ -372,5 +372,10 @@ export class Entity {
 	isUnderwater(): boolean {
 		return this.world.isLiquid(this.x, this.y, this.z);
 	}
+
+	isInLoadingChunk(): boolean {
+		const chunk = this.world.getChunk(this.x, this.y, this.z);
+		return chunk?.loaded === false;
+	}
 }
 registerEntity("Entity", Entity);
