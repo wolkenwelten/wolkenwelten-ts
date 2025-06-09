@@ -301,7 +301,7 @@ export class ClientConnection {
 	updateChunkVersions() {
 		this.chunkUpdateLoop(1);
 		this.chunkUpdateLoop(4);
-		this.chunkUpdateLoop(12);
+		this.chunkUpdateLoop(8);
 	}
 
 	transferQueue() {
