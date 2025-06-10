@@ -37,9 +37,6 @@ export class Character extends Being {
 	jumpStart = -1;
 	yStretch = 1;
 
-	inertiaX = 0;
-	inertiaZ = 0;
-
 	health = 24;
 	maxHealth = 24;
 	isDead = false;
@@ -60,7 +57,11 @@ export class Character extends Being {
 	private animation = 0;
 	private animationId = 0;
 	knockoutTimer = 0;
-	blockStarted = -1;
+	blockCharge = 0;
+
+	public primaryCharge = 0;
+	public primaryHeld = false;
+	public secondaryHeld = false;
 
 	respawn() {
 		this.init();
@@ -71,20 +72,8 @@ export class Character extends Being {
 		this.animationId = 1 - this.animationId;
 	}
 
-	startBlocking() {
-		if (this.blockStarted < 0) {
-			this.blockStarted = this.world.game.ticks;
-		}
-	}
-
-	stopBlocking() {
-		if (this.world.game.ticks - this.blockStarted > 36) {
-			this.blockStarted = -1;
-		}
-	}
-
 	isBlocking(): boolean {
-		return this.blockStarted > 0;
+		return this.blockCharge > 0;
 	}
 
 	serialize() {
@@ -92,7 +81,7 @@ export class Character extends Being {
 			...super.serialize(),
 			animation: this.animation,
 			animationId: this.animationId,
-			blockStarted: this.blockStarted,
+			blockCharge: this.blockCharge,
 		};
 	}
 
@@ -100,7 +89,7 @@ export class Character extends Being {
 		super.deserialize(data);
 		this.animation = data.animation;
 		this.animationId = data.animationId;
-		this.blockStarted = data.blockStarted ?? -1;
+		this.blockCharge = data.blockCharge ?? 0;
 	}
 
 	/* Initialize an already existing Character, that way we can easily reuse the same object, */
@@ -142,7 +131,7 @@ export class Character extends Being {
 
 		// Check if player is blocking
 		if (this.isBlocking()) {
-			const ticksSinceBlockStart = this.world.game.ticks - this.blockStarted;
+			const ticksSinceBlockStart = this.blockCharge;
 
 			// Super block: just entered blocking mode (within first few ticks)
 			if (ticksSinceBlockStart <= 5) {
@@ -196,9 +185,6 @@ export class Character extends Being {
 
 	/* Walk/Run according to the direction of the Entity, ignores pitch */
 	move(ox: number, oy: number, oz: number) {
-		this.inertiaX = this.inertiaX * 0.97 + ox * -0.03;
-		this.inertiaZ = this.inertiaZ * 0.97 + oz * -0.03;
-
 		if (ox === 0 && oz === 0) {
 			this.movementX = this.movementZ = 0;
 			this.isWalking = false;
@@ -445,6 +431,28 @@ export class Character extends Being {
 		this.z += this.vz;
 
 		this.animation = Math.max(0, Math.min(64, this.animation - 1));
+
+		if (this.primaryHeld) {
+			this.primaryCharge++;
+		} else {
+			if (this.primaryCharge > 0) {
+				if (this.primaryCharge > 24) {
+					this.strike(true);
+				} else {
+					this.strike();
+				}
+				this.primaryCharge = 0;
+			}
+		}
+		if (this.secondaryHeld) {
+			this.blockCharge++;
+		} else {
+			if (this.blockCharge > 0) {
+				if (++this.blockCharge > 24) {
+					this.blockCharge = 0;
+				}
+			}
+		}
 	}
 
 	cooldown(ticks: number) {
@@ -515,7 +523,7 @@ export class Character extends Being {
 	}
 
 	/* Do a melee attack using whatever item is currently selected */
-	strike() {
+	strike(heavy = false) {
 		if (this.world.game.ticks < this.lastAction) {
 			return;
 		}
@@ -525,29 +533,41 @@ export class Character extends Being {
 
 		this.animation = this.world.game.render?.frames || 0;
 		const hit = this.attack(1.8);
-		const cooldownDur = 20;
+		const cooldownDur = heavy ? 14 : 10;
 		this.animationId = (this.animationId + 1) & 1;
+		if (heavy) {
+			this.animationId = 1;
+		}
 
 		const cam = this.world.game.render?.camera;
 		if (cam?.entityToFollow === this) {
-			cam.shake(hit ? 0.3 : 0.15);
+			cam.shake(heavy ? 0.75 : hit ? 0.5 : 0.25);
 		}
 
 		this.cooldown(cooldownDur);
-		if (hit) {
-			this.world.game.audio?.play("punch");
+		if (hit || heavy) {
+			this.playSound("punch", 0.4);
 		} else {
-			this.world.game.audio?.play("punchMiss");
+			this.playSound("punchMiss", 0.4);
 		}
 		const px = this.x + Math.cos(-this.yaw - Math.PI / 2);
 		const py = this.y - 0.9;
 		const pz = this.z + Math.sin(-this.yaw - Math.PI / 2);
-		this.world.game.render?.particle.fxStrike(px, py, pz);
+		this.world.game.render?.particle.fxStrike(px, py, pz, heavy);
+
+		if (heavy) {
+			const vx = Math.cos(-this.yaw - Math.PI / 2) * -0.1;
+			const vz = Math.sin(-this.yaw - Math.PI / 2) * -0.1;
+			this.vx = vx;
+			this.vz = vz;
+			this.vy += 0.05;
+		}
+
 		// Send hit message to server
 		if (this.world.game.isClient) {
 			const game = this.world.game as ClientGame;
 			const radius = 1.8;
-			const damage = 6;
+			const damage = heavy ? 12 : 4;
 			game.network.playerHit(
 				this.id,
 				radius,
@@ -559,13 +579,14 @@ export class Character extends Being {
 				this.y,
 				this.z,
 				game.networkID,
+				heavy,
 			);
 		}
 	}
 
 	/* Use the current item or punch if we don't have anything equipped */
 	primaryAction() {
-		this.strike();
+		this.primaryHeld = true;
 	}
 
 	/* Use whatever skill is currently selected */
@@ -649,8 +670,7 @@ export class Character extends Being {
 
 		// Blocking animation - put arms up in defensive position
 		if (this.isBlocking()) {
-			const t =
-				Math.min(this.world.game.ticks - this.blockStarted, 8) * (1 / 8);
+			const t = Math.min(this.blockCharge, 8) * (1 / 8);
 
 			leftArmPitch =
 				(2 + leftArmPitch * 0.1) * t + leftArmPitch * 1.2 * (1 - t); // Left arm up

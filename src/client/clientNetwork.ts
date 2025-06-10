@@ -233,7 +233,7 @@ export class ClientNetwork {
 
 			// The rest of the existing code for handling damage to the local player
 			const game = this.game;
-			game.render?.particle.fxStrike(msg.px, msg.py, msg.pz);
+			game.render?.particle.fxStrike(msg.px, msg.py, msg.pz, msg.heavy);
 
 			if (!game.player) {
 				return;
@@ -248,12 +248,12 @@ export class ClientNetwork {
 			if (dd <= msg.radius * msg.radius) {
 				let dmg = msg.damage;
 				if (game.player.isBlocking()) {
-					dmg *= 0.4;
+					dmg *= 0.6;
 				}
 
-				if (game.ticks - game.player.blockStarted < 8) {
+				if (game.player.blockCharge > 0 && game.player.blockCharge < 8) {
 					// Super block
-					game.player.blockStarted = -1;
+					game.player.blockCharge = 0;
 					game.player.strike();
 					return;
 				}
@@ -270,7 +270,11 @@ export class ClientNetwork {
 					//game.player.onAttack(attacker.char);
 				}
 
-				game.player.playSound("punch", 0.4);
+				if (msg.heavy) {
+					game.player.playSound("punch", 0.4);
+				} else {
+					game.player.playSound("punchMiss", 0.4);
+				}
 				if (dist > 0) {
 					// Normalize direction vector
 					let ndx = odx / dist;
@@ -278,7 +282,10 @@ export class ClientNetwork {
 
 					// Base knockback + additional based on damage
 					let knockbackForce =
-						0.2 + msg.damage * 0.1 * game.player.repulsionMultiplier;
+						0.1 +
+						Math.max(1, msg.damage - 3) *
+							0.05 *
+							game.player.repulsionMultiplier;
 
 					if (game.player.isBlocking()) {
 						ndx *= 0.1;
@@ -304,7 +311,6 @@ export class ClientNetwork {
 						25;
 				}
 			}
-			game.audio.playAtPosition("punchMiss", 0.4, [msg.px, msg.py, msg.pz]);
 		});
 
 		this.queue.registerCallHandler("playerList", async (args: unknown) => {
@@ -405,6 +411,7 @@ export class ClientNetwork {
 		oy: number,
 		oz: number,
 		networkID: number,
+		heavy: boolean,
 	) {
 		// Send to server
 		await this.queue.call("playerHit", {
@@ -418,6 +425,7 @@ export class ClientNetwork {
 			oy,
 			oz,
 			networkID,
+			heavy,
 		});
 	}
 

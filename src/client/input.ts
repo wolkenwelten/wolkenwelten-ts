@@ -249,7 +249,7 @@ export class InputManager {
 		if (gamepad.buttons[2]?.pressed) {
 			state.primary = true;
 		}
-		if (gamepad.buttons[1]?.pressed) {
+		if (gamepad.buttons[3]?.pressed) {
 			state.secondary = true;
 		}
 		if (gamepad.buttons[14]?.pressed) {
@@ -318,7 +318,6 @@ export class InputManager {
 		const state = new ControlState();
 		this.updateKeyboard(state);
 		this.updateMouse(state);
-
 		this.updateTouch(state);
 
 		const player = this.game.player;
@@ -351,13 +350,19 @@ export class InputManager {
 		if (!state.sprint) {
 			this.didDash = false;
 		}
-		if (state.primary) {
-			player?.primaryAction();
-		}
-		if (state.secondary) {
-			player?.startBlocking();
-		} else {
-			player?.stopBlocking();
+		if (player) {
+			if (state.primary) {
+				player.primaryAction();
+				player.primaryHeld = true;
+			} else {
+				player.primaryHeld = false;
+			}
+			if (state.secondary) {
+				player.secondaryAction();
+				player.secondaryHeld = true;
+			} else {
+				player.secondaryHeld = false;
+			}
 		}
 
 		this.lastState = state;

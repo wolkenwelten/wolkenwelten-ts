@@ -56,11 +56,9 @@ export class Camera {
 		if (this.yaw < 0) {
 			this.yaw += Math.PI * 2;
 		}
-		this.shakeIntensity -= 0.04;
-		if (this.shakeIntensity < 0) {
-			this.shakeIntensity = 0;
-		}
 		const v = this.entityToFollow?.getVelocity() || 0;
+		const minIntensity = v * 0.3;
+		this.shakeIntensity = Math.max(minIntensity, this.shakeIntensity - 0.04);
 		const goalDistance = 6 + Math.max(0, Math.min(v * 6 * (v * 6), 4));
 		this.distance = this.distance * 0.98 + goalDistance * 0.02;
 	}
@@ -97,7 +95,7 @@ export class Camera {
 		}
 		const i = Math.min(this.shakeIntensity, 1);
 
-		const t = ticks * 0.1;
+		const t = ticks * 0.25;
 		const ox = this.noise.noise(t, 128, 128) * i;
 		const oy = this.noise.noise(128, t, 128) * i;
 		const oz = this.noise.noise(128, 128, t) * i;

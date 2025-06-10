@@ -149,19 +149,21 @@ export class ParticleMesh {
 		}
 	}
 
-	fxStrike(x: number, y: number, z: number) {
-		for (let i = 0; i < 32; i++) {
+	fxStrike(x: number, y: number, z: number, heavy = false) {
+		const count = heavy ? 64 : 32;
+		for (let i = 0; i < count; i++) {
 			const cx = x + Math.random() - 0.5;
 			const cy = y + Math.random() - 0.5;
 			const cz = z + Math.random() - 0.5;
-			const cs = 96 + Math.random() * 64;
+			const cs = heavy ? 128 + Math.random() * 64 : 96 + Math.random() * 64;
 			let cc = 0xff20c0e0;
 			cc |= (Math.random() * 32) | 0;
 			cc |= ((Math.random() * 16) | 0) << 8;
 			cc |= ((Math.random() * 16) | 0) << 16;
-			const vx = (Math.random() - 0.5) * 0.06;
-			const vy = Math.random() * 0.05;
-			const vz = (Math.random() - 0.5) * 0.06;
+			const vv = heavy ? 0.16 : 0.06;
+			const vx = (Math.random() - 0.5) * vv;
+			const vy = Math.random() * vv;
+			const vz = (Math.random() - 0.5) * vv;
 			const vs = -14;
 			this.add(cx, cy, cz, cs, cc, vx, vy, vz, vs, 0, -0.001, 0, 0);
 		}
