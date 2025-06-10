@@ -670,9 +670,9 @@ export class Character extends Being {
 			leftArmYaw = (t / 16) * -0.5;
 			rightArmYaw = leftArmYaw * -1;
 
-			leftLegPitch += rightArmPitch * 0.1;
-			rightLegPitch += rightArmPitch * -0.1;
-			headPitch += rightArmPitch * 0.15;
+			leftLegPitch += rightArmPitch * 0.3;
+			rightLegPitch += rightArmPitch * -0.3;
+			headPitch += rightArmPitch * 0.1;
 
 			if (this.animationId === 1) {
 				const tmp = rightArmPitch;
