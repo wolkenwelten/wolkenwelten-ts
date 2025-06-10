@@ -78,7 +78,7 @@ export class Character extends Being {
 	}
 
 	stopBlocking() {
-		if (this.world.game.ticks - this.blockStarted > 24) {
+		if (this.world.game.ticks - this.blockStarted > 36) {
 			this.blockStarted = -1;
 		}
 	}
@@ -184,13 +184,13 @@ export class Character extends Being {
 			}
 			this.isSprinting = true;
 			this.mayDash = false;
-			const dashSpeed = this.knockoutTimer > 0 ? 0.25 : 0.75;
+			const dashSpeed = this.knockoutTimer > 0 ? 0.2 : 0.6;
 			this.world.game.render?.particle.fxDash(this.x, this.y - 0.5, this.z);
 			const vx = Math.cos(-this.yaw - Math.PI / 2) * dashSpeed;
 			const vz = Math.sin(-this.yaw - Math.PI / 2) * dashSpeed;
 			this.vx = vx;
 			this.vz = vz;
-			this.vy += 0.15;
+			this.vy += 0.1;
 		}
 	}
 
@@ -345,13 +345,11 @@ export class Character extends Being {
 			movementLength > 0.01 ? CHARACTER_ACCELERATION : CHARACTER_STOP_RATE;
 
 		if (this.isBlocking()) {
-			speed *= 0.5;
-			accel *= 0.5;
+			speed *= 0.25;
 		}
 
 		if (!this.mayJump()) {
-			speed *= 0.8; // Slow down player movement changes during jumps
-			accel *= 0.4;
+			accel *= 0.2; // Slow down player movement changes during jumps
 			if (this.jumpStart < 0) {
 				this.jumpStart = this.world.game.ticks - 1;
 			}
