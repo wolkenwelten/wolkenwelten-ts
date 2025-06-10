@@ -330,7 +330,7 @@ export class Character extends Being {
 		let accel =
 			movementLength > 0.01 ? CHARACTER_ACCELERATION : CHARACTER_STOP_RATE;
 
-		if (this.isBlocking()) {
+		if (this.isBlocking() || this.primaryCharge > 0) {
 			speed *= 0.25;
 		}
 
@@ -359,7 +359,7 @@ export class Character extends Being {
 
 		if (this.knockoutTimer > 0) {
 			speed *= 0.2;
-			accel *= 0.2;
+			accel *= 0.6;
 		}
 
 		this.vx = this.vx * (1.0 - accel) + this.movementX * speed * accel;
@@ -418,11 +418,10 @@ export class Character extends Being {
 		}
 
 		const len = this.vx * this.vx + this.vz * this.vz + this.vy * this.vy;
-		if (len > 8.0) {
-			const v = clamp(1.0 - (len - 0.2), 0.0001, 1.0);
-			this.vx *= v;
-			this.vy *= v;
-			this.vz *= v;
+		if (len > 4 * 4 * 4) {
+			this.vx *= 0.95;
+			this.vy *= 0.95;
+			this.vz *= 0.95;
 		}
 		this.autoDecreaseRepulsionMultiplier();
 
@@ -464,25 +463,22 @@ export class Character extends Being {
 		target.onAttack(this);
 	}
 
-	attack(radius = 1.6): boolean {
+	attack(radius = 1.6, heave = false): boolean {
 		const [vx, vy, vz] = this.direction(0, 0, radius * -0.6);
 		const x = this.x + vx;
 		const y = this.y + vy;
 		const z = this.z + vz;
 		let hit = false;
 
-		const br = radius * 0.8;
+		const br = radius * 0.5;
 		for (let cx = Math.floor(x - br); cx < Math.ceil(x + br); cx++) {
-			for (
-				let cy = Math.floor(y - br - 0.5);
-				cy < Math.ceil(y + br - 0.5);
-				cy++
-			) {
+			for (let cy = Math.floor(y - br); cy < Math.ceil(y + br - 0.5); cy++) {
 				for (let cz = Math.floor(z - br); cz < Math.ceil(z + br); cz++) {
 					const b = this.world.getBlock(cx, cy, cz);
 					if (b) {
 						const bt = this.world.blocks[b];
-						if (bt.health < 200) {
+						const maxHealth = heave ? 500 : 200;
+						if (bt.health < maxHealth) {
 							this.world.setBlock(cx, cy, cz, 0);
 							this.world.game.render?.particle.fxBlockBreak(cx, cy, cz, bt);
 							this.playUnmovingSound("tock", 0.1);
@@ -532,7 +528,7 @@ export class Character extends Being {
 		}
 
 		this.animation = this.world.game.render?.frames || 0;
-		const hit = this.attack(1.8);
+		const hit = this.attack(1.8, heavy);
 		const cooldownDur = heavy ? 14 : 10;
 		this.animationId = (this.animationId + 1) & 1;
 		if (heavy) {
@@ -683,7 +679,7 @@ export class Character extends Being {
 			headPitch -= 0.4 * t; // Head slightly tilted back
 			bodyPitch += 0.15 * t; // Body slightly leaning back
 		} else if (this.animation > 0) {
-			const t = this.animation * (16 / 64);
+			const t = Math.max(0, Math.min(64, this.animation) * (1 / 4));
 			rightArmPitch = (t / 16) * 1.5;
 			rightArmPitch *= rightArmPitch;
 			leftArmPitch = rightArmPitch * -0.5;

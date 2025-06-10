@@ -263,7 +263,7 @@ export class ClientNetwork {
 				const ody = game.player.y - msg.oy;
 				const odz = game.player.z - msg.oz;
 				const odist = odx * odx + ody * ody + odz * odz;
-				const dist = Math.sqrt(odist);
+				const dist = Math.cbrt(odist);
 				game.player.damage(dmg);
 				if (attacker) {
 					console.log("attacker", attacker);
@@ -285,30 +285,25 @@ export class ClientNetwork {
 						0.1 +
 						Math.max(1, msg.damage - 3) *
 							0.05 *
+							game.player.repulsionMultiplier *
 							game.player.repulsionMultiplier;
 
 					if (game.player.isBlocking()) {
-						ndx *= 0.1;
-						ndz *= 0.1;
 						knockbackForce *= 0.1;
 					}
-
-					// Apply horizontal knockback
-					game.player.vx += ndx * knockbackForce;
-					game.player.vz += ndz * knockbackForce;
 
 					if (msg.networkID !== 0) {
 						game.player.lastAttackerId = msg.networkID;
 						game.player.lastAttackerCooldown = 100;
 					}
 
+					// Apply horizontal knockback
+					game.player.vx += ndx * Math.min(12, knockbackForce);
+					game.player.vz += ndz * Math.min(12, knockbackForce);
 					// Add some vertical knockback for a more dramatic effect
-					game.player.vy += knockbackForce * 0.2;
+					game.player.vy += Math.min(1, knockbackForce * 0.2);
 
-					game.player.knockoutTimer +=
-						game.player.repulsionMultiplier *
-						game.player.repulsionMultiplier *
-						25;
+					game.player.knockoutTimer += game.player.repulsionMultiplier * 25;
 				}
 			}
 		});
