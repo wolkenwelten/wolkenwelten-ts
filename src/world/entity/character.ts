@@ -652,12 +652,16 @@ export class Character extends Being {
 			const t =
 				Math.min(this.world.game.ticks - this.blockStarted, 8) * (1 / 8);
 
-			leftArmPitch = (2 + leftArmPitch * 0.1) * t + leftArmPitch * (1 - t); // Left arm up
-			leftArmYaw = -0.5 * t;
-			rightArmPitch = (2 + rightArmPitch * 0.1) * t + rightArmPitch * (1 - t); // Right arm up
-			rightArmYaw = 0.5 * t;
-			headPitch -= 0.3 * t; // Head slightly tilted back
-			bodyPitch += 0.1 * t; // Body slightly leaning back
+			leftArmPitch =
+				(2 + leftArmPitch * 0.1) * t + leftArmPitch * 1.2 * (1 - t); // Left arm up
+			leftArmYaw = -0.6 * t;
+			rightArmPitch =
+				(2 + rightArmPitch * 0.1) * t + rightArmPitch * 1.2 * (1 - t); // Right arm up
+			rightArmYaw = 0.6 * t;
+			leftLegPitch -= 0.3 * t;
+			rightLegPitch += 0.3 * t;
+			headPitch -= 0.4 * t; // Head slightly tilted back
+			bodyPitch += 0.15 * t; // Body slightly leaning back
 		} else if (this.animation > 0) {
 			const t = this.animation * (16 / 64);
 			rightArmPitch = (t / 16) * 1.5;
