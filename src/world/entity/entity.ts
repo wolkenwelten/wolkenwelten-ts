@@ -333,7 +333,7 @@ export class Entity {
 	}
 
 	beRepelledByEntities() {
-		if ((this.id & 0xf) !== (this.world.game.ticks & 0xf)) {
+		if ((this.id & 0x7) !== (this.world.game.ticks & 0x7)) {
 			return;
 		}
 		for (const e of this.world.entities.values()) {
@@ -344,10 +344,10 @@ export class Entity {
 			const dy = e.y - this.y;
 			const dz = e.z - this.z;
 			const dd = dx * dx + dy * dy * 0.5 + dz * dz;
-			if (dd < 1.8) {
-				const w = Math.max(0.98, Math.min(0.999, this.weight / e.weight));
-				this.vx = this.vx * w + (dx < 0 ? 1.35 : -1.35 - dx) * (1.0 - w);
-				this.vz = this.vz * w + (dz < 0 ? 1.35 : -1.35 - dz) * (1.0 - w);
+			if (dd < 0.6) {
+				const w = Math.max(0.9, Math.min(0.95, this.weight / e.weight));
+				this.vx += (dx < 0 ? 1.5 : -1.5) * (1.0 - w);
+				this.vz += (dz < 0 ? 1.5 : -1.5) * (1.0 - w);
 			}
 		}
 	}
