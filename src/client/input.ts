@@ -243,13 +243,13 @@ export class InputManager {
 		if (gamepad.buttons[0]?.pressed) {
 			state.y = 1;
 		}
-		if (gamepad.buttons[1]?.pressed) {
+		if (gamepad.buttons[3]?.pressed) {
 			state.sprint = true;
 		}
 		if (gamepad.buttons[2]?.pressed) {
 			state.primary = true;
 		}
-		if (gamepad.buttons[3]?.pressed) {
+		if (gamepad.buttons[1]?.pressed) {
 			state.secondary = true;
 		}
 		if (gamepad.buttons[14]?.pressed) {
