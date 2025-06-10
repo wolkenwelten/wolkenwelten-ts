@@ -532,7 +532,7 @@ export class Character extends Being {
 		const cooldownDur = heavy ? 14 : 10;
 		this.animationId = (this.animationId + 1) & 1;
 		if (heavy) {
-			this.animationId = 1;
+			this.animationId = 0;
 		}
 
 		const cam = this.world.game.render?.camera;
@@ -542,9 +542,9 @@ export class Character extends Being {
 
 		this.cooldown(cooldownDur);
 		if (hit || heavy) {
-			this.playSound("punch", 0.4);
+			this.playSound("punch", 0.3);
 		} else {
-			this.playSound("punchMiss", 0.4);
+			this.playSound("punchMiss", 0.2);
 		}
 		const px = this.x + Math.cos(-this.yaw - Math.PI / 2);
 		const py = this.y - 0.9;
@@ -664,6 +664,10 @@ export class Character extends Being {
 		let rightLegPitch = this.walkAnimationFactor * 1.6;
 		let leftLegPitch = this.walkAnimationFactor * -1.6;
 
+		this.updateYStretch();
+		let yStretch = this.yStretch;
+		let yOff = 0;
+
 		// Blocking animation - put arms up in defensive position
 		if (this.isBlocking()) {
 			const t = Math.min(this.blockCharge, 8) * (1 / 8);
@@ -678,6 +682,17 @@ export class Character extends Being {
 			rightLegPitch += 0.3 * t;
 			headPitch -= 0.4 * t; // Head slightly tilted back
 			bodyPitch += 0.15 * t; // Body slightly leaning back
+		} else if (this.primaryCharge > 0) {
+			const t = Math.max(0, Math.min(64, this.primaryCharge) * (1 / 4));
+			rightArmPitch = (t / 16) * 1.5;
+			rightArmYaw = (t / 16) * -1.5;
+
+			leftArmPitch = (t / 16) * -0.5;
+			leftArmYaw = (t / 16) * -0.5;
+
+			headPitch += (t / 16) * -0.2;
+			yStretch += (t / 16) * 0.2;
+			yOff += (t / 16) * 0.25;
 		} else if (this.animation > 0) {
 			const t = Math.max(0, Math.min(64, this.animation) * (1 / 4));
 			rightArmPitch = (t / 16) * 1.5;
@@ -705,15 +720,13 @@ export class Character extends Being {
 			playerRightArm,
 			playerRightLeg,
 		} = this.world.game.render.assets;
-		this.updateYStretch();
-		const yStretch = this.yStretch;
 
 		this.drawBodyPart(
 			projectionMatrix,
 			viewMatrix,
 			alpha,
 			0,
-			-0.175 * yStretch,
+			-0.175 * yStretch + yOff,
 			0.05,
 			headYaw,
 			headPitch,
@@ -724,7 +737,7 @@ export class Character extends Being {
 			viewMatrix,
 			alpha,
 			0,
-			-0.95 * yStretch,
+			-0.95 * yStretch + yOff,
 			-0.0125,
 			0,
 			bodyPitch,
@@ -735,7 +748,7 @@ export class Character extends Being {
 			viewMatrix,
 			alpha,
 			-0.45,
-			-0.625 * yStretch,
+			-0.625 * yStretch + yOff,
 			0,
 			leftArmYaw,
 			leftArmPitch,
@@ -749,7 +762,7 @@ export class Character extends Being {
 			viewMatrix,
 			alpha,
 			0.45,
-			-0.625 * yStretch,
+			-0.625 * yStretch + yOff,
 			0,
 			rightArmYaw,
 			rightArmPitch,
@@ -763,7 +776,7 @@ export class Character extends Being {
 			viewMatrix,
 			alpha,
 			0.125,
-			-1.35 * yStretch,
+			-1.35 * yStretch + yOff,
 			0,
 			0,
 			rightLegPitch,
@@ -777,7 +790,7 @@ export class Character extends Being {
 			viewMatrix,
 			alpha,
 			-0.125,
-			-1.35 * yStretch,
+			-1.35 * yStretch + yOff,
 			0,
 			0,
 			leftLegPitch,

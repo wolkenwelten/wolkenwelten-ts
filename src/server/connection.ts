@@ -186,6 +186,19 @@ export class ClientConnection {
 			}
 		});
 
+		this.q.registerCallHandler("playSound", async (args: unknown) => {
+			if (typeof args !== "object") {
+				throw new Error("Invalid player hit received");
+			}
+			const hit = args as any;
+			for (const client of this.server.sockets.values()) {
+				if (client === this) {
+					continue;
+				}
+				client.q.call("playSound", hit);
+			}
+		});
+
 		this.q.registerCallHandler("playerDeath", async (args: unknown) => {
 			this.deaths++;
 			if (typeof args !== "number") {

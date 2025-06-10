@@ -270,11 +270,13 @@ export class ClientNetwork {
 					//game.player.onAttack(attacker.char);
 				}
 
-				if (msg.heavy) {
-					game.player.playSound("punch", 0.4);
-				} else {
-					game.player.playSound("punchMiss", 0.4);
-				}
+				this.playSound({
+					sound: "slap",
+					volume: msg.heavy ? 0.8 : 0.1,
+					entityId: game.player.id,
+				});
+				game.player.playSound("slap", msg.heavy ? 1 : 0.1);
+
 				if (dist > 0) {
 					// Normalize direction vector
 					let ndx = odx / dist;
@@ -359,6 +361,28 @@ export class ClientNetwork {
 
 			// Show jump particles at the specified location
 			this.game.render?.particle.fxJump(msg.x, msg.y, msg.z);
+		});
+
+		this.queue.registerCallHandler("playSound", async (args: unknown) => {
+			if (typeof args !== "object") {
+				throw new Error("Invalid player hit received");
+			}
+			const hit = args as any;
+			if (!hit.sound) {
+				throw new Error("Invalid sound received");
+			}
+			if (hit.entityId) {
+				const entity = this.game.world.entities.get(hit.entityId);
+				if (entity) {
+					entity.playSound(hit.sound, hit.volume || 1);
+					return;
+				}
+			} else {
+				const x = hit.x || 0;
+				const y = hit.y || 0;
+				const z = hit.z || 0;
+				this.game.audio?.playAtPosition(hit.sound, hit.volume || 1, [x, y, z]);
+			}
 		});
 	}
 
@@ -453,5 +477,16 @@ export class ClientNetwork {
 			z,
 			strength,
 		});
+	}
+
+	async playSound(args: {
+		sound: string;
+		volume: number;
+		entityId?: number;
+		x?: number;
+		y?: number;
+		z?: number;
+	}) {
+		await this.queue.call("playSound", args);
 	}
 }

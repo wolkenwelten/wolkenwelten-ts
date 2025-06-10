@@ -8,6 +8,7 @@ import punchUrl from "../../assets/sfx/punch.ogg?url";
 import punchMissUrl from "../../assets/sfx/punchMiss.ogg?url";
 import stepUrl from "../../assets/sfx/step.ogg?url";
 import stompUrl from "../../assets/sfx/stomp.ogg?url";
+import slapUrl from "../../assets/sfx/slap.mp3?url";
 import tockUrl from "../../assets/sfx/tock.ogg?url";
 import unghUrl from "../../assets/sfx/ungh.ogg?url";
 import bgmUrl from "../../assets/bgm/PixelShowdown.mp3?url";
@@ -23,6 +24,7 @@ export const registerAudioContent = (audio: AudioManager) => {
 	audio.add("stomp", stompUrl);
 	audio.add("punch", punchUrl);
 	audio.add("punchMiss", punchMissUrl);
+	audio.add("slap", slapUrl);
 	audio.add("bomb", bombUrl);
 	audio.add("projectile", projectileUrl);
 	audio.add("bgm", bgmUrl);
