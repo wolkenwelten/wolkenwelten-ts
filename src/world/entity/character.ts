@@ -657,10 +657,10 @@ export class Character extends Being {
 		const headYaw = this.calcHeadYaw(cam);
 		let headPitch = this.walkAnimationFactor * 0.1 + cam.pitch * 0.25;
 		let bodyPitch = this.walkAnimationFactor * -0.1 + speedPitch;
-		let leftArmPitch = this.walkAnimationFactor * 1.7;
-		let rightArmPitch = this.walkAnimationFactor * -1.7;
-		let leftArmYaw = this.walkAnimationFactor * -0.3;
-		let rightArmYaw = this.walkAnimationFactor * -0.3;
+		let leftArmPitch = this.walkAnimationFactor * 1.4;
+		let rightArmPitch = this.walkAnimationFactor * -1.4;
+		let leftArmYaw = this.walkAnimationFactor * -0.5;
+		let rightArmYaw = this.walkAnimationFactor * -0.5;
 		let rightLegPitch = this.walkAnimationFactor * 1.6;
 		let leftLegPitch = this.walkAnimationFactor * -1.6;
 
