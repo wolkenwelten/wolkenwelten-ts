@@ -667,7 +667,7 @@ export class Character extends Being {
 			rightArmPitch = (t / 16) * 1.5;
 			rightArmPitch *= rightArmPitch;
 			leftArmPitch = rightArmPitch * -0.5;
-			leftArmYaw = (t / 16) * -0.3;
+			leftArmYaw = (t / 16) * -0.5;
 			rightArmYaw = leftArmYaw * -1;
 
 			leftLegPitch += rightArmPitch * 0.1;
