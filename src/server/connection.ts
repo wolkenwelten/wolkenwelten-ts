@@ -297,7 +297,7 @@ export class ClientConnection {
 			for (let oy = -r; oy <= r; oy++) {
 				for (let oz = -r; oz <= r; oz++) {
 					if (this.maybeUpdateChunk(ox, oy, oz)) {
-						if (++updates > 8) {
+						if (++updates > 4) {
 							console.log(`Sent ${updates} chunk updates`);
 							return;
 						}
