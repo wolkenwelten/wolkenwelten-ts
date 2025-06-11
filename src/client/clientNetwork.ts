@@ -251,7 +251,7 @@ export class ClientNetwork {
 					dmg *= 0.6;
 				}
 
-				if (game.player.blockCharge > 0 && game.player.blockCharge < 8) {
+				if (game.player.blockCharge > 0 && game.player.blockCharge < 16) {
 					// Super block
 					game.player.blockCharge = 0;
 					game.player.strike();
