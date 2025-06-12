@@ -51,7 +51,7 @@ const main = async () => {
 			.join("");
 		const players = playerList
 			? `<div class="player-list"><h4>Players</h4><ul>${playerList}</ul></div>`
-			: "<div class='player-list'><h4>Nobody is playing right now (｡•́︿•̀｡)</h4></div>";
+			: "<div class='player-list'><h4>Nobody is playing right now (｡•́︿•̀｡)</h4><h5>Maybe you'll bring a friend and play together?</h5></div>";
 		const content = indexContent.replace("<!--PLAYERS-->", players);
 		res.send(
 			mainTemplate.renderPage(
