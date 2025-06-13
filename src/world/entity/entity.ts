@@ -1,4 +1,4 @@
-/* Copyright 2023 - Benjamin Vincent Schulenburg
+/* Copyright - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import { mat4 } from "gl-matrix";
@@ -34,6 +34,9 @@ export const registerEntity = (
 
 export class Entity {
 	static readonly registeredEntities = registeredEntities;
+
+	// Track entities whose ownership has changed and need a final update sent
+	static pendingOwnershipChanges: Entity[] = [];
 
 	id: number;
 	ownerID: number;
@@ -376,6 +379,40 @@ export class Entity {
 	isInLoadingChunk(): boolean {
 		const chunk = this.world.getChunk(this.x, this.y, this.z);
 		return chunk?.loaded === false;
+	}
+
+	/**
+	 * Change the owner of this entity, enforcing client/server rules.
+	 * - On client: can only pass ownership to the server (ownerID 0)
+	 * - On server: can only pass ownership to a different client (not itself)
+	 * Throws an error if rules are violated.
+	 * Adds the entity to pendingOwnershipChanges for networking code to send a final update.
+	 */
+	changeOwner(newOwnerID: number) {
+		const isClient = this.world.game.isClient;
+		const isServer = this.world.game.isServer;
+		if (isClient) {
+			if (newOwnerID !== 0) {
+				throw new Error(
+					"(｡•́︿•̀｡) Client can only transfer ownership to the server (ownerID 0)!",
+				);
+			}
+		} else if (isServer) {
+			if (newOwnerID === this.ownerID || newOwnerID === 0) {
+				throw new Error(
+					"(╬ Ò﹏Ó) Server can only transfer ownership to a different client!",
+				);
+			}
+		} else {
+			throw new Error(
+				"(⊙_⊙;) Unknown execution context for ownership transfer!",
+			);
+		}
+		this.ownerID = newOwnerID;
+		// Add to pendingOwnershipChanges for networking code to send a final update
+		if (!Entity.pendingOwnershipChanges.includes(this)) {
+			Entity.pendingOwnershipChanges.push(this);
+		}
 	}
 }
 registerEntity("Entity", Entity);

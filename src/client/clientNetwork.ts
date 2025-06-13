@@ -4,6 +4,7 @@
 import { WSPacket, WSQueue } from "../network";
 import { ClientEntry, PlayerStatus, PlayerUpdate } from "./clientEntry";
 import type { ClientGame } from "./clientGame";
+import { Entity } from "../world/entity/entity";
 export type ClientHandler = (game: ClientGame, args: unknown) => Promise<void>;
 
 export class ClientNetwork {
@@ -32,6 +33,11 @@ export class ClientNetwork {
 			}
 			entities.push(entity.serialize());
 		}
+		// Also send any entities with pending ownership changes, even if it means duplicates!
+		for (const entity of Entity.pendingOwnershipChanges) {
+			entities.push(entity.serialize());
+		}
+		Entity.pendingOwnershipChanges.length = 0;
 		this.queue.call("updateEntities", entities);
 	}
 

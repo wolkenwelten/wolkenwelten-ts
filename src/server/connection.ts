@@ -7,6 +7,7 @@ import { WSPacket, WSQueue } from "../network";
 import { coordinateToWorldKey } from "../world/world";
 import { Chunk } from "../world/chunk/chunk";
 import type { PlayerStatus } from "../client/clientEntry";
+import { Entity } from "../world/entity/entity";
 
 let idCounter = 0;
 export class ClientConnection {
@@ -96,6 +97,11 @@ export class ClientConnection {
 			}
 			entities.push(entity.serialize());
 		}
+		// Also send any entities with pending ownership changes, even if it means duplicates!
+		for (const entity of Entity.pendingOwnershipChanges) {
+			entities.push(entity.serialize());
+		}
+		Entity.pendingOwnershipChanges.length = 0;
 		this.q.call("updateEntities", entities);
 	}
 
