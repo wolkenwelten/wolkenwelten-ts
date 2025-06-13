@@ -6,5 +6,4 @@
  * gameplay mechanics reference a single source of truth instead of scattering
  * magic numbers throughout the codebase.
  */
-
 export const GRAVITY = 0.008;

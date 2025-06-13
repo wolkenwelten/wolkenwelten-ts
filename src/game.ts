@@ -1,52 +1,50 @@
 /* Copyright - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  *
- * ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
- * ┃  Game – Abstract root of all game sessions (server *and* client)        ┃
- * ┃  "One loop to rule them all"  ⸜(｡˃ ᵕ ˂ )⸝💖                               ┃
- * ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
- * ┃ Purpose                                                                  ┃
- * ┃  • Encapsulates world state, timing and common managers that are shared  ┃
- * ┃    by both the browser-side `ClientGame` and Node-side `ServerGame`.      ┃
- * ┃  • Provides an *update-loop* that attempts to catch up with real time    ┃
- * ┃    (~60 Hz) without blocking for longer than ≈16 ticks.                  ┃
- * ┃  • Boots a fresh world via `World` + a specific `WorldGenHandler`.       ┃
- * ┃  • Houses global registries (currently only `blocks`) that are required  ┃
- * ┃    by content loading helpers.                                           ┃
- * ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
- * ┃ How to extend                                                            ┃
- * ┃ 1. Create a derived class (see `src/client/clientGame.ts` or             ┃
- * ┃    `src/server/serverGame.ts`).                                          ┃
- * ┃ 2. Call `super(config)` *first* in your constructor so that common       ┃
- * ┃    managers are initialised correctly.                                   ┃
- * ┃ 3. Overwrite / add managers as needed (audio, network, render …).        ┃
- * ┃ 4. When overriding `init()` or `update()` ALWAYS call `await super.init()`┃
- * ┃    / `super.update()` or you will desync ticks or miss world generation. ┃
- * ┃ 5. Set the convenience flags `this.isClient` / `this.isServer` in your   ┃
- * ┃    subclass – *they are only hints*, but several systems rely on them.   ┃
- * ┃ 6. If you schedule your own loops (for example the server does via       ┃
- * ┃    `setInterval`), remember to flip `this.running = true` or the base    ┃
- * ┃    class will silently early-return in `update()`.                       ┃
- * ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
- * ┃ Potential footguns 🧨                                                    ┃
- * ┃  • `ready` flag – `update()` & `gc()` NOP until worldgen finished.       ┃
- * ┃    Forgetting to await/observe `init()` leads to apparent freezes.       ┃
- * ┃  • `ticks` is mutated inside the tight loop; never rely on it to equal   ┃
- * ┃    *number of calls* to `update()`.                                      ┃
- * ┃  • Long-running synchronous work in `world.update()` can still block     ┃
- * ┃    the event loop because it is executed repeatedly until we caught      ┃
- * ┃    up with real time. Heavy AI or path-finding should be spread out.     ┃
- * ┃  • `registerContent()` is invoked from constructor; content code must    ┃
- * ┃    not rely on overriden fields that are set *after* `super()`.          ┃
- * ┃  • Garbage collection (`gc()`) is naïve – it runs on a separate          ┃
- * ┃    `setInterval` and touches world chunks directly; be mindful of race   ┃
- * ┃    conditions if you integrate workers or atlas rebuilds.               ┃
- * ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
- * ┃ Quick reference                                                          ┃
- * ┃  update() – step world until caught up with real-time.                   ┃
- * ┃  gc()      – thin wrapper that delegates to `world.gc()`.                ┃
- * ┃  millis()  – wall-clock milliseconds since game start.                  ┃
- * ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+ * Game – Abstract root of all game sessions (server *and* client)
+ * "One loop to rule them all"
+ *
+ * # Purpose
+ * • Encapsulates world state, timing and common managers that are shared
+ *   by both the browser-side `ClientGame` and Node-side `ServerGame`.
+ * • Provides an *update-loop* that attempts to catch up with real time
+ *   (~60 Hz) without blocking for longer than ≈16 ticks.
+ * • Boots a fresh world via `World` + a specific `WorldGenHandler`.
+ * • Houses global registries (currently only `blocks`) that are required
+ *   by content loading helpers.
+ *
+ * # How to extend
+ * 1. Create a derived class (see `src/client/clientGame.ts` or
+ *    `src/server/serverGame.ts`).
+ * 2. Call `super(config)` *first* in your constructor so that common
+ *    managers are initialised correctly.
+ * 3. Overwrite / add managers as needed (audio, network, render …).
+ * 4. When overriding `init()` or `update()` ALWAYS call `await super.init()`
+ *    / `super.update()` or you will desync ticks or miss world generation.
+ * 5. Set the convenience flags `this.isClient` / `this.isServer` in your
+ *    subclass – *they are only hints*, but several systems rely on them.
+ * 6. If you schedule your own loops (for example the server does via
+ *    `setInterval`), remember to flip `this.running = true` or the base
+ *    class will silently early-return in `update()`.
+ *
+ * # Potential footguns 🧨
+ * • `ready` flag – `update()` & `gc()` NOP until worldgen finished.
+ *   Forgetting to await/observe `init()` leads to apparent freezes.
+ * • `ticks` is mutated inside the tight loop; never rely on it to equal
+ *   *number of calls* to `update()`.
+ * • Long-running synchronous work in `world.update()` can still block
+ *   the event loop because it is executed repeatedly until we caught
+ *   up with real time. Heavy AI or path-finding should be spread out.
+ * • `registerContent()` is invoked from constructor; content code must
+ *   not rely on overriden fields that are set *after* `super()`.
+ * • Garbage collection (`gc()`) is naïve – it runs on a separate
+ *   `setInterval` and touches world chunks directly; be mindful of race
+ *   conditions if you integrate workers or atlas rebuilds.
+ *
+ * # Quick reference
+ * • update() – step world until caught up with real-time.
+ * • gc()     – thin wrapper that delegates to `world.gc()`.
+ * • millis() – wall-clock milliseconds since game start.
  */
 import { registerBlockTypes } from "./content/blockTypes";
 

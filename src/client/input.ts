@@ -1,43 +1,42 @@
 /* Copyright - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  *
- * ────────────────────────────────────────────────────────────────────────────────
- *  InputManager – Centralised browser-input aggregation for the client runtime
- * ────────────────────────────────────────────────────────────────────────────────
- *  The InputManager converts raw browser events (keyboard, mouse, gamepad and
- *  touch) into a unified ControlState that the game loop can consume once every
- *  tick via update().  It also performs a small amount of direct side-effects
- *  (camera rotation, player dash, etc.) for latency-sensitive actions.
+ * InputManager – Centralised browser-input aggregation for the client runtime
  *
- *  Typical usage in ClientGame:
- *    const input = new InputManager(this);
- *    ...
- *    tick() {
- *      input.update();   // exactly once per tick
- *    }
+ * The InputManager converts raw browser events (keyboard, mouse, gamepad and
+ * touch) into a unified ControlState that the game loop can consume once every
+ * tick via update().  It also performs a small amount of direct side-effects
+ * (camera rotation, player dash, etc.) for latency-sensitive actions.
  *
- *  Extending / customising:
- *  • Add new key handlers by inserting entries into `keyPushHandler` or
- *    `keyReleaseHandler` *before* update() is called.
- *  • To support additional hardware, subclass InputManager and override the
- *    corresponding updateXXX() helper but remember to invoke super.updateXXX()
- *    so existing devices keep working.
+ * Typical usage in ClientGame:
+ *   const input = new InputManager(this);
+ *   ...
+ *   tick() {
+ *     input.update();   // exactly once per tick
+ *   }
  *
- *  Footguns & caveats:
- *  1. update() must run before any code that queries player.primaryHeld etc.,
- *     otherwise the game will act on stale input.
- *  2. requestFullscreenAndPointerLock() quietly fails when the browser blocks
- *     the request (missing user gesture).  Callers should not assume either
- *     fullscreen or pointer-lock was granted.
- *  3. Gamepad support relies on the Standard mapping; non-standard controllers
- *     may yield funny button numbers.
- *  4. Touch devices that also have a track-pad/mouse will report both kinds of
- *     input – make sure your UI does not duplicate actions.
- *  5. Several methods reach into `this.game` for side-effects; when you mock or
- *     reuse the class outside the normal runtime you need to provide those
- *     members.
+ * Extending / customising:
+ * • Add new key handlers by inserting entries into `keyPushHandler` or
+ *   `keyReleaseHandler` *before* update() is called.
+ * • To support additional hardware, subclass InputManager and override the
+ *   corresponding updateXXX() helper but remember to invoke super.updateXXX()
+ *   so existing devices keep working.
  *
- *  See individual JSDoc comments below for per-method details.
+ * Footguns & caveats:
+ * 1. update() must run before any code that queries player.primaryHeld etc.,
+ *    otherwise the game will act on stale input.
+ * 2. requestFullscreenAndPointerLock() quietly fails when the browser blocks
+ *    the request (missing user gesture).  Callers should not assume either
+ *    fullscreen or pointer-lock was granted.
+ * 3. Gamepad support relies on the Standard mapping; non-standard controllers
+ *    may yield funny button numbers.
+ * 4. Touch devices that also have a track-pad/mouse will report both kinds of
+ *    input – make sure your UI does not duplicate actions.
+ * 5. Several methods reach into `this.game` for side-effects; when you mock or
+ *    reuse the class outside the normal runtime you need to provide those
+ *    members.
+ *
+ * See individual JSDoc comments below for per-method details.
  */
 import { isClient } from "../util/compat";
 import { Character } from "../world/entity/character";

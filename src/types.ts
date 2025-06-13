@@ -6,7 +6,6 @@
  * this file in sync with new loader plugins you introduce so the editor and
  * tsc stay silent.
  */
-
 declare module "*?raw" {
 	const content: string;
 	export default content;

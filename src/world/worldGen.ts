@@ -1,47 +1,43 @@
 /* Copyright - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
+ *
+ * # WorldGen 🌍
+ *
+ * Abstract base class for ALL procedural world-generation back-ends. A
+ * single subclass instance is attached to the `World` and queried whenever
+ * chunks need to be filled with blocks or global world information is
+ * required.
+ *
+ * ## Typical lifecycle
+ * 1. `new ConcreteWorldGen(seed)`
+ * 2. `await init()`   (async heavy lifting / asset downloads)
+ * 3. `preGen(world)`  (server-side global preprocessing)
+ * 4. For each chunk: `genChunk(chunk)`
+ *
+ * ## Extension guidelines ⚙️
+ * * Keep all RNG deterministic by ONLY using the provided `seed` plus the
+ *   chunk coordinates. Networked clients rely on byte-perfect equality!
+ * * Heavy, world-wide computations (biome maps, nav-meshes, etc.) belong
+ *   into `preGen()` so they run once per world.
+ * * NEVER perform blocking IO inside `genChunk()`; that method is called
+ *   in the game loop and must stay short.
+ * * Implement a sensible `mayGC()` strategy or the server will happily
+ *   keep the whole planet in memory 🤯.
+ *
+ * ## Footguns & Gotchas ⚠️
+ * * `spawnPos()` must return a coordinate that is NOT SOLID; the engine
+ *   will not double-check and your player may suffocate.
+ * * `genChunk()` runs on the server ONLY. The client receives already
+ *   filled chunks over the wire.
+ * * If you cache data keyed by chunk coordinates, remember that each axis
+ *   is 32-block-aligned (bitshift >> 5) just like in `coordinateToWorldKey`.
+ *
+ * Have fun shaping new worlds! (≧▽≦)ゞ
  */
 import type { Chunk } from "./chunk/chunk";
 import type { Character } from "./entity/character";
 import type { World } from "./world";
 
-/**
- * ╔══════════════════════════════════════════════════════════════════════╗
- * ║                              WorldGen                               ║
- * ╚══════════════════════════════════════════════════════════════════════╝
- *
- * Abstract base class for ALL procedural world-generation back-ends. A
- * single subclass instance is attached to the `World` and queried whenever
- * chunks need to be filled with blocks or global world information is
- * required.                                                            🌍
- *
- * Typical lifecycle
- * ──────────────────────────────────────────────────────────────────────────
- *   1. `new ConcreteWorldGen(seed)`
- *   2. `await init()`   (async heavy lifting / asset downloads)
- *   3. `preGen(world)`  (server-side global preprocessing)
- *   4. For each chunk: `genChunk(chunk)`
- *
- * Extension guidelines ⚙️
- *   • Keep all RNG deterministic by ONLY using the provided `seed` plus the
- *     chunk coordinates. Networked clients rely on byte-perfect equality!
- *   • Heavy, world-wide computations (biome maps, nav-meshes, etc.) belong
- *     into `preGen()` so they run once per world.
- *   • NEVER perform blocking IO inside `genChunk()`; that method is called
- *     in the game loop and must stay short.
- *   • Implement a sensible `mayGC()` strategy or the server will happily
- *     keep the whole planet in memory 🤯.
- *
- * Footguns & Gotchas ⚠️
- *   • `spawnPos()` must return a coordinate that is NOT SOLID; the engine
- *     will not double-check and your player may suffocate.
- *   • `genChunk()` runs on the server ONLY.  The client receives already
- *     filled chunks over the wire.
- *   • If you cache data keyed by chunk coordinates, remember that each axis
- *     is 32-block-aligned (bitshift >> 5) just like in `coordinateToWorldKey`.
- *
- * Have fun shaping new worlds! (≧▽≦)ゞ
- */
 export abstract class WorldGen {
 	public readonly seed: string;
 

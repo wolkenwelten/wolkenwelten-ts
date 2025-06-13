@@ -1,37 +1,29 @@
 /* Copyright - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  *
- * ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
- * ┃  ClientGame – The browser-side facade of a Wolkenwelten session ☁️🎮     ┃
- * ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
- * ┃ Purpose                                                                  ┃
- * ┃  • Wires together all client-only managers: rendering, audio, UI, input, ┃
- * ┃    and the websocket based `ClientNetwork`.                              ┃
- * ┃  • Owns a DOM container (`config.parent`) that gets filled by the        ┃
- * ┃    `RenderManager` and UI system.                                        ┃
- * ┃  • Keeps an *authoritative* mirror of server state via `ClientNetwork`.   ┃
- * ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
- * ┃ Lifecycle hint                                                           ┃
- * ┃ 1. call `new ClientGame({ parent: <div>, … })`                           ┃
- * ┃ 2. store the return value **somewhere global** – managers use singletons┃
- * ┃ 3. flip `game.running = true` when you are ready to enter the main loop. ┃
- * ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
- * ┃ Hidden dragons 🐉                                                        ┃
- * ┃  • `setPlayerID()` *must* be called once the server assigns an ID,       ┃
- * ┃    otherwise entity IDs collide and replication breaks.                  ┃
- * ┃  • `audio.update()` *requires* the local player entity; null checks are  ┃
- * ┃    done but your soundscape will be silent if `player` isn't set.        ┃
- * ┃  • The constructor touches the DOM right away by instantiating render/UI;┃
- * ┃    ensure `config.parent` is attached to the document first.             ┃
- * ┃  • Any heavy work in `update()` still blocks the UI thread; offload to   ┃
- * ┃    web-workers where possible.                                           ┃
- * ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
- * ┃ Quick reference                                                          ┃
- * ┃  constructor() – sets up managers, calls `super()`                       ┃
- * ┃  init()        – awaits worldgen from base class                         ┃
- * ┃  setPlayerID() – link local player entity + camera, sync entity counter  ┃
- * ┃  update()      – super.update + audio & network                         ┃
- * ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+ * ClientGame – The browser-side facade of a Wolkenwelten session ☁️🎮
+ *
+ * # Purpose
+ * • Wires together all client-only managers: rendering, audio, UI, input, and the websocket based `ClientNetwork`.
+ * • Owns a DOM container (`config.parent`) that gets filled by the `RenderManager` and UI system.
+ * • Keeps an *authoritative* mirror of server state via `ClientNetwork`.
+ *
+ * # Lifecycle hint
+ * 1. call `new ClientGame({ parent: <div>, … })`
+ * 2. store the return value **somewhere global** – managers use singletons
+ * 3. flip `game.running = true` when you are ready to enter the main loop.
+ *
+ * # Hidden dragons 🐉
+ * • `setPlayerID()` *must* be called once the server assigns an ID, otherwise entity IDs collide and replication breaks.
+ * • `audio.update()` *requires* the local player entity; null checks are done but your soundscape will be silent if `player` isn't set.
+ * • The constructor touches the DOM right away by instantiating render/UI; ensure `config.parent` is attached to the document first.
+ * • Any heavy work in `update()` still blocks the UI thread; offload to web-workers where possible.
+ *
+ * # Quick reference
+ * • constructor() – sets up managers, calls `super()`
+ * • init()        – awaits worldgen from base class
+ * • setPlayerID() – link local player entity + camera, sync entity counter
+ * • update()      – super.update + audio & network
  */
 import { Game, GameConfig } from "../game";
 import { RenderManager } from "./render/render";

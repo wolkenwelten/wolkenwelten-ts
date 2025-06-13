@@ -1,16 +1,6 @@
 /* Copyright - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
- */
-import type { RenderManager } from "./render";
-import { TriangleMesh } from "./meshes/triangleMesh/triangleMesh";
-import { Texture } from "./texture";
-import skyTextureUrl from "../../../assets/gfx/sky.png";
-import sunTextureUrl from "../../../assets/gfx/sun.png";
-import { mat4 } from "gl-matrix";
-
-const mvp = mat4.create();
-
-/**
+ *
  * Sky renders two very simple primitives that together create the illusion of
  * a skybox: an inverted textured sphere for the sky gradient plus a billboarded
  * quad for the sun.  It is free of time-of-day logic; callers are expected to
@@ -34,6 +24,15 @@ const mvp = mat4.create();
  * • The sun quad is placed at a fixed position; animated suns should update the
  *   vertex buffer each frame or regenerate the mesh.
  */
+import type { RenderManager } from "./render";
+import { TriangleMesh } from "./meshes/triangleMesh/triangleMesh";
+import { Texture } from "./texture";
+import skyTextureUrl from "../../../assets/gfx/sky.png";
+import sunTextureUrl from "../../../assets/gfx/sun.png";
+import { mat4 } from "gl-matrix";
+
+const mvp = mat4.create();
+
 export class Sky {
 	mesh: TriangleMesh;
 	sunMesh: TriangleMesh;

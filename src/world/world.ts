@@ -1,10 +1,8 @@
 /* Copyright - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  *
- * ╔════════════════════════════════════════════════════════════════════════╗
- * ║                                World                                  ║
- * ║   — central state container of the voxel game engine —                ║
- * ╚════════════════════════════════════════════════════════════════════════╝
+ * # World
+ * Central state container of the voxel game engine
  *
  * TL;DR 📜
  *   • Exactly one `World` exists per `Game` instance.
