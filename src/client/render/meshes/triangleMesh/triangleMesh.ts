@@ -1,5 +1,15 @@
 /* Copyright - Benjamin Vincent Schulenburg
- * Licensed under the AGPL3+, for the full text see /LICENSE
+ * Licensed under the AGPL3+, see /LICENSE for full text.
+ *
+ * TriangleMesh
+ * ------------
+ * Generic helper that wraps an interleaved *position/uv/lightness* vertex
+ * array and renders it with a very small shader.  The class can ingest data
+ * from several sources: a Wavefront OBJ asset (`addObj`), dynamically built
+ * geometry like block previews (`addBlockType`) or convenience primitives
+ * (`addPlane`, `addInverseSphere`).  Once the client is done feeding
+ * vertices, `finish` uploads a static VBO and the mesh can be drawn over and
+ * over again with negligible cost.
  */
 import { mat4 } from "gl-matrix";
 

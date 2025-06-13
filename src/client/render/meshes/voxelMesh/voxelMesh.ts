@@ -1,5 +1,14 @@
 /* Copyright - Benjamin Vincent Schulenburg
- * Licensed under the AGPL3+, for the full text see /LICENSE
+ * Licensed under the AGPL3+, see /LICENSE for full text.
+ *
+ * VoxelMesh
+ * ---------
+ * Lightweight renderer for MagicaVoxel `.vox` assets.  The file is parsed on
+ * the client, colours are lazily inserted into a 1-D LUT texture and the
+ * geometry is triangulated with the same meshing code that is used for world
+ * chunks.  Two vertex formats are supported: *tiny* (5 bytes per vertex) for
+ * single models and *short* (8 bytes) when multiple models are merged with
+ * per-vertex translations.
  */
 import { mat4 } from "gl-matrix";
 import readVox from "vox-reader";

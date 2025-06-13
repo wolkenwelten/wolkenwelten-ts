@@ -1,5 +1,12 @@
 /* Copyright - Benjamin Vincent Schulenburg
- * Licensed under the AGPL3+, for the full text see /LICENSE
+ * Licensed under the AGPL3+, see /LICENSE for full text.
+ *
+ * `objLoader.ts`
+ * --------------
+ * Extremely small subset loader for Wavefront OBJ files.  Only the features
+ * required by `TriangleMesh` are parsed: *single* objects, triangular faces and
+ * optional UV / normal indices.  The parser is deliberately strict so that
+ * malformed assets fail early during development instead of at runtime.
  */
 export interface WavefrontObjectFace {
 	positionIndex: number;

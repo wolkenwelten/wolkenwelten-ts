@@ -1,5 +1,17 @@
 /* Copyright - Benjamin Vincent Schulenburg
- * Licensed under the AGPL3+, for the full text see /LICENSE
+ * Licensed under the AGPL3+, see /LICENSE for full text.
+ *
+ * DecalMesh
+ * ---------
+ * Manages a large dynamic vertex buffer that contains small quads (decals)
+ * which are placed directly onto block faces (e.g. shadows, footprints,
+ * block selection outlines).  Vertices are accumulated on the CPU every
+ * frame with `add*` helper methods, copied to the GPU in a single call via
+ * `finish`, and finally rendered with polygon-offset to avoid Z-fighting.
+ *
+ * This implementation intentionally ignores index buffers in favour of a
+ * tightly-packed triangle list because quads are generated ad-hoc and are
+ * rarely reused across frames.
  */
 import { mat4 } from "gl-matrix";
 

@@ -1,5 +1,13 @@
 /* Copyright - Benjamin Vincent Schulenburg
- * Licensed under the AGPL3+, for the full text see /LICENSE
+ * Licensed under the AGPL3+, see /LICENSE for full text.
+ *
+ * CloudMesh
+ * ---------
+ * Generates and renders a simple flat circle mesh that is used to represent
+ * stylised cloud layers.  The geometry is generated completely on the CPU
+ * (no external assets) and uploaded once.  Multiple semi-transparent layers
+ * are drawn with varying colour tints and slight offsets to fake parallax and
+ * volumetric depth while keeping fill-rate cost low.
  */
 import { mat4 } from "gl-matrix";
 

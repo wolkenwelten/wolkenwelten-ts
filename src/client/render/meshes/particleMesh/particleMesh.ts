@@ -1,5 +1,18 @@
 /* Copyright - Benjamin Vincent Schulenburg
- * Licensed under the AGPL3+, for the full text see /LICENSE
+ * Licensed under the AGPL3+, see /LICENSE for full text.
+ *
+ * ParticleMesh
+ * ------------
+ * CPU-side particle system that batches thousands of billboards into a single
+ * vertex buffer every frame.  Each particle stores its position/size in four
+ * floats and its colour in a packed RGBA uint; behaviour such as gravity and
+ * velocity damping is advanced on the CPU (`update`).  The data layout is
+ * intentionally AoS so that we can DMA straight into a GL_ARRAY_BUFFER without
+ * any additional transforms.
+ *
+ * A handful of convenience `fx*` helpers encapsulate common visual effects –
+ * block breaking, strikes, jumping etc.  These are purely cosmetic and never
+ * manipulate world state.
  */
 import { mat4 } from "gl-matrix";
 
