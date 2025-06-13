@@ -1,5 +1,48 @@
-/* Copyright 2023 - Benjamin Vincent Schulenburg
+/* Copyright - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
+ *
+ * RenderManager is the central orchestrator for everything WebGL related on the
+ * client side. It owns the WebGL2 rendering context of the main canvas and
+ * delegates the heavy lifting to specialized helper classes such as
+ * `WorldRenderer`, `DecalMesh`, `ParticleMesh`, `Sky`, `CloudMesh`, and
+ * `TextRenderer`.
+ *
+ * Usage
+ * =====
+ * 1. Constructed **once** by `ClientGame` after the UI root element exists.
+ * 2. Keeps an internal animation loop via `requestAnimationFrame` and drives
+ *    the game-tick → render-frame pipeline by calling `game.update()` and its
+ *    own `drawScene()` every frame.
+ * 3. Generates chunk meshes lazily on a background timer so the main thread is
+ *    not blocked for too long.
+ * 4. Exposes utility helpers such as `dropBlockMesh()` when world data is
+ *    invalidated and the corresponding mesh needs to be discarded.
+ *
+ * Extensibility guidelines
+ * ------------------------
+ * • Extend by composition: Add a new specialised mesh / effect class and wire
+ *   it into `drawScene()` at the appropriate location.
+ * • Do NOT introduce long-running synchronous work inside `drawFrame()`;
+ *   enqueue it through `generateMesh()` instead so it can be spread over
+ *   multiple time-slices.
+ * • Preserve the render-order: opaque world → transparent clouds / decals /
+ *   particles → UI text. Incorrect ordering will produce depth or blending
+ *   artefacts.
+ *
+ * Footguns & common pitfalls
+ * --------------------------
+ * • The WebGL state machine is global. Always restore GL flags after enabling
+ *   or disabling them in custom renderers.
+ * • Keep `renderSizeMultiplier` in sync with device-pixel-ratio if you add HiDPI
+ *   support, otherwise the canvas will look blurry.
+ * • `generateMesh()` runs recursively via `setTimeout`; make sure the queue is
+ *   eventually emptied or the closure will keep the JS task queue busy.
+ * • `drawPlayerNames()` depends on accurate `Character.getPlayerName()` data –
+ *   ensure the server sends it early enough.
+ *
+ * Threading / concurrency note: All rendering happens on the main thread in
+ * JavaScript; WebGL contexts are not transferable yet, so avoid heavy CPU work
+ * inside the render loop.
  */
 import { mat4 } from "gl-matrix";
 
@@ -48,6 +91,11 @@ export class RenderManager {
 	clouds: CloudMesh;
 	textRenderer: TextRenderer;
 
+	/**
+	 * Detects the browser / device flavour and lowers the `renderDistance` for
+	 * notoriously slow configurations (mobile, ARM, Firefox-WebGL, Safari).
+	 * Call *once* from the constructor before the WebGL context is used.
+	 */
 	setPlatformDefaults() {
 		const isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
 		const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
@@ -64,6 +112,11 @@ export class RenderManager {
 		}
 	}
 
+	/**
+	 * Creates the canvas, sets up WebGL2, instantiates helper renderers and
+	 * starts the main animation loop. Only one `RenderManager` should exist per
+	 * page.
+	 */
 	constructor(game: ClientGame) {
 		this.game = game;
 		this.setPlatformDefaults();
@@ -103,11 +156,20 @@ export class RenderManager {
 		this.resize();
 	}
 
+	/**
+	 * Copies the number of rendered frames to `fps` every second. The value is
+	 * strictly visual and never used for logic.
+	 */
 	updateFPS() {
 		this.fps = this.fpsCounter;
 		this.fpsCounter = 0;
 	}
 
+	/**
+	 * Sets the most commonly used WebGL state flags once during start-up.
+	 * If you change them at runtime in custom renderers remember to restore the
+	 * defaults afterwards to avoid hard-to-trace artefacts.
+	 */
 	initGLContext() {
 		this.gl.enable(this.gl.DEPTH_TEST);
 		this.gl.enable(this.gl.CULL_FACE);
@@ -116,11 +178,20 @@ export class RenderManager {
 		this.gl.clearColor(0.09, 0.478, 1, 1);
 	}
 
+	/**
+	 * Smoothly interpolates the current Field-of-View towards the desired value
+	 * to avoid motion sickness caused by sudden FOV jumps.
+	 */
 	updateFOV() {
 		const shouldFOV = 90;
 		this.fov = this.fov * 0.95 + shouldFOV * 0.05;
 	}
 
+	/**
+	 * Renders a *single* frame. The order is performance-critical and relies on
+	 * depth-buffer and blending state configured in `initGLContext()` and the
+	 * body of this method. Insert new render passes with care.
+	 */
 	drawScene() {
 		this.updateFOV();
 		mat4.perspective(
@@ -164,6 +235,11 @@ export class RenderManager {
 		this.gl.disable(this.gl.BLEND);
 	}
 
+	/**
+	 * Draws the 3-D billboarded player nameplates above characters. Heavy math
+	 * or complex text formatting should be avoided here; keep it fast as it runs
+	 * every frame.
+	 */
 	private drawPlayerNames(projectionMatrix: mat4, viewMatrix: mat4) {
 		// Collect all characters and their names
 		for (const entity of this.game.world.entities.values()) {
@@ -217,6 +293,11 @@ export class RenderManager {
 		}
 	}
 
+	/**
+	 * Re-sizes the canvas and updates the viewport whenever the browser window
+	 * changes. If you introduce device-pixel-ratio aware rendering, multiply the
+	 * canvas dimensions accordingly *before* calling `gl.viewport()`.
+	 */
 	resize() {
 		this.width = (window.innerWidth | 0) * this.renderSizeMultiplier;
 		this.height = (window.innerHeight | 0) * this.renderSizeMultiplier;
@@ -225,6 +306,11 @@ export class RenderManager {
 		this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
 	}
 
+	/**
+	 * Incrementally dequeues up to four chunk-mesh generation jobs. The function
+	 * re-schedules itself as long as work is left so that we don't stall the main
+	 * thread.
+	 */
 	generateMesh() {
 		for (let i = 0; i < 4; i++) {
 			this.world.generateOneQueuedMesh();
@@ -239,6 +325,11 @@ export class RenderManager {
 		}
 	}
 
+	/**
+	 * The per-frame driver. Handles UI, input and game logic updates, clears the
+	 * frame-buffer and eventually calls `drawScene()`. Avoid adding expensive
+	 * synchronous tasks here.
+	 */
 	drawFrame() {
 		window.requestAnimationFrame(this.drawFrameClosure);
 		this.game.ui.update();
@@ -282,6 +373,11 @@ export class RenderManager {
 		}
 	}
 
+	/**
+	 * Immediately disposes of a world-chunk mesh when the underlying voxel data
+	 * became invalid (e.g. block broken, chunk unloaded). Omitting this will
+	 * leak GPU memory.
+	 */
 	dropBlockMesh(x: number, y: number, z: number) {
 		const key = coordinateToWorldKey(x, y, z);
 		const mesh = this.world.meshes.get(key);

@@ -1,5 +1,25 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
+ *
+ * main.ts – entry point for the standalone WolkenWelten game server.
+ *
+ * Responsibilities:
+ *   • Configure and start an Express HTTP application that serves the
+ *     landing page (`/`) and the client game page (`/game`).
+ *   • In development it spins up a Vite dev-server in middleware mode to
+ *     enable hot-module reloading and template transforms; in production it
+ *     loads pre-built HTML from the `dist/` directory.
+ *   • Boots the authoritative `ServerGame` instance and attaches a
+ *     `WebSocketServer` on `/api/ws`, forwarding each incoming socket to
+ *     `game.onConnect` for processing.
+ *   • Displays a simple player list on the landing page, showcasing live
+ *     interaction between HTTP and the game state.
+ *
+ * Operational caveats:
+ *   • Ensure `npm run build` has been executed before running in production,
+ *     otherwise `ViteTemplate.loadAll()` will throw.
+ *   • Two `unhandledRejection` listeners are registered – if you refactor this
+ *     keep them consolidated to avoid duplicate logging.
  */
 import { WebSocketServer } from "ws";
 import { ServerGame } from "./serverGame.js";

@@ -1,5 +1,30 @@
-/* Copyright 2023 - Benjamin Vincent Schulenburg
+/* Copyright - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
+ *
+ * Camera controls both viewpoint calculation and player-follow logic. It
+ * operates in a *third-person chase-cam* configuration by default (see
+ * `distance`) but can be adjusted for first-person by setting `distance` to 0.
+ *
+ * Capabilities
+ * ------------
+ * • Smooth yaw/pitch updates with clamping to avoid flipping.
+ * • Procedural camera shake driven by Perlin noise (`shakeIntensity`).
+ * • Converts entity world coordinates into view matrices that downstream
+ *   renderers consume every frame.
+ *
+ * Usage
+ * -----
+ * 1. Assign `entityToFollow` (usually the local player).
+ * 2. Call `update()` each game tick to advance smoothing & shake timers.
+ * 3. Use `calcViewMatrix()` and/or `calcUntranslatedViewMatrix()` from the
+ *    render path to build the final camera matrices.
+ *
+ * Pitfalls
+ * --------
+ * • `rotate()` and `moveEntity()` are in **world space**, not screen space; make
+ *   sure input mapping is correct.
+ * • `getCamOffset()` is CPU-heavy noise; avoid calling it outside the render
+ *   tick.
  */
 import { mat4 } from "gl-matrix";
 import { PerlinNoise } from "../../util/noise";
@@ -33,6 +58,10 @@ export class Camera {
 		return world.isSolid(this.x, this.y, this.z);
 	}
 
+	/**
+	 * Adjust current yaw & pitch by deltas while clamping pitch to ±0.4π. Combine
+	 * this with pointer-lock mouse input for a familiar FPS feel.
+	 */
 	rotate(yaw: number, pitch: number) {
 		this.yaw = this.yaw + yaw;
 		this.pitch = Math.max(
@@ -41,6 +70,10 @@ export class Camera {
 		);
 	}
 
+	/**
+	 * Triggers or updates procedural camera shake. Pass larger values for stronger
+	 * effect; the intensity decays automatically over time.
+	 */
 	shake(intensity: number) {
 		this.shakeIntensity = Math.min(1, Math.max(this.shakeIntensity, intensity));
 	}
@@ -49,6 +82,10 @@ export class Camera {
 		this.shakeIntensity = 0;
 	}
 
+	/**
+	 * Call once per tick to decay shake, keep yaw within 0–2π and smoothly adjust
+	 * chase distance based on followed entity velocity.
+	 */
 	update() {
 		if (this.yaw > Math.PI * 2) {
 			this.yaw -= Math.PI * 2;
@@ -63,6 +100,10 @@ export class Camera {
 		this.distance = this.distance * 0.98 + goalDistance * 0.02;
 	}
 
+	/**
+	 * Helper to move the followed entity relative to camera orientation. Used by
+	 * WASD controls so forward is always *camera forward*.
+	 */
 	moveEntity(
 		ox: number,
 		oy: number,
@@ -108,6 +149,11 @@ export class Camera {
 		mat4.rotateY(viewMatrix, viewMatrix, -this.yaw);
 	}
 
+	/**
+	 * Builds a full view matrix (including translation) and also updates the
+	 * cached camera world position (`x`, `y`, `z`). Must be called once per frame
+	 * after the followed entity updated its position.
+	 */
 	calcViewMatrix(ticks: number, viewMatrix: mat4) {
 		mat4.identity(viewMatrix);
 		transPos[0] = 0;

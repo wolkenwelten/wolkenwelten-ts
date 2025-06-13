@@ -1,4 +1,4 @@
-/* Copyright 2023 - Benjamin Vincent Schulenburg
+/* Copyright - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  *
  * This file prepares all the chunk data so that the meshing function itself can be pure.

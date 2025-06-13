@@ -1,5 +1,45 @@
-/* Copyright 2023 - Benjamin Vincent Schulenburg
+/* Copyright - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
+ *
+ *  ClientNetwork is the browser-side façade around a single WebSocket connection that talks to the
+ *  Wolkenwelten game server. It handles three distinct concerns:
+ *  1.  Maintaining the physical connection – automatic reconnect with exponential back-off, buffering of
+ *      outgoing packets while offline, and thin wrappers around the browser WebSocket API.
+ *  2.  (De)serialising packets – JSON for regular traffic via `WSQueue` and a very small binary protocol
+ *      for latency-critical updates (currently only chunk updates).
+ *  3.  Dispatching higher-level game messages to the rest of the client – e.g. world transforms, UI log
+ *      entries, sound effects, etc.
+ *
+ *  Usage pattern:
+ *  ```ts
+ *  const net = new ClientNetwork(gameInstance); // automatically connects
+ *  function gameLoop() {
+ *      gameInstance.update();
+ *      net.update();            // flush outbound packets once per frame
+ *      requestAnimationFrame(gameLoop);
+ *  }
+ *  ```
+ *
+ *  Extending:
+ *  ──────────
+ *  Add new packet types by registering a handler **before** the network connects:
+ *  ```ts
+ *  ClientNetwork.addDefaultHandler("myPacket", async (game, args) => {
+ *      // ... do something with args
+ *  });
+ *  ```
+ *  On the server side, call `queue.call("myPacket", payload)` to broadcast to clients.
+ *
+ *  Foot-guns & gotchas:
+ *  • `update()` **must** be called every tick – otherwise nothing is actually sent.
+ *  • While the socket is down, outbound packets pile up in `rawQueue`; this array is unbounded so keep
+ *    traffic low during connection loss.
+ *  • Only JSON-serialisable values survive the trip through `WSQueue`. Passing functions, class instances
+ *    or `BigInt` will explode in `postMessage`.
+ *  • `broadcastEntities()` clears `Entity.pendingOwnershipChanges` every time it runs; touching that global
+ *    elsewhere is a recipe for race conditions.
+ *  • The binary protocol in `onArrayBuffer()` is intentionally minimal – make sure both ends agree on the
+ *    exact layout before adding new message types.
  */
 import { WSPacket, WSQueue } from "../network";
 import { ClientEntry, PlayerStatus, PlayerUpdate } from "./clientEntry";
@@ -25,6 +65,14 @@ export class ClientNetwork {
 		this.defaultHandlers.set(T, handler);
 	}
 
+	/**
+	 * Collects every entity currently owned by the local player and sends their serialised form to the
+	 * server. This is invoked from `flushRawQueue()` each tick so the authoritative state remains in sync
+	 * without callers having to remember explicit updates.
+	 *
+	 * WARNING: This method also empties `Entity.pendingOwnershipChanges`, potentially dropping ownership
+	 * changes queued elsewhere if you call it manually.
+	 */
 	private broadcastEntities() {
 		const entities = [];
 		for (const entity of this.game.world.entities.values()) {
@@ -41,6 +89,16 @@ export class ClientNetwork {
 		this.queue.call("updateEntities", entities);
 	}
 
+	/**
+	 * Fast-path for binary messages coming from the server. Currently only message-type `1` (chunk update)
+	 * is implemented. The binary layout is:
+	 *  byte 0   – uint8   message type (1 = chunk update)
+	 *  bytes 4-7 – int32   chunk X coordinate
+	 *  bytes 8-11– int32   chunk Y coordinate
+	 *  bytes 12-15–int32   chunk Z coordinate
+	 *  bytes 16-19–uint32  chunk version
+	 *  bytes 20… – uint8[] raw block data
+	 */
 	private onArrayBuffer(data: ArrayBuffer) {
 		const view = new DataView(data);
 		const messageType = view.getUint8(0);
@@ -94,6 +152,11 @@ export class ClientNetwork {
 		}
 	}
 
+	/**
+	 * Flushes the internal message buffer when the socket is open. Besides sending the raw strings queued
+	 * in `rawQueue` it also piggybacks mandatory sync packets like entity state and the player's status.
+	 * Should **only** be called when `ws.readyState === WebSocket.OPEN`.
+	 */
 	private flushRawQueue() {
 		if (!this.ws) {
 			throw new Error("WebSocket not connected");
@@ -161,6 +224,10 @@ export class ClientNetwork {
 		this.ws.onerror = this.close.bind(this);
 	}
 
+	/**
+	 * Low-level helper used by the public API to ship a raw JSON string over the wire. If the connection is
+	 * not yet open the payload is buffered until the next successful `onopen` event.
+	 */
 	private sendRaw(raw: string) {
 		if (!this.ws) {
 			this.rawQueue.push(raw);
@@ -175,6 +242,10 @@ export class ClientNetwork {
 		this.ws.send(raw);
 	}
 
+	/**
+	 * One tick of network I/O: serialise everything in `WSQueue` into a single JSON string and hand it over
+	 * to `sendRaw()`. This is decoupled so the caller can inspect/modify the queue right before sending.
+	 */
 	private transfer() {
 		if (!this.ws || this.ws.readyState !== this.ws.OPEN) {
 			return;
@@ -183,10 +254,18 @@ export class ClientNetwork {
 		this.sendRaw(this.queue.flush());
 	}
 
+	/**
+	 * Public entry-point – call this once per game tick to allow ClientNetwork to push its outbound traffic.
+	 */
 	update() {
 		this.transfer();
 	}
 
+	/**
+	 * Creates a new ClientNetwork bound to the provided `ClientGame` instance and immediately attempts to
+	 * establish a WebSocket connection. The constructor is deliberately lightweight so that failure to
+	 * connect does not break game start-up; reconnect logic will take over.
+	 */
 	constructor(client: ClientGame) {
 		this.game = client;
 		this.queue = new WSQueue();
@@ -194,6 +273,10 @@ export class ClientNetwork {
 		this.connect();
 	}
 
+	/**
+	 * Register the built-in packet handlers that the vanilla server relies on. If you need to override any
+	 * of them, register your own handler **before** instantiating ClientNetwork so it takes precedence.
+	 */
 	private addDefaultHandlers() {
 		this.queue.registerCallHandler("addLogEntry", async (args: unknown) => {
 			if (typeof args !== "string") {

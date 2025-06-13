@@ -1,5 +1,43 @@
-/* Copyright 2023 - Benjamin Vincent Schulenburg
+/* Copyright - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
+ *
+ * ────────────────────────────────────────────────────────────────────────────────
+ *  InputManager – Centralised browser-input aggregation for the client runtime
+ * ────────────────────────────────────────────────────────────────────────────────
+ *  The InputManager converts raw browser events (keyboard, mouse, gamepad and
+ *  touch) into a unified ControlState that the game loop can consume once every
+ *  tick via update().  It also performs a small amount of direct side-effects
+ *  (camera rotation, player dash, etc.) for latency-sensitive actions.
+ *
+ *  Typical usage in ClientGame:
+ *    const input = new InputManager(this);
+ *    ...
+ *    tick() {
+ *      input.update();   // exactly once per tick
+ *    }
+ *
+ *  Extending / customising:
+ *  • Add new key handlers by inserting entries into `keyPushHandler` or
+ *    `keyReleaseHandler` *before* update() is called.
+ *  • To support additional hardware, subclass InputManager and override the
+ *    corresponding updateXXX() helper but remember to invoke super.updateXXX()
+ *    so existing devices keep working.
+ *
+ *  Footguns & caveats:
+ *  1. update() must run before any code that queries player.primaryHeld etc.,
+ *     otherwise the game will act on stale input.
+ *  2. requestFullscreenAndPointerLock() quietly fails when the browser blocks
+ *     the request (missing user gesture).  Callers should not assume either
+ *     fullscreen or pointer-lock was granted.
+ *  3. Gamepad support relies on the Standard mapping; non-standard controllers
+ *     may yield funny button numbers.
+ *  4. Touch devices that also have a track-pad/mouse will report both kinds of
+ *     input – make sure your UI does not duplicate actions.
+ *  5. Several methods reach into `this.game` for side-effects; when you mock or
+ *     reuse the class outside the normal runtime you need to provide those
+ *     members.
+ *
+ *  See individual JSDoc comments below for per-method details.
  */
 import { isClient } from "../util/compat";
 import { Character } from "../world/entity/character";
@@ -132,10 +170,22 @@ export class InputManager {
 		);
 	}
 
+	/**
+	 * Simple heuristic to detect the presence of a touch screen.
+	 * Be aware that hybrid devices may report both touch and mouse capabilities
+	 * leading to duplicated input events upstream.
+	 */
 	private detectTouchDevice(): boolean {
 		return "ontouchstart" in window || navigator.maxTouchPoints > 0;
 	}
 
+	/**
+	 * Attempts to enter fullscreen and pointer-lock mode.  A short cooldown is
+	 * applied to the local player to mitigate accidental clicks while browser UI
+	 * elements are animating.  The promise resolves even if the browser silently
+	 * rejects one of the requests – always check `document.fullscreenElement` and
+	 * `document.pointerLockElement` if you need to know the result.
+	 */
 	async requestFullscreenAndPointerLock() {
 		if (!document.fullscreenElement) {
 			this.game.player?.cooldown(15);
@@ -149,6 +199,12 @@ export class InputManager {
 		}
 	}
 
+	/**
+	 * Translates the currently active `keyStates` into the provided ControlState.
+	 * The method is a pure mapper and performs no side-effects besides mutating
+	 * `state`. It aborts early if the chat overlay is visible so that typing does
+	 * not move the character.
+	 */
 	private updateKeyboard(state: ControlState) {
 		if (this.game.ui.chat.visible()) {
 			return;
@@ -198,6 +254,11 @@ export class InputManager {
 		}
 	}
 
+	/**
+	 * Maps the state of the primary mouse buttons into ControlState while the
+	 * pointer is over the game canvas.  Pointer-lock is not required – the game
+	 * will still respond to button presses during UI interactions.
+	 */
 	private updateMouse(state: ControlState) {
 		if (this.game.ui.chat.visible()) {
 			return;
@@ -214,6 +275,11 @@ export class InputManager {
 		}
 	}
 
+	/**
+	 * Merges a single `Gamepad` snapshot into ControlState and triggers small
+	 * camera rotations. Assumes the Standard Gamepad layout (see MDN docs).
+	 * Non-standard controllers may need additional mapping logic.
+	 */
 	private updateGamepad(
 		state: ControlState,
 		player: Character,
@@ -299,6 +365,11 @@ export class InputManager {
 		}
 	}
 
+	/**
+	 * Integrates the last ControlState produced by the touch UI overlay.  All the
+	 * heavy logic lives inside the touch controller; this helper merely merges
+	 * its latest snapshot into `state`.
+	 */
 	private updateTouch(state: ControlState) {
 		if (!this.touchState) return;
 
@@ -314,6 +385,12 @@ export class InputManager {
 		if (this.touchState.sprint) state.sprint = true;
 	}
 
+	/**
+	 * Entry-point called once per tick from ClientGame.  Aggregates input from
+	 * all devices, applies movement to the camera and player, performs dash
+	 * handling, and finally stores the state for potential consumption by other
+	 * subsystems.
+	 */
 	update() {
 		const state = new ControlState();
 		this.updateKeyboard(state);

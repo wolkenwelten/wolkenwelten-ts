@@ -1,5 +1,24 @@
-/* Copyright 2023 - Benjamin Vincent Schulenburg
+/* Copyright - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
+ *
+ * AssetList is the central registry and loader for render-time assets: voxel
+ * meshes, block textures, particles, clouds etc. It initialises all static
+ * GPU resources once during game start-up and caches them for fast reuse.
+ *
+ * Highlights
+ * ----------
+ * • Simplistic URL→`VoxelMesh` cache to avoid duplicate network fetches.
+ * • Dynamically builds block-type `TriangleMesh`es from world definition so
+ *   content mods only require data changes, not engine code.
+ * • One-stop initialisation for every render sub-system (`BlockMesh.init`,
+ *   `CloudMesh.init`, …) to keep boot-strap code in one place.
+ *
+ * Common mistakes
+ * ---------------
+ * • Forgetting to call `generateBlockTypeMeshes()` after changing the block
+ *   registry at runtime – the old meshes will persist.
+ * • Asset URLs must be routed through the build system (Vite, Webpack…) so they
+ *   end up in the final bundle; plain strings won't work.
  */
 import voxelBagFile from "../../../assets/vox/bag.vox?url";
 import voxelTestOutlineFile from "../../../assets/vox/testOutline.vox?url";
@@ -37,6 +56,10 @@ export class AssetList {
 	playerLeftArm: VoxelMesh;
 	playerRightArm: VoxelMesh;
 
+	/**
+	 * Iterates over the block registry and creates one billboard-ish triangle
+	 * mesh per entry. Should be called after every change to `world.blocks`.
+	 */
 	generateBlockTypeMeshes() {
 		this.blockType.length = 0;
 		const tex = new Texture(
@@ -53,22 +76,37 @@ export class AssetList {
 		}
 	}
 
+	/**
+	 * Lazy-loads and caches a `VoxelMesh` from a MagicaVoxel .vox file. Subsequent
+	 * calls with the same URL are instant.
+	 */
 	load(url: string) {
 		const c = VoxelMesh.fromVoxFile(url);
 		this.cache.set(url, c);
 		return c;
 	}
 
+	/**
+	 * Returns a cached mesh if present, otherwise schedules loading via `load()`.
+	 */
 	get(url: string) {
 		return this.cache.get(url) || this.load(url);
 	}
 
+	/**
+	 * Fire-and-forget preloader useful for splash screens. Simply calls `get()`
+	 * on every URL.
+	 */
 	preload(urls: string[]) {
 		for (const url of urls) {
 			this.get(url);
 		}
 	}
 
+	/**
+	 * Constructs and initialises *all* render assets. Must be invoked exactly once
+	 * right after WebGL context creation.
+	 */
 	constructor(game: Game, gl: WebGL2RenderingContext) {
 		this.game = game;
 		this.gl = gl;

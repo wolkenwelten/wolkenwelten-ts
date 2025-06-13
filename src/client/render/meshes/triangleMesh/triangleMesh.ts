@@ -1,4 +1,4 @@
-/* Copyright 2023 - Benjamin Vincent Schulenburg
+/* Copyright - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import { mat4 } from "gl-matrix";
@@ -6,7 +6,6 @@ import { mat4 } from "gl-matrix";
 import shaderFragSource from "./triangleMesh.frag?raw";
 import shaderVertSource from "./triangleMesh.vert?raw";
 
-import "../../../../types";
 import type { BlockType } from "../../../../world/blockType";
 import type { Texture } from "../../texture";
 import { Shader } from "../../shader";

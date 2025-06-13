@@ -1,5 +1,33 @@
 /* Copyright 2024 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
+ *
+ * FloatingIslandsWorldGen – procedural world-generator that forges a sky-realm of
+ * lush, self-contained islands connected only by thin air. It performs *eager*
+ * generation in `preGen`, carving every island up-front using a deterministic
+ * Linear Congruential Generator (LCG) seeded from `world.seed` so the same seed
+ * always yields the same geography.
+ *
+ * Typical usage:
+ * ```ts
+ * const wg = new FloatingIslandsWorldGen();
+ * await wg.init();          // ← IMPORTANT – loads .vox assets asynchronously
+ * world.setWorldGen(wg);    // engine-specific hook
+ * ```
+ *
+ * Extending the generator:
+ *  • Override `floatingIsland` to change the geometry or decoration logic.
+ *  • Override `islandStep` for a different recursion / neighbourhood pattern.
+ *  • Keep all randomness routed through the provided `LCG` instance to preserve
+ *    determinism across clients and servers.
+ *
+ * Foot-guns & caveats:
+ *  1. Forgetting to `await init()` will crash later with "Assets not loaded".
+ *  2. `preGen` writes every block immediately – large worlds may exhaust RAM.
+ *  3. `world.bottomOfTheWorld` is set to an absolute Y of 900; any gameplay
+ *     code that assumes bedrock at 0 must be adjusted.
+ *  4. The recursive `islandStep` can explode exponentially if its random early
+ *     exit is weakened – profile after tweaking constants.
+ *  5. Block IDs are hard-coded literals (e.g. `blocks.grass` resolves to `2`).
  */
 import { WorldGenAsset } from "../world/worldGenAsset";
 import { WorldGen } from "../world/worldGen";
@@ -42,6 +70,10 @@ export interface WorldGenAssetList {
 export class FloatingIslandsWorldGen extends WorldGen {
 	private assets?: WorldGenAssetList;
 
+	/**
+	 * Asynchronously loads all .vox models required for decoration and stores
+	 * them in `this.assets`. **Must** be awaited before any generation begins.
+	 */
 	async init() {
 		this.assets = {
 			bushA: await WorldGenAsset.load(voxBushA, [5, 6]),
@@ -60,11 +92,21 @@ export class FloatingIslandsWorldGen extends WorldGen {
 		};
 	}
 
+	/**
+	 * Advises the engine whether a chunk can be garbage-collected. Currently
+	 * returns `false` for every chunk because we cannot yet distinguish empty
+	 * sky chunks from populated ones – future optimisation point.
+	 */
 	mayGC(_chunk: Chunk): boolean {
 		// Todo: Determine whether the chunk is an empty sky chunk, then it may GC
 		return false;
 	}
 
+	/**
+	 * Core routine that carves a single island, layers soil & grass, then places
+	 * decorative assets. Do not invoke directly from outside – use `islandStep`
+	 * so the recursion strategy remains intact.
+	 */
 	private floatingIsland(
 		world: World,
 		lcg: LCG,
@@ -266,6 +308,10 @@ export class FloatingIslandsWorldGen extends WorldGen {
 		}
 	}
 
+	/**
+	 * Hollows an oval depression and fills it with water surrounded by sandy
+	 * shores – a helper called from `floatingIsland`.
+	 */
 	private createPond(
 		world: World,
 		lcg: LCG,
@@ -363,6 +409,12 @@ export class FloatingIslandsWorldGen extends WorldGen {
 		}
 	}
 
+	/**
+	 * Recursive driver: places one island and then spawns neighbours of varying
+	 * sizes around it. A probabilistic stop condition (`lcg.int(0,6) < step`)
+	 * prevents unbounded recursion – tweak with care, it directly impacts memory
+	 * and generation time.
+	 */
 	islandStep(
 		world: World,
 		lcg: LCG,
@@ -422,10 +474,19 @@ export class FloatingIslandsWorldGen extends WorldGen {
 		ll(x - size * 1.5, y, z + size * 1.5);
 	}
 
+	/**
+	 * Returns the starting coordinates for new players. Currently hard-coded to
+	 * a safe spot near the first island – consider picking the highest grass
+	 * block on the main island dynamically in the future.
+	 */
 	spawnPos(_player: Character): [number, number, number] {
 		return [1000, 1040, 1000];
 	}
 
+	/**
+	 * Performs *all* terrain generation eagerly by invoking `islandStep` once.
+	 * Also sets `world.bottomOfTheWorld`.
+	 */
 	preGen(world: World) {
 		const lcg = new LCG(world.seed);
 		world.bottomOfTheWorld = 900;
@@ -433,6 +494,10 @@ export class FloatingIslandsWorldGen extends WorldGen {
 		this.islandStep(world, lcg, 1000, 1000, 1000, 50, 0);
 	}
 
+	/**
+	 * Intentionally left blank – chunk generation is unnecessary because the
+	 * entire world has been pre-generated in `preGen`.
+	 */
 	genChunk(_chunk: Chunk) {
 		// Empty, we just preGen everything!!!
 	}

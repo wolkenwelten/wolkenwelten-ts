@@ -1,5 +1,23 @@
-/* Copyright 2023 - Benjamin Vincent Schulenburg
+/* Copyright - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
+ *
+ * Frustum is a simple wrapper around the gl-matrix `mat4` and `vec4` types
+ * that implements a 3-D frustum culling algorithm. It's used by `WorldRenderer`
+ * to skip rendering chunks that are outside the camera's view.
+ *
+ * Usage
+ * -----
+ * 1. Create a new `Frustum` instance.
+ * 2. Call `build` with the current projection and view matrices.
+ * 3. Use `containsPoint` and `containsCube` to check if a point or cube is
+ *    inside the frustum.
+ *
+ * Common mistakes
+ * ---------------
+ * • Forgetting to call `build` after updating the projection or view matrices.
+ * • Using the wrong matrix dimensions – `mat4` is 4x4, `vec4` is 4-element arrays.
+ * • Not initialising the `Frustum` instance properly.
+ * • Not using the correct matrix types – `mat4` for projection/view, `vec4` for points/cubes.
  */
 import { mat4, vec4 } from "gl-matrix";
 

@@ -1,5 +1,31 @@
-/* Copyright 2023 - Benjamin Vincent Schulenburg
+/* Copyright - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
+ *
+ * ClientConnection – encapsulates the state and networking logic for a single
+ * player connected via WebSocket. It is responsible for queuing outbound
+ * packets, synchronising chunk data, forwarding RPCs to other players and
+ * cleaning up owned entities on disconnect.
+ *
+ * Life-cycle:
+ *   1. Instantiated by `ServerGame.onConnect` when a new WebSocket arrives.
+ *   2. Sets up default RPC handlers and attaches `message`, `close` and
+ *      `error` listeners to the socket.
+ *   3. `ServerGame` calls `transferQueue()` every tick (10 ms) to flush queued
+ *      packets; if the connection stays silent for several seconds it may be
+ *      closed for idleness.
+ *
+ * Extension points:
+ *   • Override `registerDefaultHandlers()` to add or change RPC behaviour.
+ *   • Override `broadcastEntities()` to change serialisation or include extra
+ *     per-tick data.
+ *
+ * Footguns & Caveats:
+ *   • Keep the work done inside the WS `message` handler lightweight – heavy
+ *     processing blocks the Node.js event loop.
+ *   • The binary chunk protocol assumes chunks are exactly 32×32×32 blocks;
+ *     changing this requires revisiting `clientUpdateChunk()`.
+ *   • Remember to reset `updatesWithoutPackets` when introducing new inbound
+ *     packet types, otherwise clients might be kicked prematurely.
  */
 import { WebSocket } from "ws";
 import type { ServerGame } from "./serverGame";
@@ -58,6 +84,16 @@ export class ClientConnection {
 		this.server.sockets.delete(this.id);
 	}
 
+	/**
+	 * Wraps a freshly accepted WebSocket inside a connection object, assigns a
+	 * unique player id and wires up all event listeners.
+	 *
+	 * Avoid long-running synchronous work here—the server tick is already
+	 * running and delays will cause missed frames.
+	 *
+	 * @param server Reference to the authoritative ServerGame instance
+	 * @param socket Raw WebSocket negotiated by the HTTP server
+	 */
 	constructor(server: ServerGame, socket: WebSocket) {
 		this.id = ++idCounter;
 		this.socket = socket;
@@ -323,6 +359,11 @@ export class ClientConnection {
 		this.chunkUpdateLoop(8);
 	}
 
+	/**
+	 * Flushes all queued RPC calls into a single packet and transmits it. Called
+	 * every tick (≈10 ms). Keep overrides O(1) to avoid increasing latency for
+	 * the whole server.
+	 */
 	transferQueue() {
 		if (!this.q.empty()) {
 			const packet = this.q.flush();
@@ -330,6 +371,11 @@ export class ClientConnection {
 		}
 	}
 
+	/**
+	 * Broadcasts the current roster (id, name, status, deaths, kills) to every
+	 * connected client. Invoked after relevant state changes and periodically by
+	 * the server to keep late joiners in sync.
+	 */
 	broadcastPlayerList() {
 		const playerList = Array.from(this.server.sockets.values()).map(
 			(client) => ({

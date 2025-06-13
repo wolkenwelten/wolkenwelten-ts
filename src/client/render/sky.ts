@@ -1,3 +1,6 @@
+/* Copyright - Benjamin Vincent Schulenburg
+ * Licensed under the AGPL3+, for the full text see /LICENSE
+ */
 import type { RenderManager } from "./render";
 import { TriangleMesh } from "./meshes/triangleMesh/triangleMesh";
 import { Texture } from "./texture";
@@ -7,10 +10,39 @@ import { mat4 } from "gl-matrix";
 
 const mvp = mat4.create();
 
+/**
+ * Sky renders two very simple primitives that together create the illusion of
+ * a skybox: an inverted textured sphere for the sky gradient plus a billboarded
+ * quad for the sun.  It is free of time-of-day logic; callers are expected to
+ * swap textures or modify shader colouring if dynamic day/night cycles are
+ * required.
+ *
+ * Implementation notes
+ * --------------------
+ * • Uses a large radius inverted sphere so that the near clipping plane never
+ *   intersects the sky geometry, avoiding artefacts when the camera clips
+ *   through.
+ * • Depth writes are disabled during drawing to keep the sky always at the very
+ *   back; depth test is also disabled so fragment processing is minimal.
+ * • A separate `TriangleMesh` instance is used for the sun so blending can be
+ *   toggled just for that draw call.
+ *
+ * Potential pitfalls
+ * ------------------
+ * • If you later introduce HDR or tonemapping, remember to render the sky last
+ *   in LDR or account for exposure – otherwise the gradient will wash out.
+ * • The sun quad is placed at a fixed position; animated suns should update the
+ *   vertex buffer each frame or regenerate the mesh.
+ */
 export class Sky {
 	mesh: TriangleMesh;
 	sunMesh: TriangleMesh;
 	renderer: RenderManager;
+	/**
+	 * Creates textured meshes for the sky dome and sun, applying linear filtering
+	 * so the low-res textures don't look blocky. Only lightweight CPU work is
+	 * done here; GPU buffers are built inside `TriangleMesh.finish()`.
+	 */
 	constructor(renderer: RenderManager) {
 		this.renderer = renderer;
 		const skyTex = new Texture(renderer.gl, "sky", skyTextureUrl, "2D");
@@ -27,6 +59,11 @@ export class Sky {
 		this.sunMesh.finish();
 	}
 
+	/**
+	 * Helper that appends vertices for a world-space oriented quad representing
+	 * the sun. Coordinates are chosen so the quad is always above the camera in
+	 * the positive Y direction.
+	 */
 	private addSunPlane() {
 		// Add a square plane for the sun high in the sky
 		const size = 50; // Size of the sun
@@ -75,6 +112,11 @@ export class Sky {
 		);
 	}
 
+	/**
+	 * Draws both sky and sun. Depth test/write are temporarily disabled so later
+	 * world geometry isn't affected. Blending is enabled only for the sun to
+	 * preserve correct alpha behaviour.
+	 */
 	draw(p: mat4, v: mat4) {
 		mat4.multiply(mvp, p, v);
 		const gl = this.renderer.gl;

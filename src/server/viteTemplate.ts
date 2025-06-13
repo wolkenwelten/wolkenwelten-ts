@@ -1,3 +1,27 @@
+/* Copyright - Benjamin Vincent Schulenburg
+ * Licensed under the AGPL3+, for the full text see /LICENSE
+ *
+ * ViteTemplate – lightweight HTML templating helper that bridges Express and
+ * Vite.
+ *
+ * Development mode:
+ *   • Uses Vite's `transformIndexHtml()` to inject HMR scripts and re-renders
+ *     the template once per second if the file's `mtime` has changed.
+ * Production mode:
+ *   • Reads the pre-built file from `./dist/{name}.html` on startup via
+ *     `loadAll()`.  Forgetting to call this will throw on the first render.
+ *
+ * Placeholder syntax: write `<!--HEAD-->`, `<!--CONTENT-->`, or custom keys in
+ * upper-case comments inside your HTML. `render()` performs a naïve string
+ * replacement for each key/value pair – avoid collisions where dynamic content
+ * might contain the marker text.
+ *
+ * Footguns & Caveats:
+ *   • `dev()` relies on second-resolution `mtime`; extremely rapid edits may
+ *     not trigger reload until the next tick.
+ *   • No HTML sanitisation is performed; caller must ensure `content` is safe
+ *     (use `escapeHtml` for user-supplied strings).
+ */
 import express from "express";
 import cookieParser from "cookie-parser";
 import fsp from "fs/promises";

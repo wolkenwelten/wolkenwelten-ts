@@ -1,5 +1,32 @@
-/* Copyright 2023 - Benjamin Vincent Schulenburg
+/* Copyright - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
+ *
+ * Shader is a minimal wrapper around a WebGL2Program that streamlines shader
+ * creation, uniform location caching and type-safe setters. It deliberately
+ * keeps the public surface small: compile & link once in the constructor, then
+ * `bind()` and push uniforms each frame.
+ *
+ * Design goals
+ * ------------
+ * • Fail fast – any compilation/link error throws with the detailed GLSL log.
+ * • Avoid repetitive `gl.getUniformLocation` calls by caching locations upfront.
+ * • Chainable uniform setters for fluent code (e.g. `shader.bind().uniform1f(...)`).
+ *
+ * Usage pattern
+ * -------------
+ * ```ts
+ * const shader = new Shader(gl, "myShader", vertSrc, fragSrc, [
+ *   "mat_mvp", "color"
+ * ]);
+ * shader.bind().uniform4f("color", 1, 0, 0, 1);
+ * ```
+ *
+ * Footguns & pitfalls
+ * -------------------
+ * • You MUST pass **every** uniform name you intend to use in the `uniforms`
+ *   array; otherwise accessors will throw at runtime.
+ * • `bind()` merely calls `gl.useProgram`; remember to set attribute pointers
+ *   and enable vertex arrays afterwards.
  */
 import { mat4 } from "gl-matrix";
 
@@ -9,6 +36,10 @@ export class Shader {
 	readonly gl: WebGL2RenderingContext;
 	uniforms: Map<string, WebGLUniformLocation> = new Map();
 
+	/**
+	 * Compiles vertex & fragment sources, links them and pre-caches uniform
+	 * locations. Throws on any GLSL or link error with verbose console output.
+	 */
 	constructor(
 		gl: WebGL2RenderingContext,
 		name: string,
@@ -64,6 +95,9 @@ export class Shader {
 		}
 	}
 
+	/**
+	 * Sets this program as current via `gl.useProgram`. Chainable.
+	 */
 	bind() {
 		this.gl.useProgram(this.program);
 		return this;

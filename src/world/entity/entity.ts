@@ -1,5 +1,34 @@
 /* Copyright - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
+ *
+ * Entity – The fundamental building block of everything that can exist inside the
+ * Wolkenwelten world.
+ *
+ * Every interactive or visible 3-D object (players, mobs, items, particles,
+ * projectiles, vehicles, etc.) MUST extend this class.  Doing so grants the new
+ * class:
+ *
+ *  • Automatic registration/instantiation over the network via
+ *    `Entity.deserialize` and the `registerEntity()` helper.
+ *  • Position, orientation (yaw/pitch), scale, velocity and basic gravity-based
+ *    physics handled in `update()`.
+ *  • Collision helpers (`collides`, `raycast`, `dircast`, …) and convenience
+ *    methods for world interaction (`move`, `fly`, `direction`, …).
+ *  • Owner tracking that allows authority hand-off between server and client –
+ *    see `changeOwner()`.
+ *
+ * ──────────────────────────────────────────────────────────────────────────────
+ * Extending Entity
+ * ──────────────────────────────────────────────────────────────────────────────
+ * 1. Create a subclass and call `registerEntity("MyType", MyClass)` **once**.
+ * 2. Add your custom fields.
+ * 3. Override `serialize()` and `deserialize()` **but always** chain to the
+ *    super implementation and extend the resulting object.  If you do this the
+ *    networking layer will seamlessly replicate your entity.
+ * 4. Override `update()` if you need per-tick behaviour.  Call `super.update()`
+ *    first if you still want gravity/collision.
+ *
+ * 💡 Tip: Look at other entities in the codebase for concise examples.
  */
 import { mat4 } from "gl-matrix";
 
@@ -65,6 +94,15 @@ export class Entity {
 		world.addEntity(this);
 	}
 
+	/**
+	 * Reconstruct an Entity (or one of its subclasses) from raw network/save
+	 * data.  The function looks up the correct constructor in
+	 * `registeredEntities`, creates the instance and forwards the data to its
+	 * own `deserialize()` implementation.
+	 *
+	 * ⚠️  Throws when the entity type is unknown – make sure your subclass is
+	 *     registered via `registerEntity()` **before** any packets arrive.
+	 */
 	static deserialize(world: World, data: any) {
 		const constructor = registeredEntities.get(data.T);
 		if (!constructor) {
@@ -75,6 +113,16 @@ export class Entity {
 		return entity;
 	}
 
+	/**
+	 * Package all entity state required for the client/server to reconstruct
+	 * this instance.  Subclasses **must** call `super.serialize()` and then merge
+	 * their additional fields, e.g.
+	 *
+	 * ```ts
+	 * const base = super.serialize();
+	 * return { ...base, myCustomField };
+	 * ```
+	 */
 	serialize() {
 		return {
 			id: this.id,
@@ -96,6 +144,11 @@ export class Entity {
 		};
 	}
 
+	/**
+	 * Apply the data produced by `serialize()` onto the current instance.
+	 * Subclasses should call `super.deserialize(data)` first and then extract
+	 * their own custom fields.
+	 */
 	deserialize(data: any) {
 		this.id = data.id;
 		this.ownerID = data.ownerID;
@@ -174,6 +227,13 @@ export class Entity {
 	damage(rawAmount: number) {}
 	heal(rawAmount: number) {}
 
+	/**
+	 * Main per-tick simulation.  The default implementation applies velocity,
+	 * gravity and very rudimentary collision/stop handling.
+	 *
+	 * Override this method to implement entity specific behaviour but remember
+	 * to call `super.update()` first if you still want the default physics.
+	 */
 	update() {
 		if (
 			this.noClip ||
@@ -196,7 +256,14 @@ export class Entity {
 		}
 	}
 
-	/* Get a velocity vector for the direction the Entity is facing */
+	/**
+	 * Convert a local offset (ox, oy, oz) into a world-space vector that points
+	 * in the direction the entity is currently facing (yaw/pitch).  Useful for
+	 * projectiles, movement or ray-casting.
+	 *
+	 * `vel` scales the final vector, `pitchDelta` lets callers temporarily adjust
+	 * the vertical angle (e.g. throw arcs) without modifying `this.pitch`.
+	 */
 	direction(
 		ox = 0,
 		oy = 0,
@@ -231,8 +298,11 @@ export class Entity {
 		return [x, y, z];
 	}
 
-	/* Cast a ray into the direction the Entity is facing and return the world coordinates of either the block, or
-	 * the location immediatly in front of the block (useful when placing blocks)
+	/**
+	 * Casts a ray **from** the entity **into the direction it faces** and
+	 * returns the first solid block hit – or, when `returnFront === true`, the
+	 * coordinate right in *front* of that block (handy for placing blocks).
+	 * Returns `null` if nothing was found within `maxSteps` steps.
 	 */
 	raycast(
 		returnFront = false,
@@ -382,11 +452,17 @@ export class Entity {
 	}
 
 	/**
-	 * Change the owner of this entity, enforcing client/server rules.
-	 * - On client: can only pass ownership to the server (ownerID 0)
-	 * - On server: can only pass ownership to a different client (not itself)
-	 * Throws an error if rules are violated.
-	 * Adds the entity to pendingOwnershipChanges for networking code to send a final update.
+	 * Transfer simulation ownership of this entity to another network peer.
+	 *
+	 * Client ↠ Server:  only allowed to hand authority back to the server
+	 *                   (`newOwnerID === 0`).
+	 * Server ↠ Client:  only allowed to give authority to a *different* client
+	 *                   (`newOwnerID !== 0 && newOwnerID !== this.ownerID`).
+	 *
+	 * Violating these rules throws to guard against desyncs.
+	 * After a successful change the entity is queued in
+	 * `Entity.pendingOwnershipChanges` so the networking layer can send one last
+	 * authoritative update.
 	 */
 	changeOwner(newOwnerID: number) {
 		const isClient = this.world.game.isClient;

@@ -1,51 +1,36 @@
-/* Copyright 2023 - Benjamin Vincent Schulenburg
+/* Copyright - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
+ *
+ * TextRenderer provides lightweight billboarding text in 3-D space. Internally
+ * it rasterises glyphs onto a hidden HTMLCanvas, uploads that as a texture and
+ * draws a camera-facing quad in WebGL using a minimal shader pair. The class is
+ * completely self-contained – it caches textures per string so repeated labels
+ * are cheap.
+ *
+ * Typical usage
+ * -------------
+ * 1. Call `TextRenderer.init(gl)` **once** during engine start-up to compile the
+ *    shaders and share them across all instances.
+ * 2. Create an instance wherever you need to emit text billboards (usually once
+ *    in `RenderManager`).
+ * 3. Call `drawTextBillboard()` every frame for each label you want to show.
+ *
+ * Extension hints
+ * ---------------
+ * • The default font is hard-coded; if you add localisation with exotic glyphs
+ *   ensure the font supports them or characters will render as tofu.
+ * • Consider packing multiple strings into a texture atlas when you need *lots*
+ *   of distinct labels – the simple per-string texture cache may grow large.
+ *
+ * Pitfalls
+ * --------
+ * • Size matters – the canvas is 256×64 px. Very long strings will be clipped.
+ * • Remember to re-enable depth testing if you disable it for UI-style labels.
  */
 import { mat4 } from "gl-matrix";
 import { Shader } from "./shader";
-
-// Simple billboard vertex shader
-const billboardVertSource = `#version 300 es
-precision mediump float;
-
-uniform mat4 mat_mvp;
-uniform mat4 view_matrix;
-uniform vec3 billboard_pos;
-uniform vec2 billboard_size;
-
-layout (location=0) in vec2 pos;
-layout (location=1) in vec2 uv;
-
-out vec2 tex_coord;
-
-void main() {
-    // Create billboard that always faces the camera
-    // Extract right and up vectors from the view matrix
-    vec3 right = normalize(vec3(view_matrix[0][0], view_matrix[1][0], view_matrix[2][0]));
-    vec3 up = normalize(vec3(view_matrix[0][1], view_matrix[1][1], view_matrix[2][1]));
-    
-    vec3 world_pos = billboard_pos + 
-                     right * (pos.x * billboard_size.x) + 
-                     up * (pos.y * billboard_size.y);
-    
-    tex_coord = uv;
-    gl_Position = mat_mvp * vec4(world_pos, 1.0);
-}`;
-
-// Simple textured fragment shader
-const billboardFragSource = `#version 300 es
-precision mediump float;
-
-uniform sampler2D text_texture;
-uniform float alpha;
-
-in vec2 tex_coord;
-out vec4 fragColor;
-
-void main() {
-    vec4 texColor = texture(text_texture, tex_coord);
-    fragColor = vec4(texColor.rgb, texColor.a * alpha);
-}`;
+import billboardVertSource from "./shaders/billboard.vert?raw";
+import billboardFragSource from "./shaders/billboard.frag?raw";
 
 export class TextRenderer {
 	static gl: WebGL2RenderingContext;
@@ -57,6 +42,10 @@ export class TextRenderer {
 	private vao!: WebGLVertexArrayObject;
 	private vbo!: WebGLBuffer;
 
+	/**
+	 * Must be invoked once before creating any `TextRenderer` instances so the
+	 * shared shader program exists. Throws otherwise.
+	 */
 	static init(gl: WebGL2RenderingContext) {
 		this.gl = gl;
 		this.shader = new Shader(
@@ -75,6 +64,10 @@ export class TextRenderer {
 		);
 	}
 
+	/**
+	 * Prepares the off-screen canvas and WebGL quad. Heavy-weight operations
+	 * (shader compilation) happen in `init`, so construction is cheap.
+	 */
 	constructor() {
 		if (!TextRenderer.gl) {
 			throw new Error(
@@ -160,76 +153,11 @@ export class TextRenderer {
 		gl.bindVertexArray(null);
 	}
 
-	private renderTextToCanvas(
-		text: string,
-		fontSize: number = 24,
-		color: string = "#FFFFFF",
-	): void {
-		const ctx = this.ctx;
-
-		// Clear canvas with transparent background
-		ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-		// Setup text rendering
-		ctx.font = `bold ${fontSize}px Arial`;
-		ctx.textAlign = "center";
-		ctx.textBaseline = "middle";
-
-		// Add text outline for better visibility
-		ctx.strokeStyle = "#000000";
-		ctx.lineWidth = 3;
-		ctx.strokeText(text, this.canvas.width / 2, this.canvas.height / 2);
-
-		// Fill text
-		ctx.fillStyle = color;
-		ctx.fillText(text, this.canvas.width / 2, this.canvas.height / 2);
-	}
-
-	getTextTexture(
-		text: string,
-		fontSize: number = 24,
-		color: string = "#FFFFFF",
-	): WebGLTexture {
-		const key = `${text}_${fontSize}_${color}`;
-
-		// Check cache first
-		let texture = this.textureCache.get(key);
-		if (texture) {
-			return texture;
-		}
-
-		// Render text to canvas
-		this.renderTextToCanvas(text, fontSize, color);
-
-		// Create WebGL texture from canvas
-		const gl = TextRenderer.gl;
-		const webglTexture = gl.createTexture();
-		if (!webglTexture) {
-			throw new Error("Could not create WebGL texture");
-		}
-
-		gl.bindTexture(gl.TEXTURE_2D, webglTexture);
-		gl.texImage2D(
-			gl.TEXTURE_2D,
-			0,
-			gl.RGBA,
-			gl.RGBA,
-			gl.UNSIGNED_BYTE,
-			this.canvas,
-		);
-
-		// Set texture parameters
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-
-		// Cache it
-		this.textureCache.set(key, webglTexture);
-
-		return webglTexture;
-	}
-
+	/**
+	 * Draws centred multiline (not implemented) text that always faces the
+	 * camera. Depth testing is optional because nameplates usually hover above
+	 * heads and shouldn't be occluded by terrain.
+	 */
 	drawTextBillboard(
 		projectionMatrix: mat4,
 		viewMatrix: mat4,
@@ -282,5 +210,84 @@ export class TextRenderer {
 		gl.enable(gl.DEPTH_TEST);
 		gl.depthMask(true);
 		gl.disable(gl.BLEND);
+	}
+
+	/**
+	 * Returns a cached WebGL texture for the given text. If not present, the text
+	 * is rasterised onto the hidden canvas and uploaded. Font size & colour are
+	 * part of the cache key.
+	 */
+	getTextTexture(
+		text: string,
+		fontSize: number = 24,
+		color: string = "#FFFFFF",
+	): WebGLTexture {
+		const key = `${text}_${fontSize}_${color}`;
+
+		// Check cache first
+		let texture = this.textureCache.get(key);
+		if (texture) {
+			return texture;
+		}
+
+		// Render text to canvas
+		this.renderTextToCanvas(text, fontSize, color);
+
+		// Create WebGL texture from canvas
+		const gl = TextRenderer.gl;
+		const webglTexture = gl.createTexture();
+		if (!webglTexture) {
+			throw new Error("Could not create WebGL texture");
+		}
+
+		gl.bindTexture(gl.TEXTURE_2D, webglTexture);
+		gl.texImage2D(
+			gl.TEXTURE_2D,
+			0,
+			gl.RGBA,
+			gl.RGBA,
+			gl.UNSIGNED_BYTE,
+			this.canvas,
+		);
+
+		// Set texture parameters
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+		// Cache it
+		this.textureCache.set(key, webglTexture);
+
+		return webglTexture;
+	}
+
+	/**
+	 * Uploads the canvas content to the currently bound texture unit and sets
+	 * reasonable parameters for billboarding (clamp, linear filtering).
+	 */
+	private renderTextToCanvas(
+		text: string,
+		fontSize: number = 24,
+		color: string = "#FFFFFF",
+	): void {
+		const ctx = this.ctx;
+
+		// Clear canvas with transparent background
+		ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+		// Setup text rendering
+		ctx.font = `bold ${fontSize}px Arial`;
+		ctx.textAlign = "center";
+		ctx.textBaseline = "middle";
+
+		// Add text outline for better visibility
+		ctx.strokeStyle = "#000000";
+		ctx.lineWidth = 3;
+		ctx.strokeText(text, this.canvas.width / 2, this.canvas.height / 2);
+
+		// Fill text
+		ctx.fillStyle = color;
+		ctx.fillText(text, this.canvas.width / 2, this.canvas.height / 2);
 	}
 }

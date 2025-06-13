@@ -1,5 +1,35 @@
-/* Copyright 2023 - Benjamin Vincent Schulenburg
+/* Copyright - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
+ *
+ * Texture is a small wrapper that unifies 2-D, 2-D array and 1-D LUT textures
+ * while hiding the verbose WebGL boilerplate. In addition to convenience
+ * helpers it implements a *global texture binding cache* so redundant
+ * `gl.bindTexture` calls are avoided.
+ *
+ * Key features
+ * ------------
+ * • Lazy asynchronous loading via `Image` for 2-D and array textures.
+ * • Automatic pink *error* placeholder until the real image arrives.
+ * • Simple caching of last bound texture per texture unit – see `bind()`.
+ * • Built-in manual colour Look-Up Table (LUT) generation for shader colour
+ *   modulation effects.
+ *
+ * Usage tips
+ * ----------
+ * • Always call `.bind(unit)` before issuing draw calls; relying on the global
+ *   cache is optional but recommended for performance.
+ * • After changing `linearInterpolation`, `doesRepeat` or similar flags remember
+ *   to call the corresponding method (`linear()`, `repeat()`, …) **after** the
+ *   image finished loading, otherwise the parameters will be reset by the miplevel upload.
+ * • If you plan to mutate the LUT at runtime, set `dirtyLUT` and let `bind()` handle it.
+ *
+ * Footguns
+ * --------
+ * • Non power-of-two textures cannot use mip-mapping or `REPEAT` wrapping – the
+ *   code falls back to clamped.
+ * • While the placeholder pixel is uploaded synchronously, texture dimensions
+ *   are 1×1 until the real image arrives. Shaders that rely on texture size in
+ *   texel space may misbehave.
  */
 const isPowerOf2 = (value: number) => (value & (value - 1)) === 0;
 
@@ -23,6 +53,11 @@ export class Texture {
 	colors: number[] = [];
 	dirtyLUT = false;
 
+	/**
+	 * Uploads a 1×1 pink placeholder, starts async image download and upgrades
+	 * the texture once loaded. Handles optional mip-map generation and repeat/
+	 * clamp states.
+	 */
 	loadTexture2D(url: string) {
 		texturesInFlight++;
 		const gl = this.gl;
@@ -81,6 +116,10 @@ export class Texture {
 		image.src = url;
 	}
 
+	/**
+	 * Similar to `loadTexture2D` but treats the source image as a vertical strip
+	 * of square layers and uploads it as `TEXTURE_2D_ARRAY`.
+	 */
 	loadTexture2DArray(url: string) {
 		const gl = this.gl;
 		this.bind();
@@ -142,6 +181,10 @@ export class Texture {
 		image.src = url;
 	}
 
+	/**
+	 * Pushes the JS-side `colors` array into a 256×1 RGBA LUT texture. Call this
+	 * after mutating the array or set `dirtyLUT` and let `bind()` handle it.
+	 */
 	updateLUT() {
 		const gl = this.gl;
 		this.gl.activeTexture(this.gl.TEXTURE0);
@@ -288,6 +331,10 @@ export class Texture {
 		return this;
 	}
 
+	/**
+	 * Ensures the texture handle is bound to the requested unit while minimising
+	 * redundant state changes. Also triggers a deferred LUT upload if required.
+	 */
 	bind(unit = 0) {
 		if (this.dirtyLUT) {
 			this.updateLUT();

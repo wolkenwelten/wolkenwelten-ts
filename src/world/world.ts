@@ -1,5 +1,46 @@
-/* Copyright 2023 - Benjamin Vincent Schulenburg
+/* Copyright - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
+ *
+ * ╔════════════════════════════════════════════════════════════════════════╗
+ * ║                                World                                  ║
+ * ║   — central state container of the voxel game engine —                ║
+ * ╚════════════════════════════════════════════════════════════════════════╝
+ *
+ * TL;DR 📜
+ *   • Exactly one `World` exists per `Game` instance.
+ *   • All coordinates are ABSOLUTE block units (Y-up, positive Y = sky).
+ *   • 32 × 32 × 32 blocks form a *chunk*; chunks are addressed via
+ *     `coordinateToWorldKey()` which packs the chunk-space x/y/z into a
+ *     single 48-bit integer (16 bits per axis).
+ *
+ * Responsibilities 💼
+ *   • Maintain a sparse `Map` of `Chunk` instances (`chunks`).
+ *   • Track live `Entity` instances and drive their `update()` loop.
+ *   • Coordinate block access, delegating writes to the network on the
+ *     client and to the in-memory chunk data on the server.
+ *   • Run procedural terrain generation through `worldgenHandler`.
+ *   • Keep the simulation footprint small via `gc()` and `DangerZone`.
+ *
+ * Extending 🚀
+ *   The `World` class is designed for composition: inject additional domain
+ *   services that reference `world` rather than subclassing.  Only subclass
+ *   when absolutely necessary and **always** call `super.*` for lifecycle
+ *   methods (`constructor`, `update`, …) or subtle desync bugs will occur.
+ *
+ * Footguns & Gotchas ⚠️
+ *   • `worldgenHandler` **must** be assigned before the first call that may
+ *     trigger chunk generation (`worldgen()`, `getOrGenChunk()`, etc.).
+ *   • `coordinateToWorldKey()` masks each axis to 16 bits; coordinates that
+ *     exceed ±32 768 blocks will alias and corrupt the chunk map.
+ *   • On the *client* `setBlock()` merely dispatches a network message; it
+ *     does **not** mutate the local chunk immediately.  Tests without a
+ *     mocked network therefore appear to "do nothing".
+ *   • `gc()` drops chunks/entities by comparing *squared block distance* to
+ *     `renderDistance² × 4`.  When tweaking render distance remember the
+ *     quadratic relationship!
+ *   • `bottomOfTheWorld` is POSITIVE (900) and represents the kill plane –
+ *     do not confuse it with y = 0.
+ *
  */
 import type { Game } from "../game";
 import { Entity } from "./entity/entity";
@@ -11,6 +52,15 @@ import { Chunk } from "./chunk/chunk";
 import { DangerZone } from "./chunk/dangerZone";
 import { isClient } from "../util/compat";
 
+/**
+ * Convert absolute block coordinates to a 48-bit key that uniquely identifies
+ * the containing 32³-block chunk.
+ *
+ * Bit layout (low → high): `[x15‥0] [y15‥0] [z15‥0]`.
+ *
+ * NOTE: Each axis is masked to 16 bits – exceeding ±32 768 blocks causes key
+ * collisions and undefined behaviour.
+ */
 export const coordinateToWorldKey = (x: number, y: number, z: number) =>
 	((Math.floor(x) >> 5) & 0xffff) +
 	((Math.floor(y) >> 5) & 0xffff) * 0x10000 +
@@ -33,6 +83,11 @@ export class World {
 		this.dangerZone = new DangerZone(this);
 	}
 
+	/**
+	 * Server-side one-time pre-generation step. Calls
+	 * `worldgenHandler.preGen()` allowing heavy global calculations (e.g.
+	 * biome maps) to be cached before chunks stream in.
+	 */
 	worldgen() {
 		if (!this.worldgenHandler) {
 			throw new Error("Missing WorldGen");
@@ -52,6 +107,12 @@ export class World {
 		return ret;
 	}
 
+	/**
+	 * Change a block at absolute world coordinates.
+	 *
+	 * Client side: Sends a network message → no immediate local mutation.
+	 * Server side: Lazily loads the corresponding chunk and writes directly.
+	 */
 	setBlock(x: number, y: number, z: number, block: number) {
 		if (this.game.isClient) {
 			(this.game as ClientGame).network.blockUpdate(x, y, z, block);
@@ -90,6 +151,13 @@ export class World {
 		return bt.liquid;
 	}
 
+	/**
+	 * Fetch the chunk that contains (`x`,`y`,`z`) or generate it on demand.
+	 *
+	 * WARNING: This involves a Map lookup and may trigger procedural
+	 * generation; avoid calling it repeatedly for many adjacent blocks – cache
+	 * the chunk reference instead.
+	 */
 	getOrGenChunk(x: number, y: number, z: number): Chunk {
 		const key = coordinateToWorldKey(x, y, z);
 		const chunk = this.chunks.get(key);
@@ -144,6 +212,11 @@ export class World {
 		this.entities.delete(entity.id);
 	}
 
+	/**
+	 * Garbage-collect far-away chunks & entities to keep memory usage bounded.
+	 * Criteria: squared block distance compared to
+	 * `renderDistance² × 4` (roughly twice the visible horizon).
+	 */
 	gc() {
 		if (!this.game.player) {
 			return;
@@ -184,6 +257,10 @@ export class World {
 		}
 	}
 
+	/**
+	 * Mark the chunk containing (`x`,`y`,`z`) *and* its 6 face neighbours as
+	 * invalid so their lighting/meshes will be rebuilt on next access.
+	 */
 	invalidatePosition(x: number, y: number, z: number) {
 		this.getChunk(x, y, z)?.invalidate();
 		const ox = ((x & 0x10) << 1) + (x & ~0x1f) - 32;

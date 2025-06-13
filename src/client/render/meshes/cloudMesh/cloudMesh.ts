@@ -1,4 +1,4 @@
-/* Copyright 2023 - Benjamin Vincent Schulenburg
+/* Copyright - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
 import { mat4 } from "gl-matrix";
@@ -7,7 +7,6 @@ import shaderFragSource from "./cloudMesh.frag?raw";
 import shaderVertSource from "./cloudMesh.vert?raw";
 import cloudTexture from "../../../../../assets/gfx/clouds.jpg";
 
-import "../../../../types";
 import { Texture } from "../../texture";
 import { Shader } from "../../shader";
 

@@ -1,5 +1,43 @@
-/* Copyright 2023 - Benjamin Vincent Schulenburg
+/* Copyright - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
+ *
+ * # Character – the primary controllable entity
+ *
+ * This class models a humanoid entity that can be directly controlled by the
+ * local player or remote clients.  It is the concrete implementation behind
+ * both the **player avatar** and other player-like NPCs in the world.
+ *
+ * High-level responsibilities:
+ *  • Transform player input (`move`, `dash`, `strike`, …) into physical motion
+ *    and combat interactions inside the voxel world.
+ *  • Provide a rich animation state machine for walking, jumping and melee
+ *    attacks that the render pipeline can query in `draw()`.
+ *  • Synchronise state with the networking layer through the inherited
+ *    `serialize` / `deserialize` helpers so that authoritative servers and
+ *    observing clients stay consistent.
+ *
+ * Extending the class:
+ *  • **ALWAYS** call `super.update()` from an override so that critical physics
+ *    and networking side-effects are preserved.  Skipping this will lead to
+ *    desyncs, rubber-banding or the player falling through the world.
+ *  • For custom combat logic, override `strike()` or `attack()` *instead* of
+ *    `damage()`.  `damage()` has intricate block/knockback rules that are
+ *    easy to break.
+ *  • Use the provided hooks `onDeath` and `onAttack` for VFX/SFX; do **not**
+ *    call `damage()` inside them or you will create infinite recursion.
+ *
+ * Footguns & common pitfalls:
+ *  • `init()` hard-resets *all* transient state – including velocity,
+ *    cooldowns and camera shakes.  Call it only when you really want to
+ *    respawn the entity.
+ *  • Healing is implemented via `damage(-amount)` – be mindful of sign errors.
+ *  • `remainingAirActions` is decremented in both `dash()` *and* `move()`
+ *    when jumping; forgetting to reset it in a subclass will brick aerial
+ *    abilities.
+ *  • Many timings are tied to `world.game.ticks`; when running the simulation
+ *    at a non-default tick-rate be sure to scale your numbers accordingly.
+ *  • The physics is *not* deterministic across clients – never trust `vx/vy/vz`
+ *    from a remote player for hit detection.
  */
 import { mat4 } from "gl-matrix";
 
@@ -63,15 +101,29 @@ export class Character extends Being {
 	public primaryHeld = false;
 	public secondaryHeld = false;
 
+	/**
+	 * Respawns the character by delegating to `init()`.  Useful when the player
+	 * dies or when the server requests a hard reset.
+	 */
 	respawn() {
 		this.init();
 	}
 
+	/**
+	 * Starts a short animation sequence (64 ticks) and toggles the internal
+	 * `animationId` so subsequent render calls can alternate between two key
+	 * frames.
+	 */
 	startAnimation(_animationId = 0) {
 		this.animation = 64;
 		this.animationId = 1 - this.animationId;
 	}
 
+	/**
+	 * Returns `true` while the character is in *blocking* stance (secondary
+	 * action held down long enough).  Several combat functions query this flag
+	 * to reduce incoming damage or disable movement abilities.
+	 */
 	isBlocking(): boolean {
 		return this.blockCharge > 0;
 	}
@@ -92,7 +144,15 @@ export class Character extends Being {
 		this.blockCharge = data.blockCharge ?? 0;
 	}
 
-	/* Initialize an already existing Character, that way we can easily reuse the same object, */
+	/**
+	 * Re-initialises the already constructed Character so it can be reused
+	 * (e.g. after death or a server hand-off).  This is *not* called by the
+	 * constructor – the ctor merely allocates the instance and then forwards
+	 * to `init()` so that game code can choose to manually invoke it again.
+	 *
+	 * Side-effects: resets health, motion vectors, cooldowns and teleports the
+	 * entity to the spawn position provided by the current world-generator.
+	 */
 	init() {
 		this.noClip = false;
 		this.isDead = false;
@@ -124,7 +184,12 @@ export class Character extends Being {
 		this.init();
 	}
 
-	/* Damage a character by a certain value, will change in the future to take a Damage argument instead */
+	/**
+	 * Applies raw damage before armour, blocking and knock-back reduction are
+	 * taken into account.  Calling this with a *negative* value will heal the
+	 * Character.  The function also updates `repulsionMultiplier`, a hidden
+	 * parameter used by `beRepelledByEntities()` to resolve collision overlap.
+	 */
 	damage(rawAmount: number) {
 		let actualAmount = rawAmount;
 		let knockbackMultiplier = 1;
@@ -158,11 +223,19 @@ export class Character extends Being {
 		}
 	}
 
-	/* Heal a character by a certain amount of hit points */
+	/**
+	 * Quick helper that heals by forwarding to `damage(-rawAmount)`.
+	 * Prefer calling `heal()` over `damage(-x)` in game-logic for clarity.
+	 */
 	heal(rawAmount: number) {
 		this.damage(-rawAmount);
 	}
 
+	/**
+	 * Consumes one *air action* (unless the Character is grounded) and propels
+	 * the player forward in the facing direction.  The method also spawns
+	 * client-side dash particles and informs the server in multiplayer mode.
+	 */
 	dash() {
 		if (this.mayJump() || this.remainingAirActions > 0) {
 			if (this.isBlocking()) {
@@ -183,7 +256,11 @@ export class Character extends Being {
 		}
 	}
 
-	/* Walk/Run according to the direction of the Entity, ignores pitch */
+	/**
+	 * Transforms local input coordinates (camera-relative) into world-space
+	 * movement vectors and stores the desired velocity in `movementX/Y/Z`.
+	 * The heavy physics lifting is deferred to the big `update()` loop.
+	 */
 	move(ox: number, oy: number, oz: number) {
 		if (ox === 0 && oz === 0) {
 			this.movementX = this.movementZ = 0;
@@ -260,8 +337,54 @@ export class Character extends Being {
 		return Math.sin(this.walkCycleCounter) * 0.08;
 	}
 
+	/**
+	 * The *heart* of the Character: runs once every tick and handles physics,
+	 * collision, animation blending, cooldown timers and networking glitches.
+	 *
+	 * ⚠️  Because the method is >300 lines it is tempting to override it in a
+	 * subclass.  Doing so is discouraged – instead hook into one of the many
+	 * smaller helpers (`dash`, `strike`, `onAttack`, etc.) or propose splitting
+	 * this method upstream.
+	 */
 	update() {
-		// Calculate overall velocity
+		// Generate velocity-based trail particles 🌀
+		this.generateTrailParticles();
+
+		// Handle ownership, loading and various early-exit conditions.
+		if (this.earlyExitChecks()) {
+			return;
+		}
+
+		// Blend walking animation & reset pitch
+		this.updateWalkAnimation();
+
+		// Freeze while surrounding chunks are not yet loaded
+		if (!this.world.isLoaded(this.x, this.y, this.z)) {
+			return;
+		}
+
+		const underwater = this.isUnderwater();
+		const movementLength = Math.sqrt(
+			this.movementX * this.movementX + this.movementZ * this.movementZ,
+		);
+
+		// Footstep sounds & walk-cycle bookkeeping
+		this.handleWalkCycleAndSounds(movementLength);
+
+		// The heavy physics + collision step
+		this.physicsStep(underwater, movementLength);
+
+		// Animation timers & combat charge bookkeeping
+		this.updateTimersAndCharges();
+	}
+
+	/*
+	 * ────────────────────────────────────────────────────────────────────────────
+	 *  Extracted helper methods – strictly move code, no new behaviour!
+	 * ────────────────────────────────────────────────────────────────────────────
+	 */
+
+	private generateTrailParticles() {
 		const v = this.vx * this.vx + this.vz * this.vz + this.vy * this.vy;
 		if (v > 0.075) {
 			this.world.game.render?.particle.fxTrail(
@@ -271,20 +394,22 @@ export class Character extends Being {
 				v * 8,
 			);
 		}
+	}
 
+	/* Returns true if the update loop should bail out early */
+	private earlyExitChecks(): boolean {
 		if (this.ownerID !== this.world.game.networkID) {
-			return;
+			return true;
 		}
 		if (this.isInLoadingChunk()) {
-			return;
+			return true;
 		}
 
 		this.knockoutTimer = Math.max(0, this.knockoutTimer - 1);
-
 		this.beRepelledByEntities();
 
 		if (this.isDead) {
-			return;
+			return true;
 		}
 
 		if (this.y < this.world.bottomOfTheWorld) {
@@ -296,9 +421,13 @@ export class Character extends Being {
 			this.x += this.movementX;
 			this.y += this.movementY;
 			this.z += this.movementZ;
-			return;
+			return true;
 		}
 
+		return false;
+	}
+
+	private updateWalkAnimation() {
 		if (!this.isWalking) {
 			this.walkAnimationFactor = this.walkAnimationFactor * 0.9;
 		} else {
@@ -310,22 +439,20 @@ export class Character extends Being {
 				this.walkAnimationFactor = this.walkAnimationFactor * 0.97 + p * 0.03;
 			}
 		}
-
+		// Head always stays horizontal in first-person
 		this.pitch = 0;
+	}
 
-		if (!this.world.isLoaded(this.x, this.y, this.z)) {
-			return; // Just freeze the character until we have loaded the area, this shouldn't happen if at all possible
-		}
-		const underwater = this.isUnderwater();
-
-		const movementLength = Math.sqrt(
-			this.movementX * this.movementX + this.movementZ * this.movementZ,
-		);
+	private handleWalkCycleAndSounds(movementLength: number) {
 		this.walkCycleCounter += Math.min(0.2, movementLength);
 		if (this.walkCycleCounter > this.nextStepSound && this.mayJump()) {
 			this.nextStepSound = this.walkCycleCounter + 6;
 			this.world.game.audio?.play("step", 0.5);
 		}
+	}
+
+	/* Complete physics step including velocity integration & collision response */
+	private physicsStep(underwater: boolean, movementLength: number) {
 		let speed = 0.6;
 		let accel =
 			movementLength > 0.01 ? CHARACTER_ACCELERATION : CHARACTER_STOP_RATE;
@@ -335,7 +462,7 @@ export class Character extends Being {
 		}
 
 		if (!this.mayJump()) {
-			accel *= 0.2; // Slow down player movement changes during jumps
+			accel *= 0.2; // Air-control nerf while jumping
 			if (this.jumpStart < 0) {
 				this.jumpStart = this.world.game.ticks - 1;
 			}
@@ -351,17 +478,17 @@ export class Character extends Being {
 			this.lastAttackerId = 0;
 		}
 		if (underwater) {
-			speed *= 0.5; // Slow down player movement while underwater
+			speed *= 0.5; // Swimming is slower
 		}
 		if (this.lastAction > this.world.game.ticks) {
 			speed *= 0.5;
 		}
-
 		if (this.knockoutTimer > 0) {
 			speed *= 0.2;
 			accel *= 0.6;
 		}
 
+		// Integrate movement
 		this.vx = this.vx * (1.0 - accel) + this.movementX * speed * accel;
 		this.vz = this.vz * (1.0 - accel) + this.movementZ * speed * accel;
 		this.vy -= underwater ? GRAVITY * 0.2 : GRAVITY;
@@ -382,20 +509,19 @@ export class Character extends Being {
 			this.vy = 0.06;
 		}
 
+		// Collision clamps
 		if (this.isSolidPillar(this.x - 0.4, this.y - 0.8, this.z)) {
 			this.vx = Math.max(this.vx, 0);
 		}
 		if (this.isSolidPillar(this.x + 0.4, this.y - 0.8, this.z)) {
 			this.vx = Math.min(this.vx, 0);
 		}
-
 		if (this.world.isSolid(this.x, this.y - 1.7, this.z)) {
 			this.vy = Math.max(this.vy, 0);
 		}
 		if (this.world.isSolid(this.x, this.y + 0.7, this.z)) {
 			this.vy = Math.min(this.vy, 0);
 		}
-
 		if (this.isSolidPillar(this.x, this.y - 0.8, this.z - 0.4)) {
 			this.vz = Math.max(this.vz, 0);
 		}
@@ -403,6 +529,7 @@ export class Character extends Being {
 			this.vz = Math.min(this.vz, 0);
 		}
 
+		// Impact force / fall damage
 		const dx = this.vx - oldVx;
 		const dy = this.vy - oldVy;
 		const dz = this.vz - oldVz;
@@ -417,6 +544,7 @@ export class Character extends Being {
 			}
 		}
 
+		// Prevent absurd velocity explosions
 		const len = this.vx * this.vx + this.vz * this.vz + this.vy * this.vy;
 		if (len > 4 * 4 * 4) {
 			this.vx *= 0.95;
@@ -425,31 +553,34 @@ export class Character extends Being {
 		}
 		this.autoDecreaseRepulsionMultiplier();
 
+		// Integrate position
 		this.x += this.vx;
 		this.y += this.vy;
 		this.z += this.vz;
+	}
 
+	private updateTimersAndCharges() {
+		// Animation countdown
 		this.animation = Math.max(0, Math.min(64, this.animation - 1));
 
+		// Primary (left-mouse) charge logic
 		if (this.primaryHeld) {
 			this.primaryCharge++;
-		} else {
-			if (this.primaryCharge > 0) {
-				if (this.primaryCharge > 24) {
-					this.strike(true);
-				} else {
-					this.strike();
-				}
-				this.primaryCharge = 0;
+		} else if (this.primaryCharge > 0) {
+			if (this.primaryCharge > 24) {
+				this.strike(true);
+			} else {
+				this.strike();
 			}
+			this.primaryCharge = 0;
 		}
+
+		// Secondary (right-mouse) block logic
 		if (this.secondaryHeld) {
 			this.blockCharge++;
-		} else {
-			if (this.blockCharge > 0) {
-				if (++this.blockCharge > 24) {
-					this.blockCharge = 0;
-				}
+		} else if (this.blockCharge > 0) {
+			if (++this.blockCharge > 24) {
+				this.blockCharge = 0;
 			}
 		}
 	}
@@ -518,7 +649,12 @@ export class Character extends Being {
 		return this.world.game.ticks < this.lastAction;
 	}
 
-	/* Do a melee attack using whatever item is currently selected */
+	/**
+	 * Performs a *melee strike* with the currently equipped item or bare hands.
+	 * Handles animation blending, camera shake, damage calculation and server
+	 * RPC.  Use the `heavy` flag for charged attacks that cause higher damage
+	 * and knockback.
+	 */
 	strike(heavy = false) {
 		if (this.world.game.ticks < this.lastAction) {
 			return;
