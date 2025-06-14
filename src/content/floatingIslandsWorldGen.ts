@@ -480,7 +480,7 @@ export class FloatingIslandsWorldGen extends WorldGen {
 	 * block on the main island dynamically in the future.
 	 */
 	spawnPos(_player: Character): [number, number, number] {
-		return [1000, 1040, 1000];
+		return [1002, 1010, 1002];
 	}
 
 	/**
