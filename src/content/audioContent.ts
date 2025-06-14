@@ -11,6 +11,7 @@ import stompUrl from "../../assets/sfx/stomp.ogg?url";
 import slapUrl from "../../assets/sfx/slap.mp3?url";
 import tockUrl from "../../assets/sfx/tock.ogg?url";
 import unghUrl from "../../assets/sfx/ungh.ogg?url";
+import dashUrl from "../../assets/sfx/dash.mp3?url";
 import bgmUrl from "../../assets/bgm/PixelShowdown.mp3?url";
 
 import type { AudioManager } from "../client/audio";
@@ -28,4 +29,5 @@ export const registerAudioContent = (audio: AudioManager) => {
 	audio.add("bomb", bombUrl);
 	audio.add("projectile", projectileUrl);
 	audio.add("bgm", bgmUrl);
+	audio.add("dash", dashUrl);
 };

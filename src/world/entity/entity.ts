@@ -38,6 +38,7 @@ import { type World } from "../world";
 import type { Position } from "../../util/math";
 import { GRAVITY } from "../../constants";
 import { NetworkObject } from "./networkObject";
+import { ClientGame } from "../../client/clientGame";
 
 const modelViewMatrix = mat4.create();
 const transPos = new Float32Array([0, 0, 0]);
@@ -371,21 +372,46 @@ export abstract class Entity extends NetworkObject {
 		}
 	}
 
-	playSound(name: string, volume = 1.0, stopWhenEntityDestroyed = false) {
+	playSound(
+		name: string,
+		volume = 1.0,
+		stopWhenEntityDestroyed = false,
+		networkPlay = true,
+	) {
 		this.world.game.audio?.playFromEntity(
 			name,
 			volume,
 			this,
 			stopWhenEntityDestroyed,
 		);
+		if (networkPlay) {
+			(this.world.game as ClientGame).network.playSound({
+				sound: name,
+				entityId: this.id,
+				volume: volume,
+				x: this.x,
+				y: this.y,
+				z: this.z,
+			});
+		}
 	}
 
-	playUnmovingSound(name: string, volume = 1.0) {
+	playUnmovingSound(name: string, volume = 1.0, networkPlay = true) {
 		this.world.game.audio?.playAtPosition(name, volume, [
 			this.x,
 			this.y,
 			this.z,
 		]);
+
+		if (networkPlay) {
+			(this.world.game as ClientGame).network.playSound({
+				sound: name,
+				volume: volume,
+				x: this.x,
+				y: this.y,
+				z: this.z,
+			});
+		}
 	}
 
 	isUnderwater(): boolean {

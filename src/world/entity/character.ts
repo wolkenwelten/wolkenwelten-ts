@@ -245,6 +245,8 @@ export class Character extends Being {
 			if (!this.mayJump()) {
 				this.remainingAirActions--;
 			}
+			this.playSound("dash", 0.5);
+
 			this.isSprinting = true;
 			this.mayDash = false;
 			const dashSpeed = this.knockoutTimer > 0 ? 0.2 : 0.6;
@@ -448,7 +450,7 @@ export class Character extends Being {
 		this.walkCycleCounter += Math.min(0.2, movementLength);
 		if (this.walkCycleCounter > this.nextStepSound && this.mayJump()) {
 			this.nextStepSound = this.walkCycleCounter + 6;
-			this.world.game.audio?.play("step", 0.5);
+			this.playSound("step", 0.3);
 		}
 	}
 
@@ -680,8 +682,6 @@ export class Character extends Being {
 		this.cooldown(cooldownDur);
 		if (hit || heavy) {
 			this.playSound("punch", 0.3);
-		} else {
-			this.playSound("punchMiss", 0.2);
 		}
 		const px = this.x + Math.cos(-this.yaw - Math.PI / 2);
 		const py = this.y - 0.9;

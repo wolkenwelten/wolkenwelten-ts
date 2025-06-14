@@ -363,11 +363,6 @@ export class ClientNetwork {
 					//game.player.onAttack(attacker.char);
 				}
 
-				this.playSound({
-					sound: "slap",
-					volume: msg.heavy ? 0.8 : 0.1,
-					entityId: game.player.id,
-				});
 				game.player.playSound("slap", msg.heavy ? 1 : 0.1);
 
 				if (dist > 0) {
@@ -467,10 +462,11 @@ export class ClientNetwork {
 			if (hit.entityId) {
 				const entity = this.game.world.entities.get(hit.entityId);
 				if (entity) {
-					entity.playSound(hit.sound, hit.volume || 1);
+					entity.playSound(hit.sound, hit.volume || 1, false, false);
 					return;
 				}
-			} else {
+			}
+			if (hit.x || hit.y || hit.z) {
 				const x = hit.x || 0;
 				const y = hit.y || 0;
 				const z = hit.z || 0;
