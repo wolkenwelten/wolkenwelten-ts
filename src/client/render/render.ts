@@ -265,14 +265,14 @@ export class RenderManager {
 					const renderDistance = this.renderDistance || 0;
 					const characterAlpha = Math.min(
 						1,
-						Math.max(0, renderDistance - distance) / 8,
+						Math.max(0, renderDistance - distance) / 4,
 					);
 					const nameAlpha =
 						Math.min(1, Math.max(0, (maxNameDistance - distance) / 20)) *
 						characterAlpha;
 
 					// Scale text based on distance (but not too small)
-					const baseScale = 1.2;
+					const baseScale = 2.4;
 					const distanceScale = Math.max(0.8, Math.min(2.0, 20 / distance));
 					const finalScale = baseScale * distanceScale;
 
