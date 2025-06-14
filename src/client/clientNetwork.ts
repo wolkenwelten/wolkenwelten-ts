@@ -45,6 +45,7 @@ import { WSPacket, WSQueue } from "../network";
 import { ClientEntry, PlayerStatus, PlayerUpdate } from "./clientEntry";
 import type { ClientGame } from "./clientGame";
 import { Entity } from "../world/entity/entity";
+import { NetworkObject } from "../world/entity/networkObject";
 export type ClientHandler = (game: ClientGame, args: unknown) => Promise<void>;
 
 export class ClientNetwork {
@@ -73,20 +74,20 @@ export class ClientNetwork {
 	 * WARNING: This method also empties `Entity.pendingOwnershipChanges`, potentially dropping ownership
 	 * changes queued elsewhere if you call it manually.
 	 */
-	private broadcastEntities() {
-		const entities = [];
-		for (const entity of this.game.world.entities.values()) {
-			if (entity.ownerID !== this.game.networkID) {
+	private broadcastNetworkObjects() {
+		const objs = [];
+		for (const obj of this.game.world.networkObjects.values()) {
+			if (obj.ownerID !== this.game.networkID) {
 				continue;
 			}
-			entities.push(entity.serialize());
+			objs.push(obj.serialize());
 		}
 		// Also send any entities with pending ownership changes, even if it means duplicates!
-		for (const entity of Entity.pendingOwnershipChanges) {
-			entities.push(entity.serialize());
+		for (const obj of NetworkObject.pendingOwnershipChanges) {
+			objs.push(obj.serialize());
 		}
-		Entity.pendingOwnershipChanges.length = 0;
-		this.queue.call("updateEntities", entities);
+		NetworkObject.pendingOwnershipChanges.length = 0;
+		this.queue.call("updateNetworkObjects", objs);
 	}
 
 	/**
@@ -162,7 +163,7 @@ export class ClientNetwork {
 			throw new Error("WebSocket not connected");
 		}
 
-		this.broadcastEntities();
+		this.broadcastNetworkObjects();
 		if (this.playerStatus !== this.lastPlayerStatus) {
 			this.queue.call("setPlayerStatus", this.playerStatus);
 			this.lastPlayerStatus = this.playerStatus;
@@ -286,15 +287,18 @@ export class ClientNetwork {
 			this.game.ui.log.addEntry(msg);
 		});
 
-		this.queue.registerCallHandler("updateEntities", async (args: unknown) => {
-			if (!Array.isArray(args)) {
-				throw new Error("Invalid entities received");
-			}
-			const entities = args as any[];
-			for (const e of entities) {
-				this.game.world.deserializeEntity(e);
-			}
-		});
+		this.queue.registerCallHandler(
+			"updateNetworkObjects",
+			async (args: unknown) => {
+				if (!Array.isArray(args)) {
+					throw new Error("Invalid network objects received");
+				}
+				const objs = args as any[];
+				for (const obj of objs) {
+					this.game.world.deserializeNetworkObject(obj);
+				}
+			},
+		);
 
 		this.queue.registerCallHandler("emptyChunk", async (args: unknown) => {
 			if (typeof args !== "object") {

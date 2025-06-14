@@ -34,7 +34,7 @@ import { InputManager } from "./input";
 import { AudioManager } from "./audio";
 import { registerAudioContent } from "../content/audioContent";
 import { Character } from "../world/entity/character";
-import { setEntityCounter } from "../world/entity/entity";
+import { setIdCounter } from "../world/entity/networkObject";
 
 export interface ClientGameConfig extends GameConfig {
 	parent: HTMLElement;
@@ -89,7 +89,7 @@ export class ClientGame extends Game {
 	 */
 	setPlayerID(playerID: number) {
 		this.networkID = playerID;
-		setEntityCounter(playerID << 28);
+		setIdCounter(playerID << 28);
 		this.player = new Character(this.world);
 		this.render.camera.entityToFollow = this.player;
 	}

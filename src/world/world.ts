@@ -49,6 +49,7 @@ import { BlockType } from "./blockType";
 import { Chunk } from "./chunk/chunk";
 import { DangerZone } from "./chunk/dangerZone";
 import { isClient } from "../util/compat";
+import { NetworkObject } from "./entity/networkObject";
 
 /**
  * Convert absolute block coordinates to a 48-bit key that uniquely identifies
@@ -68,6 +69,7 @@ export class World {
 	chunks: Map<number, Chunk> = new Map();
 	dangerZone: DangerZone;
 	entities: Map<number, Entity> = new Map();
+	networkObjects: Map<number, NetworkObject> = new Map();
 	seed: number;
 	game: Game;
 	blocks: BlockType[] = [];
@@ -192,13 +194,13 @@ export class World {
 		}
 	}
 
-	deserializeEntity(data: any) {
-		const oldEntity = this.entities.get(data.id);
-		if (oldEntity) {
-			oldEntity.deserialize(data);
-			return oldEntity;
+	deserializeNetworkObject(data: any) {
+		const oldObj = this.networkObjects.get(data.id);
+		if (oldObj) {
+			oldObj.deserialize(data);
+			return oldObj;
 		} else {
-			return Entity.deserialize(this, data);
+			return NetworkObject.deserialize(this, data);
 		}
 	}
 
@@ -206,8 +208,16 @@ export class World {
 		this.entities.set(entity.id, entity);
 	}
 
+	addNetworkObject(networkObject: NetworkObject) {
+		this.networkObjects.set(networkObject.id, networkObject);
+	}
+
 	removeEntity(entity: Entity) {
 		this.entities.delete(entity.id);
+	}
+
+	removeNetworkObject(networkObject: NetworkObject) {
+		this.networkObjects.delete(networkObject.id);
 	}
 
 	/**

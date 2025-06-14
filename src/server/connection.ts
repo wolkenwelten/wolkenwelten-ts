@@ -34,6 +34,8 @@ import { coordinateToWorldKey } from "../world/world";
 import { Chunk } from "../world/chunk/chunk";
 import type { PlayerStatus } from "../client/clientEntry";
 import { Entity } from "../world/entity/entity";
+import { Character } from "../world/entity/character";
+import { NetworkObject } from "../world/entity/networkObject";
 
 let idCounter = 0;
 export class ClientConnection {
@@ -125,20 +127,20 @@ export class ClientConnection {
 		this.registerDefaultHandlers();
 	}
 
-	private broadcastEntities() {
-		const entities = [];
-		for (const entity of this.server.world.entities.values()) {
-			if (entity.ownerID === this.id) {
+	private broadcastNetworkObjects() {
+		const objs = [];
+		for (const obj of this.server.world.networkObjects.values()) {
+			if (obj.ownerID === this.id) {
 				continue;
 			}
-			entities.push(entity.serialize());
+			objs.push(obj.serialize());
 		}
 		// Also send any entities with pending ownership changes, even if it means duplicates!
-		for (const entity of Entity.pendingOwnershipChanges) {
-			entities.push(entity.serialize());
+		for (const obj of NetworkObject.pendingOwnershipChanges) {
+			objs.push(obj.serialize());
 		}
-		Entity.pendingOwnershipChanges.length = 0;
-		this.q.call("updateEntities", entities);
+		NetworkObject.pendingOwnershipChanges.length = 0;
+		this.q.call("updateNetworkObjects", objs);
 	}
 
 	registerDefaultHandlers() {
@@ -147,24 +149,28 @@ export class ClientConnection {
 			return this.id;
 		});
 
-		this.q.registerCallHandler("updateEntities", async (args: unknown) => {
-			if (!Array.isArray(args)) {
-				throw new Error("Invalid entities received");
-			}
-			const entities = args as any[];
-			for (const e of entities) {
-				const entity = this.server.world.deserializeEntity(e);
-				if (entity && entity.ownerID === this.id && entity.T === "Character") {
-					this.x = entity.x;
-					this.y = entity.y;
-					this.z = entity.z;
-					this.yaw = entity.yaw;
-					this.pitch = entity.pitch;
+		this.q.registerCallHandler(
+			"updateNetworkObjects",
+			async (args: unknown) => {
+				if (!Array.isArray(args)) {
+					throw new Error("Invalid network objects received");
 				}
-			}
-			this.broadcastEntities();
-			this.updateChunkVersions();
-		});
+				const objs = args as any[];
+				for (const data of objs) {
+					const obj = this.server.world.deserializeNetworkObject(data);
+					if (obj && obj.ownerID === this.id && obj.T === "Character") {
+						const char = obj as Character;
+						this.x = char.x;
+						this.y = char.y;
+						this.z = char.z;
+						this.yaw = char.yaw;
+						this.pitch = char.pitch;
+					}
+				}
+				this.broadcastNetworkObjects();
+				this.updateChunkVersions();
+			},
+		);
 
 		this.q.registerCallHandler("setPlayerStatus", async (args: unknown) => {
 			if (typeof args !== "string") {

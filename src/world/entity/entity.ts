@@ -37,38 +37,12 @@ import type { VoxelMesh } from "../../client/render/meshes/voxelMesh/voxelMesh";
 import { type World } from "../world";
 import type { Position } from "../../util/math";
 import { GRAVITY } from "../../constants";
+import { NetworkObject } from "./networkObject";
 
-let entityCounter = 0;
 const modelViewMatrix = mat4.create();
 const transPos = new Float32Array([0, 0, 0]);
 
-export const setEntityCounter = (counter: number) => {
-	entityCounter = counter;
-};
-
-const registeredEntities = new Map<
-	string,
-	new (
-		world: World,
-		id?: number,
-	) => Entity
->();
-
-export const registerEntity = (
-	T: string,
-	constructor: new (world: World, id?: number) => Entity,
-) => {
-	Entity.registeredEntities.set(T, constructor);
-};
-
-export abstract class Entity {
-	static readonly registeredEntities = registeredEntities;
-
-	// Track entities whose ownership has changed and need a final update sent
-	static pendingOwnershipChanges: Entity[] = [];
-
-	id: number;
-	ownerID: number;
+export abstract class Entity extends NetworkObject {
 	T = "Entity";
 
 	x = 0;
@@ -82,35 +56,12 @@ export abstract class Entity {
 	pitch = 0;
 
 	noClip = false;
-	destroyed = false;
-	world: World;
 	weight = 1; // Necessary for physics calculations
 	scale = 1;
 
 	constructor(world: World, id = 0) {
-		this.id = id || ++entityCounter;
-		this.ownerID = world.game.networkID;
-		this.world = world;
+		super(world, id);
 		world.addEntity(this);
-	}
-
-	/**
-	 * Reconstruct an Entity (or one of its subclasses) from raw network/save
-	 * data.  The function looks up the correct constructor in
-	 * `registeredEntities`, creates the instance and forwards the data to its
-	 * own `deserialize()` implementation.
-	 *
-	 * ⚠️  Throws when the entity type is unknown – make sure your subclass is
-	 *     registered via `registerEntity()` **before** any packets arrive.
-	 */
-	static deserialize(world: World, data: any) {
-		const constructor = registeredEntities.get(data.T);
-		if (!constructor) {
-			throw new Error(`Unknown entity type: ${data.T}`);
-		}
-		const entity = new constructor(world, data.id);
-		entity.deserialize(data);
-		return entity;
 	}
 
 	/**
@@ -125,9 +76,7 @@ export abstract class Entity {
 	 */
 	serialize() {
 		return {
-			id: this.id,
-			ownerID: this.ownerID,
-			T: this.T,
+			...super.serialize(),
 
 			x: this.x,
 			y: this.y,
@@ -140,7 +89,6 @@ export abstract class Entity {
 			scale: this.scale,
 
 			noClip: this.noClip,
-			destroyed: this.destroyed,
 		};
 	}
 
@@ -150,8 +98,7 @@ export abstract class Entity {
 	 * their own custom fields.
 	 */
 	deserialize(data: any) {
-		this.id = data.id;
-		this.ownerID = data.ownerID;
+		super.deserialize(data);
 		this.x = data.x;
 		this.y = data.y;
 		this.z = data.z;
@@ -162,7 +109,6 @@ export abstract class Entity {
 		this.pitch = data.pitch;
 		this.scale = data.scale;
 		this.noClip = data.noClip;
-		this.destroyed = data.destroyed;
 	}
 
 	startAnimation(_animation = 0) {}
@@ -170,7 +116,7 @@ export abstract class Entity {
 	cooldown(ticks: number) {}
 
 	destroy() {
-		this.destroyed = true;
+		super.destroy();
 		this.world.removeEntity(this);
 	}
 
@@ -449,45 +395,5 @@ export abstract class Entity {
 	isInLoadingChunk(): boolean {
 		const chunk = this.world.getChunk(this.x, this.y, this.z);
 		return chunk?.loaded === false;
-	}
-
-	/**
-	 * Transfer simulation ownership of this entity to another network peer.
-	 *
-	 * Client ↠ Server:  only allowed to hand authority back to the server
-	 *                   (`newOwnerID === 0`).
-	 * Server ↠ Client:  only allowed to give authority to a *different* client
-	 *                   (`newOwnerID !== 0 && newOwnerID !== this.ownerID`).
-	 *
-	 * Violating these rules throws to guard against desyncs.
-	 * After a successful change the entity is queued in
-	 * `Entity.pendingOwnershipChanges` so the networking layer can send one last
-	 * authoritative update.
-	 */
-	changeOwner(newOwnerID: number) {
-		const isClient = this.world.game.isClient;
-		const isServer = this.world.game.isServer;
-		if (isClient) {
-			if (newOwnerID !== 0) {
-				throw new Error(
-					"(｡•́︿•̀｡) Client can only transfer ownership to the server (ownerID 0)!",
-				);
-			}
-		} else if (isServer) {
-			if (newOwnerID === this.ownerID || newOwnerID === 0) {
-				throw new Error(
-					"(╬ Ò﹏Ó) Server can only transfer ownership to a different client!",
-				);
-			}
-		} else {
-			throw new Error(
-				"(⊙_⊙;) Unknown execution context for ownership transfer!",
-			);
-		}
-		this.ownerID = newOwnerID;
-		// Add to pendingOwnershipChanges for networking code to send a final update
-		if (!Entity.pendingOwnershipChanges.includes(this)) {
-			Entity.pendingOwnershipChanges.push(this);
-		}
 	}
 }

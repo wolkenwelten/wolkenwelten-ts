@@ -14,7 +14,8 @@
     "start": "node --import tsx --import ./src/server/loader.js ./src/server/main.ts --nodeEnv=production",
     "preview": "vite preview",
     "format": "npx @biomejs/biome format --write ./src",
-    "optimize": "node scripts/optimizeAssets.js"
+    "optimize": "node scripts/optimizeAssets.js",
+    "test": "npm run check"
   },
   "devDependencies": {
     "@types/cookie-parser": "latest",

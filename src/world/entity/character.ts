@@ -42,12 +42,13 @@
 import { mat4 } from "gl-matrix";
 
 import type { VoxelMesh } from "../../client/render/meshes/voxelMesh/voxelMesh";
-import { registerEntity, type Entity } from "./entity";
+import type { Entity } from "./entity";
 import type { World } from "../world";
 import type { Position } from "../../util/math";
 import type { ClientGame } from "../../client/clientGame";
 import { Being } from "./being";
 import { GRAVITY } from "../../constants";
+import { registerNetworkObject } from "./networkObject";
 
 const CHARACTER_ACCELERATION = 0.08;
 const CHARACTER_STOP_RATE = CHARACTER_ACCELERATION * 3.5;
@@ -968,4 +969,4 @@ export class Character extends Being {
 		return this.world.game.render?.assets.playerHead || null;
 	}
 }
-registerEntity("Character", Character);
+registerNetworkObject("Character", Character);
