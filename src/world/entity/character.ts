@@ -238,7 +238,10 @@ export class Character extends Being {
 	 * client-side dash particles and informs the server in multiplayer mode.
 	 */
 	dash() {
-		if (this.mayJump() || this.remainingAirActions > 0) {
+		if (
+			!this.isOnCooldown() &&
+			(this.mayJump() || this.remainingAirActions > 0)
+		) {
 			if (this.isBlocking()) {
 				return;
 			}
@@ -246,6 +249,7 @@ export class Character extends Being {
 				this.remainingAirActions--;
 			}
 			this.playSound("dash", 0.5);
+			this.cooldown(12);
 
 			this.isSprinting = true;
 			this.mayDash = false;
