@@ -704,7 +704,7 @@ export class Character extends Being {
 		// Send hit message to server
 		if (this.world.game.isClient) {
 			const game = this.world.game as ClientGame;
-			const radius = 1.8;
+			const radius = 2;
 			const damage = heavy ? 12 : 4;
 			game.network.playerHit(
 				this.id,

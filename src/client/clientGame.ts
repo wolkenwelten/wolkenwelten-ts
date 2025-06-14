@@ -70,6 +70,10 @@ export class ClientGame extends Game {
 		this.ui = new UIManager(this);
 		this.render = new RenderManager(this);
 		this.input = new InputManager(this);
+
+		setInterval(() => {
+			this.update();
+		}, 1 / 30); // Update even when not rendering
 	}
 
 	/**

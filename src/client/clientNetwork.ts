@@ -363,7 +363,7 @@ export class ClientNetwork {
 					//game.player.onAttack(attacker.char);
 				}
 
-				game.player.playSound("slap", msg.heavy ? 1 : 0.1);
+				game.player.playSound("slap", msg.heavy ? 1 : 0.3);
 
 				if (dist > 0) {
 					// Normalize direction vector
