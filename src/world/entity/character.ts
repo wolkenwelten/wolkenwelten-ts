@@ -509,6 +509,7 @@ export class Character extends Being {
 			this.vz *= 0.99;
 		} else if (this.movementY > 0 && this.mayJump()) {
 			this.vy = 0.25;
+			this.playSound("jump", 0.3);
 			this.jumpStart = this.world.game.ticks;
 			this.world.game.render?.particle.fxJump(this.x, this.y - 0.5, this.z);
 		}
