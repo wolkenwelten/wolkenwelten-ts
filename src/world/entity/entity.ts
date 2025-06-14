@@ -61,7 +61,7 @@ export const registerEntity = (
 	Entity.registeredEntities.set(T, constructor);
 };
 
-export class Entity {
+export abstract class Entity {
 	static readonly registeredEntities = registeredEntities;
 
 	// Track entities whose ownership has changed and need a final update sent
@@ -491,4 +491,3 @@ export class Entity {
 		}
 	}
 }
-registerEntity("Entity", Entity);
