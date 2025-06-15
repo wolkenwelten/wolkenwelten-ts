@@ -203,6 +203,11 @@ export abstract class Entity extends NetworkObject {
 			return;
 		}
 
+		if (this.y < this.world.bottomOfTheWorld) {
+			this.destroy();
+			return;
+		}
+
 		// ────────────────────────────────────────────────────
 		// Basic forces
 		// ────────────────────────────────────────────────────

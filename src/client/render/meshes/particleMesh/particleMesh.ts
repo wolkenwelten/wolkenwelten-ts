@@ -270,7 +270,7 @@ export class ParticleMesh {
 			const vy = Math.random() * 0.04 + 0.01; // drifting upwards
 			const vz = (Math.random() - 0.5) * 0.02;
 
-			const vs = -0.5 - Math.random() * 0.5; // slow shrink
+			const vs = -2 - Math.random() * 1; // slow shrink
 			this.add(cx, cy, cz, cs, cc, vx, vy, vz, vs, 0, 0.0005, 0, 0);
 		}
 	}
