@@ -67,6 +67,7 @@ export class ClientConnection {
 	msgsSent = 0;
 	bytesReceived = 0;
 	msgsReceived = 0;
+	debugInterval: NodeJS.Timeout | null = null;
 
 	chunkVersions = new Map<number, number>();
 	private chunkBuffer = new ArrayBuffer(20 + 32 * 32 * 32);
@@ -94,6 +95,9 @@ export class ClientConnection {
 			}
 		}
 		this.server.sockets.delete(this.id);
+		if (this.debugInterval) {
+			clearInterval(this.debugInterval);
+		}
 	}
 
 	/**
@@ -137,7 +141,7 @@ export class ClientConnection {
 			}
 		});
 
-		setInterval(() => {
+		this.debugInterval = setInterval(() => {
 			const kbpsIn = this.bytesReceived / 1024;
 			const kbpsOut = this.bytesSent / 1024;
 			if (this.server.options.debug) {
