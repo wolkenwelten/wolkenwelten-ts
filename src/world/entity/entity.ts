@@ -38,7 +38,7 @@ import { type World } from "../world";
 import type { Position } from "../../util/math";
 import { GRAVITY } from "../../constants";
 import { NetworkObject } from "./networkObject";
-import { ClientGame } from "../../client/clientGame";
+import type { ClientGame } from "../../client/clientGame";
 
 const modelViewMatrix = mat4.create();
 const transPos = new Float32Array([0, 0, 0]);
