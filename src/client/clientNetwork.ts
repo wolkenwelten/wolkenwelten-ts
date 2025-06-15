@@ -57,6 +57,7 @@ export class ClientNetwork {
 	private reconnectTimeout?: NodeJS.Timeout;
 	public playerStatus: PlayerStatus = "";
 	private lastPlayerStatus: PlayerStatus = "";
+	private lastTransfer = new Date();
 
 	private pendingForceUpdates: NetworkObject[] = [];
 
@@ -256,6 +257,12 @@ export class ClientNetwork {
 		if (!this.ws || this.ws.readyState !== this.ws.OPEN) {
 			return;
 		}
+		const now = new Date();
+		const timeDiff = now.getTime() - this.lastTransfer.getTime();
+		if (timeDiff < 1000 / 30) {
+			return;
+		}
+		this.lastTransfer = now;
 
 		this.sendRaw(this.queue.flush());
 	}
