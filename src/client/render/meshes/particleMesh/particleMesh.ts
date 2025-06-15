@@ -221,6 +221,60 @@ export class ParticleMesh {
 		}
 	}
 
+	fxExplosion(x: number, y: number, z: number, r: number) {
+		// Fiery core – bright red/yellow particles moving violently outwards
+		const fireCount = 4096;
+		for (let i = 0; i < fireCount; i++) {
+			// Random position inside the explosion radius
+			const rx = (Math.random() * 2 - 1) * (r * 0.5);
+			const ry = (Math.random() * 2 - 1) * (r * 0.5);
+			const rz = (Math.random() * 2 - 1) * (r * 0.5);
+			const cx = x + rx;
+			const cy = y + ry;
+			const cz = z + rz;
+
+			// Size and colour (reds → yellows)
+			const cs = 192 + ((Math.random() * 64) | 0);
+			const red = 192 + ((Math.random() * 63) | 0); // 192-255
+			const green = 64 + ((Math.random() * 191) | 0); // 64-255
+			const blue = (Math.random() * 32) | 0; // 0-31
+			const cc = (0xff << 24) | (blue << 16) | (green << 8) | red; // ABGR packing
+
+			// Velocity predominantly radially outward
+			const len = Math.hypot(rx, ry, rz) || 1;
+			const speed = 0.2 + Math.random() * 0.12;
+			const vx = (rx / len) * speed;
+			const vy = (ry / len) * speed + Math.random() * 0.02; // slight upward bias
+			const vz = (rz / len) * speed;
+
+			const vs = -2 - Math.random() * 2; // shrink quickly
+			// Small positive Y-gravity to simulate rising heat flicker
+			this.add(cx, cy, cz, cs, cc, vx, vy, vz, vs, 0, 0.0003, 0, 0);
+		}
+
+		// Billowing black smoke – slower, long-lived particles drifting upwards
+		const smokeCount = 1024;
+		for (let i = 0; i < smokeCount; i++) {
+			const rx = (Math.random() * 2 - 1) * r * 0.5;
+			const ry = (Math.random() * 2 - 1) * r * 0.5;
+			const rz = (Math.random() * 2 - 1) * r * 0.5;
+			const cx = x + rx;
+			const cy = y + ry;
+			const cz = z + rz;
+
+			const cs = 512 + ((Math.random() * 32) | 0);
+			const shade = (Math.random() * 32) | 0; // 0-31 greyscale
+			const cc = (0xff << 24) | (shade << 16) | (shade << 8) | shade;
+
+			const vx = (Math.random() - 0.5) * 0.02;
+			const vy = Math.random() * 0.04 + 0.01; // drifting upwards
+			const vz = (Math.random() - 0.5) * 0.02;
+
+			const vs = -0.5 - Math.random() * 0.5; // slow shrink
+			this.add(cx, cy, cz, cs, cc, vx, vy, vz, vs, 0, 0.0005, 0, 0);
+		}
+	}
+
 	fxTrail(x: number, y: number, z: number, v: number) {
 		v = Math.min(v, 2);
 		for (let i = 0; i < 4; i++) {

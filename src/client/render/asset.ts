@@ -21,6 +21,7 @@
  *   end up in the final bundle; plain strings won't work.
  */
 import voxelBagFile from "../../../assets/vox/bag.vox?url";
+import voxelBombFile from "../../../assets/vox/bomb.vox?url";
 import voxelTestOutlineFile from "../../../assets/vox/testOutline.vox?url";
 
 import voxelPlayerHeadFile from "../../../assets/vox/player/head.vox?url";
@@ -46,6 +47,7 @@ export class AssetList {
 	cache: Map<string, VoxelMesh> = new Map();
 
 	bag: VoxelMesh;
+	bomb: VoxelMesh;
 	test: VoxelMesh;
 	blockType: TriangleMesh[] = [];
 
@@ -118,6 +120,7 @@ export class AssetList {
 		VoxelMesh.init(gl);
 
 		this.bag = VoxelMesh.fromVoxFile(voxelBagFile);
+		this.bomb = VoxelMesh.fromVoxFile(voxelBombFile);
 		this.test = VoxelMesh.fromVoxFile(voxelTestOutlineFile);
 		this.playerHead = VoxelMesh.fromVoxFile(voxelPlayerHeadFile);
 		this.playerTorso = VoxelMesh.fromVoxFile(voxelPlayerTorsoFile);

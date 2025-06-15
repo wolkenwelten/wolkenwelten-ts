@@ -41,7 +41,7 @@
  *
  */
 import type { Game } from "../game";
-import { Entity } from "./entity/entity";
+import { Entity } from "./entity";
 import type { WorldGen } from "./worldGen";
 import type { ClientGame } from "../client/clientGame";
 import profiler from "../profiler";
@@ -50,6 +50,8 @@ import { Chunk } from "./chunk/chunk";
 import { DangerZone } from "./chunk/dangerZone";
 import { isClient } from "../util/compat";
 import { NetworkObject } from "./entity/networkObject";
+
+import { Bomb } from "./entity/bomb";
 
 /**
  * Convert absolute block coordinates to a 48-bit key that uniquely identifies
@@ -192,6 +194,7 @@ export class World {
 		if ((this.game.ticks & 0xf) === 0) {
 			this.dangerZone.update();
 		}
+		NetworkObject.staticUpdate(this);
 	}
 
 	deserializeNetworkObject(data: any) {
@@ -218,6 +221,16 @@ export class World {
 
 	removeNetworkObject(networkObject: NetworkObject) {
 		this.networkObjects.delete(networkObject.id);
+	}
+
+	getNetworkObjectsByType(T: string): NetworkObject[] {
+		const ret = [];
+		for (const obj of this.networkObjects.values()) {
+			if (obj.T === T) {
+				ret.push(obj);
+			}
+		}
+		return ret;
 	}
 
 	/**
@@ -281,6 +294,39 @@ export class World {
 					const cy = oy + iy * 32;
 					const cz = oz + iz * 32;
 					this.getChunk(cx, cy, cz)?.invalidate();
+				}
+			}
+		}
+	}
+
+	/**
+	 * Fill a solid sphere of blocks.
+	 *
+	 * Centre: (`cx`, `cy`, `cz`) – absolute block coordinates.
+	 * Radius: `radius` – blocks (inclusive, Euclidean distance).
+	 * Block  : `block` – numeric block id.
+	 *
+	 * Client side: issues one network message per affected block.
+	 * Server side: writes directly to chunks, triggering re-meshing as needed.
+	 */
+	setSphere(cx: number, cy: number, cz: number, radius: number, block: number) {
+		const r2 = radius * radius;
+		const x0 = Math.floor(cx - radius);
+		const y0 = Math.floor(cy - radius);
+		const z0 = Math.floor(cz - radius);
+		const x1 = Math.floor(cx + radius);
+		const y1 = Math.floor(cy + radius);
+		const z1 = Math.floor(cz + radius);
+
+		for (let x = x0; x <= x1; x++) {
+			for (let y = y0; y <= y1; y++) {
+				for (let z = z0; z <= z1; z++) {
+					const dx = x - cx;
+					const dy = y - cy;
+					const dz = z - cz;
+					if (dx * dx + dy * dy + dz * dz <= r2) {
+						this.setBlock(x, y, z, block);
+					}
 				}
 			}
 		}

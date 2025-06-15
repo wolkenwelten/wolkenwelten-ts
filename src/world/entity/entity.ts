@@ -157,12 +157,24 @@ export abstract class Entity extends NetworkObject {
 		this.pitch += pitch;
 	}
 
+	size() {
+		return 0.5;
+	}
+
 	collides() {
-		return (
-			this.world.isSolid(this.x, this.y + 0.3, this.z) ||
-			this.world.isSolid(this.x, this.y, this.z) ||
-			this.world.isSolid(this.x, this.y - 0.3, this.z)
-		);
+		for (let ox = -1; ox <= 1; ox++) {
+			for (let oy = -1; oy <= 1; oy++) {
+				for (let oz = -1; oz <= 1; oz++) {
+					const x = this.x + ox * this.size();
+					const y = this.y + oy * this.size();
+					const z = this.z + oz * this.size();
+					if (this.world.isSolid(x, y, z)) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 	getVelocity() {
@@ -191,15 +203,72 @@ export abstract class Entity extends NetworkObject {
 			return;
 		}
 
-		this.x += this.vx;
-		this.y += this.vy;
-		this.z += this.vz;
+		// ────────────────────────────────────────────────────
+		// Basic forces
+		// ────────────────────────────────────────────────────
+		// Constant downward acceleration.
 		this.vy -= GRAVITY;
 
+		// A few tunable constants for the "feel" of the physics.
+		const restitution = 0.4; // How bouncy the entity is (0 = no bounce, 1 = perfect)
+		const groundFriction = 0.8; // Horizontal speed kept each tick when on ground
+		const airDrag = 0.98; // Horizontal speed kept each tick while airborne
+
+		let onGround = false;
+
+		// ────────────────────────────────────────────────────
+		// Move & resolve collisions — X axis
+		// ────────────────────────────────────────────────────
+		this.x += this.vx;
 		if (this.collides()) {
-			this.vy = 0;
-			this.vx = 0;
-			this.vz = 0;
+			this.x -= this.vx; // undo move
+			this.vx *= -restitution; // bounce back with energy loss
+		}
+
+		// ────────────────────────────────────────────────────
+		// Y axis (vertical movement + ground detection)
+		// ────────────────────────────────────────────────────
+		this.y += this.vy;
+		if (this.collides()) {
+			this.y -= this.vy;
+			if (this.vy < 0) {
+				onGround = true; // we collided while falling -> we are on the ground
+			}
+			this.vy *= -restitution;
+			if (Math.abs(this.vy) < 0.01) {
+				this.vy = 0; // stop tiny bounces
+			}
+		}
+
+		// ────────────────────────────────────────────────────
+		// Z axis
+		// ────────────────────────────────────────────────────
+		this.z += this.vz;
+		if (this.collides()) {
+			this.z -= this.vz;
+			this.vz *= -restitution;
+		}
+
+		// ────────────────────────────────────────────────────
+		// Friction / drag
+		// ────────────────────────────────────────────────────
+		if (onGround) {
+			this.vx *= groundFriction;
+			this.vz *= groundFriction;
+		} else {
+			this.vx *= airDrag;
+			this.vz *= airDrag;
+		}
+
+		// Kill minuscule velocities so the entity eventually stops
+		if (Math.abs(this.vx) < 0.0001) this.vx = 0;
+		if (Math.abs(this.vz) < 0.0001) this.vz = 0;
+
+		// ────────────────────────────────────────────────────
+		// Out-of-world check
+		// ────────────────────────────────────────────────────
+		if (this.y < this.world.bottomOfTheWorld) {
+			this.destroy();
 		}
 	}
 

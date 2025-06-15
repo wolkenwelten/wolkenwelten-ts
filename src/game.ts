@@ -51,7 +51,7 @@ import { registerBlockTypes } from "./content/blockTypes";
 import { BenchmarkManager } from "./benchmark";
 import { Options } from "./options";
 import { ProfilingManager } from "./profiler";
-import { Character } from "./world/entity/character";
+import { Character, registerNetworkObjects } from "./world/entity";
 import { World } from "./world/world";
 import { FloatingIslandsWorldGen } from "./content/floatingIslandsWorldGen";
 import type { RenderManager } from "./client/render/render";
@@ -106,6 +106,7 @@ export abstract class Game {
 	 */
 	registerContent() {
 		registerBlockTypes(this.world);
+		registerNetworkObjects();
 	}
 
 	/**

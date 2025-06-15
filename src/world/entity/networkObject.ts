@@ -50,6 +50,16 @@ export abstract class NetworkObject {
 		world.addNetworkObject(this);
 	}
 
+	static update(world: World) {
+		// Defaults to nothing
+	}
+
+	static staticUpdate(world: World) {
+		for (const c of registeredNetworkObjects.values()) {
+			(c as any).update(world);
+		}
+	}
+
 	/**
 	 * Reconstruct an Entity (or one of its subclasses) from raw network/save
 	 * data.  The function looks up the correct constructor in
@@ -102,6 +112,7 @@ export abstract class NetworkObject {
 	destroy() {
 		this.destroyed = true;
 		this.world.removeNetworkObject(this);
+		NetworkObject.pendingOwnershipChanges.push(this);
 	}
 
 	/**

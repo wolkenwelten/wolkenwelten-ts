@@ -314,6 +314,33 @@ export class ClientNetwork {
 			chunk.invalidate();
 		});
 
+		this.queue.registerCallHandler("explode", async (args: unknown) => {
+			if (typeof args !== "object") {
+				throw new Error("Invalid explode received");
+			}
+			const msg = args as any;
+			const x = msg.x;
+			const y = msg.y;
+			const z = msg.z;
+			const r = msg.radius;
+			this.game.render?.particle.fxExplosion(x, y, z, r);
+			this.game.audio?.playAtPosition("bomb", 2, [x, y, z]);
+			const damage = msg.damage;
+			const player = this.game.player;
+			if (!player) {
+				return;
+			}
+			const dx = player.x - x;
+			const dy = player.y - y;
+			const dz = player.z - z;
+			const d = Math.cbrt(dx * dx + dy * dy + dz * dz);
+			const dmg = Math.max(0, Math.min(10, 10 / d));
+			player.damage(dmg);
+			player.vx += (dx / d) * 0.5 * player.repulsionMultiplier;
+			player.vy += (dy / d) * 0.5 * player.repulsionMultiplier;
+			player.vz += (dz / d) * 0.5 * player.repulsionMultiplier;
+		});
+
 		this.queue.registerCallHandler("playerHit", async (args: unknown) => {
 			if (typeof args !== "object") {
 				throw new Error("Invalid player hit received");

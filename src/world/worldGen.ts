@@ -35,7 +35,7 @@
  * Have fun shaping new worlds! (≧▽≦)ゞ
  */
 import type { Chunk } from "./chunk/chunk";
-import type { Character } from "./entity/character";
+import type { Character } from "./entity";
 import type { World } from "./world";
 
 export abstract class WorldGen {

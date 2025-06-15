@@ -49,6 +49,7 @@ import type { ClientGame } from "../../client/clientGame";
 import { Being } from "./being";
 import { GRAVITY } from "../../constants";
 import { registerNetworkObject } from "./networkObject";
+import { Bomb } from "./bomb";
 
 const CHARACTER_ACCELERATION = 0.08;
 const CHARACTER_STOP_RATE = CHARACTER_ACCELERATION * 3.5;
@@ -102,6 +103,8 @@ export class Character extends Being {
 	public primaryHeld = false;
 	public secondaryHeld = false;
 
+	equipedItem = "";
+
 	/**
 	 * Respawns the character by delegating to `init()`.  Useful when the player
 	 * dies or when the server requests a hard reset.
@@ -135,6 +138,7 @@ export class Character extends Being {
 			animation: this.animation,
 			animationId: this.animationId,
 			blockCharge: this.blockCharge,
+			equipedItem: this.equipedItem,
 		};
 	}
 
@@ -143,6 +147,7 @@ export class Character extends Being {
 		this.animation = data.animation;
 		this.animationId = data.animationId;
 		this.blockCharge = data.blockCharge ?? 0;
+		this.equipedItem = data.equipedItem ?? "";
 	}
 
 	/**
@@ -720,6 +725,22 @@ export class Character extends Being {
 				heavy,
 			);
 		}
+
+		// Throw bomb
+		if (this.equipedItem === "Bomb" && heavy) {
+			this.equipedItem = "";
+			const bomb = new Bomb(this.world);
+			bomb.x = this.x + Math.cos(-this.yaw - Math.PI / 2) * 1.5;
+			bomb.y = this.y - 0.9;
+			bomb.z = this.z + Math.sin(-this.yaw - Math.PI / 2) * 1.5;
+			bomb.vx = Math.cos(-this.yaw - Math.PI / 2) * 0.4;
+			bomb.vz = Math.sin(-this.yaw - Math.PI / 2) * 0.4;
+			bomb.vy = 0.2;
+			bomb.ticksLeft = 120;
+			this.world.addEntity(bomb);
+			bomb.changeOwner(0);
+			return;
+		}
 	}
 
 	/* Use the current item or punch if we don't have anything equipped */
@@ -941,6 +962,22 @@ export class Character extends Being {
 			-0.2,
 			0,
 		);
+		if (this.equipedItem === "Bomb") {
+			this.drawBodyPart(
+				projectionMatrix,
+				viewMatrix,
+				alpha,
+				0.65,
+				-0.825 * yStretch + yOff,
+				-0.35,
+				rightArmYaw,
+				rightArmPitch,
+				this.world.game.render?.assets.bomb || null,
+				0,
+				-0.225,
+				0,
+			);
+		}
 	}
 
 	// Helper method to get player name - moved to a separate method for the render pipeline to use

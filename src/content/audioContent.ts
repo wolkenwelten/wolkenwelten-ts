@@ -1,7 +1,7 @@
 /* Copyright 2023 - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
-import bombUrl from "../../assets/sfx/bomb.ogg?url";
+import bombUrl from "../../assets/sfx/bomb.mp3?url";
 import projectileUrl from "../../assets/sfx/projectile.ogg?url";
 import pockUrl from "../../assets/sfx/pock.ogg?url";
 import punchUrl from "../../assets/sfx/punch.ogg?url";
@@ -32,4 +32,5 @@ export const registerAudioContent = (audio: AudioManager) => {
 	audio.add("bgm", bgmUrl);
 	audio.add("dash", dashUrl);
 	audio.add("jump", jumpUrl);
+	audio.add("bomb", bombUrl);
 };
