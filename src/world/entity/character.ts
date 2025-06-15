@@ -734,9 +734,9 @@ export class Character extends Being {
 			bomb.x = this.x + Math.cos(-this.yaw - Math.PI / 2) * 1.5;
 			bomb.y = this.y - 0.9;
 			bomb.z = this.z + Math.sin(-this.yaw - Math.PI / 2) * 1.5;
-			bomb.vx = Math.cos(-this.yaw - Math.PI / 2) * 0.4;
-			bomb.vz = Math.sin(-this.yaw - Math.PI / 2) * 0.4;
-			bomb.vy = 0.2;
+			bomb.vx = this.vx + Math.cos(-this.yaw - Math.PI / 2) * 0.4;
+			bomb.vz = this.vz + Math.sin(-this.yaw - Math.PI / 2) * 0.4;
+			bomb.vy = this.vy + 0.2;
 			bomb.ticksLeft = 120;
 			bomb.throwerID = this.world.game.networkID;
 			this.world.addEntity(bomb);

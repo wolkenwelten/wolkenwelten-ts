@@ -44,7 +44,6 @@
 import { WSPacket, WSQueue } from "../network";
 import { ClientEntry, PlayerStatus, PlayerUpdate } from "./clientEntry";
 import type { ClientGame } from "./clientGame";
-import { Entity } from "../world/entity/entity";
 import { NetworkObject } from "../world/entity/networkObject";
 export type ClientHandler = (game: ClientGame, args: unknown) => Promise<void>;
 
@@ -59,11 +58,17 @@ export class ClientNetwork {
 	public playerStatus: PlayerStatus = "";
 	private lastPlayerStatus: PlayerStatus = "";
 
+	private pendingForceUpdates: NetworkObject[] = [];
+
 	private static readonly defaultHandlers: Map<string, ClientHandler> =
 		new Map();
 
 	static addDefaultHandler(T: string, handler: ClientHandler) {
 		this.defaultHandlers.set(T, handler);
+	}
+
+	forceUpdateNetworkObject(obj: NetworkObject) {
+		this.pendingForceUpdates.push(obj);
 	}
 
 	/**
@@ -83,10 +88,10 @@ export class ClientNetwork {
 			objs.push(obj.serialize());
 		}
 		// Also send any entities with pending ownership changes, even if it means duplicates!
-		for (const obj of NetworkObject.pendingOwnershipChanges) {
+		for (const obj of this.pendingForceUpdates) {
 			objs.push(obj.serialize());
 		}
-		NetworkObject.pendingOwnershipChanges.length = 0;
+		this.pendingForceUpdates.length = 0;
 		this.queue.call("updateNetworkObjects", objs);
 	}
 
@@ -326,7 +331,6 @@ export class ClientNetwork {
 			const attackerID = msg.attackerID;
 			this.game.render?.particle.fxExplosion(x, y, z, r);
 			this.game.audio?.playAtPosition("bomb", 2, [x, y, z]);
-			const damage = msg.damage;
 			const player = this.game.player;
 			if (!player) {
 				return;
@@ -334,14 +338,28 @@ export class ClientNetwork {
 			const dx = player.x - x;
 			const dy = player.y - y;
 			const dz = player.z - z;
-			const d = Math.cbrt(dx * dx + dy * dy + dz * dz);
-			const dmg = Math.max(0, Math.min(10, 10 / d));
+			// Euclidean distance from explosion centre
+			const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+			// Simple damage falloff – same as before but using the correct distance metric
+			const dmg = Math.max(0, Math.min(10, 10 / Math.max(1, dist)));
 			player.damage(dmg);
 			player.lastAttackerId = attackerID;
 			player.lastAttackerCooldown = 100;
-			player.vx += (dx / d) * 0.5 * player.repulsionMultiplier;
-			player.vy += (dy / d) * 0.5 * player.repulsionMultiplier;
-			player.vz += (dz / d) * 0.5 * player.repulsionMultiplier;
+
+			// ---------------- Knock-back / Repulsion ----------------
+			// Players closer to the blast receive a stronger impulse.  The force falls off
+			// linearly and reaches zero at a distance of r * 2 (≈ twice the visual radius).
+			const maxKnockbackDist = r * 2;
+			if (dist > 0 && dist < maxKnockbackDist) {
+				// 0 … 1 – 1 at centre, 0 at maxKnockbackDist
+				const forceFactor = (maxKnockbackDist - dist) / maxKnockbackDist;
+				// Empirical base strength – tweak to taste
+				const baseForce = 1.5;
+				const force = baseForce * forceFactor * player.repulsionMultiplier;
+				player.vx += (dx / dist) * force;
+				player.vy += (dy / dist) * force;
+				player.vz += (dz / dist) * force;
+			}
 		});
 
 		this.queue.registerCallHandler("playerHit", async (args: unknown) => {

@@ -33,7 +33,6 @@ import { WSPacket, WSQueue } from "../network";
 import { coordinateToWorldKey } from "../world/world";
 import { Chunk } from "../world/chunk/chunk";
 import type { PlayerStatus } from "../client/clientEntry";
-import { Entity } from "../world/entity/entity";
 import { Character } from "../world/entity/character";
 import { NetworkObject } from "../world/entity/networkObject";
 
@@ -68,6 +67,12 @@ export class ClientConnection {
 	private chunkBuffer = new ArrayBuffer(20 + 32 * 32 * 32);
 
 	q: WSQueue = new WSQueue();
+
+	private pendingForceUpdates: NetworkObject[] = [];
+
+	forceUpdateNetworkObject(obj: NetworkObject) {
+		this.pendingForceUpdates.push(obj);
+	}
 
 	getChunkVersion(x: number, y: number, z: number): number {
 		return this.chunkVersions.get(coordinateToWorldKey(x, y, z)) || 0;
@@ -136,10 +141,10 @@ export class ClientConnection {
 			objs.push(obj.serialize());
 		}
 		// Also send any entities with pending ownership changes, even if it means duplicates!
-		for (const obj of NetworkObject.pendingOwnershipChanges) {
+		for (const obj of this.pendingForceUpdates) {
 			objs.push(obj.serialize());
 		}
-		NetworkObject.pendingOwnershipChanges.length = 0;
+		this.pendingForceUpdates.length = 0;
 		this.q.call("updateNetworkObjects", objs);
 	}
 
@@ -255,7 +260,7 @@ export class ClientConnection {
 			const attackerId = args as number;
 			if (attackerId !== 0) {
 				for (const client of this.server.sockets.values()) {
-					if (client.id === attackerId) {
+					if (client.id === attackerId && client.id !== this.id) {
 						client.kills++;
 					}
 				}

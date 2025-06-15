@@ -223,10 +223,13 @@ export class World {
 		this.networkObjects.delete(networkObject.id);
 	}
 
-	getNetworkObjectsByType(T: string): NetworkObject[] {
+	getNetworkObjectsByType(
+		T: string,
+		includeDestroyed = false,
+	): NetworkObject[] {
 		const ret = [];
 		for (const obj of this.networkObjects.values()) {
-			if (obj.T === T) {
+			if (obj.T === T && (includeDestroyed || !obj.destroyed)) {
 				ret.push(obj);
 			}
 		}

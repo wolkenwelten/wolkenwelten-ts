@@ -34,7 +34,10 @@ import { InputManager } from "./input";
 import { AudioManager } from "./audio";
 import { registerAudioContent } from "../content/audioContent";
 import { Character } from "../world/entity/character";
-import { setIdCounter } from "../world/entity/networkObject";
+import {
+	type NetworkObject,
+	setIdCounter,
+} from "../world/entity/networkObject";
 
 export interface ClientGameConfig extends GameConfig {
 	parent: HTMLElement;
@@ -74,6 +77,10 @@ export class ClientGame extends Game {
 		setInterval(() => {
 			this.update();
 		}, 1 / 30); // Update even when not rendering
+	}
+
+	forceUpdateNetworkObject(obj: NetworkObject) {
+		this.network.forceUpdateNetworkObject(obj);
 	}
 
 	/**

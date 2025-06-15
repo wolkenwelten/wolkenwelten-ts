@@ -38,6 +38,7 @@
 import { Game, type GameConfig } from "../game";
 import { type WebSocket } from "ws";
 import { ClientConnection } from "./connection";
+import type { NetworkObject } from "../world/entity";
 
 import "../world/entity/character";
 
@@ -57,6 +58,12 @@ export class ServerGame extends Game {
 		const con = new ClientConnection(this, socket);
 		this.sockets.set(con.id, con);
 		con.broadcastPlayerList();
+	}
+
+	forceUpdateNetworkObject(obj: NetworkObject) {
+		for (const con of this.sockets.values()) {
+			con.forceUpdateNetworkObject(obj);
+		}
 	}
 
 	/**

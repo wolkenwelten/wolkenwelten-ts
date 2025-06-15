@@ -51,7 +51,11 @@ import { registerBlockTypes } from "./content/blockTypes";
 import { BenchmarkManager } from "./benchmark";
 import { Options } from "./options";
 import { ProfilingManager } from "./profiler";
-import { Character, registerNetworkObjects } from "./world/entity";
+import {
+	Character,
+	NetworkObject,
+	registerNetworkObjects,
+} from "./world/entity";
 import { World } from "./world/world";
 import { FloatingIslandsWorldGen } from "./content/floatingIslandsWorldGen";
 import type { RenderManager } from "./client/render/render";
@@ -98,6 +102,8 @@ export abstract class Game {
 		setInterval(this.gc.bind(this), 20000);
 		setTimeout(this.init.bind(this), 0);
 	}
+
+	abstract forceUpdateNetworkObject(obj: NetworkObject): void;
 
 	/**
 	 * Register hard-coded content (block types, entities …) that is needed

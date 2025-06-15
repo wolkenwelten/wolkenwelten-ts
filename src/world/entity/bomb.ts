@@ -65,7 +65,7 @@ export class Bomb extends Entity {
 			"Character",
 		) as Character[];
 		for (const player of players) {
-			if (player.equipedItem !== "") {
+			if (player.equipedItem) {
 				continue;
 			}
 			const dx = this.x - player.x;

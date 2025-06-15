@@ -34,9 +34,6 @@ export const registerNetworkObject = (
 export abstract class NetworkObject {
 	static readonly registeredNetworkObjects = registeredNetworkObjects;
 
-	// Track entities whose ownership has changed and need a final update sent
-	static pendingOwnershipChanges: NetworkObject[] = [];
-
 	id: number;
 	ownerID: number;
 	T = "NetworkObject";
@@ -112,7 +109,7 @@ export abstract class NetworkObject {
 	destroy() {
 		this.destroyed = true;
 		this.world.removeNetworkObject(this);
-		NetworkObject.pendingOwnershipChanges.push(this);
+		this.world.game.forceUpdateNetworkObject(this);
 	}
 
 	/**
@@ -157,8 +154,6 @@ export abstract class NetworkObject {
 		}
 		this.ownerID = newOwnerID;
 		// Add to pendingOwnershipChanges for networking code to send a final update
-		if (!NetworkObject.pendingOwnershipChanges.includes(this)) {
-			NetworkObject.pendingOwnershipChanges.push(this);
-		}
+		this.world.game.forceUpdateNetworkObject(this);
 	}
 }
