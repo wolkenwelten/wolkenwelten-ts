@@ -183,6 +183,7 @@ export class Character extends Being {
 		this.lastAttackerId = 0;
 		this.lastAttackerCooldown = 0;
 		this.knockoutTimer = 0;
+		this.equipedItem = "";
 	}
 
 	constructor(world: World, id?: number) {
@@ -737,6 +738,7 @@ export class Character extends Being {
 			bomb.vz = Math.sin(-this.yaw - Math.PI / 2) * 0.4;
 			bomb.vy = 0.2;
 			bomb.ticksLeft = 120;
+			bomb.throwerID = this.world.game.networkID;
 			this.world.addEntity(bomb);
 			bomb.changeOwner(0);
 			return;

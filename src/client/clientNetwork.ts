@@ -323,6 +323,7 @@ export class ClientNetwork {
 			const y = msg.y;
 			const z = msg.z;
 			const r = msg.radius;
+			const attackerID = msg.attackerID;
 			this.game.render?.particle.fxExplosion(x, y, z, r);
 			this.game.audio?.playAtPosition("bomb", 2, [x, y, z]);
 			const damage = msg.damage;
@@ -336,6 +337,8 @@ export class ClientNetwork {
 			const d = Math.cbrt(dx * dx + dy * dy + dz * dz);
 			const dmg = Math.max(0, Math.min(10, 10 / d));
 			player.damage(dmg);
+			player.lastAttackerId = attackerID;
+			player.lastAttackerCooldown = 100;
 			player.vx += (dx / d) * 0.5 * player.repulsionMultiplier;
 			player.vy += (dy / d) * 0.5 * player.repulsionMultiplier;
 			player.vz += (dz / d) * 0.5 * player.repulsionMultiplier;

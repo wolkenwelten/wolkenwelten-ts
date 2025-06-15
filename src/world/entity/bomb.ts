@@ -11,6 +11,7 @@ import { registerNetworkObject } from "./networkObject";
 export class Bomb extends Entity {
 	T = "Bomb";
 	ticksLeft = -1;
+	throwerID = 0;
 
 	constructor(world: World, id?: number) {
 		super(world, id);
@@ -20,12 +21,14 @@ export class Bomb extends Entity {
 		return {
 			...super.serialize(),
 			ticksLeft: this.ticksLeft,
+			throwerID: this.throwerID,
 		};
 	}
 
 	deserialize(data: any) {
 		super.deserialize(data);
 		this.ticksLeft = data.ticksLeft;
+		this.throwerID = data.throwerID;
 	}
 
 	explode() {
@@ -40,6 +43,7 @@ export class Bomb extends Entity {
 					z: this.z,
 					radius: 12,
 					damage: 8,
+					attackerID: this.throwerID,
 				});
 			}
 		}
