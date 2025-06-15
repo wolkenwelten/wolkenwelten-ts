@@ -1,6 +1,7 @@
 /* Copyright - Benjamin Vincent Schulenburg
  * Licensed under the AGPL3+, for the full text see /LICENSE
  */
+import type { GameConfig } from "./game";
 import { isClient } from "./util/compat";
 
 const randomNames = [
@@ -24,7 +25,6 @@ const getRandomPlayerName = () => {
 export class Options {
 	skipMenu = false;
 	noBGM = false;
-	startWithEquipment = false;
 	playerName: string;
 	debug = false;
 
@@ -55,24 +55,18 @@ export class Options {
     }
     */
 
-	constructor() {
+	constructor(config: GameConfig) {
 		if (isClient()) {
 			const params = new URLSearchParams(window.location.search);
 			this.debug = window.location.hostname === "localhost";
 			this.skipMenu = window.location.hostname === "localhost";
 			this.skipMenu = this.parseBoolean(this.skipMenu, params.get("skipMenu"));
 			this.noBGM = this.parseBoolean(this.noBGM, params.get("noBGM"));
-			this.startWithEquipment = this.parseBoolean(
-				this.startWithEquipment,
-				params.get("startWithEquipment"),
-			);
 			this.playerName = params.get("playerName") || getRandomPlayerName();
 		} else {
 			this.skipMenu = true;
 			this.playerName = "";
+			this.debug = config.debug || false;
 		}
 	}
 }
-
-const options = new Options();
-export default options;

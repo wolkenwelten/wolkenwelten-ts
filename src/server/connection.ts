@@ -63,6 +63,11 @@ export class ClientConnection {
 
 	updatesWithoutPackets = 0;
 
+	bytesSent = 0;
+	msgsSent = 0;
+	bytesReceived = 0;
+	msgsReceived = 0;
+
 	chunkVersions = new Map<number, number>();
 	private chunkBuffer = new ArrayBuffer(20 + 32 * 32 * 32);
 
@@ -119,7 +124,10 @@ export class ClientConnection {
 		socket.on("message", (msg) => {
 			try {
 				this.updatesWithoutPackets = 0;
-				const raw = JSON.parse(msg.toString());
+				const s = msg.toString();
+				this.bytesReceived += s.length;
+				this.msgsReceived++;
+				const raw = JSON.parse(s);
 				if (raw.T === "packet") {
 					const packet = raw as WSPacket;
 					this.q.handlePacket(packet);
@@ -128,6 +136,20 @@ export class ClientConnection {
 				console.error(e);
 			}
 		});
+
+		setInterval(() => {
+			const kbpsIn = this.bytesReceived / 1024;
+			const kbpsOut = this.bytesSent / 1024;
+			if (this.server.options.debug) {
+				console.log(
+					`Bytes sent: ${kbpsOut}kbps (${this.msgsSent} msgs), bytes received: ${kbpsIn}kbps (${this.msgsReceived} msgs)`,
+				);
+			}
+			this.bytesSent = 0;
+			this.bytesReceived = 0;
+			this.msgsSent = 0;
+			this.msgsReceived = 0;
+		}, 1000);
 
 		this.registerDefaultHandlers();
 	}
@@ -378,6 +400,8 @@ export class ClientConnection {
 	transferQueue() {
 		if (!this.q.empty()) {
 			const packet = this.q.flush();
+			this.bytesSent += packet.length;
+			this.msgsSent++;
 			this.socket.send(packet);
 		}
 	}

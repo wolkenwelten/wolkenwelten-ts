@@ -112,7 +112,7 @@ const main = async () => {
 		console.error("Unhandled Rejection at:", promise, "reason:", reason);
 	});
 
-	const game = new ServerGame();
+	const game = new ServerGame({ debug: config.nodeEnv === "development" });
 
 	const onConnect = game.onConnect.bind(game);
 	wss.on("connection", onConnect);

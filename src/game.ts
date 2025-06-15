@@ -61,7 +61,9 @@ import { FloatingIslandsWorldGen } from "./content/floatingIslandsWorldGen";
 import type { RenderManager } from "./client/render/render";
 import type { AudioManager } from "./client/audio";
 
-export interface GameConfig {}
+export interface GameConfig {
+	debug?: boolean;
+}
 
 export interface BlockTypeRegistry {
 	[key: string]: number;
@@ -92,7 +94,7 @@ export abstract class Game {
 
 	constructor(config: GameConfig) {
 		this.config = config;
-		this.options = new Options();
+		this.options = new Options(config);
 		this.profiler = ProfilingManager.profiler();
 		this.benchmark = new BenchmarkManager(this);
 		this.world = new World(this);
