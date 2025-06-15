@@ -354,7 +354,7 @@ export class ClientNetwork {
 				// 0 … 1 – 1 at centre, 0 at maxKnockbackDist
 				const forceFactor = (maxKnockbackDist - dist) / maxKnockbackDist;
 				// Empirical base strength – tweak to taste
-				const baseForce = 1.5;
+				const baseForce = 3;
 				const force = baseForce * forceFactor * player.repulsionMultiplier;
 				player.vx += (dx / dist) * force;
 				player.vy += (dy / dist) * force;
