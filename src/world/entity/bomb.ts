@@ -116,7 +116,6 @@ export class Bomb extends Entity {
 	}
 
 	static update(world: World) {
-		return;
 		if (world.game.isClient) {
 			return;
 		}
