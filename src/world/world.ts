@@ -67,6 +67,13 @@ export const coordinateToWorldKey = (x: number, y: number, z: number) =>
 	((Math.floor(y) >> 5) & 0xffff) * 0x10000 +
 	((Math.floor(z) >> 5) & 0xffff) * 0x100000000;
 
+export const worldKeyToCoordinate = (key: number) => {
+	const x = (key & 0xffff) << 5;
+	const y = ((key >> 16) & 0xffff) << 5;
+	const z = ((key >> 32) & 0xffff) << 5;
+	return { x, y, z };
+};
+
 export class World {
 	chunks: Map<number, Chunk> = new Map();
 	dangerZone: DangerZone;
@@ -171,7 +178,9 @@ export class World {
 		const cz = z & ~0x1f;
 		const newChunk = new Chunk(this, cx, cy, cz);
 
-		if (!isClient()) {
+		if (isClient()) {
+			(this.game as ClientGame).network.chunkRequest(cx, cy, cz);
+		} else {
 			if (!this.worldgenHandler) {
 				throw new Error("Missing WorldGen");
 			}

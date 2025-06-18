@@ -30,7 +30,7 @@
 import { WebSocket } from "ws";
 import type { ServerGame } from "./serverGame";
 import { WSPacket, WSQueue } from "../network";
-import { coordinateToWorldKey } from "../world/world";
+import { coordinateToWorldKey, worldKeyToCoordinate } from "../world/world";
 import { Chunk } from "../world/chunk/chunk";
 import type { PlayerStatus } from "../client/clientEntry";
 import { Character } from "../world/entity/character";
@@ -73,6 +73,7 @@ export class ClientConnection {
 	private chunkBuffer = new ArrayBuffer(20 + 32 * 32 * 32);
 
 	q: WSQueue = new WSQueue();
+	syncQueued = false;
 
 	private pendingForceUpdates: NetworkObject[] = [];
 
@@ -136,6 +137,12 @@ export class ClientConnection {
 					const packet = raw as WSPacket;
 					this.q.handlePacket(packet);
 				}
+				// Only do this after handling all packets, because we might have multiple update packets in one frame
+				if (this.syncQueued) {
+					this.broadcastNetworkObjects();
+					this.chunkUpdateLoop();
+					this.syncQueued = false;
+				}
 			} catch (e) {
 				console.error(e);
 			}
@@ -198,8 +205,7 @@ export class ClientConnection {
 						this.pitch = char.pitch;
 					}
 				}
-				this.broadcastNetworkObjects();
-				this.updateChunkVersions();
+				this.syncQueued = true;
 			},
 		);
 
@@ -240,8 +246,26 @@ export class ClientConnection {
 			if (typeof args !== "object") {
 				throw new Error("Invalid chunk drop received");
 			}
-			const drop = args as any;
-			this.server.world.setBlock(drop.x, drop.y, drop.z, 0);
+			const data = args as any;
+			const cx = data.x & ~0x1f;
+			const cy = data.y & ~0x1f;
+			const cz = data.z & ~0x1f;
+
+			const key = coordinateToWorldKey(cx, cy, cz);
+			this.chunkVersions.delete(key);
+		});
+
+		this.q.registerCallHandler("chunkRequest", async (args: unknown) => {
+			if (typeof args !== "object") {
+				throw new Error("Invalid chunk request received");
+			}
+			const data = args as any;
+			const cx = data.x & ~0x1f;
+			const cy = data.y & ~0x1f;
+			const cz = data.z & ~0x1f;
+			const key = coordinateToWorldKey(cx, cy, cz);
+			const oldVersion = this.chunkVersions.get(key);
+			this.chunkVersions.set(key, Math.max(oldVersion || -1, -1)); 
 		});
 
 		this.q.registerCallHandler("blockUpdate", async (args: unknown) => {
@@ -312,88 +336,64 @@ export class ClientConnection {
 		});
 	}
 
-	clientUpdateChunk(chunk: Chunk): boolean {
-		const clientVersion = this.getChunkVersion(chunk.x, chunk.y, chunk.z);
-		const serverVersion = chunk.lastUpdated;
-
-		if (clientVersion == serverVersion) {
-			return false;
-		} else if (clientVersion > serverVersion) {
-			throw new Error(
-				"Client has a higher version than the server, this should never happen",
-			);
-		} else {
-			this.setChunkVersion(chunk.x, chunk.y, chunk.z, serverVersion);
-
-			if (chunk.isEmpty()) {
-				this.q.call("emptyChunk", {
-					x: chunk.x,
-					y: chunk.y,
-					z: chunk.z,
-					version: chunk.lastUpdated,
-				});
-				return false;
-			}
-
-			// Create binary message for chunk update
-			// Format: [messageType(1), padding(3), x(4), y(4), z(4), version(4), data(32*32*32)]
-			const view = new DataView(this.chunkBuffer);
-
-			// Message type 1 = chunk update
-			view.setUint8(0, 1);
-
-			// Chunk coordinates and version
-			view.setInt32(4, chunk.x, true);
-			view.setInt32(8, chunk.y, true);
-			view.setInt32(12, chunk.z, true);
-			view.setUint32(16, chunk.lastUpdated, true);
-
-			// Copy chunk data
-			const uint8View = new Uint8Array(this.chunkBuffer, 20);
-			uint8View.set(chunk.blocks);
-
-			// Send binary data directly
-			this.socket.send(this.chunkBuffer);
-
-			return true;
+	clientUpdateChunk(chunk: Chunk) {
+		if (chunk.isEmpty()) {
+			this.q.call("emptyChunk", {
+				x: chunk.x,
+				y: chunk.y,
+				z: chunk.z,
+				version: chunk.lastUpdated,
+			});
+			return;
 		}
+
+		// Create binary message for chunk update
+		// Format: [messageType(1), padding(3), x(4), y(4), z(4), version(4), data(32*32*32)]
+		const view = new DataView(this.chunkBuffer);
+
+		// Message type 1 = chunk update
+		view.setUint8(0, 1);
+
+		// Chunk coordinates and version
+		view.setInt32(4, chunk.x, true);
+		view.setInt32(8, chunk.y, true);
+		view.setInt32(12, chunk.z, true);
+		view.setUint32(16, chunk.lastUpdated, true);
+
+		// Copy chunk data
+		const uint8View = new Uint8Array(this.chunkBuffer, 20);
+		uint8View.set(chunk.blocks);
+
+		// Send binary data directly
+		this.socket.send(this.chunkBuffer);
+
+		this.bytesSent += this.chunkBuffer.byteLength;
+		this.msgsSent++;
 	}
 
-	maybeUpdateChunk(ox: number, oy: number, oz: number): boolean {
-		const x = this.x + ox * 32;
-		const y = this.y + oy * 32;
-		const z = this.z + oz * 32;
-
-		const chunk = this.server.world.getOrGenChunk(x, y, z);
-		return this.clientUpdateChunk(chunk);
-	}
-
-	chunkUpdateLoop(r: number) {
-		// Process chunks in a rough inside-out pattern
+	chunkUpdateLoop() {
 		let updates = 0;
 
-		for (let ox = -r; ox <= r; ox++) {
-			for (let oy = -r; oy <= r; oy++) {
-				for (let oz = -r; oz <= r; oz++) {
-					if (this.maybeUpdateChunk(ox, oy, oz)) {
-						if (++updates > 4) {
-							console.log(`Sent ${updates} chunk updates`);
-							return;
-						}
-					}
+		for (const [key, version] of this.chunkVersions.entries()) {
+			let chunk = this.server.world.chunks.get(key);
+			if (!chunk) {
+				const { x, y, z } = worldKeyToCoordinate(key);
+				chunk = this.server.world.getOrGenChunk(x, y, z);
+			}
+			if (version < chunk.lastUpdated) {
+				this.clientUpdateChunk(chunk);
+				if (++updates > 6) {
+					return;
 				}
+				this.chunkVersions.set(key, chunk.lastUpdated);
 			}
 		}
 
 		if (updates > 0) {
-			console.log(`Sent ${updates} chunk updates`);
+			if (this.server.options.debug) {
+				console.log(`Sent ${updates} chunk updates`);
+			}
 		}
-	}
-
-	updateChunkVersions() {
-		this.chunkUpdateLoop(1);
-		this.chunkUpdateLoop(4);
-		this.chunkUpdateLoop(8);
 	}
 
 	/**

@@ -190,7 +190,7 @@ export class ClientNetwork {
 		this.flushRawQueue();
 	}
 
-	private close(event?: CloseEvent | Event) {
+	private close(_event?: CloseEvent | Event) {
 		console.log("(｡•́︿•̀｡) Connection closed, attempting reconnect...");
 		if (this.ws) {
 			this.ws.close();
@@ -546,6 +546,17 @@ export class ClientNetwork {
 		await this.queue.call("setPlayerName", name);
 	}
 
+	async chunkRequest(x: number, y: number, z: number): Promise<void> {
+		x = x & ~0x1f;
+		y = y & ~0x1f;
+		z = z & ~0x1f;
+		await this.queue.call("chunkRequest", {
+			x,
+			y,
+			z,
+		});
+	}
+
 	async chunkDrop(x: number, y: number, z: number): Promise<void> {
 		await this.queue.call("chunkDrop", {
 			x,
@@ -606,20 +617,6 @@ export class ClientNetwork {
 			x,
 			y,
 			z,
-		});
-	}
-
-	async fireAdd(
-		x: number,
-		y: number,
-		z: number,
-		strength: number,
-	): Promise<void> {
-		await this.queue.call("fireAdd", {
-			x,
-			y,
-			z,
-			strength,
 		});
 	}
 
