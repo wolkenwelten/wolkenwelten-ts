@@ -89,6 +89,7 @@ export abstract class Game {
 	ticks = 1;
 	ready = false;
 	running = false;
+	private gcInterval?: NodeJS.Timeout;
 
 	player?: Character;
 
@@ -101,8 +102,20 @@ export abstract class Game {
 
 		this.registerContent();
 
-		setInterval(this.gc.bind(this), 20000);
 		setTimeout(this.init.bind(this), 0);
+	}
+
+	protected startGCInterval() {
+		if (!this.gcInterval) {
+			this.gcInterval = setInterval(this.gc.bind(this), 20000);
+		}
+	}
+
+	protected stopGCInterval() {
+		if (this.gcInterval) {
+			clearInterval(this.gcInterval);
+			this.gcInterval = undefined;
+		}
 	}
 
 	abstract forceUpdateNetworkObject(obj: NetworkObject): void;

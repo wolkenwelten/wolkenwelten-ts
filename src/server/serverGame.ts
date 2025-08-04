@@ -47,6 +47,8 @@ export interface ServerGameConfig extends GameConfig {}
 export class ServerGame extends Game {
 	isServer = true;
 	sockets: Map<number, ClientConnection> = new Map();
+	private gameInterval?: NodeJS.Timeout;
+	private tickCounter = 0;
 
 	/**
 	 * Wrap an incoming websocket in a `ClientConnection`, register it in the
@@ -55,9 +57,15 @@ export class ServerGame extends Game {
 	 * `super.onConnect(socket)` so base bookkeeping is not skipped.
 	 */
 	onConnect(socket: WebSocket) {
+		const wasEmpty = this.sockets.size === 0;
 		const con = new ClientConnection(this, socket);
 		this.sockets.set(con.id, con);
 		con.broadcastPlayerList();
+
+		// Start game interval if this is the first player
+		if (wasEmpty) {
+			this.startGameInterval();
+		}
 	}
 
 	forceUpdateNetworkObject(obj: NetworkObject) {
@@ -74,37 +82,66 @@ export class ServerGame extends Game {
 	broadcastSystems() {}
 
 	/**
-	 * Creates the game instance and immediately starts the simulation and
-	 * maintenance timers.
+	 * Creates the game instance and starts adaptive intervals based on player presence.
 	 *
-	 * Timers:
-	 *   – 10 ms: `update()` + `broadcastSystems()` + connection queue flush.
-	 *   – 10 s:  player-list broadcast and idle-connection pruning.
-	 *
-	 * Adjust the intervals if your game world is either trivial (increase) or
-	 * very heavy (decrease) to keep latency and CPU usage balanced.
+	 * Adaptive timing:
+	 *   – When players connected: 10ms interval with counter-based operations
+	 *     • Every tick: update() + broadcastSystems() + queue flush
+	 *     • Every 1000 ticks (10s): player list broadcast + connection pruning
+	 *     • Every 2000 ticks (20s): garbage collection
+	 *   – When no players: all intervals stopped, one-time GC on last disconnect
 	 */
 	constructor(config: ServerGameConfig = {}) {
 		super(config);
 		this.running = true;
+		// No intervals started - they begin when first player connects
+	}
 
-		const server = this;
-		setInterval(() => {
+	private startGameInterval() {
+		if (this.gameInterval) return;
+
+		this.tickCounter = 0;
+		this.gameInterval = setInterval(() => {
+			this.tickCounter++;
+
+			// Core game loop every tick
 			this.update();
 			this.broadcastSystems();
-			for (const con of server.sockets.values()) {
+			for (const con of this.sockets.values()) {
 				con.transferQueue();
 			}
-		}, 10);
 
-		// Add this new interval to broadcast player list
-		setInterval(() => {
-			for (const sock of this.sockets.values()) {
-				sock.broadcastPlayerList();
-				if (++sock.updatesWithoutPackets > 3) {
-					sock.close();
+			// Player list broadcast and connection pruning every 1000 ticks (10s)
+			if (this.tickCounter % 1000 === 0) {
+				for (const sock of this.sockets.values()) {
+					sock.broadcastPlayerList();
+					if (++sock.updatesWithoutPackets > 3) {
+						sock.close();
+					}
 				}
 			}
-		}, 10000);
+
+			// Garbage collection every 2000 ticks (20s)
+			if (this.tickCounter % 2000 === 0) {
+				this.gc();
+			}
+		}, 10);
+	}
+
+	private stopGameInterval() {
+		if (this.gameInterval) {
+			clearInterval(this.gameInterval);
+			this.gameInterval = undefined;
+			this.tickCounter = 0;
+			// Run final GC when stopping
+			this.gc();
+		}
+	}
+
+	onPlayerDisconnect() {
+		// Check if server is now empty after disconnect
+		if (this.sockets.size === 0) {
+			this.stopGameInterval();
+		}
 	}
 }

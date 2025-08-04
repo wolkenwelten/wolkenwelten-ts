@@ -74,6 +74,9 @@ export class ClientGame extends Game {
 		this.render = new RenderManager(this);
 		this.input = new InputManager(this);
 
+		// Client always needs GC running
+		this.startGCInterval();
+
 		setInterval(() => {
 			this.update();
 		}, 1 / 30); // Update even when not rendering

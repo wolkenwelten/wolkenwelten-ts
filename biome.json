@@ -5,7 +5,6 @@
         "indentStyle": "tab",
         "indentWidth": 2,
         "lineWidth": 80,
-        "lineEnding": "lf",
-        "ignore": []
+        "lineEnding": "lf"
     }
 }

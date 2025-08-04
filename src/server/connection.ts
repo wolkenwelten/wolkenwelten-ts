@@ -99,6 +99,8 @@ export class ClientConnection {
 		if (this.debugInterval) {
 			clearInterval(this.debugInterval);
 		}
+		// Notify server that a player disconnected
+		this.server.onPlayerDisconnect();
 	}
 
 	/**
@@ -265,7 +267,7 @@ export class ClientConnection {
 			const cz = data.z & ~0x1f;
 			const key = coordinateToWorldKey(cx, cy, cz);
 			const oldVersion = this.chunkVersions.get(key);
-			this.chunkVersions.set(key, Math.max(oldVersion || -1, -1)); 
+			this.chunkVersions.set(key, Math.max(oldVersion || -1, -1));
 		});
 
 		this.q.registerCallHandler("blockUpdate", async (args: unknown) => {
