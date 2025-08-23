@@ -81,3 +81,20 @@ Block types, items, and game content are registered through centralized systems 
 
 ### Build System
 Uses Vite for bundling with dual entry points (`index.html` for landing page, `game.html` for game). Development mode integrates Vite dev server as Express middleware.
+
+## Code Style and Conventions
+
+- **Indentation**: Always use tabs for indentation
+- **Functions**: Prefer arrow functions over function declarations
+- **Approach**: Use modern JavaScript features and functional programming patterns
+- **Philosophy**: Keep things simple and obviously correct - avoid overcomplplication
+
+## Tech Stack
+
+- **Runtime**: Node.js with TypeScript
+- **Graphics**: WebGL 2 for client-side rendering
+- **Communication**: WebSockets for client-server networking
+- **Audio**: Howler.js for positional audio
+- **Math**: gl-matrix for vector/matrix operations
+- **Assets**: vox-reader for .vox model support
+- **Build**: Vite for bundling and development server

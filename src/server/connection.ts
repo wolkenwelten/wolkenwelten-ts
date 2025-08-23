@@ -268,6 +268,7 @@ export class ClientConnection {
 			const key = coordinateToWorldKey(cx, cy, cz);
 			const oldVersion = this.chunkVersions.get(key);
 			this.chunkVersions.set(key, Math.max(oldVersion || -1, -1));
+			this.syncQueued = true;
 		});
 
 		this.q.registerCallHandler("blockUpdate", async (args: unknown) => {

@@ -187,6 +187,7 @@ export class World {
 			const start = performance.now();
 			this.worldgenHandler.genChunk(newChunk);
 			profiler.add("worldgen", start, performance.now());
+			newChunk.loaded = true;
 		}
 
 		this.chunks.set(key, newChunk);
