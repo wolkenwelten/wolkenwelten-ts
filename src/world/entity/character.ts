@@ -373,6 +373,7 @@ export class Character extends Being {
 
 		// Freeze while surrounding chunks are not yet loaded
 		if (!this.world.isLoaded(this.x, this.y, this.z)) {
+			console.log("!isLoaded");
 			return;
 		}
 
@@ -412,9 +413,6 @@ export class Character extends Being {
 	/* Returns true if the update loop should bail out early */
 	private earlyExitChecks(): boolean {
 		if (this.ownerID !== this.world.game.networkID) {
-			return true;
-		}
-		if (this.isInLoadingChunk()) {
 			return true;
 		}
 

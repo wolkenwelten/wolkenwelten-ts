@@ -197,8 +197,7 @@ export abstract class Entity extends NetworkObject {
 		if (
 			this.noClip ||
 			this.destroyed ||
-			this.ownerID !== this.world.game.networkID ||
-			!this.world.isLoaded(this.x, this.y, this.z)
+			this.ownerID !== this.world.game.networkID
 		) {
 			return;
 		}
@@ -494,6 +493,6 @@ export abstract class Entity extends NetworkObject {
 
 	isInLoadingChunk(): boolean {
 		const chunk = this.world.getChunk(this.x, this.y, this.z);
-		return chunk?.loaded === false;
+		return !chunk || chunk.loaded === false;
 	}
 }
