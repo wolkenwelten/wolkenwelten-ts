@@ -2,8 +2,13 @@ FROM node:lts-alpine
 WORKDIR /app
 RUN apk --no-cache add curl
 
+# Copy package files first for better layer caching
+COPY package*.json ./
+RUN npm ci
+
+# Copy source and build
 COPY . .
-RUN npm ci && npm run build && npm prune --production
+RUN npm run build && npm prune --production
 CMD [ "npm", "start" ]
 
 EXPOSE 3030
