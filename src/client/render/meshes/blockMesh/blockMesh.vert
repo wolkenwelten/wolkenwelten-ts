@@ -3,6 +3,7 @@ precision highp float;
 
 uniform mat4 mat_mvp;
 uniform mat4 mat_mv;
+uniform mat4 mat_light_mvp;
 uniform vec3 trans_pos;
 
 layout (location=0) in uvec3 pos;
@@ -11,7 +12,18 @@ layout (location=2) in uint side_and_light;
 
 out vec3 view_position;
 out vec3 tex_coord;
-out float light_value;
+out float ao_value;
+out vec4 light_space_pos;
+out vec3 world_normal;
+
+const vec3 normals[6] = vec3[](
+    vec3(0.0, 0.0, 1.0),
+    vec3(0.0, 0.0, -1.0),
+    vec3(0.0, 1.0, 0.0),
+    vec3(0.0, -1.0, 0.0),
+    vec3(-1.0, 0.0, 0.0),
+    vec3(1.0, 0.0, 0.0)
+);
 
 void main(){
     /* Then we use the positional data as texture coordinates, since our
@@ -32,12 +44,8 @@ void main(){
      */
 	tex_coord = vec3(uvec3(taxis[side >> 1], texture_index)) * vec3(0.5, 0.5, 1.0);
 
-    /* Finally we extract the 4-bit lightness value, turn it into a float
-     | in the range of 0.0-1.0 and then multiply it by itself to make the
-     | lightness curve look non-linear
-     */
-	float light_raw = float(side_and_light >> 4) * (1.0 / 16.0);
-	light_value = light_raw * light_raw;
+    /* Pack the 4-bit value as an ambient occlusion term. */
+	ao_value = float(side_and_light >> 4) * (1.0 / 15.0);
 
     /* To determine the position we multiply by our MVP matrix after adding
      | our transPos uniform value, this is done so that our position within
@@ -46,5 +54,7 @@ void main(){
      */
     vec4 world_position = (vec4(pos, 1.0) + vec4(trans_pos,0.0));
     view_position = (mat_mv * world_position).xyz;
+    world_normal = normals[int(side)];
+    light_space_pos = mat_light_mvp * world_position;
 	gl_Position = mat_mvp * world_position;
 }

@@ -29,6 +29,7 @@
  */
 import { mat4 } from "gl-matrix";
 import { Shader } from "./shader";
+import { invalidateTextureUnit } from "./texture";
 import billboardVertSource from "./shaders/billboard.vert?raw";
 import billboardFragSource from "./shaders/billboard.frag?raw";
 
@@ -200,6 +201,7 @@ export class TextRenderer {
 		// Bind texture and VAO
 		gl.activeTexture(gl.TEXTURE0);
 		gl.bindTexture(gl.TEXTURE_2D, texture);
+		invalidateTextureUnit(0);
 		gl.bindVertexArray(this.vao);
 
 		// Draw the billboard
@@ -241,6 +243,7 @@ export class TextRenderer {
 		}
 
 		gl.bindTexture(gl.TEXTURE_2D, webglTexture);
+		invalidateTextureUnit(0);
 		gl.texImage2D(
 			gl.TEXTURE_2D,
 			0,

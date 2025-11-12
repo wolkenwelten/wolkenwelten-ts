@@ -29,21 +29,34 @@ import { TriangleMesh } from "./meshes/triangleMesh/triangleMesh";
 import { Texture } from "./texture";
 import skyTextureUrl from "../../../assets/gfx/sky.png";
 import sunTextureUrl from "../../../assets/gfx/sun.png";
-import { mat4 } from "gl-matrix";
+import { mat4, vec3 } from "gl-matrix";
+import { SunLight } from "./sunLight";
 
-const mvp = mat4.create();
+const skyMVP = mat4.create();
+const sunMVP = mat4.create();
+const sunModel = mat4.create();
+const sunPos = vec3.create();
+const camPos = vec3.create();
+const toCamera = vec3.create();
+const sunRight = vec3.create();
+const sunUp = vec3.create();
+const worldUp = vec3.fromValues(0, 1, 0);
+const altUp = vec3.fromValues(0, 0, 1);
 
 export class Sky {
 	mesh: TriangleMesh;
 	sunMesh: TriangleMesh;
 	renderer: RenderManager;
+	private readonly sunLight: SunLight;
+	private readonly sunSize = 18;
 	/**
 	 * Creates textured meshes for the sky dome and sun, applying linear filtering
 	 * so the low-res textures don't look blocky. Only lightweight CPU work is
 	 * done here; GPU buffers are built inside `TriangleMesh.finish()`.
 	 */
-	constructor(renderer: RenderManager) {
+	constructor(renderer: RenderManager, sun: SunLight) {
 		this.renderer = renderer;
+		this.sunLight = sun;
 		const skyTex = new Texture(renderer.gl, "sky", skyTextureUrl, "2D");
 		skyTex.linear();
 		this.mesh = new TriangleMesh(skyTex);
@@ -64,47 +77,42 @@ export class Sky {
 	 * the positive Y direction.
 	 */
 	private addSunPlane() {
-		// Add a square plane for the sun high in the sky
-		const size = 50; // Size of the sun
-		const y = 400; // Height of the sun
-
-		// Define the vertices for a simple quad
-		// Position (x, y, z), UV coordinates (u, v), and lightness
+		const size = 1;
 		this.sunMesh.vertices.push(
 			-size,
-			y,
-			-size,
+			size,
+			0,
 			0,
 			0,
 			1.0, // Top-left
 			size,
-			y,
-			-size,
+			size,
+			0,
 			1,
 			0,
 			1.0, // Top-right
 			-size,
-			y,
-			size,
+			-size,
+			0,
 			0,
 			1,
 			1.0, // Bottom-left
 
 			size,
-			y,
-			-size,
+			size,
+			0,
 			1,
 			0,
 			1.0, // Top-right
 			size,
-			y,
-			size,
+			-size,
+			0,
 			1,
 			1,
 			1.0, // Bottom-right
 			-size,
-			y,
-			size,
+			-size,
+			0,
 			0,
 			1,
 			1.0, // Bottom-left
@@ -117,19 +125,53 @@ export class Sky {
 	 * preserve correct alpha behaviour.
 	 */
 	draw(p: mat4, v: mat4) {
-		mat4.multiply(mvp, p, v);
+		mat4.multiply(skyMVP, p, v);
 		const gl = this.renderer.gl;
 
 		gl.disable(gl.DEPTH_TEST);
 		gl.depthMask(false);
 
 		// Draw sky dome
-		this.mesh.draw(mvp);
+		this.mesh.draw(skyMVP);
+
+		const sunPosition = this.sunLight.getPosition();
+		vec3.copy(sunPos, sunPosition);
+		const camera = this.renderer.camera;
+		camPos[0] = camera.x;
+		camPos[1] = camera.y;
+		camPos[2] = camera.z;
+		vec3.subtract(toCamera, camPos, sunPos);
+		vec3.normalize(toCamera, toCamera);
+		vec3.cross(sunRight, toCamera, worldUp);
+		if (vec3.length(sunRight) < 1e-3) {
+			vec3.cross(sunRight, toCamera, altUp);
+		}
+		vec3.normalize(sunRight, sunRight);
+		vec3.cross(sunUp, sunRight, toCamera);
+		vec3.normalize(sunUp, sunUp);
+		vec3.scale(sunRight, sunRight, this.sunSize);
+		vec3.scale(sunUp, sunUp, this.sunSize);
+
+		mat4.identity(sunModel);
+		sunModel[0] = sunRight[0];
+		sunModel[1] = sunRight[1];
+		sunModel[2] = sunRight[2];
+		sunModel[4] = sunUp[0];
+		sunModel[5] = sunUp[1];
+		sunModel[6] = sunUp[2];
+		sunModel[8] = toCamera[0];
+		sunModel[9] = toCamera[1];
+		sunModel[10] = toCamera[2];
+		sunModel[12] = sunPos[0];
+		sunModel[13] = sunPos[1];
+		sunModel[14] = sunPos[2];
+		mat4.multiply(sunMVP, p, v);
+		mat4.multiply(sunMVP, sunMVP, sunModel);
 
 		// Enable blending for the sun (✿◠‿◠)
 		gl.enable(gl.BLEND);
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-		this.sunMesh.draw(mvp);
+		this.sunMesh.draw(sunMVP);
 		gl.disable(gl.BLEND);
 
 		gl.depthMask(true);

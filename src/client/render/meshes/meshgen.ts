@@ -8,7 +8,6 @@ import type { Chunk } from "../../../world/chunk/chunk";
 import profiler from "../../../profiler";
 import { clamp } from "../../../util/math";
 import { BlockType } from "../../../world/blockType";
-import { lightGenSimple } from "../../../world/chunk/lightGen";
 import { meshgenReal } from "./meshgenWorker";
 
 const createIdentityBlocks = () => {
@@ -22,8 +21,13 @@ const createIdentityBlocks = () => {
 
 const blockData = new Uint8Array(34 * 34 * 34);
 const lightData = new Uint8Array(34 * 34 * 34);
-const tmpSimpleLight = new Uint8Array(32 * 32 * 32);
 const identityBlocks = createIdentityBlocks();
+
+const buildAmbientField = (dst: Uint8Array, blocks: Uint8Array) => {
+	for (let i = 0; i < blocks.length; i++) {
+		dst[i] = blocks[i] === 0 ? 15 : 0;
+	}
+};
 
 const blitChunkData = (
 	blockData: Uint8Array,
@@ -56,17 +60,15 @@ const blitChunkData = (
 export const meshgenVoxelMesh = (voxels: Uint8Array): [Uint8Array, number] => {
 	const start = performance.now();
 	blockData.fill(0);
-	lightData.fill(15);
-	lightGenSimple(tmpSimpleLight, voxels);
 	blitChunkData(blockData, voxels, 1, 1, 1);
-	blitChunkData(lightData, tmpSimpleLight, 1, 1, 1);
+	buildAmbientField(lightData, blockData);
 
 	const blocks = identityBlocks;
 	const msg = {
 		blockData,
 		lightData,
 		blocks,
-		lightFinished: true,
+		lightFinished: false,
 	};
 	const ret = meshgenReal(msg);
 	let vertCount = 0;
@@ -87,7 +89,6 @@ export const meshgenChunk = (chunk: Chunk): [Uint8Array, number[]] => {
 				const cy = chunk.y + y * 32;
 				const cz = chunk.z + z * 32;
 				const curChunk = chunk.world.getOrGenChunk(cx, cy, cz);
-				curChunk.updateSimpleLight();
 				blitChunkData(
 					blockData,
 					curChunk.blocks,
@@ -95,16 +96,10 @@ export const meshgenChunk = (chunk: Chunk): [Uint8Array, number[]] => {
 					1 + y * 32,
 					1 + z * 32,
 				);
-				blitChunkData(
-					lightData,
-					curChunk.simpleLight,
-					1 + x * 32,
-					1 + y * 32,
-					1 + z * 32,
-				);
 			}
 		}
 	}
+	buildAmbientField(lightData, blockData);
 
 	const blocks = chunk.world.blocks;
 	const msg = {

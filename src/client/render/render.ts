@@ -59,6 +59,7 @@ import { Sky } from "./sky";
 import { CloudMesh } from "./meshes/cloudMesh/cloudMesh";
 import { TextRenderer } from "./textRenderer";
 import { Character } from "../../world/entity/character";
+import { SunLight } from "./sunLight";
 
 const projectionMatrix = mat4.create();
 const viewMatrix = mat4.create();
@@ -90,6 +91,7 @@ export class RenderManager {
 	sky: Sky;
 	clouds: CloudMesh;
 	textRenderer: TextRenderer;
+	sunLight: SunLight;
 
 	/**
 	 * Detects the browser / device flavour and lowers the `renderDistance` for
@@ -140,7 +142,8 @@ export class RenderManager {
 		this.world = new WorldRenderer(this);
 		this.decals = new DecalMesh(this);
 		this.particle = new ParticleMesh(this);
-		this.sky = new Sky(this);
+		this.sunLight = new SunLight(this.gl);
+		this.sky = new Sky(this, this.sunLight);
 		this.clouds = new CloudMesh();
 
 		// Initialize text renderer
@@ -206,11 +209,16 @@ export class RenderManager {
 		this.sky.draw(projectionMatrix, viewMatrix);
 		this.camera.calcViewMatrix(this.game.ticks, viewMatrix);
 
+		this.sunLight.update(this.camera, this.renderDistance);
+		this.sunLight.beginRender();
+		this.world.drawShadowMap(this.sunLight);
+		this.sunLight.endRender(this.width, this.height);
+
 		// Now enable blending for transparent/alpha objects
 		this.gl.enable(this.gl.BLEND);
 		this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
 
-		this.world.draw(projectionMatrix, viewMatrix, this.camera);
+		this.world.draw(projectionMatrix, viewMatrix, this.camera, this.sunLight);
 
 		// Draw clouds with blending
 		this.clouds.drawLayers(

@@ -41,6 +41,7 @@ import { coordinateToWorldKey } from "../../world/world";
 import { Frustum } from "./frustum";
 import { BlockMesh } from "./meshes/blockMesh/blockMesh";
 import { VoxelMesh } from "./meshes/voxelMesh/voxelMesh";
+import type { SunLight } from "./sunLight";
 
 type GeneratorQueueEntry = {
 	dd: number;
@@ -145,7 +146,7 @@ export class WorldRenderer {
 	 *  3. Two-pass render (opaque, then alpha faces)
 	 *  4. Enqueues outdated or missing meshes for regeneration
 	 */
-	draw(projectionMatrix: mat4, viewMatrix: mat4, cam: Position) {
+	draw(projectionMatrix: mat4, viewMatrix: mat4, cam: Position, sun: SunLight) {
 		const cx = cam.x & ~31;
 		const cy = cam.y & ~31;
 		const cz = cam.z & ~31;
@@ -158,6 +159,7 @@ export class WorldRenderer {
 			projectionMatrix,
 			viewMatrix,
 			this.renderer.renderDistance,
+			sun,
 		);
 
 		let drawn = 0;
@@ -228,5 +230,47 @@ export class WorldRenderer {
 			drawCalls += mesh.drawFast(mask, alpha, 6);
 		}
 		this.renderer.game.profiler.addAmount("blockMeshDrawCalls", drawCalls);
+	}
+
+	drawShadowMap(sun: SunLight) {
+		if (this.meshes.size === 0) {
+			return;
+		}
+		BlockMesh.bindShadowShader(sun.getLightMatrix());
+		const focus = sun.getFocus();
+		const radius = sun.getRadius() + 32;
+		const steps = Math.ceil(radius / 32);
+		const cx = (Math.floor(focus[0]) & ~31) | 0;
+		const cy = (Math.floor(focus[1]) & ~31) | 0;
+		const cz = (Math.floor(focus[2]) & ~31) | 0;
+		const maxDist = (radius + 32) * (radius + 32);
+		const mask = 0b111111;
+		for (let x = -steps; x <= steps; x++) {
+			const nx = cx + x * 32;
+			const dx = nx + 16 - focus[0];
+			if (dx * dx > maxDist) {
+				continue;
+			}
+			for (let y = -steps; y <= steps; y++) {
+				const ny = cy + y * 32;
+				const dy = ny + 16 - focus[1];
+				if (dx * dx + dy * dy > maxDist) {
+					continue;
+				}
+				for (let z = -steps; z <= steps; z++) {
+					const nz = cz + z * 32;
+					const dz = nz + 16 - focus[2];
+					if (dx * dx + dy * dy + dz * dz > maxDist) {
+						continue;
+					}
+					const mesh = this.getMesh(nx, ny, nz);
+					if (!mesh) {
+						continue;
+					}
+					mesh.drawShadow(mask, 0);
+					mesh.drawShadow(mask, 6);
+				}
+			}
+		}
 	}
 }

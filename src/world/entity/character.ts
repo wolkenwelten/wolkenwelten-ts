@@ -55,7 +55,9 @@ const CHARACTER_ACCELERATION = 0.08;
 const CHARACTER_STOP_RATE = CHARACTER_ACCELERATION * 3.5;
 
 const transPos = new Float32Array([0, 0, 0]);
-const modelViewMatrix = mat4.create();
+const bodyModelMatrix = mat4.create();
+const bodyViewMatrix = mat4.create();
+const bodyMVPMatrix = mat4.create();
 
 const clamp = (x: number, min: number, max: number) =>
 	Math.min(Math.max(x, min), max);
@@ -765,26 +767,27 @@ export class Character extends Being {
 		by = 0,
 		bz = 0,
 	) {
-		mat4.identity(modelViewMatrix);
+		mat4.identity(bodyModelMatrix);
 		transPos[0] = this.x;
 		transPos[1] = this.y;
 		transPos[2] = this.z;
-		mat4.translate(modelViewMatrix, modelViewMatrix, transPos);
-		mat4.rotateY(modelViewMatrix, modelViewMatrix, this.yaw);
-		mat4.rotateX(modelViewMatrix, modelViewMatrix, this.pitch);
+		mat4.translate(bodyModelMatrix, bodyModelMatrix, transPos);
+		mat4.rotateY(bodyModelMatrix, bodyModelMatrix, this.yaw);
+		mat4.rotateX(bodyModelMatrix, bodyModelMatrix, this.pitch);
 		transPos[0] = x;
 		transPos[1] = y;
 		transPos[2] = z;
-		mat4.translate(modelViewMatrix, modelViewMatrix, transPos);
-		mat4.rotateY(modelViewMatrix, modelViewMatrix, yaw);
-		mat4.rotateX(modelViewMatrix, modelViewMatrix, pitch);
+		mat4.translate(bodyModelMatrix, bodyModelMatrix, transPos);
+		mat4.rotateY(bodyModelMatrix, bodyModelMatrix, yaw);
+		mat4.rotateX(bodyModelMatrix, bodyModelMatrix, pitch);
 		transPos[0] = bx;
 		transPos[1] = by;
 		transPos[2] = bz;
-		mat4.translate(modelViewMatrix, modelViewMatrix, transPos);
-		mat4.mul(modelViewMatrix, viewMatrix, modelViewMatrix);
-		mat4.mul(modelViewMatrix, projectionMatrix, modelViewMatrix);
-		mesh.draw(modelViewMatrix, alpha);
+		mat4.translate(bodyModelMatrix, bodyModelMatrix, transPos);
+		mat4.mul(bodyViewMatrix, viewMatrix, bodyModelMatrix);
+		mat4.mul(bodyMVPMatrix, projectionMatrix, bodyViewMatrix);
+		const sun = this.world.game.render?.sunLight;
+		mesh.draw(bodyMVPMatrix, bodyModelMatrix, alpha, sun);
 	}
 
 	private updateYStretch() {

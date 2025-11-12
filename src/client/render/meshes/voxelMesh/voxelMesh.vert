@@ -4,27 +4,42 @@ precision lowp sampler2D;
 
 uniform sampler2D cur_tex;
 uniform mat4 mat_mvp;
+uniform mat4 mat_model;
+uniform mat4 mat_light_mvp;
 uniform vec3 trans_pos;
 
 layout (location=0) in uvec3 pos;
 layout (location=1) in uint texture_index;
 layout (location=2) in uint side_and_light;
 
-out vec3 light_color;
-flat out vec4 rgba;
+const vec3 normals[6] = vec3[](
+	vec3(0.0, 0.0, 1.0),
+	vec3(0.0, 0.0, -1.0),
+	vec3(0.0, 1.0, 0.0),
+	vec3(0.0, -1.0, 0.0),
+	vec3(-1.0, 0.0, 0.0),
+	vec3(1.0, 0.0, 0.0)
+);
+
+flat out vec4 voxel_color;
+out vec4 light_space_pos;
+out vec3 world_normal;
+out float ao_value;
 
 void main(){
-	lowp float light_raw = float(side_and_light >> 4) * (1.0 / 16.0);
-	lowp float light_value = light_raw * light_raw;
-	light_color = vec3(light_value, light_value, light_value);
+	uint side = side_and_light & 0x7u;
+	float light_raw = float(side_and_light >> 4) * (1.0 / 16.0);
+	ao_value = light_raw * light_raw;
+	voxel_color = texture(cur_tex, vec2(float(texture_index) * (1.0 / 256.0), 0.0));
 
-	rgba = texture(cur_tex, vec2(float(texture_index) * (1.0/256.0),0));
-
-	/* To determine the position we multiply by our MVP matrix after adding
-	 | our transPos uniform value, this is done so that our position within
-	 | a chunk can fit in 5-bits, without this step we would need 16-bit
-	 | values, per axis...
-	 */
 	vec3 npos = vec3(pos) + trans_pos;
-	gl_Position = mat_mvp * ((vec4(npos, 1.0) * vec4(1.0/32.0, 1.0/32.0, 1.0/32.0, 1.0)) - vec4(0.5,0.5,0.5,0.0));
+	vec4 local_position =
+		vec4((npos * (1.0 / 32.0)) - vec3(0.5), 1.0);
+	vec4 world_position = mat_model * local_position;
+	light_space_pos = mat_light_mvp * world_position;
+
+	mat3 normalMatrix = mat3(mat_model);
+	world_normal = normalize(normalMatrix * normals[int(side)]);
+
+	gl_Position = mat_mvp * local_position;
 }

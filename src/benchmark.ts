@@ -13,7 +13,6 @@ export class BenchmarkManager {
 
 	private benchmarkChunk(x: number, y: number, z: number): void {
 		const chunk = this.game.world.getOrGenChunk(x, y, z);
-		chunk.simpleLightLastUpdated = chunk.lastUpdated - 1;
 		const mesh = BlockMesh.fromChunk(chunk);
 		mesh.destroy();
 	}

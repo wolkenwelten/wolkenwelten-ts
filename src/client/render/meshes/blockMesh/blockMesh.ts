@@ -18,16 +18,20 @@ import { mat4 } from "gl-matrix";
 
 import shaderFragSource from "./blockMesh.frag?raw";
 import shaderVertSource from "./blockMesh.vert?raw";
+import shadowFragSource from "./blockMeshShadow.frag?raw";
+import shadowVertSource from "./blockMeshShadow.vert?raw";
 
 import type { Game } from "../../../../game";
 import type { Chunk } from "../../../../world/chunk/chunk";
 import { Shader } from "../../shader";
-import { Texture } from "../../texture";
+import { Texture, invalidateTextureUnit } from "../../texture";
 import { meshgenChunk } from "../meshgen";
+import type { SunLight } from "../../sunLight";
 
 export class BlockMesh {
 	static gl: WebGL2RenderingContext;
 	static shader: Shader;
+	static shadowShader: Shader;
 	static texture: Texture;
 	static mvp = mat4.create();
 
@@ -53,7 +57,27 @@ export class BlockMesh {
 			"blockMesh",
 			shaderVertSource,
 			shaderFragSource,
-			["cur_tex", "mat_mv", "mat_mvp", "trans_pos", "alpha", "fade_distance"],
+			[
+				"cur_tex",
+				"mat_mv",
+				"mat_mvp",
+				"mat_light_mvp",
+				"trans_pos",
+				"alpha",
+				"fade_distance",
+				"sun_direction",
+				"sun_color",
+				"ambient_color",
+				"shadow_map",
+				"shadow_map_size",
+			],
+		);
+		this.shadowShader = new Shader(
+			this.gl,
+			"blockMeshShadow",
+			shadowVertSource,
+			shadowFragSource,
+			["mat_light_mvp", "trans_pos"],
 		);
 		this.texture = new Texture(
 			this.gl,
@@ -137,6 +161,7 @@ export class BlockMesh {
 		projection: mat4,
 		modelView: mat4,
 		renderDistance: number,
+		sun: SunLight,
 	) {
 		BlockMesh.shader.bind();
 
@@ -145,9 +170,27 @@ export class BlockMesh {
 		mat4.multiply(modelViewProjection, projection, modelView);
 		BlockMesh.shader.uniform4fv("mat_mv", modelView);
 		BlockMesh.shader.uniform4fv("mat_mvp", modelViewProjection);
+		BlockMesh.shader.uniform4fv("mat_light_mvp", sun.getLightMatrix());
 		BlockMesh.shader.uniform1i("cur_tex", 1);
 		BlockMesh.shader.uniform1f("fade_distance", renderDistance);
+		const dir = sun.getDirection();
+		BlockMesh.shader.uniform3f("sun_direction", dir[0], dir[1], dir[2]);
+		BlockMesh.shader.uniform3f("sun_color", 1.0, 0.97, 0.9);
+		BlockMesh.shader.uniform3f("ambient_color", 0.32, 0.38, 0.48);
+		BlockMesh.shader.uniform1i("shadow_map", 2);
+		const size = sun.getShadowMapSize();
+		BlockMesh.shader.uniform2f("shadow_map_size", size, size);
 		BlockMesh.texture.bind(1);
+		const gl = BlockMesh.gl;
+		gl.activeTexture(gl.TEXTURE0 + 2);
+		gl.bindTexture(gl.TEXTURE_2D, sun.getDepthTexture());
+		invalidateTextureUnit(2);
+		gl.activeTexture(gl.TEXTURE0 + 1);
+	}
+
+	static bindShadowShader(lightMatrix: mat4) {
+		BlockMesh.shadowShader.bind();
+		BlockMesh.shadowShader.uniform4fv("mat_light_mvp", lightMatrix);
 	}
 
 	/* Draw certain sides of a chunk, which sides are drawn depend on the bits within mask.
@@ -169,6 +212,45 @@ export class BlockMesh {
 		BlockMesh.gl.bindVertexArray(this.vao);
 		BlockMesh.shader.uniform3f("trans_pos", this.x, this.y, this.z);
 		BlockMesh.shader.uniform1f("alpha", alpha);
+
+		let calls = 0;
+		let start = 0;
+		let end = 0;
+		for (let i = 0; i < 6; i++) {
+			if ((mask & (1 << i)) === 0) {
+				continue;
+			}
+			const curStart = this.sideStart[i + sideOffset];
+			const curEnd = curStart + this.sideElementCount[i + sideOffset];
+			if (curStart !== end) {
+				if (end !== start) {
+					BlockMesh.gl.drawArrays(BlockMesh.gl.TRIANGLES, start, end - start);
+					calls++;
+				}
+				start = curStart;
+			}
+			end = curEnd;
+		}
+		if (end !== start) {
+			BlockMesh.gl.drawArrays(BlockMesh.gl.TRIANGLES, start, end - start);
+			calls++;
+		}
+		return calls;
+	}
+
+	drawShadow(mask: number, sideOffset = 0): number {
+		if (this.destroyed) {
+			throw new Error("Tried to draw destroyed mesh");
+		}
+		const elementCount =
+			this.sideStart[sideOffset + 5] +
+			this.sideElementCount[sideOffset + 5] -
+			this.sideStart[sideOffset];
+		if (elementCount === 0 || mask === 0) {
+			return 0;
+		}
+		BlockMesh.gl.bindVertexArray(this.vao);
+		BlockMesh.shadowShader.uniform3f("trans_pos", this.x, this.y, this.z);
 
 		let calls = 0;
 		let start = 0;

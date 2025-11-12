@@ -17,11 +17,13 @@ import shaderFragSource from "./voxelMesh.frag?raw";
 import shaderVertSource from "./voxelMesh.vert?raw";
 
 import { Shader } from "../../shader";
-import { Texture } from "../../texture";
+import { Texture, invalidateTextureUnit } from "../../texture";
 import { meshgenVoxelMesh } from "../meshgen";
 import { isClient } from "../../../../util/compat";
+import type { SunLight } from "../../sunLight";
 
 const tmpBlocks = new Uint8Array(32 * 32 * 32);
+const identityMatrix = mat4.create();
 
 export interface VoxelMeshBlit {
 	vertices: Uint8Array | Uint16Array;
@@ -54,7 +56,19 @@ export class VoxelMesh {
 			"voxelMesh",
 			shaderVertSource,
 			shaderFragSource,
-			["cur_tex", "mat_mvp", "alpha", "trans_pos"],
+			[
+				"cur_tex",
+				"mat_mvp",
+				"mat_model",
+				"mat_light_mvp",
+				"alpha",
+				"trans_pos",
+				"sun_direction",
+				"sun_color",
+				"ambient_color",
+				"shadow_map",
+				"shadow_map_size",
+			],
 		);
 		this.texture = new Texture(this.gl, "voxelLUT", "", "LUT");
 		this.texture.nearest();
@@ -194,18 +208,50 @@ export class VoxelMesh {
 		this.vertices = new Uint8Array(0);
 	}
 
-	draw(modelViewProjection: mat4, alpha: number, x = 0, y = 0, z = 0) {
+	draw(
+		modelViewProjection: mat4,
+		modelMatrix: mat4,
+		alpha: number,
+		sun?: SunLight,
+		x = 0,
+		y = 0,
+		z = 0,
+	) {
 		if (this.vertCount === 0) {
 			return;
 		}
 		const gl = VoxelMesh.gl;
+		const sunLight = sun;
 
 		VoxelMesh.shader.bind();
 		VoxelMesh.shader.uniform4fv("mat_mvp", modelViewProjection);
+		VoxelMesh.shader.uniform4fv("mat_model", modelMatrix);
+		if (sunLight) {
+			VoxelMesh.shader.uniform4fv("mat_light_mvp", sunLight.getLightMatrix());
+			const dir = sunLight.getDirection();
+			VoxelMesh.shader.uniform3f("sun_direction", dir[0], dir[1], dir[2]);
+			VoxelMesh.shader.uniform3f("sun_color", 1.0, 0.97, 0.9);
+			VoxelMesh.shader.uniform3f("ambient_color", 0.32, 0.38, 0.48);
+			const size = sunLight.getShadowMapSize();
+			VoxelMesh.shader.uniform2f("shadow_map_size", size, size);
+			VoxelMesh.shader.uniform1i("shadow_map", 2);
+			gl.activeTexture(gl.TEXTURE0 + 2);
+			gl.bindTexture(gl.TEXTURE_2D, sunLight.getDepthTexture());
+			invalidateTextureUnit(2);
+		} else {
+			VoxelMesh.shader.uniform4fv("mat_light_mvp", identityMatrix);
+			VoxelMesh.shader.uniform3f("sun_direction", 0, -1, 0);
+			VoxelMesh.shader.uniform3f("sun_color", 0, 0, 0);
+			VoxelMesh.shader.uniform3f("ambient_color", 1, 1, 1);
+			VoxelMesh.shader.uniform2f("shadow_map_size", 1, 1);
+			VoxelMesh.shader.uniform1i("shadow_map", 2);
+		}
+		gl.activeTexture(gl.TEXTURE0);
 		VoxelMesh.shader.uniform3f("trans_pos", x, y, z);
-		VoxelMesh.shader.uniform1i("cur_tex", 2);
+		VoxelMesh.shader.uniform1i("cur_tex", 3);
 		VoxelMesh.shader.uniform1f("alpha", alpha);
-		VoxelMesh.texture.bind(2);
+		VoxelMesh.texture.bind(3);
+		gl.activeTexture(gl.TEXTURE0);
 
 		gl.bindVertexArray(this.vao);
 		gl.drawArrays(gl.TRIANGLES, 0, this.vertCount);

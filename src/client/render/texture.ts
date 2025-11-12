@@ -42,6 +42,10 @@ let texturesLoaded = 0;
 
 export const allTexturesLoaded = () => texturesLoaded >= texturesInFlight;
 
+export const invalidateTextureUnit = (unit: number) => {
+	lastBoundTexture[unit] = undefined;
+};
+
 export class Texture {
 	readonly name: string;
 	readonly texture: WebGLTexture;
@@ -112,7 +116,7 @@ export class Texture {
 			}
 			texturesLoaded++;
 		};
-		lastBoundTexture[activeTextureUnit] = this;
+		lastBoundTexture[activeTextureUnit] = this.texture;
 		image.src = url;
 	}
 
@@ -177,7 +181,7 @@ export class Texture {
 			}
 			that.repeat();
 		};
-		lastBoundTexture[activeTextureUnit] = this;
+		lastBoundTexture[activeTextureUnit] = this.texture;
 		image.src = url;
 	}
 

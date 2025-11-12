@@ -34,14 +34,14 @@ export class Bomb extends Entity {
 	explode() {
 		this.destroy();
 		if (this.world.game.isServer) {
-			this.world.setSphere(this.x, this.y, this.z, 12, 0);
+			this.world.setSphere(this.x, this.y, this.z, 8, 0);
 			const game = this.world.game as ServerGame;
 			for (const player of game.sockets.values()) {
 				player.q.call("explode", {
 					x: this.x,
 					y: this.y,
 					z: this.z,
-					radius: 12,
+					radius: 8,
 					damage: 8,
 					attackerID: this.throwerID,
 				});
@@ -72,13 +72,13 @@ export class Bomb extends Entity {
 			const dy = this.y - player.y;
 			const dz = this.z - player.z;
 			const d = Math.cbrt(dx * dx + dy * dy + dz * dz);
-			if (d < 2.4) {
+			if (d < 2.8) {
 				this.vx -= (dx / d) * 0.01;
 				this.vy -= (dy / d) * 0.01;
 				this.vz -= (dz / d) * 0.01;
 				this.y += 0.001;
 			}
-			if (d < 1.2) {
+			if (d < 1.6) {
 				if (
 					this.world.game.isClient &&
 					this.ownerID === this.world.game.networkID &&

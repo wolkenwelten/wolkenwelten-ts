@@ -33,14 +33,16 @@
 import { mat4 } from "gl-matrix";
 
 import type { TriangleMesh } from "../../client/render/meshes/triangleMesh/triangleMesh";
-import type { VoxelMesh } from "../../client/render/meshes/voxelMesh/voxelMesh";
+import { VoxelMesh } from "../../client/render/meshes/voxelMesh/voxelMesh";
 import { type World } from "../world";
 import type { Position } from "../../util/math";
 import { GRAVITY } from "../../constants";
 import { NetworkObject } from "./networkObject";
 import type { ClientGame } from "../../client/clientGame";
 
-const modelViewMatrix = mat4.create();
+const modelMatrix = mat4.create();
+const viewModelMatrix = mat4.create();
+const modelViewProjectionMatrix = mat4.create();
 const transPos = new Float32Array([0, 0, 0]);
 
 export abstract class Entity extends NetworkObject {
@@ -402,27 +404,32 @@ export abstract class Entity extends NetworkObject {
 		}
 		this.world.game.render?.decals.addShadow(this.x, this.y, this.z, 1);
 
+		mat4.identity(modelMatrix);
 		transPos[0] = this.x;
 		transPos[1] = this.y;
 		transPos[2] = this.z;
-		mat4.identity(modelViewMatrix);
-		mat4.translate(modelViewMatrix, modelViewMatrix, transPos);
+		mat4.translate(modelMatrix, modelMatrix, transPos);
 		if (this.scale != 1) {
 			transPos[0] = this.scale;
 			transPos[1] = this.scale;
 			transPos[2] = this.scale;
-			mat4.scale(modelViewMatrix, modelViewMatrix, transPos);
+			mat4.scale(modelMatrix, modelMatrix, transPos);
 		}
-		mat4.rotateY(modelViewMatrix, modelViewMatrix, this.yaw);
-		mat4.mul(modelViewMatrix, viewMatrix, modelViewMatrix);
-		mat4.mul(modelViewMatrix, projectionMatrix, modelViewMatrix);
+		mat4.rotateY(modelMatrix, modelMatrix, this.yaw);
+		mat4.mul(viewModelMatrix, viewMatrix, modelMatrix);
+		mat4.mul(modelViewProjectionMatrix, projectionMatrix, viewModelMatrix);
 		const dx = this.x - cam.x;
 		const dy = this.y - cam.y;
 		const dz = this.z - cam.z;
 		const d = Math.sqrt(dx * dx + dy * dy + dz * dz);
 		const renderDistance = this.world.game.render?.renderDistance || 0;
 		const alpha = Math.min(1, Math.max(0, renderDistance - d) / 8);
-		mesh.draw(modelViewMatrix, alpha);
+		const sun = this.world.game.render?.sunLight;
+		if (mesh instanceof VoxelMesh) {
+			mesh.draw(modelViewProjectionMatrix, modelMatrix, alpha, sun);
+		} else {
+			mesh.draw(modelViewProjectionMatrix);
+		}
 	}
 
 	beRepelledByEntities() {
