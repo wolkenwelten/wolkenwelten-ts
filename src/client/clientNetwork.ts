@@ -560,26 +560,34 @@ export class ClientNetwork {
 			const dx = player.x - x;
 			const dy = player.y - y;
 			const dz = player.z - z;
-			// Euclidean distance from explosion centre
 			const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
-			// Simple damage falloff – same as before but using the correct distance metric
-			const dmg = Math.max(0, Math.min(10, 10 / Math.max(1, dist)));
-			player.damage(dmg);
-			player.lastAttackerId = attackerID;
-			player.lastAttackerCooldown = 100;
+			const repulsionBeforeHit = player.repulsionMultiplier;
 
-			// ---------------- Knock-back / Repulsion ----------------
-			// Players closer to the blast receive a stronger impulse.  The force falls off
-			// linearly and reaches zero at a distance of r * 2 (≈ twice the visual radius).
-			const maxKnockbackDist = r * 2;
-			if (dist > 0 && dist < maxKnockbackDist) {
-				// 0 … 1 – 1 at centre, 0 at maxKnockbackDist
-				const forceFactor = (maxKnockbackDist - dist) / maxKnockbackDist;
-				// Empirical base strength – tweak to taste
-				const baseForce = 3;
-				const force = baseForce * forceFactor * player.repulsionMultiplier;
+			// Only apply explosion effects to entities that are actually inside the blast.
+			if (dist < r) {
+				const baseDamage =
+					typeof msg.damage === "number" && Number.isFinite(msg.damage)
+						? msg.damage
+						: 10;
+				const dmg = Math.max(0, Math.min(10, baseDamage / Math.max(1, dist)));
+				player.damage(dmg);
+				player.lastAttackerId = attackerID;
+				player.lastAttackerCooldown = 100;
+			}
+
+			// Keep blast repulsion inside explosion radius and use a softer falloff.
+			if (dist > 0 && dist < r) {
+				const normalized = (r - dist) / r;
+				const forceFactor = normalized * normalized;
+				const repulsionScale = Math.min(1.75, repulsionBeforeHit);
+				let force = Math.min(2.35, 1.85 * forceFactor * repulsionScale);
+
+				if (player.isBlocking()) {
+					force *= 0.15;
+				}
+
 				player.vx += (dx / dist) * force;
-				player.vy += (dy / dist) * force;
+				player.vy += (dy / dist) * force * 0.5;
 				player.vz += (dz / dist) * force;
 			}
 		});
