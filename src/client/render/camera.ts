@@ -33,10 +33,13 @@ import { closestRadian } from "../../util/math";
 import type { World } from "../../world/world";
 
 const transPos = new Float32Array([0, 0, 0]);
+const DEFAULT_CHASE_DISTANCE = 5.25;
 
 export class Camera {
 	private shakeIntensity = 0;
 	private readonly noise: PerlinNoise;
+	public debugCamera = false;
+	private lastDebugLogAtBySource: Map<string, number> = new Map();
 	public yaw = 0;
 	public pitch = -0.25;
 	public x = 0;
@@ -44,10 +47,26 @@ export class Camera {
 	public z = 0;
 
 	public entityToFollow?: Entity;
-	public distance = 2.5;
+	public distance = DEFAULT_CHASE_DISTANCE;
 
 	constructor() {
 		this.noise = new PerlinNoise();
+	}
+
+	private logDebug(source: string, message: string, force = false) {
+		if (!this.debugCamera) {
+			return;
+		}
+		if (source === "mouse") {
+			force = true;
+		}
+		const now = performance.now();
+		const last = this.lastDebugLogAtBySource.get(source) || 0;
+		if (!force && now - last < 120) {
+			return;
+		}
+		this.lastDebugLogAtBySource.set(source, now);
+		console.log(`[camera][${source}] ${message}`);
 	}
 
 	isUnderwater(world: World): boolean {
@@ -62,11 +81,17 @@ export class Camera {
 	 * Adjust current yaw & pitch by deltas while clamping pitch to ±0.4π. Combine
 	 * this with pointer-lock mouse input for a familiar FPS feel.
 	 */
-	rotate(yaw: number, pitch: number) {
-		this.yaw = this.yaw + yaw;
+	rotate(yaw: number, pitch: number, source = "unknown") {
+		const prevYaw = this.yaw;
+		const prevPitch = this.pitch;
+		this.yaw += yaw;
 		this.pitch = Math.max(
 			Math.PI * -0.4,
 			Math.min(Math.PI * 0.4, this.pitch + pitch),
+		);
+		this.logDebug(
+			source,
+			`rotate dyaw=${yaw.toFixed(4)} dpitch=${pitch.toFixed(4)} yaw=${prevYaw.toFixed(3)}->${this.yaw.toFixed(3)} pitch=${prevPitch.toFixed(3)}->${this.pitch.toFixed(3)}`,
 		);
 	}
 
@@ -87,17 +112,35 @@ export class Camera {
 	 * chase distance based on followed entity velocity.
 	 */
 	update() {
+		let wrapped = false;
 		if (this.yaw > Math.PI * 2) {
 			this.yaw -= Math.PI * 2;
+			wrapped = true;
 		}
 		if (this.yaw < 0) {
 			this.yaw += Math.PI * 2;
+			wrapped = true;
 		}
 		const v = this.entityToFollow?.getVelocity() || 0;
 		const minIntensity = v * 0.3;
 		this.shakeIntensity = Math.max(minIntensity, this.shakeIntensity - 0.04);
-		const goalDistance = 6 + Math.max(0, Math.min(v * 6 * (v * 6), 4));
+		// Keep distance fixed to avoid perceived "snap-back" while moving.
+		const goalDistance = DEFAULT_CHASE_DISTANCE;
+		const prevDistance = this.distance;
 		this.distance = this.distance * 0.98 + goalDistance * 0.02;
+		if (wrapped) {
+			this.logDebug(
+				"update",
+				`yaw wrapped -> ${this.yaw.toFixed(3)} pitch=${this.pitch.toFixed(3)}`,
+				true,
+			);
+		}
+		if (Math.abs(this.distance - prevDistance) > 0.01) {
+			this.logDebug(
+				"update",
+				`distance=${this.distance.toFixed(3)} goal=${goalDistance.toFixed(3)} speed=${v.toFixed(3)}`,
+			);
+		}
 	}
 
 	/**
@@ -123,7 +166,12 @@ export class Camera {
 			s = -speed;
 
 			if (rotateCam) {
+				const prevYaw = this.yaw;
 				this.yaw -= ox * 0.015;
+				this.logDebug(
+					"moveEntity-rotateCam",
+					`ox=${ox.toFixed(3)} yaw=${prevYaw.toFixed(3)}->${this.yaw.toFixed(3)}`,
+				);
 			}
 		}
 

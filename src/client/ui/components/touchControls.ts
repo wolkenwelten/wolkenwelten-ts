@@ -406,6 +406,7 @@ export class TouchControls {
 			this.game.render.camera.rotate(
 				this.cameraX * -0.05,
 				this.cameraY * -0.05,
+				"touch-right-stick",
 			);
 		}
 

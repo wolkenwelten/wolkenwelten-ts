@@ -59,6 +59,7 @@ export class Options {
 		if (isClient()) {
 			const params = new URLSearchParams(window.location.search);
 			this.debug = window.location.hostname === "localhost";
+			this.debug = this.parseBoolean(this.debug, params.get("debug"));
 			this.skipMenu = window.location.hostname === "localhost";
 			this.skipMenu = this.parseBoolean(this.skipMenu, params.get("skipMenu"));
 			this.noBGM = this.parseBoolean(this.noBGM, params.get("noBGM"));

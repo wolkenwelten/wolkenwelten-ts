@@ -136,6 +136,7 @@ export class RenderManager {
 		this.assets = new AssetList(game, gl);
 
 		this.camera = new Camera();
+		this.camera.debugCamera = this.game.options.debug;
 
 		this.world = new WorldRenderer(this);
 		this.decals = new DecalMesh(this);
