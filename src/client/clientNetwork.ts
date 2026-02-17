@@ -41,11 +41,27 @@
  *  • The binary protocol in `onArrayBuffer()` is intentionally minimal – make sure both ends agree on the
  *    exact layout before adding new message types.
  */
-import { WSPacket, WSQueue } from "../network";
+import { WSPacket, WSQueue, chunkPriorityScore } from "../network";
 import { ClientEntry, PlayerStatus, PlayerUpdate } from "./clientEntry";
 import type { ClientGame } from "./clientGame";
+import { coordinateToWorldKey } from "../world/world";
 import { NetworkObject } from "../world/entity/networkObject";
 export type ClientHandler = (game: ClientGame, args: unknown) => Promise<void>;
+
+type ChunkCoordinate = {
+	x: number;
+	y: number;
+	z: number;
+};
+
+type PendingChunkInterest = ChunkCoordinate & {
+	key: number;
+	inFlight: boolean;
+	retryCount: number;
+	lastSentAt: number;
+	nextRetryAt: number;
+	priorityHint: number;
+};
 
 export class ClientNetwork {
 	private ws?: WebSocket;
@@ -60,6 +76,19 @@ export class ClientNetwork {
 	private lastTransfer = new Date();
 
 	private pendingForceUpdates: NetworkObject[] = [];
+	private readonly wantedChunks: Map<number, PendingChunkInterest> = new Map();
+	private readonly pendingChunkCancels: Map<number, ChunkCoordinate> = new Map();
+	private readonly maxChunkInterestPerTick = 24;
+	private readonly requestTimeoutMs = 1200;
+	private readonly requestBackoff = 1.6;
+	private readonly maxRetriesBeforeBackoff = 6;
+	private readonly maxRequestTimeoutMs = 6000;
+
+	private chunkRequestsSent = 0;
+	private chunkRequestsRetried = 0;
+	private chunkCancelsSent = 0;
+	private chunkResponsesReceived = 0;
+	private lastChunkDebugLogMs = 0;
 
 	private static readonly defaultHandlers: Map<string, ClientHandler> =
 		new Map();
@@ -70,6 +99,184 @@ export class ClientNetwork {
 
 	forceUpdateNetworkObject(obj: NetworkObject) {
 		this.pendingForceUpdates.push(obj);
+	}
+
+	private normalizeChunkCoordinate(x: number, y: number, z: number): ChunkCoordinate {
+		return {
+			x: x & ~0x1f,
+			y: y & ~0x1f,
+			z: z & ~0x1f,
+		};
+	}
+
+	private markChunkLoaded(x: number, y: number, z: number) {
+		const c = this.normalizeChunkCoordinate(x, y, z);
+		const key = coordinateToWorldKey(c.x, c.y, c.z);
+		this.wantedChunks.delete(key);
+		this.pendingChunkCancels.delete(key);
+		this.chunkResponsesReceived++;
+	}
+
+	private resetChunkInflightState() {
+		for (const wanted of this.wantedChunks.values()) {
+			wanted.inFlight = false;
+			wanted.lastSentAt = 0;
+			wanted.nextRetryAt = 0;
+		}
+	}
+
+	private getPriorityHint(c: ChunkCoordinate): number {
+		const player = this.game.player;
+		if (!player) {
+			return 0;
+		}
+		return chunkPriorityScore({
+			chunkX: c.x,
+			chunkY: c.y,
+			chunkZ: c.z,
+			playerX: player.x,
+			playerY: player.y,
+			playerZ: player.z,
+			yaw: player.yaw,
+			pitch: player.pitch,
+		});
+	}
+
+	markChunkNeeded(x: number, y: number, z: number) {
+		const c = this.normalizeChunkCoordinate(x, y, z);
+		const key = coordinateToWorldKey(c.x, c.y, c.z);
+		const existing = this.wantedChunks.get(key);
+
+		if (existing) {
+			existing.x = c.x;
+			existing.y = c.y;
+			existing.z = c.z;
+			existing.priorityHint = this.getPriorityHint(c);
+			this.pendingChunkCancels.delete(key);
+			return;
+		}
+
+		this.wantedChunks.set(key, {
+			key,
+			x: c.x,
+			y: c.y,
+			z: c.z,
+			inFlight: false,
+			retryCount: 0,
+			lastSentAt: 0,
+			nextRetryAt: 0,
+			priorityHint: this.getPriorityHint(c),
+		});
+		this.pendingChunkCancels.delete(key);
+	}
+
+	markChunkDropped(x: number, y: number, z: number) {
+		const c = this.normalizeChunkCoordinate(x, y, z);
+		const key = coordinateToWorldKey(c.x, c.y, c.z);
+		this.wantedChunks.delete(key);
+		this.pendingChunkCancels.set(key, c);
+	}
+
+	private queueChunkCancels() {
+		if (this.pendingChunkCancels.size === 0) {
+			return;
+		}
+		const batch: ChunkCoordinate[] = [];
+		for (const [key, c] of this.pendingChunkCancels.entries()) {
+			batch.push(c);
+			this.pendingChunkCancels.delete(key);
+			if (batch.length >= this.maxChunkInterestPerTick) {
+				break;
+			}
+		}
+		if (batch.length > 0) {
+			this.chunkCancelsSent += batch.length;
+			this.queue.call("chunkCancelBatch", batch);
+		}
+	}
+
+	private queueChunkInterests() {
+		if (this.wantedChunks.size === 0) {
+			return;
+		}
+		const now = Date.now();
+		const pending: PendingChunkInterest[] = [];
+		for (const [key, wanted] of this.wantedChunks.entries()) {
+			const chunk = this.game.world.getChunk(wanted.x, wanted.y, wanted.z);
+			if (chunk?.loaded) {
+				this.wantedChunks.delete(key);
+				continue;
+			}
+
+			if (wanted.inFlight) {
+				if (now < wanted.nextRetryAt) {
+					continue;
+				}
+				wanted.inFlight = false;
+				wanted.retryCount++;
+				this.chunkRequestsRetried++;
+			}
+
+			wanted.priorityHint = this.getPriorityHint(wanted);
+			pending.push(wanted);
+		}
+
+		if (pending.length === 0) {
+			return;
+		}
+
+		pending.sort((a, b) => b.priorityHint - a.priorityHint);
+		const batch = pending
+			.slice(0, this.maxChunkInterestPerTick)
+			.map((wanted) => {
+				wanted.inFlight = true;
+				wanted.lastSentAt = now;
+				const timeout =
+					this.requestTimeoutMs *
+					Math.pow(
+						this.requestBackoff,
+						Math.min(wanted.retryCount, this.maxRetriesBeforeBackoff),
+					);
+				wanted.nextRetryAt = now + Math.min(this.maxRequestTimeoutMs, timeout);
+				return {
+					x: wanted.x,
+					y: wanted.y,
+					z: wanted.z,
+					priorityHint: wanted.priorityHint,
+				};
+			});
+
+		if (batch.length > 0) {
+			this.chunkRequestsSent += batch.length;
+			this.queue.call("chunkInterestBatch", batch);
+		}
+	}
+
+	private logChunkSchedulerStats() {
+		if (!this.game.options.debug) {
+			return;
+		}
+		const now = Date.now();
+		if (now - this.lastChunkDebugLogMs < 5000) {
+			return;
+		}
+		this.lastChunkDebugLogMs = now;
+
+		let inFlight = 0;
+		for (const wanted of this.wantedChunks.values()) {
+			if (wanted.inFlight) {
+				inFlight++;
+			}
+		}
+
+		console.log(
+			`[chunk-client] wanted=${this.wantedChunks.size} inflight=${inFlight} sent=${this.chunkRequestsSent} retried=${this.chunkRequestsRetried} cancels=${this.chunkCancelsSent} received=${this.chunkResponsesReceived}`,
+		);
+
+		this.chunkRequestsSent = 0;
+		this.chunkRequestsRetried = 0;
+		this.chunkCancelsSent = 0;
+		this.chunkResponsesReceived = 0;
 	}
 
 	/**
@@ -126,6 +333,7 @@ export class ClientNetwork {
 			chunk.lastUpdated = version;
 			chunk.loaded = true;
 			chunk.invalidate();
+			this.markChunkLoaded(x, y, z);
 
 			return;
 		}
@@ -182,6 +390,7 @@ export class ClientNetwork {
 
 	private onConnect() {
 		console.log("(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧ Connected to server!");
+		this.resetChunkInflightState();
 		setTimeout(async () => {
 			const playerID = await this.getPlayerID();
 			this.game.setPlayerID(playerID);
@@ -192,6 +401,7 @@ export class ClientNetwork {
 
 	private close(_event?: CloseEvent | Event) {
 		console.log("(｡•́︿•̀｡) Connection closed, attempting reconnect...");
+		this.resetChunkInflightState();
 		if (this.ws) {
 			this.ws.close();
 		}
@@ -264,6 +474,10 @@ export class ClientNetwork {
 		}
 		this.lastTransfer = now;
 
+		this.queueChunkCancels();
+		this.queueChunkInterests();
+		this.logChunkSchedulerStats();
+
 		this.sendRaw(this.queue.flush());
 	}
 
@@ -324,6 +538,7 @@ export class ClientNetwork {
 			chunk.lastUpdated = msg.version;
 			chunk.loaded = true;
 			chunk.invalidate();
+			this.markChunkLoaded(msg.x, msg.y, msg.z);
 		});
 
 		this.queue.registerCallHandler("explode", async (args: unknown) => {
@@ -547,22 +762,11 @@ export class ClientNetwork {
 	}
 
 	async chunkRequest(x: number, y: number, z: number): Promise<void> {
-		x = x & ~0x1f;
-		y = y & ~0x1f;
-		z = z & ~0x1f;
-		await this.queue.call("chunkRequest", {
-			x,
-			y,
-			z,
-		});
+		this.markChunkNeeded(x, y, z);
 	}
 
 	async chunkDrop(x: number, y: number, z: number): Promise<void> {
-		await this.queue.call("chunkDrop", {
-			x,
-			y,
-			z,
-		});
+		this.markChunkDropped(x, y, z);
 	}
 
 	async blockUpdate(x: number, y: number, z: number, block: number) {

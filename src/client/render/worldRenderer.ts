@@ -84,6 +84,9 @@ export class WorldRenderer {
 		const { x, y, z } = entry;
 
 		const chunk = this.renderer.game.world.getOrGenChunk(x, y, z);
+		if (!chunk.loaded) {
+			return;
+		}
 		const oldMesh = this.getMesh(x, y, z);
 		if (!oldMesh) {
 			const newMesh = BlockMesh.fromChunk(chunk);

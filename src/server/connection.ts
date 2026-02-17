@@ -29,12 +29,29 @@
  */
 import { WebSocket } from "ws";
 import type { ServerGame } from "./serverGame";
-import { WSPacket, WSQueue } from "../network";
-import { coordinateToWorldKey, worldKeyToCoordinate } from "../world/world";
+import { WSPacket, WSQueue, chunkPriorityScore } from "../network";
+import { coordinateToWorldKey } from "../world/world";
 import { Chunk } from "../world/chunk/chunk";
 import type { PlayerStatus } from "../client/clientEntry";
 import { Character } from "../world/entity/character";
 import { NetworkObject } from "../world/entity/networkObject";
+
+type ChunkCoordinate = {
+	x: number;
+	y: number;
+	z: number;
+};
+
+type ChunkInterestRequest = ChunkCoordinate & {
+	priorityHint?: number;
+};
+
+type WantedChunk = ChunkCoordinate & {
+	key: number;
+	knownVersion: number;
+	lastSentAt: number;
+	priorityHint: number;
+};
 
 let idCounter = 0;
 export class ClientConnection {
@@ -69,8 +86,16 @@ export class ClientConnection {
 	msgsReceived = 0;
 	debugInterval: NodeJS.Timeout | null = null;
 
-	chunkVersions = new Map<number, number>();
+	wantedChunks: Map<number, WantedChunk> = new Map();
 	private chunkBuffer = new ArrayBuffer(20 + 32 * 32 * 32);
+	private readonly maxChunkSendsPerTick = 10;
+	private readonly maxChunkBytesPerTick = 450 * 1024;
+
+	private chunkRequestsQueued = 0;
+	private chunkRequestsCanceled = 0;
+	private chunkRetrySends = 0;
+	private chunkUpdatesSent = 0;
+	private chunkBytesSent = 0;
 
 	q: WSQueue = new WSQueue();
 	syncQueued = false;
@@ -81,12 +106,57 @@ export class ClientConnection {
 		this.pendingForceUpdates.push(obj);
 	}
 
-	getChunkVersion(x: number, y: number, z: number): number {
-		return this.chunkVersions.get(coordinateToWorldKey(x, y, z)) || 0;
+	private normalizeChunkCoordinate(x: number, y: number, z: number): ChunkCoordinate {
+		return {
+			x: x & ~0x1f,
+			y: y & ~0x1f,
+			z: z & ~0x1f,
+		};
 	}
 
-	setChunkVersion(x: number, y: number, z: number, version: number) {
-		this.chunkVersions.set(coordinateToWorldKey(x, y, z), version);
+	private upsertChunkInterest(request: ChunkInterestRequest) {
+		const c = this.normalizeChunkCoordinate(request.x, request.y, request.z);
+		const key = coordinateToWorldKey(c.x, c.y, c.z);
+		const old = this.wantedChunks.get(key);
+		if (!old) {
+			this.wantedChunks.set(key, {
+				key,
+				x: c.x,
+				y: c.y,
+				z: c.z,
+				knownVersion: -1,
+				lastSentAt: 0,
+				priorityHint: request.priorityHint || 0,
+			});
+		} else {
+			old.x = c.x;
+			old.y = c.y;
+			old.z = c.z;
+			old.priorityHint = request.priorityHint || old.priorityHint;
+		}
+		this.chunkRequestsQueued++;
+	}
+
+	private cancelChunkInterest(request: ChunkCoordinate) {
+		const c = this.normalizeChunkCoordinate(request.x, request.y, request.z);
+		const key = coordinateToWorldKey(c.x, c.y, c.z);
+		if (this.wantedChunks.delete(key)) {
+			this.chunkRequestsCanceled++;
+		}
+	}
+
+	private chunkPriority(entry: WantedChunk): number {
+		const score = chunkPriorityScore({
+			chunkX: entry.x,
+			chunkY: entry.y,
+			chunkZ: entry.z,
+			playerX: this.x,
+			playerY: this.y,
+			playerZ: this.z,
+			yaw: this.yaw,
+			pitch: this.pitch,
+		});
+		return score + entry.priorityHint * 0.01;
 	}
 
 	public close() {
@@ -142,7 +212,6 @@ export class ClientConnection {
 				// Only do this after handling all packets, because we might have multiple update packets in one frame
 				if (this.syncQueued) {
 					this.broadcastNetworkObjects();
-					this.chunkUpdateLoop();
 					this.syncQueued = false;
 				}
 			} catch (e) {
@@ -155,13 +224,18 @@ export class ClientConnection {
 			const kbpsOut = this.bytesSent / 1024;
 			if (this.server.options.debug) {
 				console.log(
-					`Bytes sent: ${kbpsOut}kbps (${this.msgsSent} msgs), bytes received: ${kbpsIn}kbps (${this.msgsReceived} msgs)`,
+					`Bytes sent: ${kbpsOut}kbps (${this.msgsSent} msgs), bytes received: ${kbpsIn}kbps (${this.msgsReceived} msgs), chunkWanted=${this.wantedChunks.size}, chunkQueued=${this.chunkRequestsQueued}, chunkCanceled=${this.chunkRequestsCanceled}, chunkSent=${this.chunkUpdatesSent}, chunkRetried=${this.chunkRetrySends}, chunkBytes=${this.chunkBytesSent}`,
 				);
 			}
 			this.bytesSent = 0;
 			this.bytesReceived = 0;
 			this.msgsSent = 0;
 			this.msgsReceived = 0;
+			this.chunkRequestsQueued = 0;
+			this.chunkRequestsCanceled = 0;
+			this.chunkRetrySends = 0;
+			this.chunkUpdatesSent = 0;
+			this.chunkBytesSent = 0;
 		}, 1000);
 
 		this.registerDefaultHandlers();
@@ -244,31 +318,72 @@ export class ClientConnection {
 			return "";
 		});
 
-		this.q.registerCallHandler("chunkDrop", async (args: unknown) => {
-			if (typeof args !== "object") {
-				throw new Error("Invalid chunk drop received");
+		this.q.registerCallHandler("chunkCancelBatch", async (args: unknown) => {
+			if (!Array.isArray(args)) {
+				throw new Error("Invalid chunk cancel batch received");
 			}
-			const data = args as any;
-			const cx = data.x & ~0x1f;
-			const cy = data.y & ~0x1f;
-			const cz = data.z & ~0x1f;
-
-			const key = coordinateToWorldKey(cx, cy, cz);
-			this.chunkVersions.delete(key);
+			for (const entry of args) {
+				if (
+					typeof entry !== "object" ||
+					!entry ||
+					typeof (entry as ChunkCoordinate).x !== "number" ||
+					typeof (entry as ChunkCoordinate).y !== "number" ||
+					typeof (entry as ChunkCoordinate).z !== "number"
+				) {
+					continue;
+				}
+				this.cancelChunkInterest(entry as ChunkCoordinate);
+			}
+			return "";
 		});
 
+		this.q.registerCallHandler("chunkInterestBatch", async (args: unknown) => {
+			if (!Array.isArray(args)) {
+				throw new Error("Invalid chunk interest batch received");
+			}
+			for (const entry of args) {
+				if (
+					typeof entry !== "object" ||
+					!entry ||
+					typeof (entry as ChunkInterestRequest).x !== "number" ||
+					typeof (entry as ChunkInterestRequest).y !== "number" ||
+					typeof (entry as ChunkInterestRequest).z !== "number"
+				) {
+					continue;
+				}
+				this.upsertChunkInterest(entry as ChunkInterestRequest);
+			}
+			return "";
+		});
+
+		// Backward compatibility for legacy clients.
+		this.q.registerCallHandler("chunkDrop", async (args: unknown) => {
+			if (
+				typeof args !== "object" ||
+				!args ||
+				typeof (args as ChunkCoordinate).x !== "number" ||
+				typeof (args as ChunkCoordinate).y !== "number" ||
+				typeof (args as ChunkCoordinate).z !== "number"
+			) {
+				throw new Error("Invalid chunk drop received");
+			}
+			this.cancelChunkInterest(args as ChunkCoordinate);
+			return "";
+		});
+
+		// Backward compatibility for legacy clients.
 		this.q.registerCallHandler("chunkRequest", async (args: unknown) => {
-			if (typeof args !== "object") {
+			if (
+				typeof args !== "object" ||
+				!args ||
+				typeof (args as ChunkInterestRequest).x !== "number" ||
+				typeof (args as ChunkInterestRequest).y !== "number" ||
+				typeof (args as ChunkInterestRequest).z !== "number"
+			) {
 				throw new Error("Invalid chunk request received");
 			}
-			const data = args as any;
-			const cx = data.x & ~0x1f;
-			const cy = data.y & ~0x1f;
-			const cz = data.z & ~0x1f;
-			const key = coordinateToWorldKey(cx, cy, cz);
-			const oldVersion = this.chunkVersions.get(key);
-			this.chunkVersions.set(key, Math.max(oldVersion || -1, -1));
-			this.syncQueued = true;
+			this.upsertChunkInterest(args as ChunkInterestRequest);
+			return "";
 		});
 
 		this.q.registerCallHandler("blockUpdate", async (args: unknown) => {
@@ -374,29 +489,66 @@ export class ClientConnection {
 		this.msgsSent++;
 	}
 
-	chunkUpdateLoop() {
-		let updates = 0;
+	flushPrioritizedChunkSends() {
+		if (this.wantedChunks.size === 0) {
+			return;
+		}
 
-		for (const [key, version] of this.chunkVersions.entries()) {
-			let chunk = this.server.world.chunks.get(key);
-			if (!chunk) {
-				const { x, y, z } = worldKeyToCoordinate(key);
-				chunk = this.server.world.getOrGenChunk(x, y, z);
+		const pending: WantedChunk[] = [];
+		for (const [key, entry] of this.wantedChunks.entries()) {
+			const chunk = this.server.world.getChunk(entry.x, entry.y, entry.z);
+			if (chunk && entry.knownVersion >= chunk.lastUpdated) {
+				continue;
 			}
-			if (version < chunk.lastUpdated) {
-				this.clientUpdateChunk(chunk);
-				if (++updates > 6) {
-					return;
-				}
-				this.chunkVersions.set(key, chunk.lastUpdated);
+
+			pending.push(entry);
+			// Clean up dead references that accidentally got aliased by key reuse.
+			if (entry.key !== key) {
+				this.wantedChunks.delete(key);
+				this.wantedChunks.set(entry.key, entry);
 			}
 		}
 
-		if (updates > 0) {
-			if (this.server.options.debug) {
-				console.log(`Sent ${updates} chunk updates`);
-			}
+		if (pending.length === 0) {
+			return;
 		}
+
+		pending.sort((a, b) => this.chunkPriority(b) - this.chunkPriority(a));
+
+		let sent = 0;
+		let bytesSent = 0;
+		const now = Date.now();
+		for (const entry of pending) {
+			if (sent >= this.maxChunkSendsPerTick) {
+				break;
+			}
+			if (bytesSent >= this.maxChunkBytesPerTick) {
+				break;
+			}
+
+			const chunk = this.server.world.getOrGenChunk(entry.x, entry.y, entry.z);
+			if (entry.knownVersion >= chunk.lastUpdated) {
+				continue;
+			}
+			if (entry.knownVersion >= 0) {
+				this.chunkRetrySends++;
+			}
+
+			const bytes =
+				chunk.isEmpty() ? 96 : this.chunkBuffer.byteLength; // rough JSON+binary estimate for budgeting
+			if (bytesSent + bytes > this.maxChunkBytesPerTick && sent > 0) {
+				break;
+			}
+
+			this.clientUpdateChunk(chunk);
+			entry.knownVersion = chunk.lastUpdated;
+			entry.lastSentAt = now;
+			sent++;
+			bytesSent += bytes;
+		}
+
+		this.chunkUpdatesSent += sent;
+		this.chunkBytesSent += bytesSent;
 	}
 
 	/**
@@ -405,6 +557,7 @@ export class ClientConnection {
 	 * the whole server.
 	 */
 	transferQueue() {
+		this.flushPrioritizedChunkSends();
 		if (!this.q.empty()) {
 			const packet = this.q.flush();
 			this.bytesSent += packet.length;

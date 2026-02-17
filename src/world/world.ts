@@ -139,7 +139,8 @@ export class World {
 	}
 
 	isLoaded(x: number, y: number, z: number): boolean {
-		return Boolean(this.getChunk(x, y, z));
+		const chunk = this.getChunk(x, y, z);
+		return Boolean(chunk && chunk.loaded);
 	}
 
 	isSolid(x: number, y: number, z: number): boolean {
@@ -179,7 +180,7 @@ export class World {
 		const newChunk = new Chunk(this, cx, cy, cz);
 
 		if (isClient()) {
-			(this.game as ClientGame).network.chunkRequest(cx, cy, cz);
+			(this.game as ClientGame).network.markChunkNeeded(cx, cy, cz);
 		} else {
 			if (!this.worldgenHandler) {
 				throw new Error("Missing WorldGen");
@@ -269,7 +270,7 @@ export class World {
 
 				this.game.render?.dropBlockMesh(chunk.x, chunk.y, chunk.z);
 				if (this.game.isClient) {
-					(this.game as ClientGame).network.chunkDrop(
+					(this.game as ClientGame).network.markChunkDropped(
 						chunk.x,
 						chunk.y,
 						chunk.z,
