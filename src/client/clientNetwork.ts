@@ -77,7 +77,8 @@ export class ClientNetwork {
 
 	private pendingForceUpdates: NetworkObject[] = [];
 	private readonly wantedChunks: Map<number, PendingChunkInterest> = new Map();
-	private readonly pendingChunkCancels: Map<number, ChunkCoordinate> = new Map();
+	private readonly pendingChunkCancels: Map<number, ChunkCoordinate> =
+		new Map();
 	private readonly maxChunkInterestPerTick = 24;
 	private readonly requestTimeoutMs = 1200;
 	private readonly requestBackoff = 1.6;
@@ -101,7 +102,11 @@ export class ClientNetwork {
 		this.pendingForceUpdates.push(obj);
 	}
 
-	private normalizeChunkCoordinate(x: number, y: number, z: number): ChunkCoordinate {
+	private normalizeChunkCoordinate(
+		x: number,
+		y: number,
+		z: number,
+	): ChunkCoordinate {
 		return {
 			x: x & ~0x1f,
 			y: y & ~0x1f,

@@ -92,18 +92,18 @@ export class InputManager {
 
 		this.isTouchDevice = this.detectTouchDevice();
 
-			if (isClient()) {
-				document.addEventListener("pointerlockchange", () => {
-					if (!that.game.options.debug) {
-						return;
-					}
-					const state = document.pointerLockElement ? "locked" : "released";
-					const lockElement = that.describeElement(document.pointerLockElement);
-					const activeElement = that.describeElement(document.activeElement);
-					console.log(
-						`[camera][pointerlock] ${state} lockElement=${lockElement} activeElement=${activeElement}`,
-					);
-				});
+		if (isClient()) {
+			document.addEventListener("pointerlockchange", () => {
+				if (!that.game.options.debug) {
+					return;
+				}
+				const state = document.pointerLockElement ? "locked" : "released";
+				const lockElement = that.describeElement(document.pointerLockElement);
+				const activeElement = that.describeElement(document.activeElement);
+				console.log(
+					`[camera][pointerlock] ${state} lockElement=${lockElement} activeElement=${activeElement}`,
+				);
+			});
 			document.addEventListener("pointerlockerror", () => {
 				if (!that.game.options.debug) {
 					return;
@@ -185,50 +185,46 @@ export class InputManager {
 		that.game.ui.rootElement.addEventListener("mouseup", (e) =>
 			that.mouseStates.delete(e.button),
 		);
-			that.game.ui.rootElement.addEventListener(
-				"mousemove",
-				(e) => {
-					if (document.pointerLockElement) {
-						const rawDX = e.movementX;
-						const rawDY = e.movementY;
-						if (
-							Math.abs(rawDX) > InputManager.DROP_MOUSE_DELTA ||
-							Math.abs(rawDY) > InputManager.DROP_MOUSE_DELTA
-						) {
-							if (that.game.options.debug) {
-								const now = performance.now();
-								if (now - that.lastMouseSpikeLogAt > 250) {
-									that.lastMouseSpikeLogAt = now;
-									console.log(
-										`[camera][mouse] dropped spike raw(dx=${rawDX}, dy=${rawDY})`,
-									);
-								}
-							}
-							return;
-						}
-						const dx = Math.max(
-							-InputManager.MAX_MOUSE_DELTA,
-							Math.min(InputManager.MAX_MOUSE_DELTA, rawDX),
-						);
-						const dy = Math.max(
-							-InputManager.MAX_MOUSE_DELTA,
-							Math.min(InputManager.MAX_MOUSE_DELTA, rawDY),
-						);
-						if (that.game.options.debug && (dx !== rawDX || dy !== rawDY)) {
+		that.game.ui.rootElement.addEventListener(
+			"mousemove",
+			(e) => {
+				if (document.pointerLockElement) {
+					const rawDX = e.movementX;
+					const rawDY = e.movementY;
+					if (
+						Math.abs(rawDX) > InputManager.DROP_MOUSE_DELTA ||
+						Math.abs(rawDY) > InputManager.DROP_MOUSE_DELTA
+					) {
+						if (that.game.options.debug) {
 							const now = performance.now();
 							if (now - that.lastMouseSpikeLogAt > 250) {
 								that.lastMouseSpikeLogAt = now;
 								console.log(
-									`[camera][mouse] clamped spike raw(dx=${rawDX}, dy=${rawDY}) clamped(dx=${dx}, dy=${dy})`,
+									`[camera][mouse] dropped spike raw(dx=${rawDX}, dy=${rawDY})`,
 								);
 							}
 						}
-						that.game.render.camera.rotate(
-							dx * -0.001,
-							dy * -0.001,
-							"mouse",
-						);
-					} else if (
+						return;
+					}
+					const dx = Math.max(
+						-InputManager.MAX_MOUSE_DELTA,
+						Math.min(InputManager.MAX_MOUSE_DELTA, rawDX),
+					);
+					const dy = Math.max(
+						-InputManager.MAX_MOUSE_DELTA,
+						Math.min(InputManager.MAX_MOUSE_DELTA, rawDY),
+					);
+					if (that.game.options.debug && (dx !== rawDX || dy !== rawDY)) {
+						const now = performance.now();
+						if (now - that.lastMouseSpikeLogAt > 250) {
+							that.lastMouseSpikeLogAt = now;
+							console.log(
+								`[camera][mouse] clamped spike raw(dx=${rawDX}, dy=${rawDY}) clamped(dx=${dx}, dy=${dy})`,
+							);
+						}
+					}
+					that.game.render.camera.rotate(dx * -0.001, dy * -0.001, "mouse");
+				} else if (
 					that.game.options.debug &&
 					(Math.abs(e.movementX) > 0 || Math.abs(e.movementY) > 0)
 				) {
@@ -271,14 +267,16 @@ export class InputManager {
 		if (!document.pointerLockElement) {
 			this.game.player?.cooldown(15);
 			const lockTarget = this.game.ui.rootElement as HTMLElement & {
-				requestPointerLock: (
-					options?: { unadjustedMovement?: boolean },
-				) => Promise<void> | void;
+				requestPointerLock: (options?: {
+					unadjustedMovement?: boolean;
+				}) => Promise<void> | void;
 			};
 			try {
 				await lockTarget.requestPointerLock({ unadjustedMovement: true });
 				if (this.game.options.debug) {
-					console.log("[camera][pointerlock] requested unadjustedMovement=true");
+					console.log(
+						"[camera][pointerlock] requested unadjustedMovement=true",
+					);
 				}
 			} catch (error) {
 				if (this.game.options.debug) {

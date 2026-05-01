@@ -16,7 +16,11 @@ export type ChunkPriorityContext = {
 const VERTICAL_DISTANCE_PENALTY = 1.25;
 const VIEW_BONUS = 4096;
 
-const normalize = (x: number, y: number, z: number): [number, number, number] => {
+const normalize = (
+	x: number,
+	y: number,
+	z: number,
+): [number, number, number] => {
 	const len = Math.sqrt(x * x + y * y + z * z);
 	if (len <= 0.000001) {
 		return [0, 0, 1];

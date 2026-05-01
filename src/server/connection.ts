@@ -106,7 +106,11 @@ export class ClientConnection {
 		this.pendingForceUpdates.push(obj);
 	}
 
-	private normalizeChunkCoordinate(x: number, y: number, z: number): ChunkCoordinate {
+	private normalizeChunkCoordinate(
+		x: number,
+		y: number,
+		z: number,
+	): ChunkCoordinate {
 		return {
 			x: x & ~0x1f,
 			y: y & ~0x1f,
@@ -534,8 +538,7 @@ export class ClientConnection {
 				this.chunkRetrySends++;
 			}
 
-			const bytes =
-				chunk.isEmpty() ? 96 : this.chunkBuffer.byteLength; // rough JSON+binary estimate for budgeting
+			const bytes = chunk.isEmpty() ? 96 : this.chunkBuffer.byteLength; // rough JSON+binary estimate for budgeting
 			if (bytesSent + bytes > this.maxChunkBytesPerTick && sent > 0) {
 				break;
 			}
